@@ -9,6 +9,10 @@
   <body>
     <main class="shell">
       <header class="header">
+        <button id="dataset-btn" class="dataset-toggle">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/></svg>
+          Dataset Details
+        </button>
         <div class="brand">
           <div class="logo-mark"></div>
           <p class="eyebrow">Enterprise Data Agent</p>
@@ -24,7 +28,7 @@
               id="question"
               name="question"
               type="text"
-              placeholder="e.g. Why did revenue drop in March?"
+              placeholder="e.g. Which states have the highest revenue?"
               autocomplete="off"
             />
             <button type="submit">Analyze</button>
@@ -32,10 +36,10 @@
         </form>
         <div class="examples">
           <span>Examples:</span>
-          <button class="example-link">Why did revenue drop in March?</button>
-          <button class="example-link">Which products drove the most revenue growth?</button>
-          <button class="example-link">Which region has the highest customer churn?</button>
-          <button class="example-link">Show top 5 products by sales</button>
+          <button class="example-link">What are the top 5 product categories by revenue?</button>
+          <button class="example-link">Which Brazilian states have the highest number of orders?</button>
+          <button class="example-link">Compare average delivery time for SP vs RJ states.</button>
+          <button class="example-link failure-demo">Show the monthly trend of order volume in 2017.</button>
         </div>
       </section>
 
@@ -55,6 +59,18 @@
             <div id="confidence-bar"></div>
           </div>
           <div id="confidence-text" class="confidence"></div>
+          <div id="confidence-explanation" class="confidence-reason"></div>
+        </div>
+
+        <div class="analysis-meta">
+          <div id="why-section" class="panel why-panel" hidden>
+            <p class="label">Why this happened</p>
+            <div id="why-explanation" class="why-text"></div>
+          </div>
+          <div id="anomalies-section" class="panel anomaly-panel" hidden>
+            <p class="label">Anomalies Detected</p>
+            <ul id="anomalies-list"></ul>
+          </div>
         </div>
 
         <div class="grid">
@@ -63,9 +79,9 @@
             <ul id="findings"></ul>
           </section>
 
-          <section class="panel">
+          <section class="panel sql-panel">
             <p class="label">SQL Queries</p>
-            <div id="sql-queries"></div>
+            <div id="sql-queries" class="sql-list"></div>
           </section>
         </div>
 
@@ -75,6 +91,65 @@
         </section>
       </section>
     </main>
+
+    <div id="dataset-modal" class="modal-overlay">
+      <div class="modal-content">
+        <button id="modal-close" class="modal-close">&times;</button>
+        <h2>Brazilian E-Commerce Dataset</h2>
+        
+        <div class="modal-nav">
+          <button class="nav-item active" data-tab="overview">Description</button>
+          <button class="nav-item" data-tab="customers">Customers</button>
+          <button class="nav-item" data-tab="orders">Orders</button>
+          <button class="nav-item" data-tab="order_items">Order Items</button>
+          <button class="nav-item" data-tab="order_payments">Payments</button>
+          <button class="nav-item" data-tab="products">Products</button>
+          <button class="nav-item" data-tab="order_reviews">Reviews</button>
+        </div>
+
+        <div id="tab-overview" class="tab-content active">
+          <p class="dataset-description">
+            This dataset contains 100k orders from 2016 to 2018 made at multiple marketplaces in Brazil. 
+            Its features allows viewing an order from multiple dimensions: from order status, price, payment and freight performance to customer location, product attributes and finally reviews written by customers.
+          </p>
+          <div class="dataset-grid">
+            <div class="table-card">
+              <h3>Customers</h3>
+              <p>Customer location and unique IDs for tracking across multiple orders.</p>
+            </div>
+            <div class="table-card">
+              <h3>Orders</h3>
+              <p>Order status, timestamps for purchase, approval, and delivery.</p>
+            </div>
+            <div class="table-card">
+              <h3>Order Items</h3>
+              <p>Product, seller, price, and freight details for each item in an order.</p>
+            </div>
+            <div class="table-card">
+              <h3>Payments</h3>
+              <p>Payment methods, installments, and transaction values.</p>
+            </div>
+            <div class="table-card">
+              <h3>Products</h3>
+              <p>Product categories, weight, and dimensions.</p>
+            </div>
+            <div class="table-card">
+              <h3>Reviews</h3>
+              <p>Customer satisfaction scores and feedback messages.</p>
+            </div>
+          </div>
+        </div>
+
+        <div id="tab-data" class="tab-content">
+          <div class="table-wrapper">
+            <table id="preview-table">
+              <thead><tr id="preview-header"></tr></thead>
+              <tbody id="preview-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <script src="./app.js"></script>
   </body>

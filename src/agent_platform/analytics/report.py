@@ -27,9 +27,12 @@ class AnalyticsReportBuilder:
         return {
             "summary": summary,
             "key_findings": findings,
-            "sql_queries": [result["query"] for result in sql_results],
+            "why_explanation": state.evaluation.get("why_explanation") if state.evaluation else None,
+            "anomalies": state.evaluation.get("anomalies", []) if state.evaluation else [],
             "confidence": confidence,
+            "confidence_explanation": state.evaluation.get("confidence_explanation") if state.evaluation else "Analysis was performed using SQL evidence.",
             "execution_trace": self._execution_trace(state),
+            "sql_queries": [result["query"] for result in sql_results],
         }
 
     def _findings_from(self, sql_results: list[dict[str, Any]]) -> list[str]:

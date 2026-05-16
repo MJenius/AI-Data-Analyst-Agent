@@ -8,6 +8,8 @@ __pycache__/
 .ruff_cache/
 runtime/
 *.db
+data/olist/
+*.csv
 node_modules/
 .next/
 dist/

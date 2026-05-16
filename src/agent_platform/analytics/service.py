@@ -11,7 +11,7 @@ from agent_platform.analytics.agents import (
     AnalyticsPlannerAgent,
 )
 from agent_platform.analytics.report import AnalyticsReportBuilder
-from agent_platform.llms.groq_client import GroqClient
+from agent_platform.llms.client import LLMClient, get_llm_client
 from agent_platform.observability.traces import AnalyticsObserver, JsonlTraceStore
 from agent_platform.orchestration.loop import ExecutionLoop
 from agent_platform.rag.ingestion.schema_context import SchemaContextBuilder
@@ -59,7 +59,7 @@ class AnalyticsAgentService:
         database_path: str | Path,
         trace_path: str | Path | None = None,
         run_store: RunStore | None = None,
-        llm_client: GroqClient | None = None,
+        llm_client: LLMClient | None = None,
     ) -> "AnalyticsAgentService":
         connection = sqlite3.connect(database_path)
         try:
@@ -69,7 +69,7 @@ class AnalyticsAgentService:
         retriever = SchemaRetriever.from_documents(schema_documents)
         sql_tool = SQLTool(database_url=f"sqlite:///{Path(database_path)}")
         observer = AnalyticsObserver(JsonlTraceStore(trace_path) if trace_path else None)
-        shared_llm_client = llm_client or GroqClient()
+        shared_llm_client = llm_client or get_llm_client()
         return cls(
             planner=AnalyticsPlannerAgent(retriever, shared_llm_client),
             executor=AnalyticsExecutorAgent(retriever, sql_tool, shared_llm_client),
@@ -86,8 +86,11 @@ class AnalyticsAgentService:
         result = {
             "summary": report["summary"],
             "key_findings": report["key_findings"],
+            "why_explanation": report.get("why_explanation"),
+            "anomalies": report.get("anomalies", []),
             "sql_queries": report["sql_queries"],
             "confidence": report["confidence"],
+            "confidence_explanation": report.get("confidence_explanation"),
             "verdict": state.evaluation.get("verdict", "uncertain") if state.evaluation else "uncertain",
             "steps": report["execution_trace"]["steps"],
             # Keep metadata for internal use if needed, but the primary response is above

@@ -5,17 +5,23 @@ from dataclasses import dataclass
 
 
 TABLE_DESCRIPTIONS = {
-    "customers": "Customer profile table with region, signup date, and segment for retention and regional analysis.",
-    "products": "Product catalog table with SKU, category, cost, and active status for product performance analysis.",
-    "orders": "Order header table with customer, order date, region, and status for revenue trend analysis.",
-    "order_items": "Line item table joining orders to products with quantity, unit price, and discounts. Revenue is quantity times unit_price times one minus discount_rate.",
+    "customers": "Customer profiles including unique IDs, city, and state for demographic analysis.",
+    "geolocation": "Coordinate mapping for Brazilian zip codes, used for spatial and mapping analysis.",
+    "order_items": "Details for each product in an order including price, freight value, and shipping dates.",
+    "order_payments": "Transaction details such as payment type, installments, and total value paid.",
+    "order_reviews": "Customer feedback including scores and text comments for sentiment analysis.",
+    "orders": "Primary order records with status and full lifecycle timestamps (purchase to delivery).",
+    "products": "Product catalog with categories and physical dimensions.",
+    "sellers": "Seller information including city and state.",
+    "product_category_name_translation": "Lookup table translating Portuguese category names to English.",
 }
 
 BUSINESS_TERMS = {
-    "revenue": "Revenue is calculated from order_items.quantity * order_items.unit_price * (1 - order_items.discount_rate).",
-    "growth": "Growth compares revenue between two time periods, typically month-over-month or quarter-over-quarter.",
-    "retention": "Retention compares repeat ordering behavior by customer signup cohort or order history.",
-    "region": "Regional insights use customers.region or orders.region depending on whether the question asks customer location or transaction region.",
+    "revenue": "Total revenue is calculated as the sum of price in order_items. Do not include freight_value unless specifically asked for total value.",
+    "freight": "Freight represents the shipping cost for an item. Total order cost is price + freight_value.",
+    "delivery_time": "Delivery time is the duration between order_purchase_timestamp and order_delivered_customer_date.",
+    "customer_satisfaction": "Measured by review_score in the order_reviews table, ranging from 1 to 5.",
+    "region": "Regional analysis can be performed using customer_state or seller_state.",
 }
 
 
@@ -43,7 +49,7 @@ class SchemaContextBuilder:
         temporal_bounds = ""
         if "orders" in tables:
             try:
-                row = self._connection.execute("SELECT MIN(order_date), MAX(order_date) FROM orders").fetchone()
+                row = self._connection.execute("SELECT MIN(order_purchase_timestamp), MAX(order_purchase_timestamp) FROM orders").fetchone()
                 if row and row[0] and row[1]:
                     temporal_bounds = f" The dataset spans from {row[0]} to {row[1]}."
             except sqlite3.Error:

@@ -5,9 +5,9 @@ import re
 from typing import Any
 
 from agent_platform.infra.cache import global_cache
+from agent_platform.llms.client import LLMClient, get_llm_client
 from agent_platform.llms.evaluator_prompt import SYSTEM_PROMPT as EVALUATOR_SYSTEM_PROMPT
 from agent_platform.llms.evaluator_prompt import build_evaluator_prompt
-from agent_platform.llms.groq_client import GroqClient, GroqClientError
 from agent_platform.llms.planner_prompt import SYSTEM_PROMPT as PLANNER_SYSTEM_PROMPT
 from agent_platform.llms.planner_prompt import build_planner_prompt
 from agent_platform.llms.sql_generation_prompt import SYSTEM_PROMPT as SQL_SYSTEM_PROMPT
@@ -23,9 +23,9 @@ logger = logging.getLogger(__name__)
 class AnalyticsPlannerAgent:
     """Schema-aware planner powered by Groq, with a deterministic local fallback."""
 
-    def __init__(self, schema_retriever: SchemaRetriever, llm_client: GroqClient | None = None) -> None:
+    def __init__(self, schema_retriever: SchemaRetriever, llm_client: LLMClient | None = None) -> None:
         self._schema_retriever = schema_retriever
-        self._llm_client = llm_client or GroqClient()
+        self._llm_client = llm_client or get_llm_client()
         self.last_reasoning: str | None = None
 
     async def plan(self, task: str) -> list[str]:
@@ -37,8 +37,10 @@ class AnalyticsPlannerAgent:
         """
         context = self._schema_retriever.retrieve(task, top_k=5)
         context_text = [item.text for item in context]
+        logger.info(f"Planning analytical steps for: {task}")
         if self._llm_client.enabled:
             try:
+                logger.info(f"Requesting plan from LLM (Provider: {type(self._llm_client).__name__})...")
                 result = self._llm_client.complete_json(
                     system_prompt=PLANNER_SYSTEM_PROMPT,
                     user_prompt=build_planner_prompt(task, context_text),
@@ -47,7 +49,7 @@ class AnalyticsPlannerAgent:
                 if isinstance(steps, list) and all(isinstance(step, str) for step in steps):
                     self.last_reasoning = str(result.get("reasoning", "LLM generated the analytical plan."))
                     return steps
-            except GroqClientError as exc:
+            except Exception as exc:
                 logger.warning("planner_llm_fallback", extra={"error": str(exc)})
         self.last_reasoning = "Used deterministic fallback plan because Groq was unavailable."
         return self._fallback_plan(task, context)
@@ -90,11 +92,11 @@ class AnalyticsExecutorAgent:
         self,
         schema_retriever: SchemaRetriever,
         sql_tool: SQLTool,
-        llm_client: GroqClient | None = None,
+        llm_client: LLMClient | None = None,
     ) -> None:
         self._schema_retriever = schema_retriever
         self._sql_tool = sql_tool
-        self._llm_client = llm_client or GroqClient()
+        self._llm_client = llm_client or get_llm_client()
 
     async def execute(
         self,
@@ -130,6 +132,7 @@ class AnalyticsExecutorAgent:
             if last_error:
                 prompt_context = schema_text + [f"FIX PREVIOUS ERROR: {last_error}"]
 
+            logger.info(f"Executing analytical step {attempt + 1}: {step}")
             sql_payload = self._generate_sql_payload(state.task, step, prompt_context)
             sql = sql_payload.get("sql")
             reasoning = sql_payload.get("reasoning", "Generated SQL from schema context.")
@@ -141,7 +144,9 @@ class AnalyticsExecutorAgent:
             validation_errors = self._validate_sql(sql, schema_context)
             if not validation_errors:
                 try:
+                    logger.info(f"Running SQL: {sql[:100]}...")
                     sql_result = self._sql_tool.execute(sql)
+                    logger.info(f"SQL executed successfully. Returned {sql_result.get('row_count', 0)} rows.")
                     analysis = self._interpret(step, sql_result)
                     return {
                         "step": step,
@@ -227,7 +232,7 @@ class AnalyticsExecutorAgent:
                         "sql": result.get("sql"),
                         "reasoning": result.get("reasoning", "Groq generated SQL from schema context."),
                     }
-            except GroqClientError as exc:
+            except Exception as exc:
                 logger.warning("sql_generation_llm_fallback", extra={"error": str(exc), "step": step})
         return {
             "sql": self._fallback_sql(task, step),
@@ -235,9 +240,26 @@ class AnalyticsExecutorAgent:
         }
 
     def _fallback_sql(self, task: str, step: str) -> str | None:
-        lowered = f"{task} {step}".lower()
-        if "schema" in lowered and "calculate" not in lowered:
+        # Split metadata if present to avoid false matches on 'schema_context'
+        core_step = step.split("|")[0].strip().lower()
+        lowered = f"{task} {core_step}".lower()
+
+        if "schema" in core_step and "calculate" not in core_step:
             return None
+        if "regional" in lowered or "region" in lowered:
+            return """
+            SELECT
+                o.region,
+                p.name AS product_name,
+                ROUND(SUM(oi.quantity * oi.unit_price * (1 - oi.discount_rate)), 2) AS revenue
+            FROM order_items oi
+            JOIN orders o ON o.id = oi.order_id
+            JOIN products p ON p.id = oi.product_id
+            WHERE o.status = 'paid'
+            GROUP BY o.region, p.name
+            ORDER BY revenue DESC
+            LIMIT 8
+            """
         if "growth" in lowered or "highest revenue" in lowered:
             return """
             WITH product_period_revenue AS (
@@ -269,20 +291,6 @@ class AnalyticsExecutorAgent:
             GROUP BY product_name, category
             ORDER BY revenue_growth DESC
             LIMIT 5
-            """
-        if "regional" in lowered or "region" in lowered:
-            return """
-            SELECT
-                o.region,
-                p.name AS product_name,
-                ROUND(SUM(oi.quantity * oi.unit_price * (1 - oi.discount_rate)), 2) AS revenue
-            FROM order_items oi
-            JOIN orders o ON o.id = oi.order_id
-            JOIN products p ON p.id = oi.product_id
-            WHERE o.status = 'paid'
-            GROUP BY o.region, p.name
-            ORDER BY revenue DESC
-            LIMIT 8
             """
         if "trend" in lowered or "month" in lowered or "drop" in lowered:
             return """
@@ -329,8 +337,8 @@ class AnalyticsExecutorAgent:
 class AnalyticsEvaluatorAgent:
     """Validates SQL-backed analytical outputs and assigns confidence with Groq when available."""
 
-    def __init__(self, llm_client: GroqClient | None = None) -> None:
-        self._llm_client = llm_client or GroqClient()
+    def __init__(self, llm_client: LLMClient | None = None) -> None:
+        self._llm_client = llm_client or get_llm_client()
 
     async def evaluate(self, state: ExecutionState) -> dict[str, Any]:
         """
@@ -357,6 +365,9 @@ class AnalyticsEvaluatorAgent:
             "issues": issues,
             "validated": bool(state.intermediate_outputs) and not issues,
             "reasoning": "Validated SQL safety, evidence presence, and non-empty result sets.",
+            "why_explanation": "Analytical synthesis was performed based on available SQL data points.",
+            "anomalies": [],
+            "confidence_explanation": "Confidence is based on the presence of validated SQL queries and non-empty results." if not issues else "Confidence is low due to identified issues in the analytical trace.",
         }
         if not self._llm_client.enabled:
             return fallback
@@ -374,13 +385,16 @@ class AnalyticsEvaluatorAgent:
             return {
                 "summary": str(result.get("summary", "")),
                 "key_findings": result.get("key_findings", []),
+                "why_explanation": result.get("why_explanation"),
+                "anomalies": result.get("anomalies", []),
                 "confidence": confidence,
+                "confidence_explanation": result.get("confidence_explanation", fallback["confidence_explanation"]),
                 "issues": issues + [str(issue) for issue in llm_issues],
                 "validated": bool(result.get("validated", fallback["validated"])) and not issues,
                 "reasoning": str(result.get("reasoning", fallback["reasoning"])),
                 "verdict": "accurate" if confidence > 0.8 else "uncertain",
                 "detected_contradictions": result.get("detected_contradictions", [])
             }
-        except (GroqClientError, TypeError, ValueError) as exc:
+        except (Exception, TypeError, ValueError) as exc:
             logger.warning("evaluator_llm_fallback", extra={"error": str(exc)})
             return fallback
