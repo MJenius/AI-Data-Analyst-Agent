@@ -114,15 +114,11 @@ class AnalyticsExecutorAgent:
         4. Executing the SQL and interpreting the results.
         5. Retrying with error context if execution fails.
         """
-        # 1. Retrieval with Caching
-        cache_key = f"retrieval:{state.task}:{step}"
-        schema_context = await global_cache.get_or_set(
-            cache_key, lambda: self._schema_retriever.retrieve(f"{state.task} {step}", top_k=7)
-        )
-        schema_text = [item.text for item in schema_context]
+        # 1. Fast Retrieval
+        schema_text = [item.text for item in context]
 
-        # 2. SQL Generation with Retry Mechanism
-        max_retries = 2
+        # 2. SQL Generation (No Retries for Maximum Speed)
+        max_retries = 0
         last_error = None
         sql = None
         reasoning = ""
@@ -141,7 +137,7 @@ class AnalyticsExecutorAgent:
                 break
 
             # 3. Validation
-            validation_errors = self._validate_sql(sql, schema_context)
+            validation_errors = self._validate_sql(sql, context)
             if not validation_errors:
                 try:
                     logger.info(f"Running SQL: {sql[:100]}...")
@@ -154,7 +150,7 @@ class AnalyticsExecutorAgent:
                             "analysis": analysis,
                             "reasoning": reasoning,
                             "sql": sql,
-                            "schema_context": [item.text for item in schema_context],
+                            "schema_context": [item.text for item in context],
                             "sql_result": sql_result,
                         },
                         "tool_results": [{"tool": "sql", "result": sql_result}],
@@ -177,7 +173,7 @@ class AnalyticsExecutorAgent:
                         "analysis": self._interpret(step, sql_result),
                         "reasoning": f"Retries failed ({last_error}). Used safe fallback SQL.",
                         "sql": fallback_sql,
-                        "schema_context": [item.text for item in schema_context],
+                        "schema_context": [item.text for item in context],
                         "sql_result": sql_result,
                     },
                     "tool_results": [{"tool": "sql", "result": sql_result}],
@@ -187,7 +183,7 @@ class AnalyticsExecutorAgent:
             "analysis": "Inspected schema context and business definitions.",
             "reasoning": reasoning,
             "sql": None,
-            "schema_context": [item.text for item in schema_context],
+            "schema_context": [item.text for item in context],
         }
         return {"step": step, "output": output, "tool_results": []}
 
@@ -205,9 +201,7 @@ class AnalyticsExecutorAgent:
                 # Extract columns from text if possible, or just skip strict column check
         
         # Very basic check: are mentioned tables in the retrieved schema?
-        # In a real system, we'd use a SQL parser here.
         words = set(re.findall(r"[a-zA-Z_][a-zA-Z0-9_]*", lowered_sql))
-        # Note: 're' is not imported, I should add it.
         
         # If we have table info, check for hallucinations
         if allowed_tables:
@@ -246,74 +240,59 @@ class AnalyticsExecutorAgent:
 
         if "schema" in core_step and "calculate" not in core_step:
             return None
-        if "regional" in lowered or "region" in lowered:
+        
+        # Olist Schema Mapping:
+        # orders: order_id, customer_id, order_status, order_purchase_timestamp
+        # order_items: order_id, product_id, price, freight_value
+        # products: product_id, product_category_name
+        
+        if "regional" in lowered or "state" in lowered:
             return """
             SELECT
-                o.region,
-                p.name AS product_name,
-                ROUND(SUM(oi.quantity * oi.unit_price * (1 - oi.discount_rate)), 2) AS revenue
+                c.customer_state AS state,
+                ROUND(SUM(oi.price), 2) AS revenue
             FROM order_items oi
-            JOIN orders o ON o.id = oi.order_id
-            JOIN products p ON p.id = oi.product_id
-            WHERE o.status = 'paid'
-            GROUP BY o.region, p.name
+            JOIN orders o ON o.order_id = oi.order_id
+            JOIN customers c ON c.customer_id = o.customer_id
+            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')
+            GROUP BY state
             ORDER BY revenue DESC
-            LIMIT 8
+            LIMIT 10
             """
-        if "growth" in lowered or "highest revenue" in lowered:
+        if "growth" in lowered or "highest revenue" in lowered or "top 5" in lowered or "category" in lowered:
             return """
-            WITH product_period_revenue AS (
-                SELECT
-                    p.name AS product_name,
-                    p.category,
-                    CASE
-                        WHEN o.order_date < '2025-04-01' THEN 'prior_period'
-                        ELSE 'current_period'
-                    END AS period,
-                    ROUND(SUM(oi.quantity * oi.unit_price * (1 - oi.discount_rate)), 2) AS revenue
-                FROM order_items oi
-                JOIN orders o ON o.id = oi.order_id
-                JOIN products p ON p.id = oi.product_id
-                WHERE o.status = 'paid'
-                GROUP BY p.name, p.category, period
-            )
             SELECT
-                product_name,
-                category,
-                ROUND(SUM(CASE WHEN period = 'prior_period' THEN revenue ELSE 0 END), 2) AS prior_revenue,
-                ROUND(SUM(CASE WHEN period = 'current_period' THEN revenue ELSE 0 END), 2) AS current_revenue,
-                ROUND(
-                    SUM(CASE WHEN period = 'current_period' THEN revenue ELSE 0 END)
-                    - SUM(CASE WHEN period = 'prior_period' THEN revenue ELSE 0 END),
-                    2
-                ) AS revenue_growth
-            FROM product_period_revenue
-            GROUP BY product_name, category
-            ORDER BY revenue_growth DESC
-            LIMIT 5
+                p.product_category_name,
+                ROUND(SUM(oi.price), 2) AS revenue
+            FROM order_items oi
+            JOIN orders o ON o.order_id = oi.order_id
+            JOIN products p ON p.product_id = oi.product_id
+            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')
+            GROUP BY p.product_category_name
+            ORDER BY revenue DESC
+            LIMIT 10
             """
         if "trend" in lowered or "month" in lowered or "drop" in lowered:
             return """
             SELECT
-                substr(o.order_date, 1, 7) AS month,
-                ROUND(SUM(oi.quantity * oi.unit_price * (1 - oi.discount_rate)), 2) AS revenue
+                substr(o.order_purchase_timestamp, 1, 7) AS month,
+                ROUND(SUM(oi.price), 2) AS revenue
             FROM order_items oi
-            JOIN orders o ON o.id = oi.order_id
-            WHERE o.status = 'paid'
+            JOIN orders o ON o.order_id = oi.order_id
+            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')
             GROUP BY month
             ORDER BY month
             """
         return """
         SELECT
-            p.category,
-            p.name AS product_name,
-            ROUND(SUM(oi.quantity * oi.unit_price * (1 - oi.discount_rate)), 2) AS revenue
+            p.product_category_name,
+            COUNT(DISTINCT o.order_id) AS order_count,
+            ROUND(SUM(oi.price), 2) AS total_revenue
         FROM order_items oi
-        JOIN orders o ON o.id = oi.order_id
-        JOIN products p ON p.id = oi.product_id
-        WHERE o.status = 'paid'
-        GROUP BY p.category, p.name
-        ORDER BY revenue DESC
+        JOIN orders o ON o.order_id = oi.order_id
+        JOIN products p ON p.product_id = oi.product_id
+        GROUP BY p.product_category_name
+        ORDER BY total_revenue DESC
         LIMIT 10
         """
 

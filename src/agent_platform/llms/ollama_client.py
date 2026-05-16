@@ -25,8 +25,11 @@ class OllamaClient:
 
     model: str | None = None
     base_url: str = "http://localhost:11434/api/chat"
-    timeout_seconds: float = 60.0  # Local models can be slow
+    timeout_seconds: float = 300.0  # Local models can be slow
+
     transport: Callable[[request.Request], Any] | None = None
+    _enabled_cache: bool | None = None
+    _last_check_time: float = 0.0
 
     def __post_init__(self) -> None:
         self.model = self.model or os.getenv("OLLAMA_MODEL", "qwen2.5-coder:7b")
@@ -34,13 +37,21 @@ class OllamaClient:
 
     @property
     def enabled(self) -> bool:
-        # Check if Ollama is reachable
+        # Cache reachability check for 60 seconds
+        import time
+        now = time.time()
+        if self._enabled_cache is not None and (now - self._last_check_time) < 60:
+            return self._enabled_cache
+
         try:
             # Short timeout for reachability check
-            with request.urlopen("http://localhost:11434/api/tags", timeout=1) as _:
-                return True
+            with request.urlopen("http://localhost:11434/api/tags", timeout=1.0) as _:
+                self._enabled_cache = True
         except Exception:
-            return False
+            self._enabled_cache = False
+        
+        self._last_check_time = now
+        return self._enabled_cache
 
     def complete_json(
         self,
@@ -90,9 +101,13 @@ class OllamaClient:
         
         try:
             body = json.loads(raw)
-            content = body["message"]["content"]
-            # Ollama sometimes returns the JSON inside the content string, 
-            # and 'format': 'json' ensures it is valid JSON.
-            return json.loads(content)
+            content = body["message"]["content"].strip()
+            if content.startswith("```json"):
+                content = content[7:]
+            if content.startswith("```"):
+                content = content[3:]
+            if content.endswith("```"):
+                content = content[:-3]
+            return json.loads(content.strip())
         except (KeyError, IndexError, TypeError, json.JSONDecodeError) as exc:
             raise OllamaClientError("Ollama response did not contain valid JSON content.") from exc

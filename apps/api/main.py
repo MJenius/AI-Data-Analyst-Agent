@@ -27,20 +27,60 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    class GlobalProgressStore:
+        latest_message: str = "Initializing..."
+
+    progress_store = GlobalProgressStore()
+
     db_path = Path(os.getenv("ANALYTICS_DB_PATH", "runtime/analytics.db"))
     if not db_path.exists():
         seed_database(db_path)
 
     run_store = RunStore()
+    
+    trace_path = os.getenv("TRACE_JSONL_PATH", "runtime/traces.jsonl")
+    
+    # We create the service but need to intercept the observer to send progress to the frontend
     service = AnalyticsAgentService.from_sqlite(
         db_path,
-        trace_path=os.getenv("TRACE_JSONL_PATH", "runtime/traces.jsonl"),
+        trace_path=trace_path,
         run_store=run_store,
     )
+    
+    # Monkeypatch observer for real-time progress
+    original_step_start = service._observer.on_step_start
+    def custom_step_start(state, step):
+        progress_store.latest_message = f"Executing: {step}"
+        original_step_start(state, step)
+    service._observer.on_step_start = custom_step_start
+    
+    original_run_start = service._observer.on_run_start
+    def custom_run_start(state):
+        progress_store.latest_message = "Analyzing question and planning steps..."
+        original_run_start(state)
+    service._observer.on_run_start = custom_run_start
+    
+    original_step_end = service._observer.on_step_end
+    def custom_step_end(state, step, result, elapsed):
+        progress_store.latest_message = f"Completed: {step}"
+        original_step_end(state, step, result, elapsed)
+    service._observer.on_step_end = custom_step_end
 
     @app.post("/tasks/analyze")
     async def analyze(request: AnalyzeRequest):
-        return await service.analyze(request.question)
+        import asyncio
+        progress_store.latest_message = "Initializing..."
+        try:
+            # Run in a separate thread and event loop so we don't freeze the FastAPI server
+            return await asyncio.to_thread(
+                lambda: asyncio.run(service.analyze(request.question))
+            )
+        finally:
+            progress_store.latest_message = "Finished."
+
+    @app.get("/tasks/progress")
+    async def get_progress():
+        return {"message": progress_store.latest_message}
 
     @app.get("/runs/{run_id}")
     async def get_run(run_id: str):

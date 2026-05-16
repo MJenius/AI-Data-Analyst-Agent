@@ -32,6 +32,7 @@ class GroqClient:
     def __post_init__(self) -> None:
         self.api_key = self.api_key or os.getenv("GROQ_API_KEY")
         self.model = self.model or os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+        self.base_url = os.getenv("LLM_BASE_URL", self.base_url)
         self.transport = self.transport or request.urlopen
 
     @property
@@ -47,43 +48,63 @@ class GroqClient:
         if not self.api_key:
             raise GroqClientError("GROQ_API_KEY is not configured.")
 
-        payload = {
-            "model": self.model,
-            "messages": [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt},
-            ],
-            "temperature": temperature,
-            "response_format": {"type": "json_object"},
-        }
-        logger.info(
-            "groq_request",
-            extra={
-                "model": self.model,
-                "system_prompt": _truncate(system_prompt),
-                "user_prompt": _truncate(user_prompt),
-            },
-        )
-        req = request.Request(
-            self.base_url,
-            data=json.dumps(payload).encode("utf-8"),
-            headers={
-                "Authorization": f"Bearer {self.api_key}",
-                "Content-Type": "application/json",
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
-            },
-            method="POST",
-        )
-        try:
-            with self.transport(req) as response:
-                raw = response.read().decode("utf-8")
-        except Exception as exc:
-            raise GroqClientError(str(exc)) from exc
+        models_to_try = []
+        if self.model:
+            models_to_try.append(self.model)
+        for fallback in ["qwen-2.5-32b", "llama-3.1-8b-instant", "llama-3.3-70b-versatile"]:
+            if fallback not in models_to_try:
+                models_to_try.append(fallback)
 
-        logger.info("groq_response", extra={"model": self.model, "response": _truncate(raw)})
-        try:
-            body = json.loads(raw)
-            content = body["choices"][0]["message"]["content"]
-            return json.loads(content)
-        except (KeyError, IndexError, TypeError, json.JSONDecodeError) as exc:
-            raise GroqClientError("Groq response did not contain valid JSON content.") from exc
+        last_error = None
+        for current_model in models_to_try:
+            payload = {
+                "model": current_model,
+                "messages": [
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt},
+                ],
+                "temperature": temperature,
+                "response_format": {"type": "json_object"},
+            }
+            logger.info(
+                "groq_request",
+                extra={
+                    "model": current_model,
+                    "system_prompt": _truncate(system_prompt),
+                    "user_prompt": _truncate(user_prompt),
+                },
+            )
+            req = request.Request(
+                self.base_url,
+                data=json.dumps(payload).encode("utf-8"),
+                headers={
+                    "Authorization": f"Bearer {self.api_key}",
+                    "Content-Type": "application/json",
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+                },
+                method="POST",
+            )
+            try:
+                with self.transport(req, timeout=self.timeout_seconds) as response:
+                    raw = response.read().decode("utf-8")
+                
+                logger.info("groq_response", extra={"model": current_model, "response": _truncate(raw)})
+                try:
+                    body = json.loads(raw)
+                    content = body["choices"][0]["message"]["content"]
+                    return json.loads(content)
+                except (KeyError, IndexError, TypeError, json.JSONDecodeError) as exc:
+                    raise GroqClientError("Groq response did not contain valid JSON content.") from exc
+            
+            except Exception as exc:
+                import urllib.error
+                if isinstance(exc, urllib.error.HTTPError):
+                    error_body = exc.read().decode('utf-8')
+                    last_error = Exception(f"HTTP {exc.code}: {error_body}")
+                    logger.warning(f"Groq model {current_model} failed: HTTP {exc.code}: {error_body}. Trying next model...")
+                else:
+                    last_error = exc
+                    logger.warning(f"Groq model {current_model} failed: {exc}. Trying next model...")
+                continue
+
+        raise GroqClientError(f"All Groq models failed. Last error: {last_error}") from last_error
