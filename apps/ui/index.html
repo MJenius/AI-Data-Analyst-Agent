@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI Data Analyst Agent</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="query-band">
+        <div>
+          <p class="eyebrow">AI Data Analyst Agent</p>
+          <h1>Ask a business question. Get traced, SQL-backed analysis.</h1>
+        </div>
+        <form id="analysis-form" class="query-form">
+          <input
+            id="question"
+            name="question"
+            type="text"
+            value="What products drove the highest revenue growth?"
+            autocomplete="off"
+          />
+          <button type="submit">Analyze</button>
+        </form>
+      </section>
+
+      <section id="status" class="status" hidden>Analyzing...</section>
+
+      <section id="results" class="results" hidden>
+        <div class="summary-panel">
+          <p class="label">Summary</p>
+          <h2 id="summary"></h2>
+          <div id="confidence" class="confidence"></div>
+        </div>
+
+        <div class="grid">
+          <section class="panel">
+            <p class="label">Key Findings</p>
+            <ul id="findings"></ul>
+          </section>
+
+          <section class="panel">
+            <p class="label">SQL Queries</p>
+            <div id="sql-queries"></div>
+          </section>
+        </div>
+
+        <section class="panel trace-panel">
+          <p class="label">Execution Trace</p>
+          <div id="trace"></div>
+        </section>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
