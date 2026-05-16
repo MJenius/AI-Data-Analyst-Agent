@@ -81,29 +81,24 @@ class AnalyticsAgentService:
     async def analyze(self, question: str) -> dict[str, Any]:
         state = await self._loop.run(question)
         report = self._report_builder.build(state)
-        generated_sql = [
-            item["result"]["query"]
-            for item in state.tool_results
-            if item.get("tool") == "sql" and isinstance(item.get("result"), dict)
-        ]
+        
+        # New structured response format
         result = {
-            "run_id": state.run_id,
-            "question": question,
             "summary": report["summary"],
-            "findings": report["key_findings"],
+            "key_findings": report["key_findings"],
             "sql_queries": report["sql_queries"],
             "confidence": report["confidence"],
-            "execution_trace": report["execution_trace"],
-            "plan": state.plan,
-            "generated_sql": generated_sql,
-            "intermediate_outputs": state.intermediate_outputs,
-            "tool_results": state.tool_results,
-            "evaluation": state.evaluation,
-            "report": report,
-            "trace": self._observer.events,
-            "errors": [asdict(error) for error in state.errors],
+            "verdict": state.evaluation.get("verdict", "uncertain") if state.evaluation else "uncertain",
+            "steps": report["execution_trace"]["steps"],
+            # Keep metadata for internal use if needed, but the primary response is above
+            "run_id": state.run_id,
+            "status": state.status.value,
         }
-        self._run_store.save(result)
+        
+        # Save full state to store for retrieval if needed
+        full_run_data = {**result, "state": asdict(state)}
+        self._run_store.save(full_run_data)
+        
         return result
 
     def get_run(self, run_id: str) -> dict[str, Any] | None:

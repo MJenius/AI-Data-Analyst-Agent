@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import math
 import re
+from pathlib import Path
 from collections import Counter
 from dataclasses import dataclass
 
@@ -77,6 +78,35 @@ class KeywordVectorIndex(VectorIndex):
         return boost
 
 
+class SemanticVectorIndex(VectorIndex):
+    """Semantic vector index using FAISS and local embeddings with persistence."""
+
+    def __init__(self, documents: list[SchemaDocument], embedding_model: EmbeddingModel | None = None, index_path: str | Path = "runtime/cache/vector_index") -> None:
+        from agent_platform.rag.embeddings import EmbeddingModel
+        from agent_platform.rag.vector_store import FaissVectorStore
+
+        self._embedding_model = embedding_model or EmbeddingModel()
+        self._store = FaissVectorStore(self._embedding_model)
+        self.index_path = Path(index_path)
+        
+        # Try loading existing index first
+        if not self._store.load(self.index_path):
+            self._store.add_documents(documents)
+            self._store.save(self.index_path)
+
+    def search(self, query: str, top_k: int) -> list[RetrievedContext]:
+        results = self._store.search(query, top_k)
+        return [
+            RetrievedContext(
+                id=doc.id,
+                text=doc.text,
+                score=1.0 / (1.0 + dist),
+                metadata=doc.metadata,
+            )
+            for doc, dist in results
+        ]
+
+
 class SchemaRetriever:
     """Retrieves relevant schema and business context for analytics questions."""
 
@@ -84,7 +114,14 @@ class SchemaRetriever:
         self._index = index
 
     @classmethod
-    def from_documents(cls, documents: list[SchemaDocument]) -> "SchemaRetriever":
+    def from_documents(cls, documents: list[SchemaDocument], use_semantic: bool = True) -> "SchemaRetriever":
+        if use_semantic:
+            try:
+                return cls(SemanticVectorIndex(documents))
+            except (ImportError, Exception) as exc:
+                import logging
+                logging.getLogger(__name__).warning("semantic_index_failed_falling_back", extra={"error": str(exc)})
+        
         return cls(KeywordVectorIndex(documents))
 
     def retrieve(self, query: str, top_k: int = 5) -> list[RetrievedContext]:

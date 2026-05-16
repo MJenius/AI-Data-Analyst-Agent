@@ -6,9 +6,12 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from dotenv import load_dotenv
 
 from agent_platform.analytics.service import AnalyticsAgentService, RunStore
 from agent_platform.data.seed_data import seed_database
+
+load_dotenv()
 
 
 class AnalyzeRequest(BaseModel):

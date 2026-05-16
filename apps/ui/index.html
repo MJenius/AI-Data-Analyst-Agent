@@ -8,30 +8,53 @@
   </head>
   <body>
     <main class="shell">
-      <section class="query-band">
-        <div>
-          <p class="eyebrow">AI Data Analyst Agent</p>
-          <h1>Ask a business question. Get traced, SQL-backed analysis.</h1>
+      <header class="header">
+        <div class="brand">
+          <div class="logo-mark"></div>
+          <p class="eyebrow">Enterprise Data Agent</p>
         </div>
+        <h1>Autonomous Data Analysis</h1>
+        <p class="subtitle">An agentic system for multi-step analytical reasoning, SQL generation, and automated verification.</p>
+      </header>
+
+      <section class="query-section">
         <form id="analysis-form" class="query-form">
-          <input
-            id="question"
-            name="question"
-            type="text"
-            value="What products drove the highest revenue growth?"
-            autocomplete="off"
-          />
-          <button type="submit">Analyze</button>
+          <div class="input-wrapper">
+            <input
+              id="question"
+              name="question"
+              type="text"
+              placeholder="e.g. Why did revenue drop in March?"
+              autocomplete="off"
+            />
+            <button type="submit">Analyze</button>
+          </div>
         </form>
+        <div class="examples">
+          <span>Examples:</span>
+          <button class="example-link">Why did revenue drop in March?</button>
+          <button class="example-link">Which products drove the most revenue growth?</button>
+          <button class="example-link">Which region has the highest customer churn?</button>
+          <button class="example-link">Show top 5 products by sales</button>
+        </div>
       </section>
 
-      <section id="status" class="status" hidden>Analyzing...</section>
+      <section id="status" class="status" hidden>
+        <div class="loader"></div>
+        <span>Analyzing data and synthesizing findings...</span>
+      </section>
 
       <section id="results" class="results" hidden>
         <div class="summary-panel">
-          <p class="label">Summary</p>
+          <div class="summary-header">
+            <p class="label">Executive Summary</p>
+            <div id="verdict-badge" class="badge"></div>
+          </div>
           <h2 id="summary"></h2>
-          <div id="confidence" class="confidence"></div>
+          <div id="confidence-bar-container">
+            <div id="confidence-bar"></div>
+          </div>
+          <div id="confidence-text" class="confidence"></div>
         </div>
 
         <div class="grid">
@@ -47,7 +70,7 @@
         </div>
 
         <section class="panel trace-panel">
-          <p class="label">Execution Trace</p>
+          <p class="label">Step-by-Step Reasoning Trace</p>
           <div id="trace"></div>
         </section>
       </section>

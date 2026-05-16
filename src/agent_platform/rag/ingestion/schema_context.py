@@ -35,28 +35,78 @@ class SchemaContextBuilder:
     def build(self) -> list[SchemaDocument]:
         documents: list[SchemaDocument] = []
         tables = self._table_names()
+        
+        # 1. Global Schema Summary
+        all_tables_text = ", ".join(tables)
+        
+        # Add temporal bounds if orders table exists
+        temporal_bounds = ""
+        if "orders" in tables:
+            try:
+                row = self._connection.execute("SELECT MIN(order_date), MAX(order_date) FROM orders").fetchone()
+                if row and row[0] and row[1]:
+                    temporal_bounds = f" The dataset spans from {row[0]} to {row[1]}."
+            except sqlite3.Error:
+                pass
+
+        documents.append(
+            SchemaDocument(
+                id="schema:summary",
+                text=(
+                    f"Database schema contains {len(tables)} tables: {all_tables_text}."
+                    f"{temporal_bounds} Useful for high-level planning and year-specific filters."
+                ),
+                metadata={"kind": "schema_summary"}
+            )
+        )
+
         for table in tables:
             columns = self._columns_for(table)
-            column_text = ", ".join(f"{name} {kind}" for name, kind in columns)
-            description = TABLE_DESCRIPTIONS.get(table, f"Database table named {table}.")
+            column_details = []
+            for name, kind in columns:
+                desc = self._infer_column_description(table, name)
+                column_details.append(f"- {name} ({kind}): {desc}")
+            
+            column_text = "\n".join(column_details)
+            table_desc = TABLE_DESCRIPTIONS.get(table, f"Database table named {table}.")
+            
+            # 2. Detailed Table Document
             documents.append(
                 SchemaDocument(
                     id=f"table:{table}",
-                    text=f"Table {table}: {description} Columns: {column_text}.",
+                    text=(
+                        f"Table: {table}\n"
+                        f"Description: {table_desc}\n"
+                        f"Columns:\n{column_text}"
+                    ),
                     metadata={"kind": "table", "table": table},
                 )
             )
 
+        # 3. Relationships
         documents.extend(self._relationship_documents(tables))
+
+        # 4. Business Semantics
         for term, description in BUSINESS_TERMS.items():
             documents.append(
                 SchemaDocument(
                     id=f"term:{term}",
-                    text=f"Business term {term}: {description}",
+                    text=f"Business Concept: {term}\nLogic: {description}",
                     metadata={"kind": "business_term", "term": term},
                 )
             )
         return documents
+
+    def _infer_column_description(self, table: str, column: str) -> str:
+        lowered = column.lower()
+        if lowered == "id": return "Primary key unique identifier."
+        if "date" in lowered: return "Timestamp/date field for temporal analysis."
+        if "price" in lowered or "cost" in lowered: return "Monetary value (REAL/NUMERIC)."
+        if "rate" in lowered or "discount" in lowered: return "Percentage or multiplier."
+        if "region" in lowered: return "Geographic category for regional segmentation."
+        if "category" in lowered or "segment" in lowered: return "Categorical grouping field."
+        if "status" in lowered: return "Operational state (e.g., active, paid, shipped)."
+        return f"Attribute field in {table}."
 
     def _table_names(self) -> list[str]:
         rows = self._connection.execute(

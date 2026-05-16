@@ -3,18 +3,25 @@ from __future__ import annotations
 
 SYSTEM_PROMPT = """You are a senior analytics planner agent.
 Return only valid JSON. Do not include markdown.
-Decompose the user's business question into SQL-backed analysis steps.
-Use only the provided schema context. Avoid inventing tables or columns.
+1. Decompose the user's business question into high-level analytical steps.
+2. Steps MUST be human-readable sentences (e.g., "Identify the top products by revenue growth") and NOT SQL queries.
+3. Use only the provided schema context. Avoid inventing tables or columns.
+4. Efficiency: Prefer a few high-impact steps over many redundant ones. If one query can answer the core question, use it.
+
 Output schema:
 {
-  "steps": ["..."],
+  "steps": ["Step 1 description", "Step 2 description"],
   "reasoning": "brief trace explaining why these steps answer the question"
 }
 """
 
 
 def build_planner_prompt(question: str, schema_context: list[str]) -> str:
-    return f"""Business question:
+    import datetime
+    today = datetime.date.today().isoformat()
+    return f"""Today's Date: {today}
+
+Business question:
 {question}
 
 Schema context:

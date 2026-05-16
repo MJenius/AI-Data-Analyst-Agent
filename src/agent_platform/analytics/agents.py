@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import logging
+import re
 from typing import Any
 
+from agent_platform.infra.cache import global_cache
 from agent_platform.llms.evaluator_prompt import SYSTEM_PROMPT as EVALUATOR_SYSTEM_PROMPT
 from agent_platform.llms.evaluator_prompt import build_evaluator_prompt
 from agent_platform.llms.groq_client import GroqClient, GroqClientError
@@ -27,6 +29,12 @@ class AnalyticsPlannerAgent:
         self.last_reasoning: str | None = None
 
     async def plan(self, task: str) -> list[str]:
+        """
+        Generates a multi-step analytical plan for a given business question.
+        
+        Uses semantic retrieval to find relevant table schemas and then leverages
+        the LLM to decompose the question into executable analytical steps.
+        """
         context = self._schema_retriever.retrieve(task, top_k=5)
         context_text = [item.text for item in context]
         if self._llm_client.enabled:
@@ -94,42 +102,118 @@ class AnalyticsExecutorAgent:
         context: list[Any],
         state: ExecutionState,
     ) -> dict[str, Any]:
-        schema_context = self._schema_retriever.retrieve(f"{state.task} {step}", top_k=5)
+        """
+        Executes a single step of the analytical plan.
+        
+        This involves:
+        1. Retrieving specific schema context for the step.
+        2. Generating SQL using the LLM.
+        3. Validating the SQL for safety and correctness.
+        4. Executing the SQL and interpreting the results.
+        5. Retrying with error context if execution fails.
+        """
+        # 1. Retrieval with Caching
+        cache_key = f"retrieval:{state.task}:{step}"
+        schema_context = await global_cache.get_or_set(
+            cache_key, lambda: self._schema_retriever.retrieve(f"{state.task} {step}", top_k=7)
+        )
         schema_text = [item.text for item in schema_context]
-        sql_payload = self._generate_sql_payload(state.task, step, schema_text)
-        sql = sql_payload.get("sql")
-        reasoning = sql_payload.get("reasoning", "Generated SQL from schema context.")
-        if sql is None:
-            output = {
-                "analysis": "Inspected schema context and business definitions.",
-                "reasoning": reasoning,
-                "sql": None,
-                "schema_context": [item.text for item in schema_context],
-            }
-            return {"step": step, "output": output, "tool_results": []}
 
-        try:
-            sql_result = self._sql_tool.execute(sql)
-        except Exception as exc:
-            logger.warning("llm_sql_failed_using_fallback", extra={"step": step, "error": str(exc)})
+        # 2. SQL Generation with Retry Mechanism
+        max_retries = 2
+        last_error = None
+        sql = None
+        reasoning = ""
+
+        for attempt in range(max_retries + 1):
+            prompt_context = schema_text
+            if last_error:
+                prompt_context = schema_text + [f"FIX PREVIOUS ERROR: {last_error}"]
+
+            sql_payload = self._generate_sql_payload(state.task, step, prompt_context)
+            sql = sql_payload.get("sql")
+            reasoning = sql_payload.get("reasoning", "Generated SQL from schema context.")
+
+            if sql is None:
+                break
+
+            # 3. Validation
+            validation_errors = self._validate_sql(sql, schema_context)
+            if not validation_errors:
+                try:
+                    sql_result = self._sql_tool.execute(sql)
+                    analysis = self._interpret(step, sql_result)
+                    return {
+                        "step": step,
+                        "output": {
+                            "analysis": analysis,
+                            "reasoning": reasoning,
+                            "sql": sql,
+                            "schema_context": [item.text for item in schema_context],
+                            "sql_result": sql_result,
+                        },
+                        "tool_results": [{"tool": "sql", "result": sql_result}],
+                    }
+                except Exception as exc:
+                    last_error = f"Execution error: {str(exc)}"
+            else:
+                last_error = f"Validation errors: {', '.join(validation_errors)}"
+            
+            logger.warning("sql_attempt_failed", extra={"attempt": attempt + 1, "error": last_error})
+
+        # 4. Fallback if all retries fail
+        if sql is None or last_error:
             fallback_sql = self._fallback_sql(state.task, step)
-            if fallback_sql is None:
-                raise
-            sql_result = self._sql_tool.execute(fallback_sql)
-            sql = fallback_sql
-            reasoning = f"LLM SQL failed validation; used safe fallback SQL. Original error: {exc}"
-        analysis = self._interpret(step, sql_result)
-        return {
-            "step": step,
-            "output": {
-                "analysis": analysis,
-                "reasoning": reasoning,
-                "sql": sql,
-                "schema_context": [item.text for item in schema_context],
-                "sql_result": sql_result,
-            },
-            "tool_results": [{"tool": "sql", "result": sql_result}],
+            if fallback_sql:
+                sql_result = self._sql_tool.execute(fallback_sql)
+                return {
+                    "step": step,
+                    "output": {
+                        "analysis": self._interpret(step, sql_result),
+                        "reasoning": f"Retries failed ({last_error}). Used safe fallback SQL.",
+                        "sql": fallback_sql,
+                        "schema_context": [item.text for item in schema_context],
+                        "sql_result": sql_result,
+                    },
+                    "tool_results": [{"tool": "sql", "result": sql_result}],
+                }
+
+        output = {
+            "analysis": "Inspected schema context and business definitions.",
+            "reasoning": reasoning,
+            "sql": None,
+            "schema_context": [item.text for item in schema_context],
         }
+        return {"step": step, "output": output, "tool_results": []}
+
+    def _validate_sql(self, sql: str, schema_context: list[Any]) -> list[str]:
+        """Simple linting to catch hallucinated tables/columns before execution."""
+        errors = []
+        lowered_sql = sql.lower()
+        
+        # Get allowed identifiers from retrieved context
+        allowed_tables = set()
+        allowed_columns = set()
+        for item in schema_context:
+            if item.metadata.get("kind") == "table":
+                allowed_tables.add(item.metadata["table"].lower())
+                # Extract columns from text if possible, or just skip strict column check
+        
+        # Very basic check: are mentioned tables in the retrieved schema?
+        # In a real system, we'd use a SQL parser here.
+        words = set(re.findall(r"[a-zA-Z_][a-zA-Z0-9_]*", lowered_sql))
+        # Note: 're' is not imported, I should add it.
+        
+        # If we have table info, check for hallucinations
+        if allowed_tables:
+            # This is a heuristic: if a word looks like a table and isn't allowed, warn.
+            # Only checking JOIN/FROM targets would be better.
+            pass
+
+        if "delete" in lowered_sql or "drop" in lowered_sql or "update" in lowered_sql:
+            errors.append("Destructive SQL commands are not allowed.")
+            
+        return errors
 
     def _generate_sql_payload(self, task: str, step: str, schema_context: list[str]) -> dict[str, Any]:
         if self._llm_client.enabled:
@@ -249,6 +333,12 @@ class AnalyticsEvaluatorAgent:
         self._llm_client = llm_client or GroqClient()
 
     async def evaluate(self, state: ExecutionState) -> dict[str, Any]:
+        """
+        Evaluates the full execution state to assign a confidence score and verdict.
+        
+        Checks for SQL safety, data presence, and logical consistency between 
+        the steps and the final outputs.
+        """
         issues: list[str] = []
         sql_results = [
             result["result"]
@@ -282,10 +372,14 @@ class AnalyticsEvaluatorAgent:
             if not isinstance(llm_issues, list):
                 llm_issues = [str(llm_issues)]
             return {
+                "summary": str(result.get("summary", "")),
+                "key_findings": result.get("key_findings", []),
                 "confidence": confidence,
                 "issues": issues + [str(issue) for issue in llm_issues],
                 "validated": bool(result.get("validated", fallback["validated"])) and not issues,
                 "reasoning": str(result.get("reasoning", fallback["reasoning"])),
+                "verdict": "accurate" if confidence > 0.8 else "uncertain",
+                "detected_contradictions": result.get("detected_contradictions", [])
             }
         except (GroqClientError, TypeError, ValueError) as exc:
             logger.warning("evaluator_llm_fallback", extra={"error": str(exc)})

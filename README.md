@@ -1,207 +1,82 @@
-# AI Data Analyst Agent
+# AI Data Analyst Agent ⚡
 
-AI Data Analyst Agent - Autonomous data analysis using agentic AI.
+An agentic AI system that performs autonomous data analysis using planning, schema-aware SQL generation, and multi-step evaluation.
 
-Dashboards are useful for known questions, but they struggle when business teams ask open-ended questions like "Why did revenue drop in March?" or "Which products drove growth last quarter?" This project turns those questions into planned, schema-aware, SQL-backed analysis with validation and execution traces.
+## 🚀 One-Line Pitch
+"An autonomous agent that reasons over structured databases to answer complex business questions with full traceability and SQL verification."
 
-## Problem
+## 📺 Demo
+![Demo UI Screenshot](docs/screenshots/ui_demo.png)
 
-Traditional analytics workflows are limited by:
+### Example Input:
+> "Why did revenue drop in March?"
 
-- Static dashboards that only answer pre-modeled questions
-- Manual SQL handoffs between business teams and data analysts
-- Text-to-SQL systems that generate queries without validation
-- Lack of traceability from question to query to conclusion
+### Agent Output:
+- **Executive Summary**: Analysis of revenue trends across product categories.
+- **Key Findings**: Identification of specific products with the largest month-over-month declines.
+- **SQL Evidence**: Validated SQL queries executed against the live database.
+- **Reasoning Trace**: A step-by-step look into the agent's thought process.
 
-Production analytics agents need more than a chatbot. They need planning, tool use, evaluation, and observability.
+## 🏗️ Architecture
+The system follows a **Plan-Execute-Evaluate** loop:
 
-## Solution
+1. **Planner Agent**: Analyzes the user question and database schema to create a logical sequence of analytical steps.
+2. **Schema Retriever (RAG)**: Uses FAISS and embeddings to retrieve the most relevant table schemas and business definitions for the current step.
+3. **Executor Agent**: Generates optimized SQL using Groq LLM, validates it for safety/syntax, and executes it against SQLite.
+4. **Evaluator Agent**: Inspects the results, assigns a confidence score, and provides a final verdict on the accuracy of the analysis.
 
-This repository implements a production-shaped AI Data Analyst Agent:
+## ✨ Key Features
+- **Semantic RAG**: Schema-aware retrieval ensures the LLM only sees relevant table context, reducing token costs and hallucinations.
+- **SQL Validation & Retry**: Automatic detection of hallucinated columns/tables with self-correction logic.
+- **Multi-Step Orchestration**: Handles complex questions that require multiple queries and data joins.
+- **High Observability**: Every run is traced with timing and reasoning metadata, viewable in a polished UI.
+- **Performance Optimized**: Cached embeddings and reused vector indices for sub-second planning.
 
-```text
-User question
-    |
-    v
-Planner Agent
-    |
-    v
-Schema-aware RAG
-    |
-    v
-SQL Generation
-    |
-    v
-Safe SQL Tool
-    |
-    v
-Result Analysis
-    |
-    v
-Evaluator Agent
-    |
-    v
-Structured Report + Trace
-```
+## 🛠️ Tech Stack
+- **Backend**: Python, FastAPI
+- **LLM Reasoning**: Groq (Llama 3 70B)
+- **Vector DB**: FAISS
+- **Database**: SQLite
+- **Observability**: Custom JSONL Tracing
+- **Frontend**: Vanilla JS, Modern CSS (Premium Aesthetics)
 
-The system is modular: LLM providers, vector stores, SQL backends, tools, evaluators, and orchestration policies can be swapped independently.
+## 🏃 How to Run
 
-## Features
-
-- Schema-aware RAG over tables, columns, relationships, and business metrics
-- Groq-powered planner, SQL generation, and evaluator agents
-- Safe read-only SQL execution with destructive-query blocking
-- Structured reports with summary, findings, SQL queries, metrics, confidence, and trace
-- Observability hooks for LLM calls, SQL execution, step timing, and run traces
-- FastAPI backend with `POST /tasks/analyze` and `GET /runs/{run_id}`
-- Lightweight browser UI in `apps/ui`
-- Local SQLite demo dataset with e-commerce revenue data
-- Clean test coverage for SQL safety, retrieval quality, orchestration, and e2e flow
-
-## Demo
-
-Input:
-
-```text
-What products drove the highest revenue growth?
-```
-
-Example output:
-
-```json
-{
-  "summary": "Insight Pro drove the highest revenue growth at 1685.0 incremental revenue.",
-  "findings": [
-    "Insight Pro drove the highest revenue growth at 1685.0 incremental revenue."
-  ],
-  "sql_queries": [
-    "WITH product_period_revenue AS (...) SELECT product_name, category, prior_revenue, current_revenue, revenue_growth ..."
-  ],
-  "confidence": 0.92,
-  "execution_trace": {
-    "steps": [
-      {
-        "step": "calculate product revenue growth between prior and current periods",
-        "reasoning": "Generated SQL from schema context.",
-        "sql": "WITH product_period_revenue AS (...)",
-        "result_preview": "[{'product_name': 'Insight Pro', ...}]",
-        "execution_time_ms": 2.4
-      }
-    ]
-  }
-}
-```
-
-## Tech Stack
-
-- Python
-- FastAPI
-- Groq API with `llama-3.3-70b-versatile`
-- SQLite for local demo data
-- PostgreSQL-ready SQL abstraction
-- FAISS-ready vector index abstraction with local keyword fallback
-- Plain HTML/CSS/JS frontend
-- `unittest` test suite
-
-## Setup
-
-Create and activate a virtual environment:
-
+### 1. Setup Environment
 ```bash
-python -m venv .venv
-.venv\Scripts\activate
-```
+# Clone the repository
+git clone https://github.com/your-repo/ai-data-analyst.git
+cd ai-data-analyst
 
-Install the project:
-
-```bash
+# Install dependencies
 pip install -e .
 ```
 
-Configure environment variables:
-
-```powershell
-$env:GROQ_API_KEY="your-groq-api-key"
-$env:GROQ_MODEL="llama-3.3-70b-versatile"
-$env:ANALYTICS_DB_PATH="runtime/analytics.db"
-$env:TRACE_JSONL_PATH="runtime/traces.jsonl"
+### 2. Configure API Keys
+Create a `.env` file with your Groq API key:
+```env
+GROQ_API_KEY=your_key_here
+ANALYTICS_DB_PATH=runtime/analytics.db
 ```
 
-The repository ignores `.env` and `.env.*` files, so local secrets stay out of git.
-
-## Run Backend
-
+### 3. Run the Backend
 ```bash
-uvicorn apps.api.main:app --reload
+python -m uvicorn apps.api.main:app --reload
 ```
 
-Backend URL:
-
-```text
-http://localhost:8000
-```
-
-## Run UI
-
-Open:
-
-```text
-apps/ui/index.html
-```
-
-The UI calls:
-
-```text
-http://localhost:8000/tasks/analyze
-```
-
-## API
-
-Analyze a question:
-
+### 4. Run the CLI Demo
 ```bash
-curl -X POST http://localhost:8000/tasks/analyze ^
-  -H "Content-Type: application/json" ^
-  -d "{\"question\":\"What products drove the highest revenue growth?\"}"
+python run_analysis.py "Show me the top 5 products by sales"
 ```
 
-Fetch a stored run:
+### 5. Open the UI
+Simply open `apps/ui/index.html` in your browser.
 
-```bash
-curl http://localhost:8000/runs/{run_id}
-```
+## 📊 Example Demo Queries
+- "Why did revenue drop in March?"
+- "Which products drove the most revenue growth?"
+- "Which region has the highest customer churn?"
+- "Show top 5 products by sales"
 
-## Project Structure
-
-```text
-apps/
-  api/                  FastAPI backend
-  ui/                   Lightweight demo UI
-data/
-  schema.sql            Local analytics schema
-src/agent_platform/
-  analytics/            Planner, executor, evaluator, report service
-  data/                 Dataset seeding
-  llms/                 Groq client and prompt templates
-  observability/        Trace hooks and JSONL trace store
-  orchestration/        Execution loop and state management
-  rag/                  Schema context ingestion and retrieval
-  tools/                Safe SQL execution tool
-tests/                  Unit and e2e tests
-```
-
-## Testing
-
-```bash
-python -m unittest discover tests
-```
-
-## Future Improvements
-
-- PostgreSQL execution backend
-- FAISS/Pinecone/Weaviate vector index implementation
-- Streaming agent traces over WebSockets or Server-Sent Events
-- Chart generation and visualization recommendations
-- Multi-agent decomposition for retention, forecasting, and anomaly analysis
-- Persistent run storage in PostgreSQL
-- Role-based access controls and query governance
+---
+*Built for Enterprise Data Teams*
