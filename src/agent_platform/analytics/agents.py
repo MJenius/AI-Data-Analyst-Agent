@@ -45,10 +45,19 @@ class AnalyticsPlannerAgent:
                     system_prompt=PLANNER_SYSTEM_PROMPT,
                     user_prompt=build_planner_prompt(task, context_text),
                 )
-                steps = result.get("steps", [])
-                if isinstance(steps, list) and all(isinstance(step, str) for step in steps):
-                    self.last_reasoning = str(result.get("reasoning", "LLM generated the analytical plan."))
-                    return steps
+                if not isinstance(result, dict):
+                    raise ValueError("Planner did not return a valid JSON object.")
+                steps = result.get("steps")
+                if steps is None or not isinstance(steps, list):
+                    raise KeyError("Planner output is missing 'steps' list.")
+                if not all(isinstance(step, str) for step in steps):
+                    raise ValueError("All planner steps must be strings.")
+                reasoning = result.get("reasoning")
+                if reasoning is None or not isinstance(reasoning, str):
+                    raise KeyError("Planner output is missing 'reasoning' string.")
+                
+                self.last_reasoning = reasoning
+                return steps
             except Exception as exc:
                 logger.warning("planner_llm_fallback", extra={"error": str(exc)})
         self.last_reasoning = "Used deterministic fallback plan because Groq was unavailable."
@@ -117,8 +126,8 @@ class AnalyticsExecutorAgent:
         # 1. Fast Retrieval
         schema_text = [item.text for item in context]
 
-        # 2. SQL Generation (No Retries for Maximum Speed)
-        max_retries = 0
+        # 2. SQL Generation (Enabled Retries for Self-Correction)
+        max_retries = 2
         last_error = None
         sql = None
         reasoning = ""
@@ -128,7 +137,7 @@ class AnalyticsExecutorAgent:
             if last_error:
                 prompt_context = schema_text + [f"FIX PREVIOUS ERROR: {last_error}"]
 
-            logger.info(f"Executing analytical step {attempt + 1}: {step}")
+            logger.info(f"Executing analytical step (Attempt {attempt + 1}/{max_retries + 1}): {step}")
             sql_payload = self._generate_sql_payload(state.task, step, prompt_context)
             sql = sql_payload.get("sql")
             reasoning = sql_payload.get("reasoning", "Generated SQL from schema context.")
@@ -140,7 +149,7 @@ class AnalyticsExecutorAgent:
             validation_errors = self._validate_sql(sql, context)
             if not validation_errors:
                 try:
-                    logger.info(f"Running SQL: {sql[:100]}...")
+                    logger.info(f"Running SQL: {sql.strip()}")
                     sql_result = self._sql_tool.execute(sql)
                     logger.info(f"SQL executed successfully. Returned {sql_result.get('row_count', 0)} rows.")
                     analysis = self._interpret(step, sql_result)
@@ -166,6 +175,7 @@ class AnalyticsExecutorAgent:
         if sql is None or last_error:
             fallback_sql = self._fallback_sql(state.task, step)
             if fallback_sql:
+                logger.info(f"Using safe fallback SQL: {fallback_sql.strip()}")
                 sql_result = self._sql_tool.execute(fallback_sql)
                 return {
                     "step": step,
@@ -188,29 +198,31 @@ class AnalyticsExecutorAgent:
         return {"step": step, "output": output, "tool_results": []}
 
     def _validate_sql(self, sql: str, schema_context: list[Any]) -> list[str]:
-        """Simple linting to catch hallucinated tables/columns before execution."""
+        """Strict linting to check for destructive keywords and prevent hallucinations."""
         errors = []
         lowered_sql = sql.lower()
         
-        # Get allowed identifiers from retrieved context
+        # Get allowed table names from retrieved context
         allowed_tables = set()
-        allowed_columns = set()
         for item in schema_context:
             if item.metadata.get("kind") == "table":
                 allowed_tables.add(item.metadata["table"].lower())
-                # Extract columns from text if possible, or just skip strict column check
         
-        # Very basic check: are mentioned tables in the retrieved schema?
-        words = set(re.findall(r"[a-zA-Z_][a-zA-Z0-9_]*", lowered_sql))
-        
-        # If we have table info, check for hallucinations
-        if allowed_tables:
-            # This is a heuristic: if a word looks like a table and isn't allowed, warn.
-            # Only checking JOIN/FROM targets would be better.
-            pass
+        # Extract potential table targets by finding patterns in JOIN / FROM clauses
+        # E.g. "from table_name" or "join table_name"
+        table_matches = re.findall(r"\b(?:from|join)\s+([a-zA-Z_][a-zA-Z0-9_]*)", lowered_sql)
+        for tbl in table_matches:
+            if allowed_tables and tbl not in allowed_tables:
+                # Table is not in schema context, mark as a potential hallucination error
+                # Skip Olist translation/categories standard names to avoid false positives
+                if tbl not in ["product_category_name_translation"]:
+                    errors.append(f"Table '{tbl}' is not in retrieved schema context (hallucination prevention).")
 
-        if "delete" in lowered_sql or "drop" in lowered_sql or "update" in lowered_sql:
-            errors.append("Destructive SQL commands are not allowed.")
+        # Rigorous check for destructive SQL commands to guarantee safety
+        destructive_keywords = ["delete", "drop", "update", "insert", "alter", "create", "replace", "truncate", "grant", "revoke"]
+        for kw in destructive_keywords:
+            if re.search(r"\b" + kw + r"\b", lowered_sql):
+                errors.append(f"Destructive SQL command '{kw}' is not allowed in read-only environment.")
             
         return errors
 
@@ -221,11 +233,18 @@ class AnalyticsExecutorAgent:
                     system_prompt=SQL_SYSTEM_PROMPT,
                     user_prompt=build_sql_prompt(task, step, schema_context),
                 )
-                if "sql" in result:
-                    return {
-                        "sql": result.get("sql"),
-                        "reasoning": result.get("reasoning", "Groq generated SQL from schema context."),
-                    }
+                if not isinstance(result, dict):
+                    raise ValueError("Executor did not return a valid JSON object.")
+                sql = result.get("sql")
+                reasoning = result.get("reasoning")
+                if reasoning is None or not isinstance(reasoning, str):
+                    raise KeyError("Executor output is missing 'reasoning' string.")
+                if sql is not None and not isinstance(sql, str):
+                    raise ValueError("Executor 'sql' must be a string or null.")
+                return {
+                    "sql": sql,
+                    "reasoning": reasoning,
+                }
             except Exception as exc:
                 logger.warning("sql_generation_llm_fallback", extra={"error": str(exc), "step": step})
         return {
@@ -234,17 +253,11 @@ class AnalyticsExecutorAgent:
         }
 
     def _fallback_sql(self, task: str, step: str) -> str | None:
-        # Split metadata if present to avoid false matches on 'schema_context'
         core_step = step.split("|")[0].strip().lower()
         lowered = f"{task} {core_step}".lower()
 
         if "schema" in core_step and "calculate" not in core_step:
             return None
-        
-        # Olist Schema Mapping:
-        # orders: order_id, customer_id, order_status, order_purchase_timestamp
-        # order_items: order_id, product_id, price, freight_value
-        # products: product_id, product_category_name
         
         if "regional" in lowered or "state" in lowered:
             return """
@@ -272,7 +285,7 @@ class AnalyticsExecutorAgent:
             ORDER BY revenue DESC
             LIMIT 10
             """
-        if "trend" in lowered or "month" in lowered or "drop" in lowered:
+        if "trend" in lowered or "month" in lowered or "drop" in lowered or "over time" in lowered or "history" in lowered or "time series" in lowered:
             return """
             SELECT
                 substr(o.order_purchase_timestamp, 1, 7) AS month,
@@ -283,6 +296,82 @@ class AnalyticsExecutorAgent:
             GROUP BY month
             ORDER BY month
             """
+        if "aov" in lowered or "average order value" in lowered or "average order" in lowered or "average value" in lowered:
+            return """
+            SELECT ROUND(SUM(price) / COUNT(DISTINCT order_id), 2) AS average_order_value
+            FROM order_items
+            """
+
+        if "seller" in lowered:
+            return """
+            SELECT
+                oi.seller_id,
+                COUNT(DISTINCT oi.order_id) AS total_orders,
+                ROUND(SUM(oi.price), 2) AS total_sales
+            FROM order_items oi
+            GROUP BY oi.seller_id
+            ORDER BY total_sales DESC
+            LIMIT 10
+            """
+        
+        if "repeat" in lowered or "loyalty" in lowered or "recurring" in lowered:
+            return """
+            SELECT
+                c.customer_unique_id,
+                COUNT(o.order_id) AS order_count
+            FROM orders o
+            JOIN customers c ON c.customer_id = o.customer_id
+            GROUP BY c.customer_unique_id
+            HAVING order_count > 1
+            ORDER BY order_count DESC
+            LIMIT 10
+            """
+            
+        if "cancel" in lowered or "cancellation" in lowered:
+            return """
+            SELECT
+                o.order_status,
+                COUNT(DISTINCT o.order_id) AS order_count,
+                ROUND(SUM(oi.price), 2) AS total_price
+            FROM orders o
+            LEFT JOIN order_items oi ON o.order_id = oi.order_id
+            WHERE o.order_status = 'canceled'
+            GROUP BY o.order_status
+            """
+            
+        if "rating" in lowered or "review" in lowered:
+            return """
+            SELECT
+                review_score,
+                COUNT(*) AS count,
+                ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM order_reviews), 2) AS percentage
+            FROM order_reviews
+            GROUP BY review_score
+            ORDER BY review_score DESC
+            """
+            
+        if "geolocation" in lowered or "density" in lowered or "zip" in lowered:
+            return """
+            SELECT
+                customer_state,
+                COUNT(DISTINCT customer_unique_id) AS unique_customers
+            FROM customers
+            GROUP BY customer_state
+            ORDER BY unique_customers DESC
+            LIMIT 10
+            """
+            
+        if "payment" in lowered:
+            return """
+            SELECT
+                payment_type,
+                COUNT(DISTINCT order_id) AS order_count,
+                ROUND(SUM(payment_value), 2) AS total_payment_value
+            FROM order_payments
+            GROUP BY payment_type
+            ORDER BY order_count DESC
+            """
+
         return """
         SELECT
             p.product_category_name,
@@ -356,14 +445,33 @@ class AnalyticsEvaluatorAgent:
                 system_prompt=EVALUATOR_SYSTEM_PROMPT,
                 user_prompt=build_evaluator_prompt(state.task, state.plan, sql_results, draft_report),
             )
-            confidence = float(result.get("confidence", fallback["confidence"]))
+            if not isinstance(result, dict):
+                raise ValueError("Evaluator did not return a valid JSON object.")
+            
+            # Require key structure fields
+            summary = result.get("summary")
+            if summary is None or not isinstance(summary, str):
+                raise KeyError("Evaluator output is missing 'summary' string.")
+            
+            key_findings = result.get("key_findings")
+            if key_findings is None or not isinstance(key_findings, list):
+                raise KeyError("Evaluator output is missing 'key_findings' list.")
+            
+            confidence = result.get("confidence")
+            if confidence is None:
+                raise KeyError("Evaluator output is missing 'confidence' field.")
+            try:
+                confidence = float(confidence)
+            except (ValueError, TypeError):
+                raise ValueError("Evaluator 'confidence' must be a numeric value.")
+            
             confidence = max(0.0, min(1.0, confidence))
             llm_issues = result.get("issues", [])
             if not isinstance(llm_issues, list):
                 llm_issues = [str(llm_issues)]
             return {
-                "summary": str(result.get("summary", "")),
-                "key_findings": result.get("key_findings", []),
+                "summary": summary,
+                "key_findings": key_findings,
                 "why_explanation": result.get("why_explanation"),
                 "anomalies": result.get("anomalies", []),
                 "confidence": confidence,

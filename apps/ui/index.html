@@ -43,9 +43,23 @@
         </div>
       </section>
 
-      <section id="status" class="status" hidden>
-        <div class="loader"></div>
-        <span>Analyzing data and synthesizing findings...</span>
+      <section id="status" class="status-card" hidden>
+        <div class="status-header">
+          <div class="loader"></div>
+          <div>
+            <h3 class="status-title">Agent Execution In Progress...</h3>
+            <span id="status-message">Initializing analytical agents...</span>
+          </div>
+        </div>
+        <div id="status-steps" class="status-steps">
+          <!-- Steps will be rendered dynamically -->
+        </div>
+        <div class="thinking-log-header" style="font-size: 11px; font-weight: 750; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; letter-spacing: 0.08em;">
+          Agent Telemetry Logs
+        </div>
+        <div id="thinking-log" class="thinking-log">
+          <!-- Terminal logs will be rendered dynamically -->
+        </div>
       </section>
 
       <section id="results" class="results" hidden>

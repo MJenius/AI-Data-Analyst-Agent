@@ -29,6 +29,10 @@ def create_app() -> FastAPI:
     )
     class GlobalProgressStore:
         latest_message: str = "Initializing..."
+        plan_steps: list[str] = []
+        completed_steps: list[dict] = []
+        current_step: str | None = None
+        error: str | None = None
 
     progress_store = GlobalProgressStore()
 
@@ -51,20 +55,36 @@ def create_app() -> FastAPI:
     original_step_start = service._observer.on_step_start
     def custom_step_start(state, step):
         progress_store.latest_message = f"Executing: {step}"
+        progress_store.plan_steps = list(state.plan) if state.plan else []
+        progress_store.current_step = step
         original_step_start(state, step)
     service._observer.on_step_start = custom_step_start
     
     original_run_start = service._observer.on_run_start
     def custom_run_start(state):
         progress_store.latest_message = "Analyzing question and planning steps..."
+        progress_store.plan_steps = []
+        progress_store.completed_steps = []
+        progress_store.current_step = None
+        progress_store.error = None
         original_run_start(state)
     service._observer.on_run_start = custom_run_start
     
     original_step_end = service._observer.on_step_end
     def custom_step_end(state, step, result, elapsed):
         progress_store.latest_message = f"Completed: {step}"
+        progress_store.completed_steps.append({
+            "step": step,
+            "elapsed": elapsed
+        })
         original_step_end(state, step, result, elapsed)
     service._observer.on_step_end = custom_step_end
+
+    original_run_error = service._observer.on_run_error
+    def custom_run_error(state, step, error):
+        progress_store.error = str(error)
+        original_run_error(state, step, error)
+    service._observer.on_run_error = custom_run_error
 
     @app.post("/tasks/analyze")
     async def analyze(request: AnalyzeRequest):
@@ -80,7 +100,13 @@ def create_app() -> FastAPI:
 
     @app.get("/tasks/progress")
     async def get_progress():
-        return {"message": progress_store.latest_message}
+        return {
+            "message": progress_store.latest_message,
+            "plan_steps": progress_store.plan_steps,
+            "completed_steps": progress_store.completed_steps,
+            "current_step": progress_store.current_step,
+            "error": progress_store.error
+        }
 
     @app.get("/runs/{run_id}")
     async def get_run(run_id: str):

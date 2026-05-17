@@ -200,24 +200,139 @@ button:active {
   color: #9a3412;
 }
 
-.status {
+.status-card {
+  background: white;
+  padding: 40px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--line);
+  margin-bottom: 32px;
+}
+
+.status-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 16px;
+}
+
+.status-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.status-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.status-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 15px;
+  color: #475569;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  transition: all 0.3s ease;
+}
+
+.status-step.active {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #1e40af;
+  font-weight: 600;
+  box-shadow: 0 2px 4px 0 rgba(37, 99, 235, 0.05);
+}
+
+.status-step.completed {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+  color: #166534;
+}
+
+.step-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 16px;
-  padding: 40px;
-  color: var(--muted);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.step-icon.pending {
+  background: #e2e8f0;
+  color: #64748b;
+}
+
+.step-icon.active {
+  background: #dbeafe;
+  color: #2563eb;
+  animation: pulse 1.5s infinite;
+}
+
+.step-icon.completed {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.7; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.thinking-log {
+  background: #0f172a;
+  color: #38bdf8;
+  padding: 16px 20px;
+  border-radius: var(--radius-md);
+  font-family: monospace;
+  font-size: 13px;
+  min-height: 80px;
+  max-height: 160px;
+  overflow-y: auto;
+  border: 1px solid #1e293b;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.thinking-log .log-line {
+  display: flex;
+  gap: 8px;
+  animation: fadeInLog 0.2s ease-out;
+}
+
+@keyframes fadeInLog {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.thinking-log .log-line .timestamp {
+  color: #64748b;
+  user-select: none;
   font-weight: 500;
-  font-size: 16px;
 }
 
 .loader {
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
   border: 3px solid #e2e8f0;
   border-top-color: var(--accent);
   border-radius: 50%;
   animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  flex-shrink: 0;
 }
 
 @keyframes spin {

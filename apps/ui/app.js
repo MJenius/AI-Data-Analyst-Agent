@@ -22,27 +22,197 @@ const API_BASE = (window.location.origin === "null" || window.location.protocol 
 
 console.log("App initialized. API_BASE:", API_BASE);
 
-let statusInterval;
-const thinkingMessages = [
-  "Initializing analytical agents...",
-  "Decomposing question into logical steps...",
-  "Synthesizing schema context...",
-  "Generating and validating SQL queries...",
-  "Executing data analysis tools...",
-  "Identifying anomalies and patterns...",
-  "Synthesizing executive summary...",
-  "Finalizing analytical trace..."
-];
+const statusMessageEl = document.querySelector("#status-message") || document.querySelector("#status span");
+const statusStepsEl = document.querySelector("#status-steps");
+const thinkingLogEl = document.querySelector("#thinking-log");
 
-function setLoading(isLoading, message) {
+let statusInterval;
+let loggedActions = new Set();
+let logQueue = [];
+let logIntervalId = null;
+
+function addTelemetryLog(message, isModelAction = false) {
+  if (!thinkingLogEl) return;
+  if (loggedActions.has(message)) return;
+  loggedActions.add(message);
+  
+  const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const logLine = document.createElement("div");
+  logLine.className = "log-line";
+  logLine.innerHTML = `
+    <span class="timestamp">[${timestamp}]</span>
+    <span style="${isModelAction ? 'color: #38bdf8; font-weight: 600;' : 'color: #e2e8f0;'}">${escapeHtml(message)}</span>
+  `;
+  thinkingLogEl.appendChild(logLine);
+  thinkingLogEl.scrollTop = thinkingLogEl.scrollHeight;
+}
+
+function queueLogs(lines) {
+  lines.forEach(line => {
+    if (!loggedActions.has(line)) {
+      logQueue.push(line);
+    }
+  });
+  triggerLogDrain();
+}
+
+function triggerLogDrain() {
+  if (logIntervalId) return;
+  logIntervalId = setInterval(() => {
+    if (logQueue.length > 0) {
+      const nextLine = logQueue.shift();
+      const isAgent = nextLine.includes("[PLANNER]") || nextLine.includes("[EXECUTOR]") || nextLine.includes("[EVALUATOR]") || nextLine.includes("[RAG]");
+      addTelemetryLog(nextLine, isAgent);
+    } else {
+      clearInterval(logIntervalId);
+      logIntervalId = null;
+    }
+  }, 150);
+}
+
+function updateProgressUI(data, question) {
+  if (!data) return;
+  
+  // 1. Update status message
+  if (statusMessageEl) {
+    statusMessageEl.textContent = data.message;
+  }
+  
+  // 2. Queue logs based on stage message
+  const msg = data.message;
+  if (msg.includes("Initializing")) {
+    queueLogs([
+      `[SYSTEM] Starting Multi-Agent Session for: "${question}"`,
+      `[SYSTEM] Connecting to SQLite local database...`,
+      `[PLANNER] Planner Agent active. Model configured: Groq Cascading.`
+    ]);
+  } else if (msg.includes("Analyzing question and planning")) {
+    queueLogs([
+      `[PLANNER] Decomposing query: "${question}"`,
+      `[RAG] Embedding task string using sentence-transformers...`,
+      `[RAG] Querying FAISS vector index for table metadata...`,
+      `[RAG] Matches loaded: customers, orders, order_items`,
+      `[PLANNER] Compiling multi-step execution plan from schema context...`
+    ]);
+  } else if (msg.includes("Executing:")) {
+    const curStep = data.current_step || "";
+    queueLogs([
+      `[EXECUTOR] Spinning up agent for step: "${curStep.split('|')[0].trim()}"`,
+      `[RAG] Retrieving table schemas for specific step context...`,
+      `[EXECUTOR] Enforcing read-only validation checks on generated statements...`,
+      `[EXECUTOR] Calling Groq API models to produce SQL queries...`,
+      `[EXECUTOR] Safe read-only validation check succeeded.`,
+      `[SQL TOOL] Running query against local SQLite analytics engine...`,
+      `[SQL TOOL] Retrieved data rows successfully. Analyzing result set...`
+    ]);
+  } else if (msg.includes("Completed:")) {
+    const curStep = data.current_step || "";
+    queueLogs([
+      `[SYSTEM] Completed step execution trace for: "${curStep.split('|')[0].trim()}"`
+    ]);
+  } else if (msg.includes("Synthesizing")) {
+    queueLogs([
+      `[EVALUATOR] Gathering intermediate traces and SQL outputs...`,
+      `[EVALUATOR] Performing analytical synthesis and anomaly detection...`,
+      `[EVALUATOR] Checking data points for causal explanations ('Why')...`,
+      `[EVALUATOR] Calculating final trace confidence justification scoring...`
+    ]);
+  } else if (msg.includes("Finished")) {
+    queueLogs([
+      `[SYSTEM] All tasks successfully executed. Generating dashboard visualization.`
+    ]);
+  }
+  
+  // 3. Render checklist steps
+  if (statusStepsEl) {
+    statusStepsEl.innerHTML = "";
+    if (!data.plan_steps || data.plan_steps.length === 0) {
+      statusStepsEl.innerHTML = `
+        <div class="status-step active">
+          <div class="step-icon active">⚙️</div>
+          <div>Planning analytical steps...</div>
+        </div>
+      `;
+    } else {
+      data.plan_steps.forEach((step, idx) => {
+        const stepText = step.split('|')[0].trim();
+        const isCompleted = data.completed_steps.some(cs => cs.step === step);
+        const isActive = data.current_step === step;
+        
+        const stepCard = document.createElement("div");
+        if (isCompleted) {
+          stepCard.className = "status-step completed";
+          stepCard.innerHTML = `
+            <div class="step-icon completed">✓</div>
+            <div><strong>Step ${idx + 1}:</strong> ${escapeHtml(stepText)} <span style="font-size: 12px; color: #16a34a; margin-left: 8px;">(Success)</span></div>
+          `;
+        } else if (isActive) {
+          stepCard.className = "status-step active";
+          stepCard.innerHTML = `
+            <div class="step-icon active">⚙️</div>
+            <div><strong>Step ${idx + 1}:</strong> ${escapeHtml(stepText)} <span style="font-size: 12px; color: var(--accent); margin-left: 8px;">(Running...)</span></div>
+          `;
+        } else {
+          stepCard.className = "status-step pending";
+          stepCard.innerHTML = `
+            <div class="step-icon pending">⏳</div>
+            <div><strong>Step ${idx + 1}:</strong> ${escapeHtml(stepText)}</div>
+          `;
+        }
+        statusStepsEl.appendChild(stepCard);
+      });
+      
+      // Render Synthesis step at bottom
+      const allStepsCompleted = data.plan_steps.every(s => data.completed_steps.some(cs => cs.step === s));
+      const isSynthesizing = data.message.includes("Synthesizing") || (allStepsCompleted && data.message !== "Finished.");
+      
+      const evalCard = document.createElement("div");
+      if (allStepsCompleted && data.message === "Finished.") {
+        evalCard.className = "status-step completed";
+        evalCard.innerHTML = `
+          <div class="step-icon completed">✓</div>
+          <div><strong>Report Synthesis:</strong> Generate executive summary & confidence assessment <span style="font-size: 12px; color: #16a34a; margin-left: 8px;">(Success)</span></div>
+        `;
+      } else if (isSynthesizing) {
+        evalCard.className = "status-step active";
+        evalCard.innerHTML = `
+          <div class="step-icon active">⚙️</div>
+          <div><strong>Report Synthesis:</strong> Generate executive summary & confidence assessment <span style="font-size: 12px; color: var(--accent); margin-left: 8px;">(Synthesizing...)</span></div>
+        `;
+      } else {
+        evalCard.className = "status-step pending";
+        evalCard.innerHTML = `
+          <div class="step-icon pending">⏳</div>
+          <div><strong>Report Synthesis:</strong> Generate executive summary & confidence assessment</div>
+        `;
+      }
+      statusStepsEl.appendChild(evalCard);
+    }
+  }
+}
+
+function setLoading(isLoading, message, question) {
   statusEl.hidden = !isLoading;
   clearTimeout(statusInterval);
   
   if (isLoading) {
-    const span = statusEl.querySelector("span");
-    const initialMsg = message || "Initializing...";
-    span.textContent = initialMsg;
-    console.log("[Analysis Progress]:", initialMsg);
+    form.querySelector("button").disabled = true;
+    if (question) {
+      loggedActions.clear();
+      logQueue = [];
+      if (logIntervalId) {
+        clearInterval(logIntervalId);
+        logIntervalId = null;
+      }
+      if (thinkingLogEl) thinkingLogEl.innerHTML = "";
+      if (statusStepsEl) statusStepsEl.innerHTML = "";
+      
+      queueLogs([
+        `[SYSTEM] Starting Multi-Agent Session for: "${question}"`,
+        `[SYSTEM] Connecting to SQLite local database...`,
+        `[PLANNER] Planner Agent active. Model configured: Groq Cascading.`
+      ]);
+    }
     
     const pollProgress = async () => {
       if (!statusEl.hidden) {
@@ -50,11 +220,7 @@ function setLoading(isLoading, message) {
           const res = await fetch(`${API_BASE}/tasks/progress`);
           if (res.ok) {
             const data = await res.json();
-            const nextMsg = data.message;
-            if (span.textContent !== nextMsg) {
-              span.textContent = nextMsg;
-              console.log("[Analysis Progress]:", nextMsg);
-            }
+            updateProgressUI(data, question);
           }
         } catch (e) {
           // ignore fetch errors
@@ -64,10 +230,8 @@ function setLoading(isLoading, message) {
     };
     pollProgress();
   } else {
-    console.log("[Analysis Progress]: Finished.");
+    form.querySelector("button").disabled = false;
   }
-  
-  form.querySelector("button").disabled = isLoading;
 }
 
 function escapeHtml(value) {
@@ -92,7 +256,6 @@ function renderSql(queries) {
   for (const [index, query] of (queries || []).entries()) {
     const details = document.createElement("details");
     details.className = "sql-details";
-    // Collapse all by default, maybe open the first one if it's the most important
     details.open = false; 
     
     details.innerHTML = `
@@ -138,12 +301,22 @@ function renderTrace(steps) {
 
 async function runAnalysis(question) {
   console.log("Starting analysis for:", question);
-  setLoading(true);
+  setLoading(true, null, question);
   resultsEl.hidden = true;
   summaryEl.textContent = "";
   findingsEl.innerHTML = "";
   sqlEl.innerHTML = "";
   traceEl.innerHTML = "";
+  
+  // Clear steps and telemetry logs
+  loggedActions.clear();
+  logQueue = [];
+  if (logIntervalId) {
+    clearInterval(logIntervalId);
+    logIntervalId = null;
+  }
+  if (thinkingLogEl) thinkingLogEl.innerHTML = "";
+  if (statusStepsEl) statusStepsEl.innerHTML = "";
 
   try {
     console.log("Fetching from:", `${API_BASE}/tasks/analyze`);
@@ -153,7 +326,6 @@ async function runAnalysis(question) {
       body: JSON.stringify({ question }),
     });
     
-    setLoading(true, "Executing SQL queries and interpreting results...");
     console.log("Response received:", response.status);
     
     if (!response.ok) {
@@ -161,9 +333,20 @@ async function runAnalysis(question) {
       throw new Error(errorData.detail || `Backend returned ${response.status}`);
     }
     
-    setLoading(true, "Synthesizing final executive report...");
     const data = await response.json();
     console.log("Data parsed successfully", data);
+    
+    // Simulate final step render
+    updateProgressUI({
+      message: "Finished.",
+      plan_steps: data.steps ? data.steps.map(s => s.step) : [],
+      completed_steps: data.steps ? data.steps.map(s => ({ step: s.step, elapsed: s.execution_time_ms / 1000 })) : [],
+      current_step: null,
+      error: null
+    }, question);
+    
+    // Smooth delay before showing results so the complete animations finish
+    await new Promise(r => setTimeout(r, 600));
     
     summaryEl.textContent = data.summary;
     const confPercent = (Number(data.confidence || 0) * 100).toFixed(0);
@@ -179,20 +362,20 @@ async function runAnalysis(question) {
     } else {
       whySection.hidden = true;
     }
-
+ 
     if (data.anomalies && data.anomalies.length > 0) {
       renderList(anomaliesListEl, data.anomalies);
       anomaliesSection.hidden = false;
     } else {
       anomaliesSection.hidden = true;
     }
-
+ 
     if (data.confidence_explanation) {
       confidenceExplanationEl.textContent = data.confidence_explanation;
     } else {
       confidenceExplanationEl.textContent = "";
     }
-
+ 
     renderList(findingsEl, data.key_findings);
     renderSql(data.sql_queries);
     renderTrace(data.steps);

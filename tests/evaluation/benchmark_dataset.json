@@ -1,0 +1,1138 @@
+[
+  {
+    "category": "Revenue & Sales",
+    "question": "What is the total revenue generated?",
+    "expected_tables": [
+      "order_items"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ]
+  },
+  {
+    "category": "Revenue & Sales",
+    "question": "What is the monthly revenue trend?",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "month",
+      "revenue"
+    ]
+  },
+  {
+    "category": "Revenue & Sales",
+    "question": "Which month had the highest revenue?",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "peak_month",
+      "revenue"
+    ]
+  },
+  {
+    "category": "Revenue & Sales",
+    "question": "Which month had the lowest revenue?",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "lowest_month",
+      "revenue"
+    ]
+  },
+  {
+    "category": "Revenue & Sales",
+    "question": "What is the average order value (AOV)?",
+    "expected_tables": [
+      "order_items"
+    ],
+    "expected_metrics": [
+      "average_order_value"
+    ]
+  },
+  {
+    "category": "Revenue & Sales",
+    "question": "How has AOV changed over time?",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "month",
+      "average_order_value"
+    ]
+  },
+  {
+    "category": "Revenue & Sales",
+    "question": "What percentage of revenue comes from top 10% customers?",
+    "expected_tables": [
+      "customers",
+      "orders",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "customer_revenue_percentage"
+    ]
+  },
+  {
+    "category": "Revenue & Sales",
+    "question": "Which days of the week generate the most revenue?",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "day_of_week",
+      "revenue"
+    ]
+  },
+  {
+    "category": "Revenue & Sales",
+    "question": "What is the revenue distribution by hour of the day?",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "hour",
+      "revenue"
+    ]
+  },
+  {
+    "category": "Revenue & Sales",
+    "question": "What is the revenue growth rate month-over-month?",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "month",
+      "revenue_growth_rate"
+    ]
+  },
+  {
+    "category": "Revenue & Sales",
+    "question": "What is the cumulative revenue over time?",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "month",
+      "cumulative_revenue"
+    ]
+  },
+  {
+    "category": "Revenue & Sales",
+    "question": "Which payment type contributes most to revenue?",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "expected_metrics": [
+      "payment_type",
+      "total_revenue"
+    ]
+  },
+  {
+    "category": "Revenue & Sales",
+    "question": "What is the median order value?",
+    "expected_tables": [
+      "order_items"
+    ],
+    "expected_metrics": [
+      "median_order_value"
+    ]
+  },
+  {
+    "category": "Revenue & Sales",
+    "question": "What is the revenue per customer?",
+    "expected_tables": [
+      "customers",
+      "orders",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "revenue_per_customer"
+    ]
+  },
+  {
+    "category": "Revenue & Sales",
+    "question": "What is the revenue per order?",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "revenue_per_order"
+    ]
+  },
+  {
+    "category": "Orders & Transactions",
+    "question": "How many total orders are there?",
+    "expected_tables": [
+      "orders"
+    ],
+    "expected_metrics": [
+      "total_orders"
+    ]
+  },
+  {
+    "category": "Orders & Transactions",
+    "question": "How many orders per month?",
+    "expected_tables": [
+      "orders"
+    ],
+    "expected_metrics": [
+      "month",
+      "order_count"
+    ]
+  },
+  {
+    "category": "Orders & Transactions",
+    "question": "What is the average number of items per order?",
+    "expected_tables": [
+      "order_items"
+    ],
+    "expected_metrics": [
+      "average_items_per_order"
+    ]
+  },
+  {
+    "category": "Orders & Transactions",
+    "question": "What is the distribution of order sizes?",
+    "expected_tables": [
+      "order_items"
+    ],
+    "expected_metrics": [
+      "items_per_order",
+      "order_count"
+    ]
+  },
+  {
+    "category": "Orders & Transactions",
+    "question": "How many orders are completed vs cancelled?",
+    "expected_tables": [
+      "orders"
+    ],
+    "expected_metrics": [
+      "order_status",
+      "count"
+    ]
+  },
+  {
+    "category": "Orders & Transactions",
+    "question": "What is the cancellation rate?",
+    "expected_tables": [
+      "orders"
+    ],
+    "expected_metrics": [
+      "cancellation_rate"
+    ]
+  },
+  {
+    "category": "Orders & Transactions",
+    "question": "How long does it take to deliver orders on average?",
+    "expected_tables": [
+      "orders"
+    ],
+    "expected_metrics": [
+      "average_delivery_time_days"
+    ]
+  },
+  {
+    "category": "Orders & Transactions",
+    "question": "What is the order processing time (purchase -> shipped)?",
+    "expected_tables": [
+      "orders"
+    ],
+    "expected_metrics": [
+      "average_processing_time_hours"
+    ]
+  },
+  {
+    "category": "Orders & Transactions",
+    "question": "What percentage of orders are delivered late?",
+    "expected_tables": [
+      "orders"
+    ],
+    "expected_metrics": [
+      "percentage_late_deliveries"
+    ]
+  },
+  {
+    "category": "Orders & Transactions",
+    "question": "What is the trend of late deliveries over time?",
+    "expected_tables": [
+      "orders"
+    ],
+    "expected_metrics": [
+      "month",
+      "percentage_late_deliveries"
+    ]
+  },
+  {
+    "category": "Orders & Transactions",
+    "question": "What is the busiest day for orders?",
+    "expected_tables": [
+      "orders"
+    ],
+    "expected_metrics": [
+      "day_of_week",
+      "order_count"
+    ]
+  },
+  {
+    "category": "Orders & Transactions",
+    "question": "What is the peak hour for order placement?",
+    "expected_tables": [
+      "orders"
+    ],
+    "expected_metrics": [
+      "hour",
+      "order_count"
+    ]
+  },
+  {
+    "category": "Orders & Transactions",
+    "question": "What is the average time between orders for a customer?",
+    "expected_tables": [
+      "customers",
+      "orders"
+    ],
+    "expected_metrics": [
+      "average_time_between_orders_days"
+    ]
+  },
+  {
+    "category": "Orders & Transactions",
+    "question": "What is the repeat order rate?",
+    "expected_tables": [
+      "customers",
+      "orders"
+    ],
+    "expected_metrics": [
+      "repeat_order_rate"
+    ]
+  },
+  {
+    "category": "Orders & Transactions",
+    "question": "How many orders contain multiple sellers?",
+    "expected_tables": [
+      "order_items"
+    ],
+    "expected_metrics": [
+      "multiple_seller_order_count"
+    ]
+  },
+  {
+    "category": "Customers",
+    "question": "How many unique customers are there?",
+    "expected_tables": [
+      "customers"
+    ],
+    "expected_metrics": [
+      "unique_customer_count"
+    ]
+  },
+  {
+    "category": "Customers",
+    "question": "How many new customers per month?",
+    "expected_tables": [
+      "customers",
+      "orders"
+    ],
+    "expected_metrics": [
+      "month",
+      "new_customer_count"
+    ]
+  },
+  {
+    "category": "Customers",
+    "question": "What is the customer retention rate?",
+    "expected_tables": [
+      "customers",
+      "orders"
+    ],
+    "expected_metrics": [
+      "retention_rate"
+    ]
+  },
+  {
+    "category": "Customers",
+    "question": "What is the churn rate?",
+    "expected_tables": [
+      "customers",
+      "orders"
+    ],
+    "expected_metrics": [
+      "churn_rate"
+    ]
+  },
+  {
+    "category": "Customers",
+    "question": "What is the average number of orders per customer?",
+    "expected_tables": [
+      "customers",
+      "orders"
+    ],
+    "expected_metrics": [
+      "average_orders_per_customer"
+    ]
+  },
+  {
+    "category": "Customers",
+    "question": "What percentage of customers are repeat buyers?",
+    "expected_tables": [
+      "customers",
+      "orders"
+    ],
+    "expected_metrics": [
+      "percentage_repeat_buyers"
+    ]
+  },
+  {
+    "category": "Customers",
+    "question": "Which regions have the most customers?",
+    "expected_tables": [
+      "customers"
+    ],
+    "expected_metrics": [
+      "customer_state",
+      "customer_count"
+    ]
+  },
+  {
+    "category": "Customers",
+    "question": "What is the distribution of customers by state?",
+    "expected_tables": [
+      "customers"
+    ],
+    "expected_metrics": [
+      "customer_state",
+      "customer_count"
+    ]
+  },
+  {
+    "category": "Customers",
+    "question": "What is the average revenue per customer (ARPU)?",
+    "expected_tables": [
+      "customers",
+      "order_items",
+      "orders"
+    ],
+    "expected_metrics": [
+      "average_revenue_per_customer"
+    ]
+  },
+  {
+    "category": "Customers",
+    "question": "Who are the top 10 customers by revenue?",
+    "expected_tables": [
+      "customers",
+      "orders",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "customer_unique_id",
+      "total_spend"
+    ]
+  },
+  {
+    "category": "Customers",
+    "question": "What is the lifetime value (LTV) of customers?",
+    "expected_tables": [
+      "customers",
+      "orders",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "customer_lifetime_value"
+    ]
+  },
+  {
+    "category": "Customers",
+    "question": "How long do customers stay active?",
+    "expected_tables": [
+      "customers",
+      "orders"
+    ],
+    "expected_metrics": [
+      "active_days_duration"
+    ]
+  },
+  {
+    "category": "Customers",
+    "question": "What is the average time between first and last purchase?",
+    "expected_tables": [
+      "customers",
+      "orders"
+    ],
+    "expected_metrics": [
+      "average_days_between_first_last"
+    ]
+  },
+  {
+    "category": "Customers",
+    "question": "What percentage of customers make only one purchase?",
+    "expected_tables": [
+      "customers",
+      "orders"
+    ],
+    "expected_metrics": [
+      "percentage_single_purchase"
+    ]
+  },
+  {
+    "category": "Customers",
+    "question": "What is the geographic distribution of high-value customers?",
+    "expected_tables": [
+      "customers",
+      "orders",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "customer_state",
+      "high_value_customer_count"
+    ]
+  },
+  {
+    "category": "Products & Categories",
+    "question": "Which product categories generate the most revenue?",
+    "expected_tables": [
+      "products",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "product_category_name",
+      "total_revenue"
+    ]
+  },
+  {
+    "category": "Products & Categories",
+    "question": "Which product categories have the most orders?",
+    "expected_tables": [
+      "products",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "product_category_name",
+      "order_count"
+    ]
+  },
+  {
+    "category": "Products & Categories",
+    "question": "What is the average price per product category?",
+    "expected_tables": [
+      "products",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "product_category_name",
+      "average_price"
+    ]
+  },
+  {
+    "category": "Products & Categories",
+    "question": "Which products are most frequently purchased?",
+    "expected_tables": [
+      "products",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "product_id",
+      "purchase_frequency"
+    ]
+  },
+  {
+    "category": "Products & Categories",
+    "question": "Which products generate the most revenue?",
+    "expected_tables": [
+      "order_items"
+    ],
+    "expected_metrics": [
+      "product_id",
+      "total_revenue"
+    ]
+  },
+  {
+    "category": "Products & Categories",
+    "question": "What is the distribution of product prices?",
+    "expected_tables": [
+      "order_items"
+    ],
+    "expected_metrics": [
+      "price_bucket",
+      "product_count"
+    ]
+  },
+  {
+    "category": "Products & Categories",
+    "question": "Which categories have the highest AOV?",
+    "expected_tables": [
+      "products",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "product_category_name",
+      "average_order_value"
+    ]
+  },
+  {
+    "category": "Products & Categories",
+    "question": "Which categories have declining sales trends?",
+    "expected_tables": [
+      "products",
+      "order_items",
+      "orders"
+    ],
+    "expected_metrics": [
+      "product_category_name",
+      "decline_rate"
+    ]
+  },
+  {
+    "category": "Products & Categories",
+    "question": "Which categories have the fastest growth?",
+    "expected_tables": [
+      "products",
+      "order_items",
+      "orders"
+    ],
+    "expected_metrics": [
+      "product_category_name",
+      "growth_rate"
+    ]
+  },
+  {
+    "category": "Products & Categories",
+    "question": "What is the average number of items sold per product?",
+    "expected_tables": [
+      "order_items"
+    ],
+    "expected_metrics": [
+      "average_items_sold"
+    ]
+  },
+  {
+    "category": "Products & Categories",
+    "question": "Which products are often bought together? (basic co-occurrence)",
+    "expected_tables": [
+      "order_items"
+    ],
+    "expected_metrics": [
+      "product_a",
+      "product_b",
+      "co_occurrence_count"
+    ]
+  },
+  {
+    "category": "Products & Categories",
+    "question": "What is the revenue contribution of top categories?",
+    "expected_tables": [
+      "products",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "product_category_name",
+      "revenue_share_percentage"
+    ]
+  },
+  {
+    "category": "Products & Categories",
+    "question": "Which products have the highest return/cancellation rate?",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "product_id",
+      "cancellation_rate"
+    ]
+  },
+  {
+    "category": "Products & Categories",
+    "question": "What is the price vs sales relationship?",
+    "expected_tables": [
+      "order_items"
+    ],
+    "expected_metrics": [
+      "price_range",
+      "units_sold"
+    ]
+  },
+  {
+    "category": "Products & Categories",
+    "question": "Which categories have seasonal demand patterns?",
+    "expected_tables": [
+      "products",
+      "order_items",
+      "orders"
+    ],
+    "expected_metrics": [
+      "product_category_name",
+      "seasonal_variance"
+    ]
+  },
+  {
+    "category": "Logistics & Delivery",
+    "question": "What is the average delivery time?",
+    "expected_tables": [
+      "orders"
+    ],
+    "expected_metrics": [
+      "average_delivery_days"
+    ]
+  },
+  {
+    "category": "Logistics & Delivery",
+    "question": "What is the average shipping delay?",
+    "expected_tables": [
+      "orders"
+    ],
+    "expected_metrics": [
+      "average_delay_days"
+    ]
+  },
+  {
+    "category": "Logistics & Delivery",
+    "question": "Which states have the longest delivery times?",
+    "expected_tables": [
+      "customers",
+      "orders"
+    ],
+    "expected_metrics": [
+      "customer_state",
+      "average_delivery_days"
+    ]
+  },
+  {
+    "category": "Logistics & Delivery",
+    "question": "Which sellers deliver the fastest?",
+    "expected_tables": [
+      "sellers",
+      "orders",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "seller_id",
+      "average_delivery_days"
+    ]
+  },
+  {
+    "category": "Logistics & Delivery",
+    "question": "What percentage of deliveries are delayed?",
+    "expected_tables": [
+      "orders"
+    ],
+    "expected_metrics": [
+      "delay_percentage"
+    ]
+  },
+  {
+    "category": "Logistics & Delivery",
+    "question": "What is the trend of delivery delays over time?",
+    "expected_tables": [
+      "orders"
+    ],
+    "expected_metrics": [
+      "month",
+      "delay_percentage"
+    ]
+  },
+  {
+    "category": "Logistics & Delivery",
+    "question": "How does distance affect delivery time? (approx via location)",
+    "expected_tables": [
+      "customers",
+      "sellers",
+      "orders",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "approx_distance",
+      "delivery_days"
+    ]
+  },
+  {
+    "category": "Logistics & Delivery",
+    "question": "Which regions have the best delivery performance?",
+    "expected_tables": [
+      "customers",
+      "orders"
+    ],
+    "expected_metrics": [
+      "customer_state",
+      "on_time_delivery_percentage"
+    ]
+  },
+  {
+    "category": "Logistics & Delivery",
+    "question": "What is the distribution of delivery times?",
+    "expected_tables": [
+      "orders"
+    ],
+    "expected_metrics": [
+      "delivery_days_bucket",
+      "order_count"
+    ]
+  },
+  {
+    "category": "Logistics & Delivery",
+    "question": "Are late deliveries increasing or decreasing?",
+    "expected_tables": [
+      "orders"
+    ],
+    "expected_metrics": [
+      "month",
+      "late_order_count"
+    ]
+  },
+  {
+    "category": "Sellers",
+    "question": "How many sellers are there?",
+    "expected_tables": [
+      "sellers"
+    ],
+    "expected_metrics": [
+      "total_sellers"
+    ]
+  },
+  {
+    "category": "Sellers",
+    "question": "Which sellers generate the most revenue?",
+    "expected_tables": [
+      "order_items"
+    ],
+    "expected_metrics": [
+      "seller_id",
+      "total_revenue"
+    ]
+  },
+  {
+    "category": "Sellers",
+    "question": "Which sellers have the most orders?",
+    "expected_tables": [
+      "order_items"
+    ],
+    "expected_metrics": [
+      "seller_id",
+      "order_count"
+    ]
+  },
+  {
+    "category": "Sellers",
+    "question": "What is the average revenue per seller?",
+    "expected_tables": [
+      "order_items",
+      "sellers"
+    ],
+    "expected_metrics": [
+      "average_revenue_per_seller"
+    ]
+  },
+  {
+    "category": "Sellers",
+    "question": "Which sellers have the highest ratings?",
+    "expected_tables": [
+      "order_reviews",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "seller_id",
+      "average_rating"
+    ]
+  },
+  {
+    "category": "Sellers",
+    "question": "Which sellers have the most delayed deliveries?",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "seller_id",
+      "delay_count"
+    ]
+  },
+  {
+    "category": "Sellers",
+    "question": "What is the distribution of sellers by region?",
+    "expected_tables": [
+      "sellers"
+    ],
+    "expected_metrics": [
+      "seller_state",
+      "seller_count"
+    ]
+  },
+  {
+    "category": "Sellers",
+    "question": "Which sellers are growing fastest?",
+    "expected_tables": [
+      "order_items",
+      "orders"
+    ],
+    "expected_metrics": [
+      "seller_id",
+      "sales_growth_rate"
+    ]
+  },
+  {
+    "category": "Sellers",
+    "question": "What is the average delivery time per seller?",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "seller_id",
+      "average_delivery_days"
+    ]
+  },
+  {
+    "category": "Sellers",
+    "question": "Which sellers have the highest cancellation rate?",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "seller_id",
+      "cancellation_rate"
+    ]
+  },
+  {
+    "category": "Payments",
+    "question": "Which payment method is most used?",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "expected_metrics": [
+      "payment_type",
+      "payment_count"
+    ]
+  },
+  {
+    "category": "Payments",
+    "question": "What is the revenue by payment type?",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "expected_metrics": [
+      "payment_type",
+      "total_payments_value"
+    ]
+  },
+  {
+    "category": "Payments",
+    "question": "What is the average payment value?",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "expected_metrics": [
+      "average_payment_value"
+    ]
+  },
+  {
+    "category": "Payments",
+    "question": "How many installments are used on average?",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "expected_metrics": [
+      "average_installments"
+    ]
+  },
+  {
+    "category": "Payments",
+    "question": "What is the distribution of installment payments?",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "expected_metrics": [
+      "payment_installments",
+      "order_count"
+    ]
+  },
+  {
+    "category": "Payments",
+    "question": "Do installment payments affect order value?",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "expected_metrics": [
+      "payment_installments",
+      "average_payment_value"
+    ]
+  },
+  {
+    "category": "Payments",
+    "question": "What is the failure rate of payments?",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "expected_metrics": [
+      "payment_failure_rate"
+    ]
+  },
+  {
+    "category": "Payments",
+    "question": "Which payment types have highest order value?",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "expected_metrics": [
+      "payment_type",
+      "average_payment_value"
+    ]
+  },
+  {
+    "category": "Payments",
+    "question": "How does payment method vary by region?",
+    "expected_tables": [
+      "customers",
+      "orders",
+      "order_payments"
+    ],
+    "expected_metrics": [
+      "customer_state",
+      "payment_type",
+      "count"
+    ]
+  },
+  {
+    "category": "Payments",
+    "question": "What is the trend of payment methods over time?",
+    "expected_tables": [
+      "orders",
+      "order_payments"
+    ],
+    "expected_metrics": [
+      "month",
+      "payment_type",
+      "count"
+    ]
+  },
+  {
+    "category": "Reviews & Satisfaction",
+    "question": "What is the average review score?",
+    "expected_tables": [
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "average_review_score"
+    ]
+  },
+  {
+    "category": "Reviews & Satisfaction",
+    "question": "What is the distribution of review scores?",
+    "expected_tables": [
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "review_score",
+      "count"
+    ]
+  },
+  {
+    "category": "Reviews & Satisfaction",
+    "question": "Which products have the best reviews?",
+    "expected_tables": [
+      "order_reviews",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "product_id",
+      "average_review_score"
+    ]
+  },
+  {
+    "category": "Reviews & Satisfaction",
+    "question": "Which sellers have the worst reviews?",
+    "expected_tables": [
+      "order_reviews",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "seller_id",
+      "average_review_score"
+    ]
+  },
+  {
+    "category": "Reviews & Satisfaction",
+    "question": "What is the relationship between delivery time and review score?",
+    "expected_tables": [
+      "orders",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "delivery_days",
+      "average_review_score"
+    ]
+  },
+  {
+    "category": "Reviews & Satisfaction",
+    "question": "Do late deliveries lead to lower ratings?",
+    "expected_tables": [
+      "orders",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "is_late",
+      "average_review_score"
+    ]
+  },
+  {
+    "category": "Reviews & Satisfaction",
+    "question": "What percentage of orders receive reviews?",
+    "expected_tables": [
+      "orders",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "review_response_rate"
+    ]
+  },
+  {
+    "category": "Reviews & Satisfaction",
+    "question": "What is the trend of review scores over time?",
+    "expected_tables": [
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "month",
+      "average_review_score"
+    ]
+  },
+  {
+    "category": "Reviews & Satisfaction",
+    "question": "Which categories have the highest satisfaction?",
+    "expected_tables": [
+      "products",
+      "order_reviews",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "product_category_name",
+      "average_review_score"
+    ]
+  },
+  {
+    "category": "Reviews & Satisfaction",
+    "question": "Which categories have the lowest satisfaction?",
+    "expected_tables": [
+      "products",
+      "order_reviews",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "product_category_name",
+      "average_review_score"
+    ]
+  }
+]
