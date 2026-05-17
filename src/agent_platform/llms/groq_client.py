@@ -44,6 +44,7 @@ class GroqClient:
         system_prompt: str,
         user_prompt: str,
         temperature: float = 0.1,
+        response_model: type[BaseModel] | None = None,
     ) -> dict[str, Any]:
         if not self.api_key:
             raise GroqClientError("GROQ_API_KEY is not configured.")
@@ -51,7 +52,7 @@ class GroqClient:
         models_to_try = []
         if self.model:
             models_to_try.append(self.model)
-        for fallback in ["qwen-2.5-32b", "llama-3.1-8b-instant", "llama-3.3-70b-versatile"]:
+        for fallback in ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"]:
             if fallback not in models_to_try:
                 models_to_try.append(fallback)
 
@@ -92,7 +93,19 @@ class GroqClient:
                 try:
                     body = json.loads(raw)
                     content = body["choices"][0]["message"]["content"]
-                    return json.loads(content)
+                    result_dict = json.loads(content)
+                    
+                    if response_model is not None:
+                        # Perform Pydantic validation
+                        from pydantic import ValidationError
+                        try:
+                            validated_obj = response_model.model_validate(result_dict)
+                            return validated_obj.model_dump()
+                        except ValidationError as val_err:
+                            logger.error(f"JSON validation failed for {response_model.__name__}: {val_err}")
+                            raise
+                            
+                    return result_dict
                 except (KeyError, IndexError, TypeError, json.JSONDecodeError) as exc:
                     raise GroqClientError("Groq response did not contain valid JSON content.") from exc
             

@@ -191,9 +191,15 @@ function updateProgressUI(data, question) {
   }
 }
 
-function setLoading(isLoading, message, question) {
+let currentEventSource = null;
+
+function setLoading(isLoading, message, question, taskId) {
   statusEl.hidden = !isLoading;
   clearTimeout(statusInterval);
+  if (currentEventSource) {
+    currentEventSource.close();
+    currentEventSource = null;
+  }
   
   if (isLoading) {
     form.querySelector("button").disabled = true;
@@ -214,21 +220,42 @@ function setLoading(isLoading, message, question) {
       ]);
     }
     
-    const pollProgress = async () => {
-      if (!statusEl.hidden) {
+    if (taskId) {
+      // Connect to the per-task SSE stream!
+      const es = new EventSource(`${API_BASE}/tasks/progress/${taskId}/stream`);
+      currentEventSource = es;
+      es.onmessage = (event) => {
         try {
-          const res = await fetch(`${API_BASE}/tasks/progress`);
-          if (res.ok) {
-            const data = await res.json();
-            updateProgressUI(data, question);
+          const data = JSON.parse(event.data);
+          updateProgressUI(data, question);
+          if (data.message === "Finished." || data.error) {
+            es.close();
           }
-        } catch (e) {
-          // ignore fetch errors
+        } catch (err) {
+          // ignore parsing errors
         }
-        statusInterval = setTimeout(pollProgress, 500);
-      }
-    };
-    pollProgress();
+      };
+      es.onerror = () => {
+        es.close();
+      };
+    } else {
+      // Fallback to traditional global polling if no taskId provided
+      const pollProgress = async () => {
+        if (!statusEl.hidden) {
+          try {
+            const res = await fetch(`${API_BASE}/tasks/progress`);
+            if (res.ok) {
+              const data = await res.json();
+              updateProgressUI(data, question);
+            }
+          } catch (e) {
+            // ignore fetch errors
+          }
+          statusInterval = setTimeout(pollProgress, 500);
+        }
+      };
+      pollProgress();
+    }
   } else {
     form.querySelector("button").disabled = false;
   }
@@ -301,7 +328,8 @@ function renderTrace(steps) {
 
 async function runAnalysis(question) {
   console.log("Starting analysis for:", question);
-  setLoading(true, null, question);
+  const taskId = self.crypto.randomUUID ? self.crypto.randomUUID() : Math.random().toString(36).substring(2, 15);
+  setLoading(true, null, question, taskId);
   resultsEl.hidden = true;
   summaryEl.textContent = "";
   findingsEl.innerHTML = "";
@@ -323,7 +351,7 @@ async function runAnalysis(question) {
     const response = await fetch(`${API_BASE}/tasks/analyze`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ question }),
+      body: JSON.stringify({ question, task_id: taskId }),
     });
     
     console.log("Response received:", response.status);

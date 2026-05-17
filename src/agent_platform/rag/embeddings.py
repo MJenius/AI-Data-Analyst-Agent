@@ -54,5 +54,40 @@ class EmbeddingModel:
         return embedding
 
     def embed_batch(self, texts: list[str]) -> list[list[float]]:
-        # For simplicity, just use embed_text for each; in a real app, we'd batch the non-cached ones
-        return [self.embed_text(t) for t in texts]
+        results: list[list[float] | None] = [None] * len(texts)
+        uncached_indices: list[int] = []
+        uncached_texts: list[str] = []
+        
+        # 1. Check cache first
+        for idx, text in enumerate(texts):
+            cache_path = self._get_cache_path(text)
+            if cache_path.exists():
+                try:
+                    with open(cache_path, "r") as f:
+                        results[idx] = json.load(f)
+                except Exception as exc:
+                    logger.warning(f"Failed to read cached embedding, will re-embed: {exc}")
+                    uncached_indices.append(idx)
+                    uncached_texts.append(text)
+            else:
+                uncached_indices.append(idx)
+                uncached_texts.append(text)
+                
+        # 2. Batch encode any uncached texts
+        if uncached_texts:
+            model = self._ensure_model()
+            logger.info(f"Batch encoding {len(uncached_texts)} uncached text items...")
+            embeddings = model.encode(uncached_texts, batch_size=32).tolist()
+            
+            # Save to cache and populate results
+            for idx, text, emb in zip(uncached_indices, uncached_texts, embeddings):
+                results[idx] = emb
+                cache_path = self._get_cache_path(text)
+                try:
+                    with open(cache_path, "w") as f:
+                        json.dump(emb, f)
+                except Exception as exc:
+                    logger.warning(f"Failed to write cache for embedding: {exc}")
+                    
+        # Verify all elements are populated
+        return [r for r in results if r is not None]

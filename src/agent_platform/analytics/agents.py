@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import logging
 import re
 from typing import Any
@@ -41,9 +42,11 @@ class AnalyticsPlannerAgent:
         if self._llm_client.enabled:
             try:
                 logger.info(f"Requesting plan from LLM (Provider: {type(self._llm_client).__name__})...")
+                from agent_platform.llms.models import PlannerOutput
                 result = self._llm_client.complete_json(
                     system_prompt=PLANNER_SYSTEM_PROMPT,
                     user_prompt=build_planner_prompt(task, context_text),
+                    response_model=PlannerOutput,
                 )
                 if not isinstance(result, dict):
                     raise ValueError("Planner did not return a valid JSON object.")
@@ -123,7 +126,15 @@ class AnalyticsExecutorAgent:
         4. Executing the SQL and interpreting the results.
         5. Retrying with error context if execution fails.
         """
-        # 1. Fast Retrieval
+        # 1. Fast Retrieval - Proactively retrieve table schemas if missing
+        if not any(item.metadata.get("kind") == "table" for item in context):
+            logger.info("No table documents found in step context. Proactively retrieving table schema context...")
+            additional_context = self._schema_retriever.retrieve(step + " tables", top_k=3)
+            existing_ids = {item.id for item in context}
+            for item in additional_context:
+                if item.id not in existing_ids:
+                    context.append(item)
+
         schema_text = [item.text for item in context]
 
         # 2. SQL Generation (Enabled Retries for Self-Correction)
@@ -150,7 +161,7 @@ class AnalyticsExecutorAgent:
             if not validation_errors:
                 try:
                     logger.info(f"Running SQL: {sql.strip()}")
-                    sql_result = self._sql_tool.execute(sql)
+                    sql_result = await asyncio.to_thread(self._sql_tool.execute, sql)
                     logger.info(f"SQL executed successfully. Returned {sql_result.get('row_count', 0)} rows.")
                     analysis = self._interpret(step, sql_result)
                     return {
@@ -176,7 +187,7 @@ class AnalyticsExecutorAgent:
             fallback_sql = self._fallback_sql(state.task, step)
             if fallback_sql:
                 logger.info(f"Using safe fallback SQL: {fallback_sql.strip()}")
-                sql_result = self._sql_tool.execute(fallback_sql)
+                sql_result = await asyncio.to_thread(self._sql_tool.execute, fallback_sql)
                 return {
                     "step": step,
                     "output": {
@@ -212,11 +223,10 @@ class AnalyticsExecutorAgent:
         # E.g. "from table_name" or "join table_name"
         table_matches = re.findall(r"\b(?:from|join)\s+([a-zA-Z_][a-zA-Z0-9_]*)", lowered_sql)
         for tbl in table_matches:
-            if allowed_tables and tbl not in allowed_tables:
-                # Table is not in schema context, mark as a potential hallucination error
-                # Skip Olist translation/categories standard names to avoid false positives
-                if tbl not in ["product_category_name_translation"]:
-                    errors.append(f"Table '{tbl}' is not in retrieved schema context (hallucination prevention).")
+            if tbl in ["product_category_name_translation"]:
+                continue
+            if tbl not in allowed_tables:
+                errors.append(f"Table '{tbl}' is not in retrieved schema context (hallucination prevention).")
 
         # Rigorous check for destructive SQL commands to guarantee safety
         destructive_keywords = ["delete", "drop", "update", "insert", "alter", "create", "replace", "truncate", "grant", "revoke"]
@@ -229,9 +239,11 @@ class AnalyticsExecutorAgent:
     def _generate_sql_payload(self, task: str, step: str, schema_context: list[str]) -> dict[str, Any]:
         if self._llm_client.enabled:
             try:
+                from agent_platform.llms.models import SQLOutput
                 result = self._llm_client.complete_json(
                     system_prompt=SQL_SYSTEM_PROMPT,
                     user_prompt=build_sql_prompt(task, step, schema_context),
+                    response_model=SQLOutput,
                 )
                 if not isinstance(result, dict):
                     raise ValueError("Executor did not return a valid JSON object.")
@@ -390,16 +402,27 @@ class AnalyticsExecutorAgent:
         if not rows:
             return "The query returned no rows, so no supporting metric is available."
         first = rows[0]
-        if "revenue_growth" in first:
-            return (
-                f"{first['product_name']} leads revenue growth with "
-                f"{first['revenue_growth']} incremental revenue."
-            )
-        if "region" in first:
-            return f"{first['region']} shows the strongest regional revenue contribution."
-        if "month" in first:
-            return "Monthly revenue trend was calculated for anomaly and drop analysis."
-        return f"{first.get('product_name', first.get('category', 'Top segment'))} is the leading revenue contributor."
+        
+        parts = []
+        for col, val in first.items():
+            if col in ["product_category_name", "category", "product_name", "state", "month", "payment_type", "seller_id", "customer_unique_id"]:
+                parts.append(f"{col}: {val}")
+            elif col in ["revenue", "total_revenue", "total_sales", "payment_value", "total_payment_value", "price"]:
+                try:
+                    parts.append(f"Revenue: ${float(val):,.2f}")
+                except (ValueError, TypeError):
+                    parts.append(f"Revenue: {val}")
+            elif col in ["order_count", "total_orders", "count", "unique_customers", "order_item_id"]:
+                parts.append(f"Count: {val}")
+            elif col in ["average_order_value", "aov"]:
+                try:
+                    parts.append(f"AOV: ${float(val):,.2f}")
+                except (ValueError, TypeError):
+                    parts.append(f"AOV: {val}")
+                    
+        if parts:
+            return f"Top result indicators: {', '.join(parts)}."
+        return f"{list(first.values())[0]} is the leading metric for this step."
 
 
 class AnalyticsEvaluatorAgent:
@@ -441,9 +464,11 @@ class AnalyticsEvaluatorAgent:
             return fallback
         try:
             draft_report = {"intermediate_outputs": state.intermediate_outputs}
+            from agent_platform.llms.models import EvaluatorOutput
             result = self._llm_client.complete_json(
                 system_prompt=EVALUATOR_SYSTEM_PROMPT,
                 user_prompt=build_evaluator_prompt(state.task, state.plan, sql_results, draft_report),
+                response_model=EvaluatorOutput,
             )
             if not isinstance(result, dict):
                 raise ValueError("Evaluator did not return a valid JSON object.")
@@ -483,5 +508,5 @@ class AnalyticsEvaluatorAgent:
                 "detected_contradictions": result.get("detected_contradictions", [])
             }
         except (Exception, TypeError, ValueError) as exc:
-            logger.warning("evaluator_llm_fallback", extra={"error": str(exc)})
+            logger.exception("evaluator_llm_fallback triggered")
             return fallback

@@ -3,8 +3,10 @@ from __future__ import annotations
 import os
 import logging
 from typing import Any, Protocol
+from pydantic import BaseModel
 from agent_platform.llms.groq_client import GroqClient
 from agent_platform.llms.ollama_client import OllamaClient
+from agent_platform.llms.gemini_client import GeminiClient
 
 
 logger = logging.getLogger(__name__)
@@ -13,46 +15,61 @@ class LLMClient(Protocol):
     """Unified interface for LLM providers."""
     @property
     def enabled(self) -> bool: ...
-    def complete_json(self, system_prompt: str, user_prompt: str, temperature: float = 0.1) -> dict[str, Any]: ...
+    def complete_json(
+        self,
+        system_prompt: str,
+        user_prompt: str,
+        temperature: float = 0.1,
+        response_model: type[BaseModel] | None = None,
+    ) -> dict[str, Any]: ...
 
 
 class FallbackLLMClient:
-    """Tries a primary client and falls back to a secondary client on failure."""
-    def __init__(self, primary: LLMClient, secondary: LLMClient) -> None:
-        self.primary = primary
-        self.secondary = secondary
+    """Tries a list of clients in priority order and falls back to subsequent ones on failure."""
+    def __init__(self, clients: list[LLMClient]) -> None:
+        self.clients = [c for c in clients if c is not None]
 
     @property
     def enabled(self) -> bool:
-        return self.primary.enabled or self.secondary.enabled
+        return any(c.enabled for c in self.clients)
 
-    def complete_json(self, system_prompt: str, user_prompt: str, temperature: float = 0.1) -> dict[str, Any]:
-        if self.primary.enabled:
-            try:
-                return self.primary.complete_json(system_prompt, user_prompt, temperature)
-            except Exception as e:
-                logger.warning(f"Primary LLM failed, falling back to secondary: {e}")
-                if not self.secondary.enabled:
-                    raise
+    def complete_json(
+        self,
+        system_prompt: str,
+        user_prompt: str,
+        temperature: float = 0.1,
+        response_model: type[BaseModel] | None = None,
+    ) -> dict[str, Any]:
+        last_error = None
+        for client in self.clients:
+            if client.enabled:
+                try:
+                    return client.complete_json(system_prompt, user_prompt, temperature, response_model)
+                except Exception as e:
+                    logger.warning(f"LLM Client {type(client).__name__} failed: {e}. Trying next fallback...")
+                    last_error = e
+                    continue
         
-        if self.secondary.enabled:
-            return self.secondary.complete_json(system_prompt, user_prompt, temperature)
-        
-        raise RuntimeError("No enabled LLM clients available for request.")
+        raise RuntimeError(f"All configured LLM clients failed or were disabled. Last error: {last_error}")
 
 
 def get_llm_client() -> LLMClient:
     """
     Returns the configured LLM client.
-    By default, returns a FallbackLLMClient that prioritizes Groq and uses Ollama as a safety net.
+    By default, returns a FallbackLLMClient cascade: Groq -> Gemini -> Ollama.
     """
     provider = os.getenv("LLM_PROVIDER", "auto").lower()
     
     if provider == "groq":
         return GroqClient()
     
+    if provider == "gemini":
+        return GeminiClient()
+    
     if provider == "ollama":
         return OllamaClient()
     
-    # Auto-mode: Dynamic fallback
-    return FallbackLLMClient(primary=GroqClient(), secondary=OllamaClient())
+    # Auto-mode: Dynamic list-based cascade: Groq -> Gemini -> Ollama
+    return FallbackLLMClient(clients=[GroqClient(), GeminiClient(), OllamaClient()])
+
+

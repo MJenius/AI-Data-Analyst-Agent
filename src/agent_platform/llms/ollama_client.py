@@ -58,6 +58,7 @@ class OllamaClient:
         system_prompt: str,
         user_prompt: str,
         temperature: float = 0.1,
+        response_model: type[BaseModel] | None = None,
     ) -> dict[str, Any]:
         logger.info(f"Ollama ({self.model}) starting generation...")
         payload = {
@@ -108,6 +109,18 @@ class OllamaClient:
                 content = content[3:]
             if content.endswith("```"):
                 content = content[:-3]
-            return json.loads(content.strip())
+            result_dict = json.loads(content.strip())
+            
+            if response_model is not None:
+                # Perform Pydantic validation
+                from pydantic import ValidationError
+                try:
+                    validated_obj = response_model.model_validate(result_dict)
+                    return validated_obj.model_dump()
+                except ValidationError as val_err:
+                    logger.error(f"JSON validation failed for {response_model.__name__}: {val_err}")
+                    raise
+                    
+            return result_dict
         except (KeyError, IndexError, TypeError, json.JSONDecodeError) as exc:
             raise OllamaClientError("Ollama response did not contain valid JSON content.") from exc

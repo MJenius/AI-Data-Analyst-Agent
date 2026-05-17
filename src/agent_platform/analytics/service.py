@@ -19,17 +19,28 @@ from agent_platform.rag.retriever import SchemaRetriever
 from agent_platform.tools.sql_tool import SQLTool
 
 
-class RunStore:
-    """In-memory run store for API lookups; replace with PostgreSQL repository later."""
+from collections import OrderedDict
 
-    def __init__(self) -> None:
-        self._runs: dict[str, dict[str, Any]] = {}
+class RunStore:
+    """In-memory run store with LRU eviction policy; replace with PostgreSQL repository later."""
+
+    def __init__(self, capacity: int = 1000) -> None:
+        self._runs: OrderedDict[str, dict[str, Any]] = OrderedDict()
+        self._capacity = capacity
 
     def save(self, run: dict[str, Any]) -> None:
-        self._runs[run["run_id"]] = run
+        run_id = run["run_id"]
+        if run_id in self._runs:
+            self._runs.move_to_end(run_id)
+        self._runs[run_id] = run
+        if len(self._runs) > self._capacity:
+            self._runs.popitem(last=False)
 
     def get(self, run_id: str) -> dict[str, Any] | None:
-        return self._runs.get(run_id)
+        if run_id in self._runs:
+            self._runs.move_to_end(run_id)
+            return self._runs[run_id]
+        return None
 
 
 class AnalyticsAgentService:
