@@ -57,6 +57,17 @@ class AnalyticsReportBuilder:
                     else:
                         findings.append(f"Revenue increased to {c_rev:.1f} in {label}.")
 
+            # Delivery time comparison
+            elif len(rows) >= 2 and "avg_delivery_time_days" in rows[0] and "state" in rows[0]:
+                sp_row = next((r for r in rows if r["state"] == "SP"), None)
+                rj_row = next((r for r in rows if r["state"] == "RJ"), None)
+                if sp_row and rj_row:
+                    diff = rj_row["avg_delivery_time_days"] - sp_row["avg_delivery_time_days"]
+                    pct = (diff / sp_row["avg_delivery_time_days"] * 100) if sp_row["avg_delivery_time_days"] > 0 else 0
+                    findings.append(f"Rio de Janeiro (RJ) deliveries take {diff:.2f} days longer than São Paulo (SP) on average (+{pct:.1f}%).")
+                for row in rows:
+                    findings.append(f"Average delivery time in state {row['state']} is {row['avg_delivery_time_days']:.2f} days.")
+
             # Single row attribution
             elif len(rows) == 1:
                 first = rows[0]
