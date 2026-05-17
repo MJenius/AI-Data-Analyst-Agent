@@ -26,8 +26,8 @@ graph TD
     
     subgraph LLM Cascade / Fallback
         LLM --> Groq[Groq API <br> Llama-3.3-70b-versatile]
-        Groq -.-->|Fallback if down| Gemini[Gemini API <br> Gemini-1.5-flash]
-        Gemini -.-->|Fallback if down| SQL[Deterministic SQL Fallback]
+        Groq -. "Fallback if down" .-> Gemini[Gemini API <br> Gemini-1.5-flash]
+        Gemini -. "Fallback if down" .-> SQL[Deterministic SQL Fallback]
     end
 ```
 
@@ -37,49 +37,31 @@ graph TD
 The agentic planning, semantic schema lookup, query safety auditing, self-correcting query loop, and executive summary formulation run in a strictly coordinated sequence:
 
 ```mermaid
-sequenceDiagram
-    autonumber
-    actor User as Business User
-    participant UI as Web Dashboard
-    participant API as FastAPI Gateway
-    participant Plan as Planner Agent
-    participant RAG as Schema RAG (FAISS)
-    participant Exec as Executor Agent
-    participant DB as SQLite Sandbox
-    participant Eval as Evaluator Agent
+graph TD
+    classDef agent fill:#89b4fa,stroke:#1e66f5,stroke-width:2px,color:#11111b,font-weight:bold;
+    classDef process fill:#a6e3a1,stroke:#40a02b,stroke-width:2px,color:#11111b;
+    classDef error fill:#f38ba8,stroke:#d20f39,stroke-width:2px,color:#11111b;
+    classDef output fill:#f9e2af,stroke:#df8e1d,stroke-width:2px,color:#11111b,font-weight:bold;
 
-    User->>UI: Submit Question ("Why did revenue drop in March?")
-    UI->>API: POST /tasks/analyze (with client-side Task ID)
-    API-->>UI: Binds SSE Stream (/tasks/progress/stream)
-    
-    API->>Plan: Trigger planning phase
-    Plan->>RAG: Retrieve schemas for relevant tables
-    RAG-->>Plan: DDL schemas (orders, products, etc.)
-    Plan->>Plan: Formulate step-by-step analytical plan
-    API-->>UI: SSE Stream: Planner Steps Created
+    User(["User Question <br> 'Why did revenue drop?'"])
+    Plan["1. Analytics Planner Agent <br> (Decomposes query into step-by-step plan)"]:::agent
+    RAG["2. Schema Retriever RAG <br> (Retrieves matching schemas via FAISS)"]:::process
+    Exec["3. Analytics Executor Agent <br> (Generates SQL & checks safety rules)"]:::agent
+    Validate{"Is SQL Query Valid & Safe?"}
+    Correct["4. Self-Correct & Retry <br> (Up to 2 healing iterations)"]:::error
+    DB[("SQLite Sandboxed DB <br> (Executes query & fetches datasets)")]
+    Eval["5. Analytics Evaluator Agent <br> (Validates results & scores confidence)"]:::agent
+    Report(["Polished Executive Report <br> (Causal explanations & verified metrics)"]):::output
 
-    loop Each Plan Step
-        API->>Exec: Trigger step execution
-        Exec->>Exec: Generate safe SQL via LLM Cascade
-        Exec->>Exec: Audit SQL safety linter
-        alt SQL runs successfully
-            Exec->>DB: Execute read-only SQL query
-            DB-->>Exec: SQL Result Dataset
-        else SQL fails (Syntax/Column)
-            Exec->>Exec: Auto-correct query with error context (Up to 2 Retries)
-        end
-        Exec->>Exec: Store step results & metrics
-        API-->>UI: SSE Stream: Step execution complete
-    end
-
-    API->>Eval: Trigger evaluation phase
-    Eval->>Eval: Audit raw SQL traces, flag anomalies & score confidence
-    alt LLMs Offline / Failed
-        Eval->>Exec: Trigger high-fidelity deterministic SQL fallback
-    end
-    Eval-->>API: Synthetic Report & Verdict (accurate / uncertain)
-    API->>UI: Return Final JSON Analysis
-    UI-->>User: Display Glassmorphism Interactive Report Card
+    User --> Plan
+    Plan --> RAG
+    RAG --> Exec
+    Exec --> Validate
+    Validate -- "No: Syntax/Linter Error" --> Correct
+    Correct --> Exec
+    Validate -- "Yes: Safe Read-Only SQL" --> DB
+    DB --> Eval
+    Eval --> Report
 ```
 
 ---
