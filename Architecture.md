@@ -50,7 +50,7 @@ To maintain a responsive, low-overhead local profile, the platform strictly segr
 | **Orchestration Loop** | Pure Asynchronous CPython Task Loop (Stateless execution graph) | LangGraph / Temporal.io |
 | **Observability/SSE** | `StreamingResponse` (Native ASGI Server-Sent Events) | Apache Kafka / RabbitMQ |
 | **In-Memory Cache** | `collections.OrderedDict` (LRU Run Store capped at 1,000 runs) | Redis |
-| **LLM Clients** | `GroqClient` $\rightarrow$ `GeminiClient` $\rightarrow$ `OllamaClient` Cascade | OpenAI API / Anthropic API |
+| **LLM Clients** | `GroqClient` $\rightarrow$ `GeminiClient` Cascade | OpenAI API / Anthropic API |
 
 ---
 
@@ -66,7 +66,7 @@ Exposes non-blocking endpoints for analysis and previews:
 Orchestrates requests across API boundaries with automatic structural Pydantic validation:
 1. **Primary (`GroqClient`)**: Executes `llama-3.3-70b-versatile` or `qwen-2.5-32b` over JSON-mode endpoints.
 2. **Secondary (`GeminiClient`)**: Rest-based direct `gemini-1.5-flash` client utilizing standard `urllib.request` to operate under zero-dependency constraints.
-3. **Tertiary (`OllamaClient`)**: Local safety-net hosting `llama3` for offline execution.
+3. **Deterministic SQL Fallback**: Pre-compiled database queries executed when LLM calls are exhausted or offline.
 
 ### C. FAISS RAG Retrieval (`src/agent_platform/rag/`)
 Retrieves database schema tokens dynamically:

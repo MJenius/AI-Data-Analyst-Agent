@@ -56,7 +56,7 @@ class FallbackLLMClient:
 def get_llm_client() -> LLMClient:
     """
     Returns the configured LLM client.
-    By default, returns a FallbackLLMClient cascade: Groq -> Gemini -> Ollama.
+    By default, returns a FallbackLLMClient cascade: Groq -> Gemini.
     """
     provider = os.getenv("LLM_PROVIDER", "auto").lower()
     
@@ -69,7 +69,7 @@ def get_llm_client() -> LLMClient:
     if provider == "ollama":
         return OllamaClient()
     
-    # Auto-mode: Dynamic list-based cascade: Groq -> Gemini -> Ollama
-    return FallbackLLMClient(clients=[GroqClient(), GeminiClient(), OllamaClient()])
+    # Auto-mode: Dynamic list-based cascade: Groq -> Gemini
+    return FallbackLLMClient(clients=[GroqClient(), GeminiClient()])
 
 
