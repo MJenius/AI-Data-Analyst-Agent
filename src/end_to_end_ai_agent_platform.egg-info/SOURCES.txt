@@ -7,9 +7,14 @@ src/agent_platform/analytics/report.py
 src/agent_platform/analytics/service.py
 src/agent_platform/data/__init__.py
 src/agent_platform/data/seed_data.py
+src/agent_platform/infra/cache.py
 src/agent_platform/llms/__init__.py
+src/agent_platform/llms/client.py
 src/agent_platform/llms/evaluator_prompt.py
+src/agent_platform/llms/gemini_client.py
 src/agent_platform/llms/groq_client.py
+src/agent_platform/llms/models.py
+src/agent_platform/llms/ollama_client.py
 src/agent_platform/llms/planner_prompt.py
 src/agent_platform/llms/sql_generation_prompt.py
 src/agent_platform/observability/__init__.py
@@ -21,7 +26,9 @@ src/agent_platform/orchestration/planner_executor.py
 src/agent_platform/orchestration/state.py
 src/agent_platform/orchestration/step_executor.py
 src/agent_platform/rag/__init__.py
+src/agent_platform/rag/embeddings.py
 src/agent_platform/rag/retriever.py
+src/agent_platform/rag/vector_store.py
 src/agent_platform/rag/ingestion/__init__.py
 src/agent_platform/rag/ingestion/schema_context.py
 src/agent_platform/tools/__init__.py

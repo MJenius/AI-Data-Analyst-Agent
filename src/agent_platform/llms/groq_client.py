@@ -6,6 +6,7 @@ import os
 from dataclasses import dataclass
 from typing import Any, Callable
 from urllib import request
+from pydantic import BaseModel
 
 
 logger = logging.getLogger(__name__)

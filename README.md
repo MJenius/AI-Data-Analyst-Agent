@@ -145,15 +145,33 @@ graph TD
 *   **Cached Reachability Checks**: The Ollama status endpoint checks are cached for 60 seconds to avoid repeating network requests on every routing call, ensuring zero latency overhead.
 *   **Model Isolation (`FallbackLLMClient`)**: Set `LLM_PROVIDER=auto` to automatically run Groq as primary and failover to Ollama as a safety net.
 
-### ⚡ Non-Blocking Async Backend Server
-*   **Async Thread Isolation**: Solves FastAPI blockages during long agent execution times. By wrapping `service.analyze(question)` in `asyncio.to_thread` with an isolated event loop, uvicorn continues running concurrently.
-*   **Real-Time Progress Endpoint**: A dedicated `/tasks/progress` endpoint.
-*   **Dynamic Observer Interception**: Leverages custom monkeypatched listeners intercepting agent hooks (`on_run_start`, `on_step_start`, `on_step_end`) to write detailed progress state directly to the front-end in real-time.
+### ⚡ Asynchronous SSE Architecture & Zero-Lag Progress Streaming
+*   **ContextVars Context Propagation**: Uses Python's `contextvars.ContextVar` to propagate the `active_task_id` safely across asynchronous execution boundaries and async tasks. This isolates request-scoped context across concurrent request tasks.
+*   **Direct Push Progress Queue**: Spawns an `asyncio.Queue` per in-flight request. The `/tasks/progress/{task_id}/stream` endpoint uses Server-Sent Events (SSE) to push progress updates from this queue to the client instantly. This completely eliminates the 500ms polling latency and delivers instantaneous, real-time feedback.
+*   **Client-Side UUID Synchronization**: The UI pre-generates a client-side UUID and registers the SSE stream before submitting the analysis payload, ensuring that the very first setup and planning steps are captured in full.
+
+### 🗄️ Bounded LRU Cache & OrderedDict Run Store
+*   **Capacity-Capped OrderedDict**: The `RunStore` is backed by `collections.OrderedDict` with a maximum capacity of 1,000 runs.
+*   **LRU Eviction Policy**: Accessing runs via `get` and adding/updating runs via `save` calls `move_to_end` to keep them fresh in memory. Once capacity is exceeded, the least recently used run is popped automatically, preventing memory footprint growth.
+
+### 🚀 O(1) Embedding Batching & Disk Caching
+*   **Disk Cache Auditing**: Check cache on disk for all inputs first in O(1) to see if embeddings have already been generated.
+*   **Single-Pass Forward Inference**: Collects only the uncached text items and makes a single batch call to `model.encode(uncached_texts, batch_size=32)` instead of triggering O(n) slow sequential model calls.
+*   **Bulk Cache Persistence**: Writes all freshly computed embeddings back to the cache in bulk, minimizing model inference load and maximizing retrieval speed.
+
+### ✅ Strict Pydantic Boundary Validation
+*   **Structured Output Boundaries**: Pydantic schemas — `PlannerOutput`, `SQLOutput`, and `EvaluatorOutput` — validate LLM outputs at all key execution boundaries.
+*   **Type-Safe Validation**: Calls `.model_validate()` before returning. This prevents unvalidated, malformed JSON structures from breaking the downstream reasoning loop.
+
+### ⚙️ Non-Blocking Async Database Executor
+*   **Offloaded Async Worker Threads**: Offloads sqlite execution from the async event loop using `await asyncio.to_thread(self._sql_tool.execute, sql)`. This prevents heavy database disk I/O from blocking the web server.
+*   **Hallucination-Protected Schema Retrievals**: Proactively retrieves database table schemas if missing from the initial step context. This ensures that the SQL validation linter can match the table names accurately against active schema information.
+*   **Safe System Table Queries**: Table schema validation supports system metadata tables (`sqlite_master` and `sqlite_schema`) to allow schema-inspection steps to execute lightweight database metadata audits rather than failing open.
 
 ### 💎 High-Fidelity Premium UI Dashboard
-*   **Dynamic Progress Bar**: Fetches live agent updates every 500ms, replacing static loaders with a responsive, step-by-step progress monitor.
-*   **Olist High-Fidelity Data Preview**: Integrated instant, high-fidelity table lookups on the frontend (`MOCK_TABLE_DATA`) showcasing real Olist schemas (`customers`, `orders`, `products`, `order_items`) to offer sub-millisecond previews without database locking.
-*   **Stunning Aesthetics**: Elegant layout with deep dark-mode tones, vibrant gradients, glassmorphism containers, structured SQL code blocks, and visual analytical grids.
+*   **Live Dynamic Progress Trackers**: Displays real-time agent updates using SSE connection, with color-coded steps, animated loaders, and step duration metrics.
+*   **High-Fidelity Schema Explorer**: Fast front-end database previews for key Olist tables like `orders`, `order_items`, `customers`, and `products`.
+*   **Premium Glassmorphism Style**: Layout featuring dark background colors, gradients, structured SQL syntax blocks, and interactive tables.
 
 ---
 

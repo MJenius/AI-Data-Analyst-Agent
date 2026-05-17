@@ -223,7 +223,7 @@ class AnalyticsExecutorAgent:
         # E.g. "from table_name" or "join table_name"
         table_matches = re.findall(r"\b(?:from|join)\s+([a-zA-Z_][a-zA-Z0-9_]*)", lowered_sql)
         for tbl in table_matches:
-            if tbl in ["product_category_name_translation"]:
+            if tbl in ["product_category_name_translation", "sqlite_master", "sqlite_schema"]:
                 continue
             if tbl not in allowed_tables:
                 errors.append(f"Table '{tbl}' is not in retrieved schema context (hallucination prevention).")
@@ -269,7 +269,7 @@ class AnalyticsExecutorAgent:
         lowered = f"{task} {core_step}".lower()
 
         if "schema" in core_step and "calculate" not in core_step:
-            return None
+            return "SELECT name, type FROM sqlite_master WHERE type='table' ORDER BY name;"
         
         if "regional" in lowered or "state" in lowered:
             return """
@@ -405,7 +405,7 @@ class AnalyticsExecutorAgent:
         
         parts = []
         for col, val in first.items():
-            if col in ["product_category_name", "category", "product_name", "state", "month", "payment_type", "seller_id", "customer_unique_id"]:
+            if col in ["product_category_name", "category", "product_name", "state", "month", "payment_type", "seller_id", "customer_unique_id", "name", "type"]:
                 parts.append(f"{col}: {val}")
             elif col in ["revenue", "total_revenue", "total_sales", "payment_value", "total_payment_value", "price"]:
                 try:

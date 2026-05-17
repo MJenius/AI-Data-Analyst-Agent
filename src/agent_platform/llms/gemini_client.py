@@ -98,7 +98,24 @@ class GeminiClient:
         
         try:
             body = json.loads(raw)
-            text_response = body["candidates"][0]["content"]["parts"][0]["text"].strip()
+            candidates = body.get("candidates")
+            if not candidates:
+                raise GeminiClientError("Gemini response is empty or contains no candidates.")
+            
+            first_candidate = candidates[0]
+            finish_reason = first_candidate.get("finishReason")
+            if finish_reason and finish_reason != "STOP":
+                raise GeminiClientError(f"Gemini candidate failed to finish normally. Reason: {finish_reason}")
+                
+            content = first_candidate.get("content")
+            if not content:
+                raise GeminiClientError(f"Gemini candidate content is missing. Finish reason: {finish_reason}")
+                
+            parts = content.get("parts")
+            if not parts:
+                raise GeminiClientError("Gemini candidate content contains no parts.")
+                
+            text_response = parts[0].get("text", "").strip()
             result_dict = json.loads(text_response)
             
             if response_model is not None:
@@ -112,5 +129,7 @@ class GeminiClient:
                     raise
                     
             return result_dict
+        except GeminiClientError:
+            raise
         except (KeyError, IndexError, TypeError, json.JSONDecodeError) as exc:
             raise GeminiClientError(f"Gemini response did not contain valid JSON content. Raw response: {raw}") from exc

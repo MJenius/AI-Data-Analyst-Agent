@@ -6,6 +6,7 @@ import json
 import logging
 import asyncio
 import contextvars
+import time
 from pathlib import Path
 from typing import Any
 
@@ -35,6 +36,8 @@ class TaskProgress:
         self.completed_steps: list[dict] = []
         self.current_step: str | None = None
         self.error: str | None = None
+        self.created_at: float = time.time()
+        self.finished_at: float | None = None
 
 
 # Thread-safe ContextVar to store task_id for active request execution contexts
@@ -164,14 +167,8 @@ def create_app() -> FastAPI:
             raise HTTPException(status_code=500, detail=str(e))
         finally:
             store.latest_message = "Finished."
+            store.finished_at = time.time()
             push_progress_update(task_id, store)
-            
-            # Reclaim store memory in the background after 30 seconds
-            async def delayed_cleanup(t_id: str):
-                await asyncio.sleep(30)
-                progress_registry.pop(t_id, None)
-                task_queues.pop(t_id, None)
-            asyncio.create_task(delayed_cleanup(task_id))
 
     @app.get("/tasks/progress/{task_id}")
     async def get_progress_by_id(task_id: str):
@@ -263,6 +260,21 @@ def create_app() -> FastAPI:
         except Exception as e:
             api_logger.error(f"Error fetching preview for {table_name}: {e}")
             raise HTTPException(status_code=500, detail=str(e))
+
+    @app.on_event("startup")
+    async def startup_event():
+        async def periodic_cleanup():
+            while True:
+                await asyncio.sleep(10)
+                now = time.time()
+                to_remove = []
+                for t_id, store in list(progress_registry.items()):
+                    if store.finished_at and (now - store.finished_at > 30):
+                        to_remove.append(t_id)
+                for t_id in to_remove:
+                    progress_registry.pop(t_id, None)
+                    task_queues.pop(t_id, None)
+        asyncio.create_task(periodic_cleanup())
 
     ui_path = Path(__file__).parent.parent / "ui"
     if ui_path.exists():
