@@ -65,17 +65,13 @@ Produce the structured query plan for the single SQL query that answers the ques
 """
 
 
-def _llm_json(client: Any, system_prompt: str, user_prompt: str, attempts: int = 3) -> dict[str, Any]:
-    last_error = None
-    for i in range(attempts):
-        try:
-            return client.complete_json(system_prompt, user_prompt)
-        except Exception as exc:
-            last_error = exc
-            time.sleep(1.0 + i)
-    if getattr(last_error, "is_provider_failure", False):
-        raise ProviderUnavailableError(f"Provider failed after {attempts} attempts: {last_error}")
-    raise RuntimeError(f"Model/request failed after {attempts} attempts: {last_error}")
+def _llm_json(client: Any, system_prompt: str, user_prompt: str) -> dict[str, Any]:
+    try:
+        return client.complete_json(system_prompt, user_prompt)
+    except Exception as exc:
+        if getattr(exc, "is_provider_failure", False):
+            raise ProviderUnavailableError(str(exc)) from exc
+        raise RuntimeError(f"Model/request failed: {exc}") from exc
 
 
 def _response_metadata(client: Any) -> dict[str, Any]:
@@ -100,9 +96,10 @@ class ExperimentConfig:
 class ConfigCurrentSystem(ExperimentConfig):
     """Config 1: the production pipeline (Planner + RAG + SQL gen + exec feedback + evaluator), untouched."""
 
-    def __init__(self, service) -> None:
+    def __init__(self, service, client: Any) -> None:
         super().__init__("config1_current_system", "Current system (planner + RAG + SQL gen + exec feedback + evaluator)")
         self._service = service
+        self._client = client
 
     async def run(self, question: str, benchmark: dict[str, Any]) -> dict[str, Any]:
         start = time.perf_counter()
@@ -382,7 +379,7 @@ CONFIG_REGISTRY: dict[str, type[ExperimentConfig]] = {}
 
 def build_configs(service, client: Any, retriever, full_schema_text: list[str]) -> list[ExperimentConfig]:
     return [
-        ConfigCurrentSystem(service),
+        ConfigCurrentSystem(service, client),
         ConfigDirectSQLFullSchema(client, full_schema_text),
         ConfigDirectSQLRag(client, retriever),
         ConfigPlanRagSQL(client, retriever),

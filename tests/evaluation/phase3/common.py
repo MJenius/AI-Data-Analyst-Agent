@@ -373,7 +373,11 @@ def evaluate_plan(plan: QueryPlan, benchmark: dict[str, Any]) -> dict[str, Any]:
 # Full per-query evaluation
 # ---------------------------------------------------------------------------
 
-def evaluate_query(gen_sql: str | None, benchmark: dict[str, Any]) -> dict[str, Any]:
+def evaluate_query(
+    gen_sql: str | None,
+    benchmark: dict[str, Any],
+    pre_execution_errors: list[str] | None = None,
+) -> dict[str, Any]:
     expected_sql = benchmark.get("expected_sql", "")
     expected_tables = benchmark.get("expected_tables", [])
     expected_result = benchmark.get("expected_result", {})
@@ -384,7 +388,9 @@ def evaluate_query(gen_sql: str | None, benchmark: dict[str, Any]) -> dict[str, 
     sql_execution_success = False
     sql_execution_error = None
 
-    if gen_sql:
+    ast_validated = pre_execution_errors is not None
+    pre_execution_errors = pre_execution_errors or []
+    if gen_sql and not pre_execution_errors:
         exec_result = execute_sql(gen_sql)
         if exec_result["success"]:
             sql_execution_success = True
@@ -412,21 +418,29 @@ def evaluate_query(gen_sql: str | None, benchmark: dict[str, Any]) -> dict[str, 
     queried_tables = extract_tables_from_sql(gen_sql)
     correct_tables = [t for t in expected_tables if t in queried_tables]
     table_accuracy = (len(correct_tables) / len(expected_tables)) * 100.0 if expected_tables else 100.0
-    table_match = set(correct_tables) == set(expected_tables)
+    table_match = set(queried_tables) == set(expected_tables)
+    table_precision = (len(correct_tables) / len(queried_tables)) * 100.0 if queried_tables else (100.0 if not expected_tables else 0.0)
+    schema_validation_errors = [
+        error for error in pre_execution_errors
+        if error.startswith(("nonexistent_column:", "nonexistent_table:"))
+    ]
 
     return {
         "sql_execution_success": sql_execution_success,
-        "sql_execution_error": sql_execution_error,
+        "sql_execution_error": sql_execution_error or ("; ".join(pre_execution_errors) if pre_execution_errors else None),
         "result_correctness": result_correctness.get("match", False),
         "result_correctness_reason": result_correctness.get("reason", ""),
         "result_equivalence": result_equivalence.get("match", False),
         "result_equivalence_reason": result_equivalence.get("reason", ""),
         "queried_tables": queried_tables,
         "table_accuracy_pct": round(table_accuracy, 2),
+        "table_precision_pct": round(table_precision, 2),
         "table_match": table_match,
-        "invalid_sql": bool(sql_execution_error) or (gen_sql is not None and len(gen_sql.strip()) == 0),
-        "hallucinated_schema": check_hallucinated_schema(gen_sql),
+        "invalid_sql": bool(pre_execution_errors or sql_execution_error) or (gen_sql is not None and len(gen_sql.strip()) == 0),
+        "hallucinated_schema": schema_validation_errors if ast_validated else check_hallucinated_schema(gen_sql),
         "unsafe_keywords": check_unsafe_sql(gen_sql),
+        "validation_errors": pre_execution_errors,
+        "pre_execution_blocked": bool(pre_execution_errors),
         "gold_exec_success": gold_exec.get("success", False),
     }
 

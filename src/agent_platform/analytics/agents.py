@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import asyncio
 import logging
-import re
 from typing import Any
 
 from agent_platform.infra.cache import global_cache
@@ -15,7 +14,7 @@ from agent_platform.llms.sql_generation_prompt import SYSTEM_PROMPT as SQL_SYSTE
 from agent_platform.llms.sql_generation_prompt import build_sql_prompt
 from agent_platform.orchestration.state import ExecutionState
 from agent_platform.rag.retriever import SchemaRetriever
-from agent_platform.tools.sql_tool import SQLTool
+from agent_platform.tools.sql_tool import SQLTool, SQLValidationError
 
 
 logger = logging.getLogger(__name__)
@@ -36,7 +35,7 @@ class AnalyticsPlannerAgent:
         Uses semantic retrieval to find relevant table schemas and then leverages
         the LLM to decompose the question into executable analytical steps.
         """
-        context = self._schema_retriever.retrieve(task, top_k=5)
+        context = self._schema_retriever.retrieve_grounded(task)
         context_text = [item.text for item in context]
         logger.info(f"Planning analytical steps for: {task}")
         if self._llm_client.enabled:
@@ -126,19 +125,13 @@ class AnalyticsExecutorAgent:
         4. Executing the SQL and interpreting the results.
         5. Retrying with error context if execution fails.
         """
-        # 1. Fast Retrieval - Proactively retrieve table schemas if missing
-        if not any(item.metadata.get("kind") == "table" for item in context):
-            logger.info("No table documents found in step context. Proactively retrieving table schema context...")
-            additional_context = self._schema_retriever.retrieve(step + " tables", top_k=3)
-            existing_ids = {item.id for item in context}
-            for item in additional_context:
-                if item.id not in existing_ids:
-                    context.append(item)
+        # Ground the SQL step against a coherent table subset and its complete join paths.
+        context = self._schema_retriever.retrieve_grounded(f"{state.task}\n{step}")
 
         schema_text = [item.text for item in context]
 
-        # 2. SQL Generation (Enabled Retries for Self-Correction)
-        max_retries = 2
+        # One repair is enough for a concrete parser/schema/execution diagnostic.
+        max_retries = 1
         last_error = None
         sql = None
         reasoning = ""
@@ -177,6 +170,8 @@ class AnalyticsExecutorAgent:
                     }
                 except Exception as exc:
                     last_error = f"Execution error: {str(exc)}"
+                    if not self._is_repairable_execution_error(str(exc)):
+                        break
             else:
                 last_error = f"Validation errors: {', '.join(validation_errors)}"
             
@@ -209,32 +204,27 @@ class AnalyticsExecutorAgent:
         return {"step": step, "output": output, "tool_results": []}
 
     def _validate_sql(self, sql: str, schema_context: list[Any]) -> list[str]:
-        """Strict linting to check for destructive keywords and prevent hallucinations."""
-        errors = []
-        lowered_sql = sql.lower()
-        
-        # Get allowed table names from retrieved context
-        allowed_tables = set()
-        for item in schema_context:
-            if item.metadata.get("kind") == "table":
-                allowed_tables.add(item.metadata["table"].lower())
-        
-        # Extract potential table targets by finding patterns in JOIN / FROM clauses
-        # E.g. "from table_name" or "join table_name"
-        table_matches = re.findall(r"\b(?:from|join)\s+([a-zA-Z_][a-zA-Z0-9_]*)", lowered_sql)
-        for tbl in table_matches:
-            if tbl in ["product_category_name_translation", "sqlite_master", "sqlite_schema"]:
-                continue
-            if tbl not in allowed_tables:
-                errors.append(f"Table '{tbl}' is not in retrieved schema context (hallucination prevention).")
+        allowed_tables = {
+            item.metadata["table"].lower()
+            for item in schema_context
+            if item.metadata.get("kind") == "table"
+        }
+        try:
+            self._sql_tool.validate(sql, allowed_tables)
+            return []
+        except SQLValidationError as exc:
+            return exc.errors
 
-        # Rigorous check for destructive SQL commands to guarantee safety
-        destructive_keywords = ["delete", "drop", "update", "insert", "alter", "create", "replace", "truncate", "grant", "revoke"]
-        for kw in destructive_keywords:
-            if re.search(r"\b" + kw + r"\b", lowered_sql):
-                errors.append(f"Destructive SQL command '{kw}' is not allowed in read-only environment.")
-            
-        return errors
+    @staticmethod
+    def _is_repairable_execution_error(error: str) -> bool:
+        lowered = error.lower()
+        return any(
+            marker in lowered
+            for marker in (
+                "ambiguous column", "misuse of", "no such column", "no such function",
+                "no such table", "syntax error", "wrong number of arguments",
+            )
+        )
 
     def _generate_sql_payload(self, task: str, step: str, schema_context: list[str]) -> dict[str, Any]:
         if self._llm_client.enabled:

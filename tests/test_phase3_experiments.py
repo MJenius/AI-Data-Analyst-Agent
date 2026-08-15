@@ -8,6 +8,7 @@ import unittest
 from pathlib import Path
 
 from tests.evaluation.phase3 import common
+from tests.evaluation.phase3 import configs
 from tests.evaluation.phase3 import run_experiments
 
 
@@ -24,6 +25,22 @@ class _UnavailableConfig:
 
 
 class Phase3RunnerTests(unittest.TestCase):
+    def test_shared_harness_does_not_retry_a_provider_failure(self):
+        class ProviderFailure(RuntimeError):
+            is_provider_failure = True
+
+        class Client:
+            calls = 0
+
+            def complete_json(self, *_):
+                self.calls += 1
+                raise ProviderFailure("timeout")
+
+        client = Client()
+        with self.assertRaises(configs.ProviderUnavailableError):
+            configs._llm_json(client, "system", "user")
+        self.assertEqual(client.calls, 1)
+
     def test_provider_failures_are_marked_not_run_not_scored_as_a_full_benchmark(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)

@@ -1,0 +1,91 @@
+{
+  "config": "phase4_full_schema",
+  "total_queries": 100,
+  "run_status": "completed",
+  "planned_queries": 100,
+  "provider_error_count": 0,
+  "result_correctness_pct": 11.0,
+  "result_equivalence_pct": 11.0,
+  "table_accuracy_pct": 95.33,
+  "table_match_pct": 63.0,
+  "sql_execution_success_pct": 59.0,
+  "invalid_sql_rate_pct": 41.0,
+  "hallucinated_schema_rate_pct": 1.0,
+  "unsafe_sql_rate_pct": 0.0,
+  "avg_latency_seconds": 13.14,
+  "min_latency_seconds": 3.52,
+  "max_latency_seconds": 31.14,
+  "token_usage": {
+    "prompt_tokens": 495231,
+    "completion_tokens": 78388,
+    "total_tokens": 573619
+  },
+  "failure_breakdown": {
+    "correct": 11,
+    "sql_execution_error": 40,
+    "sql_gen_hallucination": 1,
+    "sql_semantic_error": 40,
+    "table_selection_error": 8
+  },
+  "by_query_type": {
+    "single_value": {
+      "total": 14,
+      "correct": 4,
+      "correct_pct": 28.57,
+      "exec": 12
+    },
+    "aggregation": {
+      "total": 40,
+      "correct": 5,
+      "correct_pct": 12.5,
+      "exec": 24
+    },
+    "ranking": {
+      "total": 26,
+      "correct": 2,
+      "correct_pct": 7.69,
+      "exec": 12
+    },
+    "time_series": {
+      "total": 17,
+      "correct": 0,
+      "correct_pct": 0.0,
+      "exec": 10
+    },
+    "unknown": {
+      "total": 3,
+      "correct": 0,
+      "correct_pct": 0.0,
+      "exec": 1
+    }
+  },
+  "by_difficulty": {
+    "easy": {
+      "total": 70,
+      "correct": 11,
+      "correct_pct": 15.71,
+      "exec": 44
+    },
+    "medium": {
+      "total": 26,
+      "correct": 0,
+      "correct_pct": 0.0,
+      "exec": 15
+    },
+    "hard": {
+      "total": 4,
+      "correct": 0,
+      "correct_pct": 0.0,
+      "exec": 0
+    }
+  },
+  "table_precision_pct": 83.88,
+  "pre_execution_blocked_pct": 3.0,
+  "retrieval_table_recall_pct": 100.0,
+  "retrieval_table_precision_pct": 16.33,
+  "retrieval_unnecessary_table_rate_pct": 100.0,
+  "validation_failure_breakdown": {
+    "malformed_sql": 2,
+    "nonexistent_column": 1
+  }
+}

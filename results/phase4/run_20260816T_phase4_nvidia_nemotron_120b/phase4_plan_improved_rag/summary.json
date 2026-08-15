@@ -1,0 +1,100 @@
+{
+  "config": "phase4_plan_improved_rag",
+  "total_queries": 100,
+  "run_status": "completed",
+  "planned_queries": 100,
+  "provider_error_count": 11,
+  "result_correctness_pct": 15.0,
+  "result_equivalence_pct": 15.0,
+  "table_accuracy_pct": 73.67,
+  "table_match_pct": 47.0,
+  "sql_execution_success_pct": 62.0,
+  "invalid_sql_rate_pct": 38.0,
+  "hallucinated_schema_rate_pct": 0.0,
+  "unsafe_sql_rate_pct": 0.0,
+  "avg_latency_seconds": 21.63,
+  "min_latency_seconds": 7.41,
+  "max_latency_seconds": 61.85,
+  "token_usage": {
+    "prompt_tokens": 273755,
+    "completion_tokens": 125087,
+    "total_tokens": 398842
+  },
+  "failure_breakdown": {
+    "correct": 15,
+    "planning_error": 19,
+    "provider_error": 11,
+    "sql_execution_error": 27,
+    "sql_semantic_error": 14,
+    "table_selection_error": 14
+  },
+  "by_query_type": {
+    "single_value": {
+      "total": 14,
+      "correct": 4,
+      "correct_pct": 28.57,
+      "exec": 9
+    },
+    "aggregation": {
+      "total": 40,
+      "correct": 6,
+      "correct_pct": 15.0,
+      "exec": 25
+    },
+    "ranking": {
+      "total": 26,
+      "correct": 5,
+      "correct_pct": 19.23,
+      "exec": 15
+    },
+    "time_series": {
+      "total": 17,
+      "correct": 0,
+      "correct_pct": 0.0,
+      "exec": 12
+    },
+    "unknown": {
+      "total": 3,
+      "correct": 0,
+      "correct_pct": 0.0,
+      "exec": 1
+    }
+  },
+  "by_difficulty": {
+    "easy": {
+      "total": 70,
+      "correct": 15,
+      "correct_pct": 21.43,
+      "exec": 39
+    },
+    "medium": {
+      "total": 26,
+      "correct": 0,
+      "correct_pct": 0.0,
+      "exec": 20
+    },
+    "hard": {
+      "total": 4,
+      "correct": 0,
+      "correct_pct": 0.0,
+      "exec": 3
+    }
+  },
+  "table_precision_pct": 63.03,
+  "pre_execution_blocked_pct": 24.0,
+  "retrieval_table_recall_pct": 88.75,
+  "retrieval_table_precision_pct": 63.85,
+  "retrieval_unnecessary_table_rate_pct": 64.0,
+  "validation_failure_breakdown": {
+    "malformed_sql": 24
+  },
+  "provider_adjusted": {
+    "scored_queries": 89,
+    "result_correctness_pct": 16.85,
+    "result_equivalence_pct": 16.85,
+    "table_accuracy_pct": 82.77,
+    "sql_execution_success_pct": 69.66,
+    "invalid_sql_rate_pct": 30.34,
+    "avg_latency_seconds": 22.88
+  }
+}

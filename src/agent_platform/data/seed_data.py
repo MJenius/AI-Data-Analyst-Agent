@@ -49,7 +49,7 @@ def seed_database(database_path: str | Path) -> Path:
             logger.info(f"Loading {csv_file} into table {table_name}...")
             # Use chunking if necessary for very large files, but for now direct load
             df = pd.read_csv(csv_path)
-            df.to_sql(table_name, connection, if_exists="replace", index=False)
+            df.to_sql(table_name, connection, if_exists="append", index=False)
             logger.info(f"Successfully loaded {len(df)} rows into {table_name}.")
             
         connection.commit()

@@ -1,0 +1,92 @@
+{
+  "config": "phase4_improved_rag",
+  "total_queries": 100,
+  "run_status": "completed",
+  "planned_queries": 100,
+  "provider_error_count": 13,
+  "result_correctness_pct": 16.0,
+  "result_equivalence_pct": 16.0,
+  "table_accuracy_pct": 71.5,
+  "table_match_pct": 42.0,
+  "sql_execution_success_pct": 50.0,
+  "invalid_sql_rate_pct": 50.0,
+  "hallucinated_schema_rate_pct": 2.0,
+  "unsafe_sql_rate_pct": 0.0,
+  "avg_latency_seconds": 12.52,
+  "min_latency_seconds": 3.43,
+  "max_latency_seconds": 60.05,
+  "token_usage": {
+    "prompt_tokens": 131461,
+    "completion_tokens": 60229,
+    "total_tokens": 191690
+  },
+  "failure_breakdown": {
+    "correct": 16,
+    "provider_error": 13,
+    "sql_execution_error": 35,
+    "sql_gen_hallucination": 2,
+    "sql_semantic_error": 22,
+    "table_selection_error": 12
+  },
+  "by_query_type": {
+    "single_value": {
+      "total": 14,
+      "correct": 3,
+      "correct_pct": 21.43,
+      "exec": 7
+    },
+    "aggregation": {
+      "total": 40,
+      "correct": 6,
+      "correct_pct": 15.0,
+      "exec": 20
+    },
+    "ranking": {
+      "total": 26,
+      "correct": 5,
+      "correct_pct": 19.23,
+      "exec": 13
+    },
+    "time_series": {
+      "total": 17,
+      "correct": 2,
+      "correct_pct": 11.76,
+      "exec": 10
+    },
+    "unknown": {
+      "total": 3,
+      "correct": 0,
+      "correct_pct": 0.0,
+      "exec": 0
+    }
+  },
+  "by_difficulty": {
+    "easy": {
+      "total": 70,
+      "correct": 14,
+      "correct_pct": 20.0,
+      "exec": 36
+    },
+    "medium": {
+      "total": 26,
+      "correct": 2,
+      "correct_pct": 7.69,
+      "exec": 13
+    },
+    "hard": {
+      "total": 4,
+      "correct": 0,
+      "correct_pct": 0.0,
+      "exec": 1
+    }
+  },
+  "table_precision_pct": 59.62,
+  "pre_execution_blocked_pct": 29.0,
+  "retrieval_table_recall_pct": 88.75,
+  "retrieval_table_precision_pct": 63.85,
+  "retrieval_unnecessary_table_rate_pct": 64.0,
+  "validation_failure_breakdown": {
+    "malformed_sql": 27,
+    "nonexistent_column": 2
+  }
+}

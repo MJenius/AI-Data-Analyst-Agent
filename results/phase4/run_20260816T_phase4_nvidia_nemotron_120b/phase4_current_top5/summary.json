@@ -1,0 +1,91 @@
+{
+  "config": "phase4_current_top5",
+  "total_queries": 100,
+  "run_status": "completed",
+  "planned_queries": 100,
+  "provider_error_count": 7,
+  "result_correctness_pct": 11.0,
+  "result_equivalence_pct": 11.0,
+  "table_accuracy_pct": 74.5,
+  "table_match_pct": 53.0,
+  "sql_execution_success_pct": 57.0,
+  "invalid_sql_rate_pct": 43.0,
+  "hallucinated_schema_rate_pct": 0.0,
+  "unsafe_sql_rate_pct": 0.0,
+  "avg_latency_seconds": 12.96,
+  "min_latency_seconds": 3.21,
+  "max_latency_seconds": 60.02,
+  "token_usage": {
+    "prompt_tokens": 87379,
+    "completion_tokens": 60299,
+    "total_tokens": 147678
+  },
+  "failure_breakdown": {
+    "correct": 11,
+    "provider_error": 7,
+    "sql_execution_error": 36,
+    "sql_semantic_error": 37,
+    "table_selection_error": 9
+  },
+  "by_query_type": {
+    "single_value": {
+      "total": 14,
+      "correct": 3,
+      "correct_pct": 21.43,
+      "exec": 11
+    },
+    "aggregation": {
+      "total": 40,
+      "correct": 5,
+      "correct_pct": 12.5,
+      "exec": 22
+    },
+    "ranking": {
+      "total": 26,
+      "correct": 2,
+      "correct_pct": 7.69,
+      "exec": 10
+    },
+    "time_series": {
+      "total": 17,
+      "correct": 1,
+      "correct_pct": 5.88,
+      "exec": 11
+    },
+    "unknown": {
+      "total": 3,
+      "correct": 0,
+      "correct_pct": 0.0,
+      "exec": 3
+    }
+  },
+  "by_difficulty": {
+    "easy": {
+      "total": 70,
+      "correct": 10,
+      "correct_pct": 14.29,
+      "exec": 41
+    },
+    "medium": {
+      "total": 26,
+      "correct": 1,
+      "correct_pct": 3.85,
+      "exec": 16
+    },
+    "hard": {
+      "total": 4,
+      "correct": 0,
+      "correct_pct": 0.0,
+      "exec": 0
+    }
+  },
+  "table_precision_pct": 65.68,
+  "pre_execution_blocked_pct": 28.0,
+  "retrieval_table_recall_pct": 94.58,
+  "retrieval_table_precision_pct": 62.25,
+  "retrieval_unnecessary_table_rate_pct": 74.0,
+  "validation_failure_breakdown": {
+    "malformed_sql": 25,
+    "table_not_in_context": 5
+  }
+}

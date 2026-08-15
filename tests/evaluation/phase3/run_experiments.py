@@ -18,7 +18,7 @@ sys.path.insert(0, str(ROOT))
 
 from dotenv import load_dotenv
 
-load_dotenv(dotenv_path=ROOT / ".env", override=True)
+load_dotenv(dotenv_path=ROOT / ".env", override=False)
 
 from agent_platform.analytics.service import AnalyticsAgentService
 from tests.evaluation.phase3.single_model_groq import SingleModelGroqClient as GroqClient
@@ -41,16 +41,16 @@ RESULTS_DIR = RESULTS_ROOT
 QUERY_TYPES = ["single_value", "aggregation", "ranking", "time_series", "unknown"]
 DIFFICULTIES = ["easy", "medium", "hard"]
 METRICS = [
-    ("result_correctness", "Result correctness"),
-    ("result_equivalence", "Result equivalence"),
+    ("result_correctness_pct", "Result correctness"),
+    ("result_equivalence_pct", "Result equivalence"),
     ("table_accuracy_pct", "Table accuracy"),
-    ("sql_execution_success", "SQL execution success"),
-    ("invalid_sql", "Invalid SQL"),
-    ("latency_seconds", "Latency (s)"),
+    ("sql_execution_success_pct", "SQL execution success"),
+    ("invalid_sql_rate_pct", "Invalid SQL"),
+    ("avg_latency_seconds", "Latency (s)"),
 ]
 
 
-def get_config_snapshot(run_id: str) -> dict[str, Any]:
+def get_config_snapshot(run_id: str, config_ids: list[str] | None = None) -> dict[str, Any]:
     provider = os.getenv("EXPERIMENT_LLM_PROVIDER", "groq").lower()
     model = os.getenv("NVIDIA_MODEL") if provider == "nvidia" else os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")
     return {
@@ -59,11 +59,14 @@ def get_config_snapshot(run_id: str) -> dict[str, Any]:
         "created_at_utc": datetime.now(timezone.utc).isoformat(),
         "llm_provider": provider,
         "model": model,
+        "request_timeout_seconds": float(os.getenv("NVIDIA_TIMEOUT_SECONDS", "60")) if provider == "nvidia" else None,
+        "max_output_tokens": int(os.getenv("NVIDIA_MAX_TOKENS", "2048")) if provider == "nvidia" else None,
         "groq_api_key_present": bool(os.getenv("GROQ_API_KEY")),
         "gemini_api_key_present": bool(os.getenv("GEMINI_API_KEY")),
         "db_path": str(DB_PATH),
         "benchmark": str(BENCHMARK_PATH),
         "benchmark_queries": 100,
+        "selected_configs": config_ids,
         "configs": {
             "config1_current_system": "Production pipeline untouched: AnalyticsPlannerAgent (LLM) + RAG + AnalyticsExecutorAgent (LLM, 2 retries w/ exec feedback) + AnalyticsEvaluatorAgent. Strict Pydantic validation on all LLM outputs.",
             "config2_llm_full_schema": "LLM + FULL schema context (all SchemaContextBuilder documents). Single SQL gen call, lenient JSON parsing, no planner, no RAG, no feedback.",
@@ -77,7 +80,10 @@ def get_config_snapshot(run_id: str) -> dict[str, Any]:
 def build_experiment_client() -> Any:
     provider = os.getenv("EXPERIMENT_LLM_PROVIDER", "groq").lower()
     if provider == "nvidia":
-        return NvidiaClient()
+        return NvidiaClient(
+            timeout_seconds=float(os.getenv("NVIDIA_TIMEOUT_SECONDS", "60")),
+            max_tokens=int(os.getenv("NVIDIA_MAX_TOKENS", "2048")),
+        )
     if provider == "groq":
         return GroqClient(model=os.getenv("GROQ_MODEL", "llama-3.1-8b-instant"), max_rpm=30)
     raise ValueError("EXPERIMENT_LLM_PROVIDER must be 'groq' or 'nvidia'.")
@@ -97,33 +103,36 @@ async def run_config(
     benchmarks: list[dict[str, Any]],
     limit: int | None,
     max_consecutive_provider_errors: int = 3,
+    initial_results: list[dict[str, Any]] | None = None,
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
-    results = []
+    results = list(initial_results or [])
     n = len(benchmarks) if limit is None else min(limit, len(benchmarks))
     out_path = RESULTS_DIR / config.id / "raw_results.json"
     run_status = {
         "status": "completed",
         "planned_queries": n,
-        "completed_queries": 0,
-        "provider_error_count": 0,
+        "completed_queries": len(results),
+        "provider_error_count": sum(bool(row.get("provider_error")) for row in results),
         "reason": None,
     }
     consecutive_provider_errors = 0
-    for i, bench in enumerate(benchmarks[:n], 1):
+    for i, bench in enumerate(benchmarks[len(results):n], len(results) + 1):
         q = bench["question"]
+        client = getattr(config, "_client", None)
+        usage_before = dict(getattr(client, "usage_totals", {}))
         t0 = time.perf_counter()
         outcome = await config.run(q, bench)
         run_latency = outcome.get("latency_seconds", round(time.perf_counter() - t0, 2))
 
         gen_sql_raw = outcome.get("generated_sql")
         gen_sql = extract_first_sql(gen_sql_raw)
-        eval_ = evaluate_query(gen_sql, bench)
+        eval_ = evaluate_query(gen_sql, bench, outcome.get("pre_execution_errors"))
 
         plan_eval = None
         if outcome.get("plan"):
             plan_eval = evaluate_plan(parse_plan_loose(outcome["plan"]), bench)
 
-        failure = classify_failure(eval_, plan_eval)
+        failure = "provider_error" if outcome.get("provider_error") else classify_failure(eval_, plan_eval)
 
         record = {
             "config": config.id,
@@ -138,6 +147,11 @@ async def run_config(
             "run_latency_seconds": run_latency,
             "failure_category": failure,
             **eval_,
+        }
+        usage_after = getattr(client, "usage_totals", {})
+        record["token_usage"] = {
+            key: usage_after.get(key, 0) - usage_before.get(key, 0)
+            for key in ("prompt_tokens", "completion_tokens", "total_tokens")
         }
         if plan_eval is not None:
             record["plan_eval"] = plan_eval
@@ -211,6 +225,10 @@ def compute_summary(
         "avg_latency_seconds": round(sum(latencies) / total, 2),
         "min_latency_seconds": round(min(latencies), 2) if latencies else 0,
         "max_latency_seconds": round(max(latencies), 2) if latencies else 0,
+        "token_usage": {
+            key: sum(r.get("token_usage", {}).get(key, 0) for r in results)
+            for key in ("prompt_tokens", "completion_tokens", "total_tokens")
+        },
         "failure_breakdown": {},
     }
 
@@ -284,9 +302,10 @@ def build_report(all_summaries: dict[str, dict], plan_summaries: dict[str, dict]
     lines = []
     lines.append("# Phase 3 — NL-to-SQL Semantic Failure Diagnosis\n")
     lines.append(f"**Date:** {time.strftime('%Y-%m-%d %H:%M:%S')}\n")
+    provider = os.getenv("EXPERIMENT_LLM_PROVIDER", "groq")
+    model = os.getenv("NVIDIA_MODEL") if provider == "nvidia" else os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")
     lines.append("**Method:** Controlled ablation on the verified 100-query V3 benchmark (benchmark_dataset_v2.json). "
-                 "LLM: Groq `llama-3.1-8b-instant` (the configured `llama-3.3-70b-versatile` hit its daily token quota during pre-flight; "
-                 "Gemini key was rejected by the API). Config 1 runs the production pipeline untouched; configs 2-5 use a shared "
+                 f"LLM: `{model}` via `{provider}`. Config 1 runs the production pipeline untouched; configs 2-5 use a shared "
                  "harness with lenient JSON parsing so the LLM's SQL output is actually exercised.\n")
 
     lines.append("## 1. Comparison Table\n")
@@ -298,13 +317,14 @@ def build_report(all_summaries: dict[str, dict], plan_summaries: dict[str, dict]
             s = all_summaries[meta["id"]]
             if key == "table_accuracy_pct":
                 vals.append(f"{s.get(key, 0):.1f}%")
-            elif key == "latency_seconds":
+            elif key == "avg_latency_seconds":
                 vals.append(f"{s.get(key, 0):.2f}s")
             else:
                 vals.append(f"{s.get(key, 0):.1f}%")
         lines.append(f"| {label} | " + " | ".join(vals) + " |")
     lines.append(f"| Hallucinated schema | " + " | ".join(f"{all_summaries[m['id']].get('hallucinated_schema_rate_pct', 0):.1f}%" for m in configs_meta) + " |")
     lines.append(f"| Table match (exact) | " + " | ".join(f"{all_summaries[m['id']].get('table_match_pct', 0):.1f}%" for m in configs_meta) + " |")
+    lines.append(f"| Total tokens | " + " | ".join(str(all_summaries[m['id']].get('token_usage', {}).get('total_tokens', 0)) for m in configs_meta) + " |")
     lines.append("\n")
 
     lines.append("## 2. Results by Query Type / Difficulty\n")
@@ -342,8 +362,8 @@ def build_report(all_summaries: dict[str, dict], plan_summaries: dict[str, dict]
         lines.append("| Plan component | Correct % |")
         lines.append("| :--- | :---: |")
         for key, label in [
-            ("plan_core_ok", "Plan core (tables+metric+agg+group_by)"),
-            ("plan_full_ok", "Plan full (all components)"),
+            ("plan_core_ok_pct", "Plan core (tables+metric+agg+group_by)"),
+            ("plan_full_ok_pct", "Plan full (all components)"),
             ("intent_ok_pct", "Intent"),
             ("metric_ok_pct", "Metric"),
             ("aggregation_ok_pct", "Aggregation"),
@@ -368,13 +388,18 @@ def build_report(all_summaries: dict[str, dict], plan_summaries: dict[str, dict]
         lines.append("\n")
 
     lines.append("## 5. Ablation Deltas (bottleneck evidence)\n")
-    c2, c3, c4, c5, c1 = [all_summaries[m["id"]] for m in configs_meta]
     lines.append("| Delta | Meaning | Value (pp) |")
     lines.append("| :--- | :--- | :---: |")
-    lines.append(f"| C3 - C2 | Effect of RAG over full schema (no planner) | {c3['result_correctness_pct'] - c2['result_correctness_pct']:+.1f} |")
-    lines.append(f"| C4 - C3 | Effect of structured planner (RAG held) | {c4['result_correctness_pct'] - c3['result_correctness_pct']:+.1f} |")
-    lines.append(f"| C5 - C4 | Effect of execution feedback / repair | {c5['result_correctness_pct'] - c4['result_correctness_pct']:+.1f} |")
-    lines.append(f"| C1 - C5 | Production pipeline vs experimental (strict validation, prose planner, evaluator) | {c1['result_correctness_pct'] - c5['result_correctness_pct']:+.1f} |")
+    deltas = [
+        ("config3_llm_rag", "config2_llm_full_schema", "C3 - C2", "Effect of RAG over full schema (no planner)"),
+        ("config4_plan_rag_sql", "config3_llm_rag", "C4 - C3", "Effect of structured planner (RAG held)"),
+        ("config5_plan_rag_sql_feedback", "config4_plan_rag_sql", "C5 - C4", "Effect of execution feedback / repair"),
+        ("config1_current_system", "config5_plan_rag_sql_feedback", "C1 - C5", "Production pipeline vs experimental"),
+    ]
+    for left, right, label, meaning in deltas:
+        if left in all_summaries and right in all_summaries:
+            value = all_summaries[left]["result_correctness_pct"] - all_summaries[right]["result_correctness_pct"]
+            lines.append(f"| {label} | {meaning} | {value:+.1f} |")
     lines.append("\n")
 
     lines.append("## 6. Methodology Notes\n")
@@ -386,7 +411,7 @@ def build_report(all_summaries: dict[str, dict], plan_summaries: dict[str, dict]
     return "\n".join(lines)
 
 
-async def main(limit: int | None, run_id: str | None = None) -> None:
+async def main(limit: int | None, run_id: str | None = None, config_ids: list[str] | None = None) -> None:
     global RESULTS_DIR
     if not DB_PATH.exists():
         logger.error(f"Database not found at {DB_PATH}")
@@ -405,7 +430,7 @@ async def main(limit: int | None, run_id: str | None = None) -> None:
     common.DB_PATH = str(DB_PATH)
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     with open(RESULTS_DIR / "config_snapshot.json", "w", encoding="utf-8") as f:
-        json.dump(get_config_snapshot(run_id), f, indent=2)
+        json.dump(get_config_snapshot(run_id, config_ids), f, indent=2)
 
     with open(BENCHMARK_PATH, "r", encoding="utf-8") as f:
         benchmarks = json.load(f)
@@ -423,6 +448,8 @@ async def main(limit: int | None, run_id: str | None = None) -> None:
     service = AnalyticsAgentService.from_sqlite(DB_PATH, llm_client=client)
 
     configs = build_configs(service, client, retriever, full_schema_text)
+    if config_ids:
+        configs = [config for config in configs if config.id in config_ids]
     configs_meta = [{"id": c.id, "name": c.name} for c in configs]
 
     all_summaries: dict[str, dict] = {}
@@ -464,5 +491,17 @@ if __name__ == "__main__":
         default=None,
         help="Immutable artifact directory name under results/phase3 (default: UTC timestamp).",
     )
+    parser.add_argument(
+        "--configs",
+        nargs="+",
+        choices=[
+            "config1_current_system",
+            "config2_llm_full_schema",
+            "config3_llm_rag",
+            "config4_plan_rag_sql",
+            "config5_plan_rag_sql_feedback",
+        ],
+        help="Run only the selected configurations.",
+    )
     args = parser.parse_args()
-    asyncio.run(main(args.limit, args.run_id))
+    asyncio.run(main(args.limit, args.run_id, args.configs))
