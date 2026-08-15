@@ -1,0 +1,47 @@
+{
+  "config": "config2_llm_full_schema",
+  "total_queries": 3,
+  "result_correctness_pct": 33.33,
+  "result_equivalence_pct": 33.33,
+  "table_accuracy_pct": 83.33,
+  "table_match_pct": 66.67,
+  "sql_execution_success_pct": 33.33,
+  "invalid_sql_rate_pct": 66.67,
+  "hallucinated_schema_rate_pct": 66.67,
+  "unsafe_sql_rate_pct": 0.0,
+  "avg_latency_seconds": 14.59,
+  "min_latency_seconds": 12.47,
+  "max_latency_seconds": 16.15,
+  "failure_breakdown": {
+    "correct": 1,
+    "sql_gen_hallucination": 2
+  },
+  "by_query_type": {
+    "single_value": {
+      "total": 2,
+      "correct": 1,
+      "correct_pct": 50.0,
+      "exec": 1
+    },
+    "time_series": {
+      "total": 1,
+      "correct": 0,
+      "correct_pct": 0.0,
+      "exec": 0
+    }
+  },
+  "by_difficulty": {
+    "easy": {
+      "total": 2,
+      "correct": 1,
+      "correct_pct": 50.0,
+      "exec": 1
+    },
+    "medium": {
+      "total": 1,
+      "correct": 0,
+      "correct_pct": 0.0,
+      "exec": 0
+    }
+  }
+}

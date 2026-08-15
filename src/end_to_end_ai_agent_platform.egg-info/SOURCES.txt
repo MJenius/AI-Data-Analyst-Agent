@@ -7,6 +7,7 @@ src/agent_platform/analytics/report.py
 src/agent_platform/analytics/service.py
 src/agent_platform/data/__init__.py
 src/agent_platform/data/seed_data.py
+src/agent_platform/experiments/query_plan.py
 src/agent_platform/infra/cache.py
 src/agent_platform/llms/__init__.py
 src/agent_platform/llms/client.py

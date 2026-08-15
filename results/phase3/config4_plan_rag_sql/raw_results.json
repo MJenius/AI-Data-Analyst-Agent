@@ -1,0 +1,313 @@
+[
+  {
+    "config": "config4_plan_rag_sql",
+    "index": 1,
+    "question": "What is the total revenue generated?",
+    "domain": "Revenue & Sales",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_items"
+    ],
+    "expected_sql": "SELECT SUM(oi.price) AS total_revenue FROM order_items oi",
+    "generated_sql": "SELECT SUM(CAST(quantity AS REAL) * unit_price * (1 - discount_rate)) AS total_revenue FROM order_items",
+    "run_latency_seconds": 16.28,
+    "failure_category": "sql_execution_error",
+    "sql_execution_success": false,
+    "sql_execution_error": "no such column: quantity",
+    "result_correctness": false,
+    "result_correctness_reason": "not_evaluated",
+    "result_equivalence": false,
+    "result_equivalence_reason": "not_evaluated",
+    "queried_tables": [
+      "order_items"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "invalid_sql": true,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "gold_exec_success": true,
+    "plan_eval": {
+      "intent": "compute total revenue",
+      "metric": "total revenue",
+      "entity": null,
+      "aggregation": "SUM",
+      "filters": [],
+      "group_by": null,
+      "ordering": null,
+      "limit": null,
+      "required_tables": [
+        "order_items"
+      ],
+      "intent_ok": true,
+      "metric_ok": false,
+      "aggregation_ok": true,
+      "group_by_ok": true,
+      "ordering_ok": true,
+      "limit_ok": true,
+      "filters_ok": true,
+      "tables_ok": true,
+      "missing_tables": [],
+      "extra_tables": [],
+      "expected_aggregation": "SUM",
+      "plan_core_ok": false,
+      "plan_full_ok": false
+    },
+    "plan": {
+      "intent": "compute total revenue",
+      "metric": "total revenue",
+      "entity": null,
+      "aggregation": "SUM",
+      "filters": [],
+      "group_by": null,
+      "ordering": null,
+      "limit": null,
+      "required_tables": [
+        "order_items"
+      ]
+    },
+    "plan_raw": {
+      "intent": "compute total revenue",
+      "metric": "total revenue",
+      "entity": "None",
+      "aggregation": "SUM",
+      "filters": "[]",
+      "group_by": "None",
+      "ordering": "None",
+      "limit": "None",
+      "required_tables": "['order_items']"
+    },
+    "retrieved_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "raw_llm": {
+      "reasoning": "Calculate total revenue from order_items.quantity * order_items.unit_price * (1 - order_items.discount_rate)",
+      "sql": "SELECT SUM(CAST(quantity AS REAL) * unit_price * (1 - discount_rate)) AS total_revenue FROM order_items",
+      "expected_result": "The total revenue generated"
+    },
+    "latency_seconds": 16.28,
+    "llm_calls": 2
+  },
+  {
+    "config": "config4_plan_rag_sql",
+    "index": 2,
+    "question": "What is the monthly revenue trend?",
+    "domain": "Revenue & Sales",
+    "query_type": "time_series",
+    "difficulty": "medium",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "expected_sql": "SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, SUM(oi.price) AS revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id GROUP BY month ORDER BY month",
+    "generated_sql": "SELECT EXTRACT(MONTH FROM order_date) AS month, SUM(order_items.quantity * order_items.unit_price * (1 - order_items.discount_rate)) AS total_revenue FROM orders INNER JOIN order_items ON orders.id = order_items.order_id WHERE EXTRACT(YEAR FROM order_date) = 2025 AND EXTRACT(MONTH FROM order_date) BETWEEN 1 AND 6 GROUP BY EXTRACT(MONTH FROM order_date) ORDER BY EXTRACT(MONTH FROM order_date) ASC",
+    "run_latency_seconds": 18.25,
+    "failure_category": "sql_gen_hallucination",
+    "sql_execution_success": false,
+    "sql_execution_error": "near \"FROM\": syntax error",
+    "result_correctness": false,
+    "result_correctness_reason": "not_evaluated",
+    "result_equivalence": false,
+    "result_equivalence_reason": "not_evaluated",
+    "queried_tables": [
+      "order_items",
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "invalid_sql": true,
+    "hallucinated_schema": [
+      "order_date",
+      "order_date",
+      "order_date",
+      "order_date",
+      "order_date"
+    ],
+    "unsafe_keywords": [],
+    "gold_exec_success": true,
+    "plan_eval": {
+      "intent": "monthly revenue trend",
+      "metric": "total revenue",
+      "entity": "order",
+      "aggregation": "SUM",
+      "filters": [
+        "EXTRACT(YEAR FROM order_date) = 2025",
+        "EXTRACT(MONTH FROM order_date) >= 1",
+        "EXTRACT(MONTH FROM order_date) <= 6"
+      ],
+      "group_by": [
+        "EXTRACT(MONTH FROM order_date)"
+      ],
+      "ordering": "EXTRACT(MONTH FROM order_date) ASC",
+      "limit": null,
+      "required_tables": [
+        "orders",
+        "order_items"
+      ],
+      "intent_ok": true,
+      "metric_ok": true,
+      "aggregation_ok": true,
+      "group_by_ok": true,
+      "ordering_ok": true,
+      "limit_ok": true,
+      "filters_ok": false,
+      "tables_ok": true,
+      "missing_tables": [],
+      "extra_tables": [],
+      "expected_aggregation": "SUM",
+      "plan_core_ok": true,
+      "plan_full_ok": false
+    },
+    "plan": {
+      "intent": "monthly revenue trend",
+      "metric": "total revenue",
+      "entity": "order",
+      "aggregation": "SUM",
+      "filters": [
+        "EXTRACT(YEAR FROM order_date) = 2025",
+        "EXTRACT(MONTH FROM order_date) >= 1",
+        "EXTRACT(MONTH FROM order_date) <= 6"
+      ],
+      "group_by": [
+        "EXTRACT(MONTH FROM order_date)"
+      ],
+      "ordering": "EXTRACT(MONTH FROM order_date) ASC",
+      "limit": null,
+      "required_tables": [
+        "orders",
+        "order_items"
+      ]
+    },
+    "plan_raw": {
+      "intent": "monthly revenue trend",
+      "metric": "total revenue",
+      "entity": "order",
+      "aggregation": "SUM",
+      "filters": "['EXTRACT(YEAR FROM order_date) = 2025', 'EXTRACT(MONTH FROM order_date) >= 1', 'EXTRACT(MONTH FROM order_date) <= 6']",
+      "group_by": "['EXTRACT(MONTH FROM order_date)']",
+      "ordering": "EXTRACT(MONTH FROM order_date) ASC",
+      "limit": "None",
+      "required_tables": "['orders', 'order_items']"
+    },
+    "retrieved_tables": [
+      "orders",
+      "order_items"
+    ],
+    "raw_llm": {
+      "reasoning": "Generate monthly revenue trend for the year 2025.",
+      "sql": "SELECT EXTRACT(MONTH FROM order_date) AS month, SUM(order_items.quantity * order_items.unit_price * (1 - order_items.discount_rate)) AS total_revenue FROM orders INNER JOIN order_items ON orders.id = order_items.order_id WHERE EXTRACT(YEAR FROM order_date) = 2025 AND EXTRACT(MONTH FROM order_date) B",
+      "expected_result": "Monthly revenue trend for the year 2025."
+    },
+    "latency_seconds": 18.25,
+    "llm_calls": 2
+  },
+  {
+    "config": "config4_plan_rag_sql",
+    "index": 3,
+    "question": "Which month had the highest revenue?",
+    "domain": "Revenue & Sales",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "expected_sql": "SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS peak_month, SUM(oi.price) AS revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id GROUP BY peak_month ORDER BY revenue DESC LIMIT 1",
+    "generated_sql": "SELECT EXTRACT(MONTH FROM order_date) AS month, SUM(order_items.quantity * order_items.unit_price * (1 - order_items.discount_rate)) AS total_revenue FROM orders INNER JOIN order_items ON orders.id = order_items.order_id GROUP BY EXTRACT(MONTH FROM order_date) ORDER BY total_revenue DESC LIMIT 1",
+    "run_latency_seconds": 14.36,
+    "failure_category": "sql_gen_hallucination",
+    "sql_execution_success": false,
+    "sql_execution_error": "near \"FROM\": syntax error",
+    "result_correctness": false,
+    "result_correctness_reason": "not_evaluated",
+    "result_equivalence": false,
+    "result_equivalence_reason": "not_evaluated",
+    "queried_tables": [
+      "order_items",
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "invalid_sql": true,
+    "hallucinated_schema": [
+      "order_date",
+      "order_date"
+    ],
+    "unsafe_keywords": [],
+    "gold_exec_success": true,
+    "plan_eval": {
+      "intent": "monthly revenue trend analysis",
+      "metric": "total revenue",
+      "entity": "month",
+      "aggregation": "MAX",
+      "filters": [
+        "EXTRACT(MONTH FROM order_date) = EXTRACT(MONTH FROM order_date)"
+      ],
+      "group_by": [
+        "EXTRACT(MONTH FROM order_date)"
+      ],
+      "ordering": "EXTRACT(MONTH FROM order_date) DESC",
+      "limit": null,
+      "required_tables": [
+        "orders",
+        "order_items"
+      ],
+      "intent_ok": false,
+      "metric_ok": true,
+      "aggregation_ok": false,
+      "group_by_ok": true,
+      "ordering_ok": true,
+      "limit_ok": false,
+      "filters_ok": false,
+      "tables_ok": true,
+      "missing_tables": [],
+      "extra_tables": [],
+      "expected_aggregation": "SUM",
+      "plan_core_ok": false,
+      "plan_full_ok": false
+    },
+    "plan": {
+      "intent": "monthly revenue trend analysis",
+      "metric": "total revenue",
+      "entity": "month",
+      "aggregation": "MAX",
+      "filters": [
+        "EXTRACT(MONTH FROM order_date) = EXTRACT(MONTH FROM order_date)"
+      ],
+      "group_by": [
+        "EXTRACT(MONTH FROM order_date)"
+      ],
+      "ordering": "EXTRACT(MONTH FROM order_date) DESC",
+      "limit": null,
+      "required_tables": [
+        "orders",
+        "order_items"
+      ]
+    },
+    "plan_raw": {
+      "intent": "monthly revenue trend analysis",
+      "metric": "total revenue",
+      "entity": "month",
+      "aggregation": "MAX",
+      "filters": "['EXTRACT(MONTH FROM order_date) = EXTRACT(MONTH FROM order_date)']",
+      "group_by": "['EXTRACT(MONTH FROM order_date)']",
+      "ordering": "EXTRACT(MONTH FROM order_date) DESC",
+      "limit": "None",
+      "required_tables": "['orders', 'order_items']"
+    },
+    "retrieved_tables": [
+      "order_items",
+      "orders"
+    ],
+    "raw_llm": {
+      "reasoning": "To find the month with the highest revenue, we need to calculate the total revenue for each month and then find the month with the maximum revenue. We use the EXTRACT function to extract the month from the order_date and join the orders and order_items tables to calculate the revenue.",
+      "sql": "SELECT EXTRACT(MONTH FROM order_date) AS month, SUM(order_items.quantity * order_items.unit_price * (1 - order_items.discount_rate)) AS total_revenue FROM orders INNER JOIN order_items ON orders.id = order_items.order_id GROUP BY EXTRACT(MONTH FROM order_date) ORDER BY total_revenue DESC LIMIT 1",
+      "expected_result": "The month with the highest revenue"
+    },
+    "latency_seconds": 14.36,
+    "llm_calls": 2
+  }
+]

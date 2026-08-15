@@ -7,6 +7,7 @@ from pydantic import BaseModel
 from agent_platform.llms.groq_client import GroqClient
 from agent_platform.llms.ollama_client import OllamaClient
 from agent_platform.llms.gemini_client import GeminiClient
+from agent_platform.llms.nvidia_client import NvidiaClient
 
 
 logger = logging.getLogger(__name__)
@@ -68,8 +69,10 @@ def get_llm_client() -> LLMClient:
     
     if provider == "ollama":
         return OllamaClient()
+
+    if provider == "nvidia":
+        return NvidiaClient()
     
     # Auto-mode: Dynamic list-based cascade: Groq -> Gemini
     return FallbackLLMClient(clients=[GroqClient(), GeminiClient()])
-
 

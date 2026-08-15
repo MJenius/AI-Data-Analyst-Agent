@@ -1,0 +1,325 @@
+{
+  "summaries": {
+    "config1_current_system": {
+      "config": "config1_current_system",
+      "total_queries": 3,
+      "result_correctness_pct": 0.0,
+      "result_equivalence_pct": 0.0,
+      "table_accuracy_pct": 100.0,
+      "table_match_pct": 100.0,
+      "sql_execution_success_pct": 100.0,
+      "invalid_sql_rate_pct": 0.0,
+      "hallucinated_schema_rate_pct": 0.0,
+      "unsafe_sql_rate_pct": 0.0,
+      "avg_latency_seconds": 97.63,
+      "min_latency_seconds": 19.43,
+      "max_latency_seconds": 137.91,
+      "failure_breakdown": {
+        "sql_semantic_error": 3
+      },
+      "by_query_type": {
+        "single_value": {
+          "total": 2,
+          "correct": 0,
+          "correct_pct": 0.0,
+          "exec": 2
+        },
+        "time_series": {
+          "total": 1,
+          "correct": 0,
+          "correct_pct": 0.0,
+          "exec": 1
+        }
+      },
+      "by_difficulty": {
+        "easy": {
+          "total": 2,
+          "correct": 0,
+          "correct_pct": 0.0,
+          "exec": 2
+        },
+        "medium": {
+          "total": 1,
+          "correct": 0,
+          "correct_pct": 0.0,
+          "exec": 1
+        }
+      }
+    },
+    "config2_llm_full_schema": {
+      "config": "config2_llm_full_schema",
+      "total_queries": 3,
+      "result_correctness_pct": 33.33,
+      "result_equivalence_pct": 33.33,
+      "table_accuracy_pct": 83.33,
+      "table_match_pct": 66.67,
+      "sql_execution_success_pct": 33.33,
+      "invalid_sql_rate_pct": 66.67,
+      "hallucinated_schema_rate_pct": 66.67,
+      "unsafe_sql_rate_pct": 0.0,
+      "avg_latency_seconds": 14.11,
+      "min_latency_seconds": 12.42,
+      "max_latency_seconds": 15.16,
+      "failure_breakdown": {
+        "correct": 1,
+        "sql_gen_hallucination": 2
+      },
+      "by_query_type": {
+        "single_value": {
+          "total": 2,
+          "correct": 1,
+          "correct_pct": 50.0,
+          "exec": 1
+        },
+        "time_series": {
+          "total": 1,
+          "correct": 0,
+          "correct_pct": 0.0,
+          "exec": 0
+        }
+      },
+      "by_difficulty": {
+        "easy": {
+          "total": 2,
+          "correct": 1,
+          "correct_pct": 50.0,
+          "exec": 1
+        },
+        "medium": {
+          "total": 1,
+          "correct": 0,
+          "correct_pct": 0.0,
+          "exec": 0
+        }
+      }
+    },
+    "config3_llm_rag": {
+      "config": "config3_llm_rag",
+      "total_queries": 3,
+      "result_correctness_pct": 0.0,
+      "result_equivalence_pct": 0.0,
+      "table_accuracy_pct": 100.0,
+      "table_match_pct": 100.0,
+      "sql_execution_success_pct": 0.0,
+      "invalid_sql_rate_pct": 100.0,
+      "hallucinated_schema_rate_pct": 0.0,
+      "unsafe_sql_rate_pct": 0.0,
+      "avg_latency_seconds": 7.58,
+      "min_latency_seconds": 7.56,
+      "max_latency_seconds": 7.6,
+      "failure_breakdown": {
+        "sql_execution_error": 3
+      },
+      "by_query_type": {
+        "single_value": {
+          "total": 2,
+          "correct": 0,
+          "correct_pct": 0.0,
+          "exec": 0
+        },
+        "time_series": {
+          "total": 1,
+          "correct": 0,
+          "correct_pct": 0.0,
+          "exec": 0
+        }
+      },
+      "by_difficulty": {
+        "easy": {
+          "total": 2,
+          "correct": 0,
+          "correct_pct": 0.0,
+          "exec": 0
+        },
+        "medium": {
+          "total": 1,
+          "correct": 0,
+          "correct_pct": 0.0,
+          "exec": 0
+        }
+      }
+    },
+    "config4_plan_rag_sql": {
+      "config": "config4_plan_rag_sql",
+      "total_queries": 3,
+      "result_correctness_pct": 0.0,
+      "result_equivalence_pct": 0.0,
+      "table_accuracy_pct": 100.0,
+      "table_match_pct": 100.0,
+      "sql_execution_success_pct": 0.0,
+      "invalid_sql_rate_pct": 100.0,
+      "hallucinated_schema_rate_pct": 66.67,
+      "unsafe_sql_rate_pct": 0.0,
+      "avg_latency_seconds": 16.3,
+      "min_latency_seconds": 14.36,
+      "max_latency_seconds": 18.25,
+      "failure_breakdown": {
+        "sql_execution_error": 1,
+        "sql_gen_hallucination": 2
+      },
+      "by_query_type": {
+        "single_value": {
+          "total": 2,
+          "correct": 0,
+          "correct_pct": 0.0,
+          "exec": 0
+        },
+        "time_series": {
+          "total": 1,
+          "correct": 0,
+          "correct_pct": 0.0,
+          "exec": 0
+        }
+      },
+      "by_difficulty": {
+        "easy": {
+          "total": 2,
+          "correct": 0,
+          "correct_pct": 0.0,
+          "exec": 0
+        },
+        "medium": {
+          "total": 1,
+          "correct": 0,
+          "correct_pct": 0.0,
+          "exec": 0
+        }
+      }
+    },
+    "config5_plan_rag_sql_feedback": {
+      "config": "config5_plan_rag_sql_feedback",
+      "total_queries": 3,
+      "result_correctness_pct": 0.0,
+      "result_equivalence_pct": 0.0,
+      "table_accuracy_pct": 100.0,
+      "table_match_pct": 100.0,
+      "sql_execution_success_pct": 0.0,
+      "invalid_sql_rate_pct": 100.0,
+      "hallucinated_schema_rate_pct": 66.67,
+      "unsafe_sql_rate_pct": 0.0,
+      "avg_latency_seconds": 34.98,
+      "min_latency_seconds": 34.05,
+      "max_latency_seconds": 35.98,
+      "failure_breakdown": {
+        "sql_execution_error": 1,
+        "sql_gen_hallucination": 2
+      },
+      "by_query_type": {
+        "single_value": {
+          "total": 2,
+          "correct": 0,
+          "correct_pct": 0.0,
+          "exec": 0
+        },
+        "time_series": {
+          "total": 1,
+          "correct": 0,
+          "correct_pct": 0.0,
+          "exec": 0
+        }
+      },
+      "by_difficulty": {
+        "easy": {
+          "total": 2,
+          "correct": 0,
+          "correct_pct": 0.0,
+          "exec": 0
+        },
+        "medium": {
+          "total": 1,
+          "correct": 0,
+          "correct_pct": 0.0,
+          "exec": 0
+        }
+      }
+    }
+  },
+  "plan_summaries": {
+    "config4_plan_rag_sql": {
+      "total_with_plan": 3,
+      "plan_core_ok_pct": 33.33,
+      "plan_full_ok_pct": 0.0,
+      "intent_ok_pct": 66.67,
+      "metric_ok_pct": 66.67,
+      "aggregation_ok_pct": 66.67,
+      "group_by_ok_pct": 100.0,
+      "ordering_ok_pct": 100.0,
+      "limit_ok_pct": 66.67,
+      "filters_ok_pct": 33.33,
+      "tables_ok_pct": 100.0,
+      "plan_ok_sql_wrong": 1,
+      "plan_wrong_sql_wrong": 2,
+      "plan_ok_sql_correct": 0,
+      "by_query_type": {
+        "single_value": {
+          "total": 2,
+          "plan_core_ok": 0,
+          "metric_ok": 1,
+          "tables_ok": 2,
+          "aggregation_ok": 1
+        },
+        "time_series": {
+          "total": 1,
+          "plan_core_ok": 1,
+          "metric_ok": 1,
+          "tables_ok": 1,
+          "aggregation_ok": 1
+        }
+      }
+    },
+    "config5_plan_rag_sql_feedback": {
+      "total_with_plan": 3,
+      "plan_core_ok_pct": 33.33,
+      "plan_full_ok_pct": 0.0,
+      "intent_ok_pct": 66.67,
+      "metric_ok_pct": 66.67,
+      "aggregation_ok_pct": 66.67,
+      "group_by_ok_pct": 100.0,
+      "ordering_ok_pct": 100.0,
+      "limit_ok_pct": 100.0,
+      "filters_ok_pct": 33.33,
+      "tables_ok_pct": 100.0,
+      "plan_ok_sql_wrong": 1,
+      "plan_wrong_sql_wrong": 2,
+      "plan_ok_sql_correct": 0,
+      "by_query_type": {
+        "single_value": {
+          "total": 2,
+          "plan_core_ok": 0,
+          "metric_ok": 1,
+          "tables_ok": 2,
+          "aggregation_ok": 1
+        },
+        "time_series": {
+          "total": 1,
+          "plan_core_ok": 1,
+          "metric_ok": 1,
+          "tables_ok": 1,
+          "aggregation_ok": 1
+        }
+      }
+    }
+  },
+  "configs": [
+    {
+      "id": "config1_current_system",
+      "name": "Current system (planner + RAG + SQL gen + exec feedback + evaluator)"
+    },
+    {
+      "id": "config2_llm_full_schema",
+      "name": "LLM + full schema context (no RAG, no planner)"
+    },
+    {
+      "id": "config3_llm_rag",
+      "name": "LLM + RAG (no planner)"
+    },
+    {
+      "id": "config4_plan_rag_sql",
+      "name": "Planner + RAG + SQL generation (no exec feedback)"
+    },
+    {
+      "id": "config5_plan_rag_sql_feedback",
+      "name": "Planner + RAG + SQL generation + execution feedback"
+    }
+  ]
+}

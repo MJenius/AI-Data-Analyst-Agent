@@ -1,0 +1,20 @@
+{
+  "experiment": "phase3_nl2sql_failure_diagnosis",
+  "run_id": "run_20260815T_phase3_full",
+  "created_at_utc": "2026-08-15T13:31:14.556488+00:00",
+  "llm_provider": "groq",
+  "groq_model": "llama-3.1-8b-instant",
+  "groq_api_key_present": true,
+  "gemini_api_key_present": true,
+  "gemini_note": "Gemini key present in .env but rejected by API (HTTP 400) during pre-flight check",
+  "db_path": "C:\\Users\\mjeni\\OneDrive\\Desktop\\Own Projects\\Data Analyst Agent\\runtime\\analytics.db",
+  "benchmark": "C:\\Users\\mjeni\\OneDrive\\Desktop\\Own Projects\\Data Analyst Agent\\tests\\evaluation\\benchmark_dataset_v2.json",
+  "benchmark_queries": 100,
+  "configs": {
+    "config1_current_system": "Production pipeline untouched: AnalyticsPlannerAgent (LLM) + RAG + AnalyticsExecutorAgent (LLM, 2 retries w/ exec feedback) + AnalyticsEvaluatorAgent. Strict Pydantic validation on all LLM outputs.",
+    "config2_llm_full_schema": "LLM + FULL schema context (all SchemaContextBuilder documents). Single SQL gen call, lenient JSON parsing, no planner, no RAG, no feedback.",
+    "config3_llm_rag": "LLM + SchemaRetriever.retrieve(top_k=5). Single SQL gen call, lenient parsing, no planner, no feedback.",
+    "config4_plan_rag_sql": "Structured QueryPlan (intent/metric/entity/aggregation/filters/group_by/ordering/limit/required_tables) + RAG + SQL gen. Lenient parsing, no execution feedback.",
+    "config5_plan_rag_sql_feedback": "Config 4 + execution feedback loop (up to 2 repair attempts with error message). Lenient parsing."
+  }
+}

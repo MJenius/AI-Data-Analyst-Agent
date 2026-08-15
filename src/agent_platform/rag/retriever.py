@@ -83,7 +83,14 @@ class SemanticVectorIndex(VectorIndex):
 
     def __init__(self, documents: list[SchemaDocument], embedding_model: EmbeddingModel | None = None, index_path: str | Path = "runtime/cache/vector_index") -> None:
         from agent_platform.rag.embeddings import EmbeddingModel
-        from agent_platform.rag.vector_store import FaissVectorStore
+        from agent_platform.rag.vector_store import FaissVectorStore, faiss
+
+        # FaissVectorStore intentionally degrades to a no-op when FAISS is not
+        # installed.  A no-op index is not a valid semantic retriever, however:
+        # callers must receive the keyword fallback rather than an empty result
+        # set.  Raising here is handled by SchemaRetriever.from_documents.
+        if faiss is None:
+            raise ImportError("faiss-cpu is required for SemanticVectorIndex")
 
         self._embedding_model = embedding_model or EmbeddingModel()
         self._store = FaissVectorStore(self._embedding_model)
