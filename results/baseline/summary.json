@@ -1,0 +1,22 @@
+{
+  "total_queries": 100,
+  "execution_accuracy_pct": 100.0,
+  "exact_sql_accuracy": "UNAVAILABLE - no expected SQL strings in benchmark dataset",
+  "invalid_sql_rate_pct": 0.0,
+  "hallucinated_schema_rate_pct": 0.0,
+  "unsafe_sql_rate_pct": 0.0,
+  "avg_latency_seconds": 7.09,
+  "min_latency_seconds": 1.68,
+  "max_latency_seconds": 14.08,
+  "avg_confidence": 0.9168,
+  "avg_table_accuracy_pct": 84.17,
+  "token_usage": "UNAVAILABLE - LLM clients do not expose token counts in current implementation",
+  "model_version": {
+    "llm_provider": "auto",
+    "groq_model": "llama-3.3-70b-versatile",
+    "gemini_model": "gemini-1.5-flash",
+    "ollama_model": "qwen2.5-coder:7b",
+    "db_path": "C:\\Users\\mjeni\\OneDrive\\Desktop\\Own Projects\\Data Analyst Agent\\runtime\\analytics.db",
+    "log_level": "INFO"
+  }
+}

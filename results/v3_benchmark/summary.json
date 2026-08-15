@@ -1,0 +1,120 @@
+{
+  "total_queries": 100,
+  "service_completion_rate_pct": 100.0,
+  "sql_execution_success_rate_pct": 100.0,
+  "result_correctness_pct": 1.0,
+  "result_equivalence_pct": 1.0,
+  "table_accuracy_pct": 86.0,
+  "sql_form_exact_match_pct": 0.0,
+  "sql_form_normalized_match_pct": 0.0,
+  "invalid_sql_rate_pct": 0.0,
+  "hallucinated_schema_rate_pct": 0.0,
+  "unsafe_sql_rate_pct": 0.0,
+  "avg_latency_seconds": 7.09,
+  "min_latency_seconds": 1.68,
+  "max_latency_seconds": 14.08,
+  "avg_confidence": 0.9168,
+  "domain_breakdown": {
+    "Revenue & Sales": {
+      "total": 15,
+      "correct": 1,
+      "exec": 15
+    },
+    "Orders & Transactions": {
+      "total": 15,
+      "correct": 0,
+      "exec": 15
+    },
+    "Customers": {
+      "total": 15,
+      "correct": 0,
+      "exec": 15
+    },
+    "Products & Categories": {
+      "total": 15,
+      "correct": 0,
+      "exec": 15
+    },
+    "Logistics & Delivery": {
+      "total": 10,
+      "correct": 0,
+      "exec": 10
+    },
+    "Sellers": {
+      "total": 10,
+      "correct": 0,
+      "exec": 10
+    },
+    "Payments": {
+      "total": 10,
+      "correct": 0,
+      "exec": 10
+    },
+    "Reviews & Satisfaction": {
+      "total": 10,
+      "correct": 0,
+      "exec": 10
+    }
+  },
+  "query_type_breakdown": {
+    "single_value": {
+      "total": 14,
+      "correct": 1,
+      "exec": 14
+    },
+    "time_series": {
+      "total": 17,
+      "correct": 0,
+      "exec": 17
+    },
+    "unknown": {
+      "total": 3,
+      "correct": 0,
+      "exec": 3
+    },
+    "aggregation": {
+      "total": 40,
+      "correct": 0,
+      "exec": 40
+    },
+    "ranking": {
+      "total": 26,
+      "correct": 0,
+      "exec": 26
+    }
+  },
+  "difficulty_breakdown": {
+    "easy": {
+      "total": 70,
+      "correct": 1,
+      "exec": 70
+    },
+    "medium": {
+      "total": 26,
+      "correct": 0,
+      "exec": 26
+    },
+    "hard": {
+      "total": 4,
+      "correct": 0,
+      "exec": 4
+    }
+  },
+  "model_version": {
+    "llm_provider": "auto",
+    "groq_model": "llama-3.3-70b-versatile",
+    "groq_api_key_present": false,
+    "gemini_model": "gemini-1.5-flash",
+    "gemini_api_key_present": false,
+    "ollama_model": "qwen2.5-coder:7b",
+    "db_path": "C:\\Users\\mjeni\\OneDrive\\Desktop\\Own Projects\\Data Analyst Agent\\runtime\\analytics.db",
+    "log_level": "INFO"
+  },
+  "evaluation_notes": {
+    "service_completion": "Agent returned a response (may include fallback SQL)",
+    "sql_execution_success": "Generated SQL was independently executed against DB without error",
+    "result_correctness": "Query-type-aware comparison of generated result vs gold result",
+    "result_equivalence": "Generated result vs gold SQL result (both executed independently)",
+    "sql_form_similarity": "Text-level SQL similarity, NOT semantic correctness"
+  }
+}

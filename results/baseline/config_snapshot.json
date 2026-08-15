@@ -1,0 +1,10 @@
+{
+  "llm_provider": "auto",
+  "groq_model": "llama-3.3-70b-versatile",
+  "groq_api_key_present": true,
+  "gemini_model": "gemini-1.5-flash",
+  "gemini_api_key_present": true,
+  "ollama_model": "qwen2.5-coder:7b",
+  "db_path": "C:\\Users\\mjeni\\OneDrive\\Desktop\\Own Projects\\Data Analyst Agent\\runtime\\analytics.db",
+  "log_level": "INFO"
+}

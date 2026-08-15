@@ -1,0 +1,28 @@
+{
+  "total_queries": 100,
+  "verified_ground_truth_queries": 100,
+  "execution_accuracy_pct": 100.0,
+  "exact_sql_accuracy_pct": 0.0,
+  "normalized_sql_accuracy_pct": 0.0,
+  "result_correctness_pct": 1.0,
+  "table_accuracy_pct": 84.17,
+  "invalid_sql_rate_pct": 0.0,
+  "hallucinated_schema_rate_pct": 0.0,
+  "unsafe_sql_rate_pct": 0.0,
+  "avg_latency_seconds": 7.09,
+  "min_latency_seconds": 1.68,
+  "max_latency_seconds": 14.08,
+  "avg_confidence": 0.9168,
+  "model_version": {
+    "llm_provider": "auto",
+    "groq_model": "llama-3.3-70b-versatile",
+    "groq_api_key_present": false,
+    "gemini_model": "gemini-1.5-flash",
+    "gemini_api_key_present": false,
+    "ollama_model": "qwen2.5-coder:7b",
+    "db_path": "C:\\Users\\mjeni\\OneDrive\\Desktop\\Own Projects\\Data Analyst Agent\\runtime\\analytics.db",
+    "log_level": "INFO"
+  },
+  "queries_without_verified_ground_truth": 0,
+  "ground_truth_source": "manually_verified_gold_sql_against_sqlite_olist"
+}
