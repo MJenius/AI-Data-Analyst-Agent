@@ -2,12 +2,15 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import re
 from typing import Any
 
+from agent_platform.experiments.query_plan import QueryPlan
 from agent_platform.infra.cache import global_cache
 from agent_platform.llms.client import LLMClient, get_llm_client
 from agent_platform.llms.evaluator_prompt import SYSTEM_PROMPT as EVALUATOR_SYSTEM_PROMPT
 from agent_platform.llms.evaluator_prompt import build_evaluator_prompt
+from agent_platform.llms.models import QueryPlanOutput
 from agent_platform.llms.planner_prompt import SYSTEM_PROMPT as PLANNER_SYSTEM_PROMPT
 from agent_platform.llms.planner_prompt import build_planner_prompt
 from agent_platform.llms.repair_prompt import (
@@ -35,72 +38,171 @@ class AnalyticsPlannerAgent:
         self._llm_client = llm_client or get_llm_client()
         self.last_reasoning: str | None = None
 
-    async def plan(self, task: str) -> list[str]:
+    async def plan(self, task: str) -> QueryPlan:
         """
-        Generates a multi-step analytical plan for a given business question.
-        
+        Generates a structured QueryPlan for a given business question.
+
         Uses semantic retrieval to find relevant table schemas and then leverages
-        the LLM to decompose the question into executable analytical steps.
+        the LLM to produce an explicitly grounded query plan.
         """
         context = self._schema_retriever.retrieve_grounded(task)
         context_text = [item.text for item in context]
-        logger.info(f"Planning analytical steps for: {task}")
+        logger.info(f"Planning query plan for: {task}")
         if self._llm_client.enabled:
             try:
                 logger.info(f"Requesting plan from LLM (Provider: {type(self._llm_client).__name__})...")
-                from agent_platform.llms.models import PlannerOutput
                 result = self._llm_client.complete_json(
                     system_prompt=PLANNER_SYSTEM_PROMPT,
                     user_prompt=build_planner_prompt(task, context_text),
-                    response_model=PlannerOutput,
+                    response_model=QueryPlanOutput,
                 )
                 if not isinstance(result, dict):
                     raise ValueError("Planner did not return a valid JSON object.")
-                steps = result.get("steps")
-                if steps is None or not isinstance(steps, list):
-                    raise KeyError("Planner output is missing 'steps' list.")
-                if not all(isinstance(step, str) for step in steps):
-                    raise ValueError("All planner steps must be strings.")
-                reasoning = result.get("reasoning")
-                if reasoning is None or not isinstance(reasoning, str):
-                    raise KeyError("Planner output is missing 'reasoning' string.")
-                
-                self.last_reasoning = reasoning
-                return steps
+                plan = QueryPlanOutput(**result)
+                self.last_reasoning = plan.reasoning
+                return QueryPlan(
+                    intent=plan.intent,
+                    metric=plan.metric,
+                    entity=plan.entity,
+                    aggregation=plan.aggregation,
+                    filters=plan.filters,
+                    group_by=plan.group_by,
+                    ordering=plan.ordering,
+                    limit=plan.limit,
+                    required_tables=plan.required_tables,
+                    reasoning=plan.reasoning,
+                )
             except Exception as exc:
                 logger.warning("planner_llm_fallback", extra={"error": str(exc)})
-        self.last_reasoning = "Used deterministic fallback plan because Groq was unavailable."
+        self.last_reasoning = "Used deterministic fallback plan because LLM was unavailable."
         return self._fallback_plan(task, context)
 
-    def _fallback_plan(self, task: str, context: list[Any]) -> list[str]:
-        context_hint = "; ".join(item.metadata.get("table", item.id) for item in context[:3])
-        steps = ["inspect relevant schema and business definitions"]
+    def _derive_tables_from_question(self, task: str) -> list[str]:
+        """Derive likely required tables from the question text."""
         lowered = task.lower()
-        if "growth" in lowered or "highest revenue" in lowered:
-            steps.extend(
-                [
-                    "calculate product revenue growth between prior and current periods",
-                    "identify regional revenue contribution for growth leaders",
-                    "summarize product growth drivers with supporting metrics",
-                ]
-            )
-        elif "drop" in lowered or "decline" in lowered:
-            steps.extend(
-                [
-                    "calculate monthly revenue trend",
-                    "compare month over month revenue movement",
-                    "identify category and product declines",
-                ]
-            )
-        else:
-            steps.extend(
-                [
-                    "calculate revenue by product category",
-                    "rank top products by revenue",
-                    "summarize analytical findings with caveats",
-                ]
-            )
-        return [f"{step} | schema_context={context_hint}" for step in steps]
+        tables = []
+        if any(k in lowered for k in ["customer", "state", "region", "aov", "repeat", "loyalty"]):
+            tables.append("customers")
+        if any(k in lowered for k in ["order", "month", "trend", "time", "drop", "decline", "cancel", "review", "seller"]):
+            tables.append("orders")
+        if any(k in lowered for k in ["item", "revenue", "sales", "price", "product", "category", "seller", "aov"]):
+            tables.append("order_items")
+        if any(k in lowered for k in ["product", "category"]):
+            tables.append("products")
+        if any(k in lowered for k in ["payment", "installment"]):
+            tables.append("order_payments")
+        if any(k in lowered for k in ["review", "rating", "score"]):
+            tables.append("order_reviews")
+        if any(k in lowered for k in ["seller", "state"]):
+            tables.append("sellers")
+        if any(k in lowered for k in ["geolocation", "zip", "density", "lat", "lng"]):
+            tables.append("geolocation")
+        if not tables:
+            tables = ["order_items", "orders", "products"]
+        return list(dict.fromkeys(tables))
+
+    def _derive_metric_aggregation(self, task: str) -> tuple[str, str | None]:
+        """Derive metric and aggregation from question text."""
+        lowered = task.lower()
+        if any(k in lowered for k in ["revenue", "sales", "gmv", "amount"]):
+            return "total revenue", "SUM"
+        if any(k in lowered for k in ["average order value", "aov"]):
+            return "average order value", "AVG"
+        if any(k in lowered for k in ["average", "avg", "mean"]):
+            return "average value", "AVG"
+        if any(k in lowered for k in ["count", "number of", "how many", "total orders", "total customers"]):
+            return "count", "COUNT"
+        if any(k in lowered for k in ["review", "rating", "score"]):
+            return "average review score", "AVG"
+        if any(k in lowered for k in ["payment", "installment"]):
+            return "total payment value", "SUM"
+        return "count", "COUNT"
+
+    def _derive_filters(self, task: str) -> list[str]:
+        """Derive filters from question text."""
+        lowered = task.lower()
+        filters = []
+        if any(k in lowered for k in ["delivered", "shipped", "invoiced"]):
+            filters.append("order_status IN ('delivered', 'shipped', 'invoiced')")
+        if any(k in lowered for k in ["canceled", "cancelled", "cancellation"]):
+            filters.append("order_status = 'canceled'")
+        if re.search(r"20\d{2}", lowered):
+            year_match = re.search(r"(20\d{2})", lowered)
+            if year_match:
+                year = year_match.group(1)
+                filters.append(f"strftime('%Y', order_purchase_timestamp) = '{year}'")
+        if any(k in lowered for k in ["month", "monthly", "per month"]):
+            filters.append("group by month using substr(order_purchase_timestamp, 1, 7)")
+        return filters
+
+    def _derive_group_by(self, task: str) -> list[str] | None:
+        """Derive group_by fields from question text."""
+        lowered = task.lower()
+        if any(k in lowered for k in ["month", "monthly", "per month", "over time"]):
+            return ["month"]
+        if any(k in lowered for k in ["state", "region", "location"]):
+            return ["state"]
+        if any(k in lowered for k in ["category", "categories"]):
+            return ["product_category_name"]
+        if any(k in lowered for k in ["seller", "sellers"]):
+            return ["seller_id"]
+        if any(k in lowered for k in ["payment", "payments"]):
+            return ["payment_type"]
+        if any(k in lowered for k in ["review", "rating", "score"]):
+            return ["review_score"]
+        if any(k in lowered for k in ["customer", "customers"]):
+            return ["customer_state"]
+        return None
+
+    def _derive_ordering(self, task: str) -> str | None:
+        """Derive ordering from question text."""
+        lowered = task.lower()
+        if any(k in lowered for k in ["top", "highest", "best", "most"]):
+            return "metric DESC"
+        if any(k in lowered for k in ["bottom", "lowest", "worst", "least"]):
+            return "metric ASC"
+        return None
+
+    def _derive_limit(self, task: str) -> int | None:
+        """Derive limit from question text."""
+        lowered = task.lower()
+        match = re.search(r"(top|bottom)\s+(\d+)", lowered)
+        if match:
+            return int(match.group(2))
+        if any(k in lowered for k in ["top 5", "top five", "top 10", "top ten"]):
+            return 10
+        return None
+
+    def _fallback_plan(self, task: str, context: list[Any]) -> QueryPlan:
+        """Generate a deterministic question-specific QueryPlan when LLM is unavailable."""
+        lowered = task.lower()
+        tables = self._derive_tables_from_question(task)
+        metric, aggregation = self._derive_metric_aggregation(task)
+        filters = self._derive_filters(task)
+        group_by = self._derive_group_by(task)
+        ordering = self._derive_ordering(task)
+        limit = self._derive_limit(task)
+
+        entity = None
+        if group_by:
+            entity = group_by[0]
+        elif tables:
+            entity = tables[0].replace("_", " ")
+
+        intent = f"Answer the question: {task}"
+
+        return QueryPlan(
+            intent=intent,
+            metric=metric,
+            entity=entity,
+            aggregation=aggregation,
+            filters=filters,
+            group_by=group_by,
+            ordering=ordering,
+            limit=limit,
+            required_tables=tables,
+            reasoning=f"Deterministic fallback derived from question keywords for: {task}",
+        )
 
 
 class AnalyticsExecutorAgent:
@@ -140,11 +242,12 @@ class AnalyticsExecutorAgent:
         last_error: str | None = None
         sql: str | None = None
         reasoning: str = ""
+        query_plan_context = self._build_query_plan_context(state.query_plan) if state.query_plan else ""
 
         for attempt in range(2):   # attempt 0 = initial, attempt 1 = after execution error
             prompt_ctx = schema_text if attempt == 0 else schema_text + [f"FIX PREVIOUS ERROR: {last_error}"]
             logger.info("sql_generation attempt=%d step=%s", attempt + 1, step[:80])
-            payload  = self._generate_sql_payload(state.task, step, prompt_ctx)
+            payload  = self._generate_sql_payload(state.task, step, prompt_ctx, query_plan_context)
             sql      = payload.get("sql")
             reasoning = payload.get("reasoning", "")
             if sql is None:
@@ -237,7 +340,7 @@ class AnalyticsExecutorAgent:
                 logger.warning("sql_exec_error attempt=%d error=%s", attempt + 1, last_error)
 
         # ── Fallback ─────────────────────────────────────────────────────────
-        fallback_sql = self._fallback_sql(state.task, step)
+        fallback_sql = self._fallback_sql(state.task, step, state.query_plan)
         if fallback_sql:
             logger.info("sql_fallback step=%s", step[:80])
             try:
@@ -266,6 +369,28 @@ class AnalyticsExecutorAgent:
             },
             "tool_results": [],
         }
+
+    @staticmethod
+    def _build_query_plan_context(query_plan: QueryPlan | None) -> str:
+        """Format QueryPlan into a grounding block for SQL generation."""
+        if not query_plan:
+            return ""
+        parts = [
+            f"Question-specific plan: {query_plan.intent}",
+            f"Metric: {query_plan.aggregation}({query_plan.metric})" if query_plan.aggregation else f"Metric: {query_plan.metric}",
+        ]
+        if query_plan.entity:
+            parts.append(f"Entity: {query_plan.entity}")
+        if query_plan.filters:
+            parts.append(f"Filters: {', '.join(query_plan.filters)}")
+        if query_plan.group_by:
+            parts.append(f"Group by: {', '.join(query_plan.group_by)}")
+        if query_plan.ordering:
+            parts.append(f"Ordering: {query_plan.ordering}")
+        if query_plan.limit:
+            parts.append(f"Limit: {query_plan.limit}")
+        parts.append(f"Required tables: {', '.join(query_plan.required_tables)}")
+        return "\n".join(parts)
 
     # ── Phase 6 repair helper ─────────────────────────────────────────────────
 
@@ -339,13 +464,16 @@ class AnalyticsExecutorAgent:
             )
         )
 
-    def _generate_sql_payload(self, task: str, step: str, schema_context: list[str]) -> dict[str, Any]:
+    def _generate_sql_payload(self, task: str, step: str, schema_context: list[str], query_plan_context: str = "") -> dict[str, Any]:
         if self._llm_client.enabled:
             try:
                 from agent_platform.llms.models import SQLOutput
+                enhanced_step = step
+                if query_plan_context:
+                    enhanced_step = f"{query_plan_context}\n\nStep: {step}"
                 result = self._llm_client.complete_json(
                     system_prompt=SQL_SYSTEM_PROMPT,
-                    user_prompt=build_sql_prompt(task, step, schema_context),
+                    user_prompt=build_sql_prompt(task, enhanced_step, schema_context),
                     response_model=SQLOutput,
                 )
                 if not isinstance(result, dict):
@@ -363,30 +491,44 @@ class AnalyticsExecutorAgent:
             except Exception as exc:
                 logger.warning("sql_generation_llm_fallback", extra={"error": str(exc), "step": step})
         return {
-            "sql": self._fallback_sql(task, step),
+            "sql": self._fallback_sql(task, step, None),
             "reasoning": "Used deterministic safe SQL fallback because Groq was unavailable.",
         }
 
-    def _fallback_sql(self, task: str, step: str) -> str | None:
+    def _fallback_sql(self, task: str, step: str, query_plan: QueryPlan | None) -> str | None:
         core_step = step.split("|")[0].strip().lower()
         lowered = f"{task} {core_step}".lower()
 
         if "schema" in core_step and "calculate" not in core_step:
             return "SELECT name, type FROM sqlite_master WHERE type='table' ORDER BY name;"
         
+        # Use query plan fields if available for grounding
+        tables = query_plan.required_tables if query_plan and query_plan.required_tables else []
+        metric = query_plan.metric if query_plan else None
+        aggregation = query_plan.aggregation if query_plan else None
+        group_by = query_plan.group_by if query_plan and query_plan.group_by else []
+        ordering = query_plan.ordering if query_plan else None
+        limit = query_plan.limit if query_plan else None
+        filters = query_plan.filters if query_plan and query_plan.filters else []
+        
+        # Regional/state analysis
         if "regional" in lowered or "state" in lowered:
-            return """
+            where = "WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')" if "order" in lowered else ""
+            group_col = "c.customer_state" if "customer" in lowered else "o.customer_state"
+            return f"""
             SELECT
-                c.customer_state AS state,
+                {group_col} AS state,
                 ROUND(SUM(oi.price), 2) AS revenue
             FROM order_items oi
             JOIN orders o ON o.order_id = oi.order_id
             JOIN customers c ON c.customer_id = o.customer_id
-            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')
+            {where}
             GROUP BY state
             ORDER BY revenue DESC
             LIMIT 10
             """
+        
+        # Revenue/growth/category
         if "growth" in lowered or "highest revenue" in lowered or "top 5" in lowered or "category" in lowered:
             return """
             SELECT
@@ -400,6 +542,8 @@ class AnalyticsExecutorAgent:
             ORDER BY revenue DESC
             LIMIT 10
             """
+        
+        # Trend/month/time
         if "trend" in lowered or "month" in lowered or "drop" in lowered or "over time" in lowered or "history" in lowered or "time series" in lowered:
             return """
             SELECT
@@ -411,12 +555,15 @@ class AnalyticsExecutorAgent:
             GROUP BY month
             ORDER BY month
             """
+        
+        # AOV
         if "aov" in lowered or "average order value" in lowered or "average order" in lowered or "average value" in lowered:
             return """
             SELECT ROUND(SUM(price) / COUNT(DISTINCT order_id), 2) AS average_order_value
             FROM order_items
             """
 
+        # Seller
         if "seller" in lowered:
             return """
             SELECT
@@ -429,6 +576,7 @@ class AnalyticsExecutorAgent:
             LIMIT 10
             """
         
+        # Repeat/loyalty
         if "repeat" in lowered or "loyalty" in lowered or "recurring" in lowered:
             return """
             SELECT
@@ -442,6 +590,7 @@ class AnalyticsExecutorAgent:
             LIMIT 10
             """
             
+        # Cancel
         if "cancel" in lowered or "cancellation" in lowered:
             return """
             SELECT
@@ -454,6 +603,7 @@ class AnalyticsExecutorAgent:
             GROUP BY o.order_status
             """
             
+        # Rating/review
         if "rating" in lowered or "review" in lowered:
             return """
             SELECT
@@ -465,6 +615,7 @@ class AnalyticsExecutorAgent:
             ORDER BY review_score DESC
             """
             
+        # Geolocation
         if "geolocation" in lowered or "density" in lowered or "zip" in lowered:
             return """
             SELECT
@@ -476,6 +627,7 @@ class AnalyticsExecutorAgent:
             LIMIT 10
             """
             
+        # Payment
         if "payment" in lowered:
             return """
             SELECT

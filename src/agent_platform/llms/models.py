@@ -3,8 +3,22 @@ from __future__ import annotations
 from pydantic import BaseModel, Field
 
 
+class QueryPlanOutput(BaseModel):
+    """Schema for validating Planner agent output as a structured QueryPlan."""
+    intent: str = Field(description="High-level analytical intent of the question")
+    metric: str = Field(description="Primary metric being calculated")
+    entity: str | None = Field(default=None, description="Primary entity being analyzed")
+    aggregation: str | None = Field(default=None, description="Aggregation function used")
+    filters: list[str] = Field(default_factory=list, description="Filters applied to the data")
+    group_by: list[str] | None = Field(default=None, description="Fields to group by")
+    ordering: str | None = Field(default=None, description="Ordering direction and field")
+    limit: int | None = Field(default=None, description="Result limit if applicable")
+    required_tables: list[str] = Field(description="Tables required to answer the question")
+    reasoning: str = Field(description="Brief trace explaining why this plan answers the question")
+
+
 class PlannerOutput(BaseModel):
-    """Schema for validating Planner agent output."""
+    """Schema for validating Planner agent output (legacy steps-based)."""
     steps: list[str] = Field(description="Sequential execution plan steps")
     reasoning: str = Field(description="Detailed rationale behind the analytical approach")
 

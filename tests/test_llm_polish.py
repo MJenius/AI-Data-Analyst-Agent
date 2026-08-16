@@ -47,10 +47,18 @@ class MockLLMClient:
     ) -> dict[str, Any]:
         model_name = response_model.__name__ if response_model else ""
         
-        if model_name == "PlannerOutput":
+        if model_name == "QueryPlanOutput":
             return {
-                "steps": ["inspect relevant schema and business definitions", "calculate product revenue growth"],
-                "reasoning": "Standard plan developed based on user query."
+                "intent": "Identify top products by revenue growth",
+                "metric": "total revenue",
+                "entity": "product_category_name",
+                "aggregation": "SUM",
+                "filters": ["order_status IN ('delivered', 'shipped', 'invoiced')"],
+                "group_by": ["product_category_name"],
+                "ordering": "revenue DESC",
+                "limit": 10,
+                "required_tables": ["order_items", "orders", "products"],
+                "reasoning": "Question asks for top products by revenue, so sum price grouped by category."
             }
         elif model_name == "SQLOutput":
             return {
@@ -75,8 +83,16 @@ class MockLLMClient:
         # Fallbacks for non-model completion calls
         if "plan" in system_prompt.lower() and "evaluator" not in system_prompt.lower():
             return {
-                "steps": ["inspect relevant schema and business definitions", "calculate product revenue growth"],
-                "reasoning": "Standard plan developed based on user query."
+                "intent": "Identify top products by revenue growth",
+                "metric": "total revenue",
+                "entity": "product_category_name",
+                "aggregation": "SUM",
+                "filters": ["order_status IN ('delivered', 'shipped', 'invoiced')"],
+                "group_by": ["product_category_name"],
+                "ordering": "revenue DESC",
+                "limit": 10,
+                "required_tables": ["order_items", "orders", "products"],
+                "reasoning": "Question asks for top products by revenue, so sum price grouped by category."
             }
         elif "sql" in system_prompt.lower() and "evaluator" not in system_prompt.lower():
             return {
