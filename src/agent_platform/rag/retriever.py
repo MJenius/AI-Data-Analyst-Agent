@@ -188,6 +188,18 @@ class SchemaRetriever:
                 if exact >= 0.75:
                     table_scores[table] = max(table_scores[table], 1.0 + exact)
 
+        if "english" in query_terms and table_scores.get("products", 0.0) > 0:
+            table_scores["product_category_name_translation"] = max(
+                table_scores.get("product_category_name_translation", 0.0),
+                table_scores["products"] + 0.1,
+            )
+
+        grounded_columns: set[str] = set()
+        for _, document in matched_terms:
+            for qualified in document.metadata.get("columns", "").split(","):
+                if qualified and "." in qualified:
+                    grounded_columns.add(qualified.strip())
+
         ordered_tables = sorted(table_scores, key=lambda table: (-table_scores[table], table))
         if not ordered_tables:
             ordered_tables = [
@@ -239,6 +251,27 @@ class SchemaRetriever:
                 and document.metadata.get("to_table") in selected
             ):
                 contexts.append(self._context(document, 1.0))
+        included_ids = {item.id for item in contexts}
+        for table in sorted(selected, key=lambda name: (-table_scores.get(name, 0.0), name)):
+            column_candidates: list[tuple[float, SchemaDocument]] = []
+            for document in self._documents:
+                if document.metadata.get("kind") != "column" or document.metadata.get("table") != table:
+                    continue
+                column_name = document.metadata.get("column", "")
+                lexical = self._overlap(query_terms, self._terms(f"{table} {column_name}"))
+                if lexical > 0:
+                    column_candidates.append((lexical, document))
+            for _, document in sorted(column_candidates, key=lambda item: -item[0])[:2]:
+                if document.id not in included_ids:
+                    contexts.append(self._context(document, 0.9))
+                    included_ids.add(document.id)
+        for qualified in sorted(grounded_columns):
+            table, column = qualified.split(".", 1)
+            column_id = f"column:{table}.{column}"
+            column_document = self._documents_by_id.get(column_id)
+            if column_document and column_id not in included_ids:
+                contexts.append(self._context(column_document, 1.0))
+                included_ids.add(column_id)
         seen = set()
         for score, document in sorted(matched_terms, key=lambda item: -item[0]):
             if document.id not in seen:

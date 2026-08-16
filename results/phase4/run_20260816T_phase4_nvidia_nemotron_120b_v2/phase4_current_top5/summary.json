@@ -1,0 +1,102 @@
+{
+  "config": "phase4_current_top5",
+  "total_queries": 100,
+  "run_status": "completed",
+  "planned_queries": 100,
+  "provider_error_count": 8,
+  "result_correctness_pct": 12.0,
+  "result_equivalence_pct": 12.0,
+  "table_accuracy_pct": 73.5,
+  "table_match_pct": 56.0,
+  "sql_execution_success_pct": 50.0,
+  "invalid_sql_rate_pct": 50.0,
+  "hallucinated_schema_rate_pct": 2.0,
+  "unsafe_sql_rate_pct": 0.0,
+  "avg_latency_seconds": 13.23,
+  "min_latency_seconds": 1.36,
+  "max_latency_seconds": 60.02,
+  "token_usage": {
+    "prompt_tokens": 89457,
+    "completion_tokens": 62977,
+    "total_tokens": 152434
+  },
+  "failure_breakdown": {
+    "correct": 12,
+    "provider_error": 8,
+    "sql_execution_error": 40,
+    "sql_gen_hallucination": 2,
+    "sql_semantic_error": 31,
+    "table_selection_error": 7
+  },
+  "by_query_type": {
+    "single_value": {
+      "total": 14,
+      "correct": 3,
+      "correct_pct": 21.43,
+      "exec": 8
+    },
+    "aggregation": {
+      "total": 40,
+      "correct": 5,
+      "correct_pct": 12.5,
+      "exec": 22
+    },
+    "ranking": {
+      "total": 26,
+      "correct": 2,
+      "correct_pct": 7.69,
+      "exec": 9
+    },
+    "time_series": {
+      "total": 17,
+      "correct": 2,
+      "correct_pct": 11.76,
+      "exec": 10
+    },
+    "unknown": {
+      "total": 3,
+      "correct": 0,
+      "correct_pct": 0.0,
+      "exec": 1
+    }
+  },
+  "by_difficulty": {
+    "easy": {
+      "total": 70,
+      "correct": 10,
+      "correct_pct": 14.29,
+      "exec": 36
+    },
+    "medium": {
+      "total": 26,
+      "correct": 2,
+      "correct_pct": 7.69,
+      "exec": 14
+    },
+    "hard": {
+      "total": 4,
+      "correct": 0,
+      "correct_pct": 0.0,
+      "exec": 0
+    }
+  },
+  "table_precision_pct": 68.08,
+  "pre_execution_blocked_pct": 32.0,
+  "retrieval_table_recall_pct": 94.58,
+  "retrieval_table_precision_pct": 62.25,
+  "retrieval_unnecessary_table_rate_pct": 74.0,
+  "validation_failure_breakdown": {
+    "malformed_sql": 26,
+    "nonexistent_column": 2,
+    "table_not_in_context": 5
+  },
+  "provider_adjusted": {
+    "scored_queries": 92,
+    "result_correctness_pct": 13.04,
+    "result_equivalence_pct": 13.04,
+    "table_accuracy_pct": 79.89,
+    "sql_execution_success_pct": 54.35,
+    "invalid_sql_rate_pct": 45.65,
+    "avg_latency_seconds": 13.23
+  }
+}

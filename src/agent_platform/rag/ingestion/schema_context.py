@@ -282,6 +282,7 @@ class SchemaContextBuilder:
                         "kind": "business_term",
                         "term": term,
                         "tables": ",".join(definition["tables"]),
+                        "columns": ",".join(definition["columns"]),
                     },
                 )
             )

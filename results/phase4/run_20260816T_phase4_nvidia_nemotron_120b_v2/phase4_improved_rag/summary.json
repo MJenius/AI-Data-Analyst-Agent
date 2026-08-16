@@ -1,0 +1,103 @@
+{
+  "config": "phase4_improved_rag",
+  "total_queries": 100,
+  "run_status": "completed",
+  "planned_queries": 100,
+  "provider_error_count": 1,
+  "result_correctness_pct": 16.0,
+  "result_equivalence_pct": 16.0,
+  "table_accuracy_pct": 82.0,
+  "table_match_pct": 49.0,
+  "sql_execution_success_pct": 60.0,
+  "invalid_sql_rate_pct": 40.0,
+  "hallucinated_schema_rate_pct": 1.0,
+  "unsafe_sql_rate_pct": 1.0,
+  "avg_latency_seconds": 14.0,
+  "min_latency_seconds": 3.14,
+  "max_latency_seconds": 56.34,
+  "token_usage": {
+    "prompt_tokens": 171975,
+    "completion_tokens": 73918,
+    "total_tokens": 245893
+  },
+  "failure_breakdown": {
+    "correct": 16,
+    "provider_error": 1,
+    "sql_execution_error": 37,
+    "sql_gen_hallucination": 1,
+    "sql_safety_blocked": 1,
+    "sql_semantic_error": 31,
+    "table_selection_error": 13
+  },
+  "by_query_type": {
+    "single_value": {
+      "total": 14,
+      "correct": 4,
+      "correct_pct": 28.57,
+      "exec": 11
+    },
+    "aggregation": {
+      "total": 40,
+      "correct": 6,
+      "correct_pct": 15.0,
+      "exec": 25
+    },
+    "ranking": {
+      "total": 26,
+      "correct": 3,
+      "correct_pct": 11.54,
+      "exec": 12
+    },
+    "time_series": {
+      "total": 17,
+      "correct": 3,
+      "correct_pct": 17.65,
+      "exec": 11
+    },
+    "unknown": {
+      "total": 3,
+      "correct": 0,
+      "correct_pct": 0.0,
+      "exec": 1
+    }
+  },
+  "by_difficulty": {
+    "easy": {
+      "total": 70,
+      "correct": 13,
+      "correct_pct": 18.57,
+      "exec": 43
+    },
+    "medium": {
+      "total": 26,
+      "correct": 3,
+      "correct_pct": 11.54,
+      "exec": 16
+    },
+    "hard": {
+      "total": 4,
+      "correct": 0,
+      "correct_pct": 0.0,
+      "exec": 1
+    }
+  },
+  "table_precision_pct": 68.62,
+  "pre_execution_blocked_pct": 16.0,
+  "retrieval_table_recall_pct": 88.75,
+  "retrieval_table_precision_pct": 63.85,
+  "retrieval_unnecessary_table_rate_pct": 64.0,
+  "validation_failure_breakdown": {
+    "malformed_sql": 14,
+    "nonexistent_column": 1,
+    "table_not_in_context": 1
+  },
+  "provider_adjusted": {
+    "scored_queries": 99,
+    "result_correctness_pct": 16.16,
+    "result_equivalence_pct": 16.16,
+    "table_accuracy_pct": 82.83,
+    "sql_execution_success_pct": 60.61,
+    "invalid_sql_rate_pct": 39.39,
+    "avg_latency_seconds": 14.07
+  }
+}
