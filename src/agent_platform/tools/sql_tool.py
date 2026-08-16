@@ -15,6 +15,7 @@ from sqlglot.optimizer.qualify import qualify
 from sqlglot.optimizer.scope import traverse_scope
 
 from agent_platform.rag.ingestion.schema_context import JOIN_RELATIONSHIPS
+from agent_platform.tools.sql_verifier import SQLSemanticVerifier, VerificationLevel
 
 
 logger = logging.getLogger(__name__)
@@ -203,6 +204,7 @@ class SQLTool:
         database_url: str,
         timeout_seconds: float = 5.0,
         max_retries: int = 1,
+        enable_semantic_verification: bool = True,
     ) -> None:
         if not database_url.startswith("sqlite:///"):
             raise ValueError("This vertical slice supports sqlite:/// URLs. Keep the interface for PostgreSQL adapters.")
@@ -211,9 +213,31 @@ class SQLTool:
         self.timeout_seconds = timeout_seconds
         self.max_retries = max_retries
         self.validator = SQLValidator(self.database_path)
+        self.verifier = SQLSemanticVerifier(str(self.database_path)) if enable_semantic_verification else None
 
-    def execute(self, query: str) -> dict[str, Any]:
+    def execute(self, query: str, expected_result: dict[str, Any] | None = None) -> dict[str, Any]:
+        """Execute SQL with semantic verification before running.
+        
+        Args:
+            query: SQL query to execute
+            expected_result: Optional expected result for semantic verification
+        """
         normalized = self._validate_read_only(query)
+        
+        # Run semantic verification BEFORE execution
+        if self.verifier and expected_result:
+            verification = self.verifier.verify(normalized, expected_result=expected_result)
+            if not verification.is_valid:
+                # Log verification issues but don't block execution
+                # The verification provides warnings that the LLM can use for self-correction
+                logger.warning(
+                    "sql_semantic_verification_issues",
+                    extra={
+                        "query": normalized,
+                        "issues": [str(issue) for issue in verification.issues],
+                    },
+                )
+        
         attempt = 0
         last_error: Exception | None = None
         while attempt <= self.max_retries:
