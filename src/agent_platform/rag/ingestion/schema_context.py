@@ -384,3 +384,230 @@ class SchemaContextBuilder:
     def _display(value: Any) -> str:
         text = "NULL" if value is None else str(value)
         return repr(text[:40])
+
+
+# ── Phase 6: explicit column-level grounding block ─────────────────────────
+
+# Exhaustive column catalogue keyed by table.  Generated from schema.sql /
+# PRAGMA table_info so it is guaranteed to match the live database.
+# Each entry: (type_string, tags, description)
+# tags is a list of "PRIMARY KEY" | "FOREIGN KEY -> table.col" strings.
+_COLUMN_CATALOGUE: dict[str, list[tuple[str, list[str], str]]] = {
+    "customers": [
+        ("TEXT", ["PRIMARY KEY"],
+         "Order-level customer ID; links orders.customer_id to this table."),
+        ("TEXT", [],
+         "Stable buyer identifier shared across all orders placed by the same person."),
+        ("TEXT", [],
+         "Customer zip-code prefix (5 digits); may join geolocation on geolocation_zip_code_prefix."),
+        ("TEXT", [], "City of the customer."),
+        ("TEXT", [], "Brazilian state abbreviation (2 letters) for the customer."),
+    ],
+    "geolocation": [
+        ("TEXT", [],
+         "5-digit zip-code prefix; NOT unique — many rows share the same prefix."),
+        ("REAL", [], "Latitude coordinate observation."),
+        ("REAL", [], "Longitude coordinate observation."),
+        ("TEXT", [], "City name for this observation."),
+        ("TEXT", [], "State abbreviation for this observation."),
+    ],
+    "order_items": [
+        ("TEXT", ["PRIMARY KEY", "FOREIGN KEY -> orders.order_id"],
+         "Parent order identifier."),
+        ("INTEGER", ["PRIMARY KEY"],
+         "1-based position of this item within its order; COUNT(*) on this table counts items, not orders."),
+        ("TEXT", ["FOREIGN KEY -> products.product_id"],
+         "Product purchased in this line."),
+        ("TEXT", ["FOREIGN KEY -> sellers.seller_id"],
+         "Seller who fulfilled this item."),
+        ("TEXT", [],
+         "Shipping limit date for the seller."),
+        ("REAL", [],
+         "Item selling price — canonical revenue measure. Do NOT multiply by a quantity column (none exists). Do NOT include freight_value unless the question asks for total paid cost."),
+        ("REAL", [], "Freight / shipping charge for this item."),
+    ],
+    "order_payments": [
+        ("TEXT", ["PRIMARY KEY", "FOREIGN KEY -> orders.order_id"],
+         "Parent order; an order may have multiple payment rows (one per payment_sequential)."),
+        ("INTEGER", ["PRIMARY KEY"],
+         "1-based payment sequence number within the order."),
+        ("TEXT", [], "Payment method (credit_card, boleto, voucher, debit_card)."),
+        ("INTEGER", [], "Number of installments chosen by the buyer."),
+        ("REAL", [],
+         "Amount for this payment sequence. SUM over all sequences to get full order payment value; aggregate at order grain before joining another one-to-many table."),
+    ],
+    "order_reviews": [
+        ("TEXT", ["PRIMARY KEY"], "Unique review identifier."),
+        ("TEXT", ["FOREIGN KEY -> orders.order_id"], "Parent order for this review."),
+        ("INTEGER", [], "Customer rating from 1 (worst) to 5 (best)."),
+        ("TEXT", [], "Optional short title left by the reviewer."),
+        ("TEXT", [], "Optional free-text review message."),
+        ("TEXT", [], "Date the review was created."),
+        ("TEXT", [], "Date the review was answered."),
+    ],
+    "orders": [
+        ("TEXT", ["PRIMARY KEY"], "Unique order identifier."),
+        ("TEXT", ["FOREIGN KEY -> customers.customer_id"],
+         "Order-level customer ID; links to customers.customer_id."),
+        ("TEXT", [],
+         "Order lifecycle status: approved, canceled, delivered, invoiced, processing, shipped, unavailable."),
+        ("TEXT", [],
+         "Canonical order date — use for all time-series and date-range analysis. Column name: order_purchase_timestamp."),
+        ("TEXT", [],
+         "Timestamp when the order was approved for processing."),
+        ("TEXT", [],
+         "Timestamp when the order was dispatched to the carrier."),
+        ("TEXT", [],
+         "Estimated delivery date promised to the customer."),
+        ("TEXT", [],
+         "Actual delivery timestamp to the customer. NULL if not yet delivered."),
+    ],
+    "products": [
+        ("TEXT", ["PRIMARY KEY"], "Unique product identifier."),
+        ("TEXT", [],
+         "Product category in Portuguese; join product_category_name_translation for English names."),
+        ("TEXT", [], "Product name length in characters."),
+        ("TEXT", [], "Product description length in characters."),
+        ("INTEGER", [], "Number of photos in the product listing."),
+        ("REAL", [], "Product weight in grams."),
+        ("REAL", [], "Product length in centimetres."),
+        ("REAL", [], "Product height in centimetres."),
+        ("REAL", [], "Product width in centimetres."),
+    ],
+    "sellers": [
+        ("TEXT", ["PRIMARY KEY"], "Unique seller identifier."),
+        ("TEXT", [], "Seller zip-code prefix."),
+        ("TEXT", [], "City of the seller."),
+        ("TEXT", [], "State abbreviation for the seller."),
+    ],
+    "product_category_name_translation": [
+        ("TEXT", ["PRIMARY KEY"],
+         "Portuguese product category name; matches products.product_category_name exactly."),
+        ("TEXT", [],
+         "English translation of the category name; use this for English-language output."),
+    ],
+}
+
+# Exact column name list per table (must stay in sync with _COLUMN_CATALOGUE order).
+EXACT_COLUMNS: dict[str, list[str]] = {
+    "customers": [
+        "customer_id", "customer_unique_id", "customer_zip_code_prefix",
+        "customer_city", "customer_state",
+    ],
+    "geolocation": [
+        "geolocation_zip_code_prefix", "geolocation_lat", "geolocation_lng",
+        "geolocation_city", "geolocation_state",
+    ],
+    "order_items": [
+        "order_id", "order_item_id", "product_id", "seller_id",
+        "shipping_limit_date", "price", "freight_value",
+    ],
+    "order_payments": [
+        "order_id", "payment_sequential", "payment_type",
+        "payment_installments", "payment_value",
+    ],
+    "order_reviews": [
+        "review_id", "order_id", "review_score",
+        "review_comment_title", "review_comment_message",
+        "review_creation_date", "review_answer_timestamp",
+    ],
+    "orders": [
+        "order_id", "customer_id", "order_status",
+        "order_purchase_timestamp", "order_approved_at",
+        "order_delivered_carrier_date", "order_estimated_delivery_date",
+        "order_delivered_customer_date",
+    ],
+    "products": [
+        "product_id", "product_category_name", "product_name_lenght",
+        "product_description_lenght", "product_photos_qty",
+        "product_weight_g", "product_length_cm",
+        "product_height_cm", "product_width_cm",
+    ],
+    "sellers": ["seller_id", "seller_zip_code_prefix", "seller_city", "seller_state"],
+    "product_category_name_translation": [
+        "product_category_name", "product_category_name_english",
+    ],
+}
+
+
+def build_column_grounding_block(tables: list[str]) -> str:
+    """Return a tightly formatted column reference block for every requested table.
+
+    This block is injected verbatim into the SQL generation prompt so the LLM
+    cannot confuse business concepts (quantity, unit_price, discount_rate) with
+    actual column names.
+
+    Example output (for order_items):
+    ──────────────────────────────────
+    COLUMN REFERENCE (use ONLY these exact column names):
+
+    Table order_items  grain=(order_id, order_item_id)
+      order_id         TEXT  [PK, FK->orders.order_id]  Parent order.
+      order_item_id    INTEGER  [PK]  1-based item position; COUNT(*) counts items.
+      product_id       TEXT  [FK->products.product_id]  Product purchased.
+      seller_id        TEXT  [FK->sellers.seller_id]  Seller who fulfilled item.
+      shipping_limit_date  TEXT  Shipping limit date.
+      price            REAL  Item selling price — canonical revenue measure.
+      freight_value    REAL  Freight/shipping charge.
+
+    Join keys for order_items:
+      order_items.order_id = orders.order_id
+      order_items.product_id = products.product_id
+      order_items.seller_id = sellers.seller_id
+    ──────────────────────────────────
+    """
+    if not tables:
+        return ""
+
+    lines: list[str] = [
+        "COLUMN REFERENCE — use ONLY the exact column names listed below.",
+        "Do NOT invent column names like 'quantity', 'unit_price', 'discount_rate', 'order_date', etc.",
+        "",
+    ]
+
+    for table in sorted(tables):
+        col_names = EXACT_COLUMNS.get(table, [])
+        col_meta  = _COLUMN_CATALOGUE.get(table, [])
+        grain     = TABLE_GRAINS.get(table, "one row")
+        lines.append(f"Table: {table}  |  grain: {grain}")
+
+        for i, col_name in enumerate(col_names):
+            if i < len(col_meta):
+                col_type, col_tags, col_desc = col_meta[i]
+            else:
+                col_type, col_tags, col_desc = "UNKNOWN", [], ""
+            tag_str = f"  [{', '.join(col_tags)}]" if col_tags else ""
+            lines.append(f"  {col_name:<40} {col_type:<8}{tag_str}  {col_desc}")
+
+        # Join keys for this table
+        join_lines = [
+            f"  {left}.{lc} = {right}.{rc}"
+            for left, lc, right, rc, _, _ in JOIN_RELATIONSHIPS
+            if left == table or right == table
+        ]
+        if join_lines:
+            lines.append(f"  -- join keys --")
+            lines.extend(join_lines)
+        lines.append("")
+
+    return "\n".join(lines)
+
+
+def tables_from_context(schema_context: list[str]) -> list[str]:
+    """Extract physical table names mentioned in a list of schema-context strings."""
+    known = set(EXACT_COLUMNS.keys())
+    found: set[str] = set()
+    import re
+    pattern = re.compile(r"\bTable:\s*(\w+)", re.IGNORECASE)
+    for chunk in schema_context:
+        for match in pattern.finditer(chunk):
+            t = match.group(1).lower()
+            if t in known:
+                found.add(t)
+    # Also scan for bare table names in "Physical tables allowed" header lines
+    summary_pattern = re.compile(r"\b(" + "|".join(re.escape(t) for t in known) + r")\b")
+    for chunk in schema_context:
+        if "Physical tables allowed" in chunk or "Grounded schema" in chunk:
+            for m in summary_pattern.finditer(chunk):
+                found.add(m.group(1))
+    return sorted(found)

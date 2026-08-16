@@ -10,11 +10,17 @@ from agent_platform.llms.evaluator_prompt import SYSTEM_PROMPT as EVALUATOR_SYST
 from agent_platform.llms.evaluator_prompt import build_evaluator_prompt
 from agent_platform.llms.planner_prompt import SYSTEM_PROMPT as PLANNER_SYSTEM_PROMPT
 from agent_platform.llms.planner_prompt import build_planner_prompt
+from agent_platform.llms.repair_prompt import (
+    SYSTEM_PROMPT as REPAIR_SYSTEM_PROMPT,
+    build_repair_prompt,
+    filter_actionable_issues,
+)
 from agent_platform.llms.sql_generation_prompt import SYSTEM_PROMPT as SQL_SYSTEM_PROMPT
 from agent_platform.llms.sql_generation_prompt import build_sql_prompt
 from agent_platform.orchestration.state import ExecutionState
 from agent_platform.rag.retriever import SchemaRetriever
 from agent_platform.tools.sql_tool import SQLTool, SQLValidationError
+from agent_platform.tools.sql_verifier import SQLSemanticVerifier, VerificationLevel
 
 
 logger = logging.getLogger(__name__)
@@ -115,93 +121,192 @@ class AnalyticsExecutorAgent:
         context: list[Any],
         state: ExecutionState,
     ) -> dict[str, Any]:
-        """
-        Executes a single step of the analytical plan.
-        
-        This involves:
-        1. Retrieving specific schema context for the step.
-        2. Generating SQL using the LLM.
-        3. Validating the SQL for safety and correctness.
-        4. Executing the SQL and interpreting the results.
-        5. Retrying with error context if execution fails.
-        """
-        # Ground the SQL step against a coherent table subset and its complete join paths.
-        context = self._schema_retriever.retrieve_grounded(f"{state.task}\n{step}")
+        """Execute one analytical step with Phase 6 verification-driven repair.
 
+        Pipeline:
+        1. Retrieve grounded schema context (FK-aware).
+        2. Generate SQL with column-level grounding in prompt.
+        3. Run SQLGlot AST + schema validation.
+        4. Run semantic verification (GROUP BY, grain, join fan-out, hallucinated columns).
+        5. If actionable issues are found → issue ONE targeted repair LLM call.
+        6. Re-validate and re-execute the repaired SQL.
+        7. Fall back to safe deterministic SQL only if both attempts fail.
+        """
+        context = self._schema_retriever.retrieve_grounded(f"{state.task}\n{step}")
         schema_text = [item.text for item in context]
 
-        # One repair is enough for a concrete parser/schema/execution diagnostic.
-        max_retries = 1
-        last_error = None
-        sql = None
-        reasoning = ""
+        # ── Step 1: generate SQL ─────────────────────────────────────────────
+        last_error: str | None = None
+        sql: str | None = None
+        reasoning: str = ""
 
-        for attempt in range(max_retries + 1):
-            prompt_context = schema_text
-            if last_error:
-                prompt_context = schema_text + [f"FIX PREVIOUS ERROR: {last_error}"]
-
-            logger.info(f"Executing analytical step (Attempt {attempt + 1}/{max_retries + 1}): {step}")
-            sql_payload = self._generate_sql_payload(state.task, step, prompt_context)
-            sql = sql_payload.get("sql")
-            reasoning = sql_payload.get("reasoning", "Generated SQL from schema context.")
-
+        for attempt in range(2):   # attempt 0 = initial, attempt 1 = after execution error
+            prompt_ctx = schema_text if attempt == 0 else schema_text + [f"FIX PREVIOUS ERROR: {last_error}"]
+            logger.info("sql_generation attempt=%d step=%s", attempt + 1, step[:80])
+            payload  = self._generate_sql_payload(state.task, step, prompt_ctx)
+            sql      = payload.get("sql")
+            reasoning = payload.get("reasoning", "")
             if sql is None:
                 break
 
-            # 3. Validation
-            validation_errors = self._validate_sql(sql, context)
-            if not validation_errors:
-                try:
-                    logger.info(f"Running SQL: {sql.strip()}")
-                    sql_result = await asyncio.to_thread(self._sql_tool.execute, sql)
-                    logger.info(f"SQL executed successfully. Returned {sql_result.get('row_count', 0)} rows.")
-                    analysis = self._interpret(step, sql_result)
-                    return {
-                        "step": step,
-                        "output": {
-                            "analysis": analysis,
-                            "reasoning": reasoning,
-                            "sql": sql,
-                            "schema_context": [item.text for item in context],
-                            "sql_result": sql_result,
-                        },
-                        "tool_results": [{"tool": "sql", "result": sql_result}],
-                    }
-                except Exception as exc:
-                    last_error = f"Execution error: {str(exc)}"
-                    if not self._is_repairable_execution_error(str(exc)):
-                        break
-            else:
-                last_error = f"Validation errors: {', '.join(validation_errors)}"
-            
-            logger.warning("sql_attempt_failed", extra={"attempt": attempt + 1, "error": last_error})
+            # ── Step 2: AST + schema validation ─────────────────────────────
+            val_errors = self._validate_sql(sql, context)
+            if val_errors:
+                last_error = f"Validation errors: {', '.join(val_errors)}"
+                logger.warning("sql_validation_failed attempt=%d errors=%s", attempt + 1, last_error)
+                continue   # retry with error in context (only 1 retry)
 
-        # 4. Fallback if all retries fail
-        if sql is None or last_error:
-            fallback_sql = self._fallback_sql(state.task, step)
-            if fallback_sql:
-                logger.info(f"Using safe fallback SQL: {fallback_sql.strip()}")
+            # ── Step 3: semantic verification (pre-execution) ────────────────
+            verifier = self._sql_tool.verifier
+            if verifier:
+                pre_verify = verifier.verify(sql, level=VerificationLevel.BALANCED)
+                actionable = filter_actionable_issues(pre_verify.issues)
+                if actionable:
+                    repaired = self._attempt_repair(sql, actionable, schema_text, step)
+                    if repaired and repaired != sql:
+                        logger.info("sql_repair_applied step=%s", step[:80])
+                        # Re-validate repaired SQL before accepting
+                        r_errors = self._validate_sql(repaired, context)
+                        if not r_errors:
+                            sql = repaired
+                            reasoning = f"[repaired] {reasoning}"
+                        else:
+                            logger.warning("sql_repair_validation_failed errors=%s", r_errors)
+
+            # ── Step 4: execute ──────────────────────────────────────────────
+            try:
+                logger.info("sql_execute sql=%s", sql.strip()[:120])
+                sql_result = await asyncio.to_thread(self._sql_tool.execute, sql)
+                logger.info("sql_execute_ok rows=%d", sql_result.get("row_count", 0))
+
+                # ── Step 5: post-execution semantic verification ─────────────
+                if verifier:
+                    exec_info = {
+                        "success": True,
+                        "row_count": sql_result.get("row_count", 0),
+                        "rows": sql_result.get("rows", []),
+                    }
+                    post_verify = verifier.verify(
+                        sql,
+                        execution_result=exec_info,
+                        level=VerificationLevel.BALANCED,
+                    )
+                    post_actionable = filter_actionable_issues(post_verify.issues)
+                    if post_actionable:
+                        post_repaired = self._attempt_repair(sql, post_actionable, schema_text, step)
+                        if post_repaired and post_repaired != sql:
+                            p_errors = self._validate_sql(post_repaired, context)
+                            if not p_errors:
+                                try:
+                                    post_result = await asyncio.to_thread(
+                                        self._sql_tool.execute, post_repaired
+                                    )
+                                    logger.info(
+                                        "sql_post_repair_ok rows=%d",
+                                        post_result.get("row_count", 0),
+                                    )
+                                    sql        = post_repaired
+                                    sql_result = post_result
+                                    reasoning  = f"[post-repair] {reasoning}"
+                                except Exception as post_exc:
+                                    logger.warning("sql_post_repair_exec_failed error=%s", post_exc)
+
+                return {
+                    "step": step,
+                    "output": {
+                        "analysis": self._interpret(step, sql_result),
+                        "reasoning": reasoning,
+                        "sql": sql,
+                        "schema_context": schema_text,
+                        "sql_result": sql_result,
+                    },
+                    "tool_results": [{"tool": "sql", "result": sql_result}],
+                }
+            except Exception as exc:
+                last_error = f"Execution error: {str(exc)}"
+                if not self._is_repairable_execution_error(str(exc)):
+                    break
+                logger.warning("sql_exec_error attempt=%d error=%s", attempt + 1, last_error)
+
+        # ── Fallback ─────────────────────────────────────────────────────────
+        fallback_sql = self._fallback_sql(state.task, step)
+        if fallback_sql:
+            logger.info("sql_fallback step=%s", step[:80])
+            try:
                 sql_result = await asyncio.to_thread(self._sql_tool.execute, fallback_sql)
                 return {
                     "step": step,
                     "output": {
                         "analysis": self._interpret(step, sql_result),
-                        "reasoning": f"Retries failed ({last_error}). Used safe fallback SQL.",
+                        "reasoning": f"All attempts failed ({last_error}). Used safe fallback SQL.",
                         "sql": fallback_sql,
-                        "schema_context": [item.text for item in context],
+                        "schema_context": schema_text,
                         "sql_result": sql_result,
                     },
                     "tool_results": [{"tool": "sql", "result": sql_result}],
                 }
+            except Exception:
+                pass
 
-        output = {
-            "analysis": "Inspected schema context and business definitions.",
-            "reasoning": reasoning,
-            "sql": None,
-            "schema_context": [item.text for item in context],
+        return {
+            "step": step,
+            "output": {
+                "analysis": "Inspected schema context and business definitions.",
+                "reasoning": reasoning,
+                "sql": None,
+                "schema_context": schema_text,
+            },
+            "tool_results": [],
         }
-        return {"step": step, "output": output, "tool_results": []}
+
+    # ── Phase 6 repair helper ─────────────────────────────────────────────────
+
+    def _attempt_repair(
+        self,
+        sql: str,
+        issues: list[Any],
+        schema_text: list[str],
+        step: str,
+    ) -> str | None:
+        """Issue ONE targeted repair LLM call.
+
+        First tries the verifier's own programmatic repair (regex-based GROUP BY
+        fix) — fast, free, and deterministic.  Only falls back to an LLM call if
+        programmatic repair is unavailable or produces the same SQL.
+
+        Returns the repaired SQL string, or None if repair was not possible.
+        """
+        verifier = self._sql_tool.verifier
+
+        # 1. Try programmatic repair (no LLM cost).
+        if verifier:
+            for issue in issues:
+                candidate = verifier.generate_repair(issue, sql)
+                if candidate and candidate.strip() != sql.strip():
+                    logger.info("sql_programmatic_repair category=%s", issue.category.value)
+                    return candidate
+
+        # 2. LLM repair — one call, no retries.
+        if not self._llm_client.enabled:
+            return None
+        try:
+            from agent_platform.llms.models import SQLOutput
+
+            repair_user_prompt = build_repair_prompt(sql, issues, schema_text)
+            result = self._llm_client.complete_json(
+                system_prompt=REPAIR_SYSTEM_PROMPT,
+                user_prompt=repair_user_prompt,
+                response_model=SQLOutput,
+            )
+            if not isinstance(result, dict):
+                return None
+            repaired_sql = result.get("sql")
+            if repaired_sql and isinstance(repaired_sql, str):
+                logger.info("sql_llm_repair_ok step=%s", step[:80])
+                return repaired_sql
+        except Exception as exc:
+            logger.warning("sql_llm_repair_failed error=%s", exc)
+        return None
 
     def _validate_sql(self, sql: str, schema_context: list[Any]) -> list[str]:
         allowed_tables = {

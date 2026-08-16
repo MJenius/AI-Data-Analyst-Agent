@@ -1,4 +1,4 @@
-"""Regression tests for Phase 4 SQL semantic failure modes.
+﻿"""Regression tests for Phase 4 SQL semantic failure modes.
 
 Tests the SQLSemanticVerifier against actual Phase 4 failure cases:
 - GROUP BY mismatch (aggregation without proper grouping)
@@ -84,23 +84,28 @@ class TestPhase4FailureModes:
     """Regression tests for Phase 4 semantic failure modes."""
 
     def test_group_by_mismatch_detection(self, verifier: SQLSemanticVerifier) -> None:
-        """Verify GROUP BY mismatch is detected for SELECT columns not in GROUP BY."""
+        """Verify GROUP BY / aggregation-grain issue is detected for agg + non-agg without GROUP BY."""
         result = verifier.verify(MONTHLY_REVENUE_NO_GROUPBY)
-        
-        # Should have at least one issue for GROUP BY mismatch
+        # Phase 6: agg + non-agg with no GROUP BY fires AGGREGATION_GRAIN.
+        # GROUP_BY_MISMATCH requires an existing GROUP BY with a missing column.
         assert not result.is_valid
-        group_by_issues = [
-            i for i in result.issues 
-            if i.category == VerificationCategory.GROUP_BY_MISMATCH
+        structural_issues = [
+            i for i in result.issues
+            if i.category in (VerificationCategory.GROUP_BY_MISMATCH, VerificationCategory.AGGREGATION_GRAIN)
         ]
-        assert len(group_by_issues) >= 1
-        assert "GROUP BY" in group_by_issues[0].message
+        assert len(structural_issues) >= 1
+        assert "GROUP BY" in structural_issues[0].message
 
     def test_aggregation_grain_validation(self, verifier: SQLSemanticVerifier) -> None:
-        """Verify aggregation without GROUP BY is detected."""
-        result = verifier.verify(SINGLE_AGG_NO_GROUP)
-        
-        # Should detect aggregation without GROUP BY
+        """Verify aggregation grain issue fires when agg + non-agg columns appear without GROUP BY."""
+        # Pure aggregates (SELECT SUM(...) only) are valid without GROUP BY.
+        # Mixed agg + non-agg without GROUP BY is the grain violation.
+        mixed_sql = """
+        SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, SUM(oi.price) AS revenue
+        FROM orders o
+        JOIN order_items oi ON o.order_id = oi.order_id
+        """
+        result = verifier.verify(mixed_sql)
         grain_issues = [
             i for i in result.issues
             if i.category == VerificationCategory.AGGREGATION_GRAIN
@@ -193,7 +198,7 @@ class TestPhase4FailureModes:
             if i.category == VerificationCategory.DUPLICATE_DETECTION
         ]
         assert len(duplicate_issues) >= 1
-        assert "5.0x" in duplicate_issues[0].message or "more rows" in duplicate_issues[0].message.lower()
+        assert "500" in duplicate_issues[0].message and "100" in duplicate_issues[0].message
 
     def test_metric_inconsistency_null_aggregates(self, verifier: SQLSemanticVerifier) -> None:
         """Verify NULL in aggregate columns is flagged."""

@@ -1,4 +1,4 @@
-"""SQL Semantic Verifier — result-level validation for aggregation grain,
+﻿"""SQL Semantic Verifier â€” result-level validation for aggregation grain,
 GROUP BY correctness, join fan-out, duplicate-row detection, and metric
 consistency.  Used as a pre-acceptance checkpoint in the Phase 5 pipeline.
 """
@@ -18,7 +18,7 @@ from sqlglot import exp
 logger = logging.getLogger(__name__)
 
 
-# ── enums & dataclasses ──────────────────────────────────────────────────────
+# â”€â”€ enums & dataclasses â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class VerificationLevel(Enum):
     """Controls which issue severities block acceptance."""
@@ -34,6 +34,7 @@ class VerificationCategory(Enum):
     DUPLICATE_DETECTION  = "duplicate_detection"
     EXPECTED_ROW_COUNT   = "expected_row_count"
     METRIC_INCONSISTENCY = "metric_inconsistency"
+    HALLUCINATED_COLUMN  = "hallucinated_column"
 
 
 @dataclass(slots=True)
@@ -57,7 +58,7 @@ class VerificationResult:
     row_count_actual:   int | None = None
 
 
-# ── helpers ──────────────────────────────────────────────────────────────────
+# â”€â”€ helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _AGG_TYPES = (exp.Avg, exp.Count, exp.Sum, exp.Max, exp.Min)
 
@@ -100,7 +101,7 @@ def _group_by_names(expression: exp.Expression) -> set[str]:
     return names
 
 
-# ── main class ───────────────────────────────────────────────────────────────
+# â”€â”€ main class â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class SQLSemanticVerifier:
     """Validates SQL queries for semantic correctness beyond syntax and schema.
@@ -118,7 +119,7 @@ class SQLSemanticVerifier:
         self.database_path = database_path
         self.schema = self._load_schema()
 
-    # ── schema loading ───────────────────────────────────────────────────────
+    # â”€â”€ schema loading â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _load_schema(self) -> dict[str, dict[str, str]]:
         import sqlite3
@@ -135,7 +136,7 @@ class SQLSemanticVerifier:
         finally:
             conn.close()
 
-    # ── public API ───────────────────────────────────────────────────────────
+    # â”€â”€ public API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def verify(
         self,
@@ -174,6 +175,7 @@ class SQLSemanticVerifier:
             )
 
         issues: list[VerificationIssue] = []
+        issues += self._verify_column_existence(tree, sql)
         issues += self._verify_group_by(tree, sql)
         issues += self._verify_aggregation_grain(tree, sql)
         issues += self._verify_join_fanout(tree, sql)
@@ -195,12 +197,120 @@ class SQLSemanticVerifier:
             row_count_actual=execution_result.get("row_count") if execution_result else None,
         )
 
-    # ── individual checks ────────────────────────────────────────────────────
+    # â”€â”€ individual checks â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+    def _verify_column_existence(self, tree: exp.Expression, sql: str) -> list[VerificationIssue]:
+        """Detect column references that do not exist in the live schema.
+
+        Catches hallucinated column names (unit_price, quantity, discount_rate,
+        order_date) that fail at SQLite runtime.  Runs before execution so the
+        repair loop can intercept without a DB round-trip.
+
+        False-positive avoidance:
+        - Build alias→physical_table map so "p.category_name_english" resolves
+          to products.category_name_english before the schema lookup.
+        - Skip names that match a SELECT output alias (e.g. GROUP BY month where
+          month is strftime(…) AS month).
+        - Skip CTE-defined names.
+        """
+        if not self.schema:
+            return []
+
+        # ── alias → physical table map ────────────────────────────────────
+        alias_to_table: dict[str, str] = {}
+        for tbl_node in tree.find_all(exp.Table):
+            physical = (tbl_node.name or "").lower()
+            alias    = (tbl_node.alias or tbl_node.name or "").lower()
+            if physical and physical in self.schema:
+                alias_to_table[alias]    = physical
+                alias_to_table[physical] = physical  # identity
+
+        # ── SELECT output aliases and CTE names ──────────────────────────
+        cte_names: set[str] = {
+            cte.alias_or_name.lower() for cte in tree.find_all(exp.CTE)
+        }
+        select_aliases: set[str] = set()
+        for select in tree.find_all(exp.Select):
+            for expr in select.expressions:
+                if isinstance(expr, exp.Alias):
+                    select_aliases.add(expr.alias.lower())
+
+        issues: list[VerificationIssue] = []
+        seen_bad: set[str] = set()
+
+        for col in tree.find_all(exp.Column):
+            table_ref = (col.table or "").lower()
+            col_name  = (col.name or "").lower()
+            if not col_name:
+                continue
+
+            # Skip SELECT aliases, CTE-derived names.
+            if col_name in select_aliases or col_name in cte_names:
+                continue
+            if table_ref in cte_names:
+                continue
+
+            if not table_ref:
+                # Unqualified: flag only if absent from ALL physical tables.
+                exists = any(
+                    col_name in {c.lower() for c in tcols}
+                    for tcols in self.schema.values()
+                )
+                if not exists:
+                    if col_name not in seen_bad:
+                        seen_bad.add(col_name)
+                        issues.append(VerificationIssue(
+                            category=VerificationCategory.HALLUCINATED_COLUMN,
+                            severity="error",
+                            message=(
+                                f"Column '{col.name}' does not exist in any table — "
+                                "likely a hallucinated column name"
+                            ),
+                            sql_context=sql[:200],
+                            suggested_repair=(
+                                "Replace with an exact column name from the COLUMN REFERENCE block"
+                            ),
+                        ))
+            else:
+                # Qualified: resolve alias to physical table first.
+                physical = alias_to_table.get(table_ref)
+                if physical is None:
+                    # Unknown alias — let AST validator handle it.
+                    continue
+                tbl_schema = self.schema.get(physical)
+                if tbl_schema is None:
+                    continue
+                if col_name not in {c.lower() for c in tbl_schema}:
+                    key = f"{physical}.{col_name}"
+                    if key not in seen_bad:
+                        seen_bad.add(key)
+                        issues.append(VerificationIssue(
+                            category=VerificationCategory.HALLUCINATED_COLUMN,
+                            severity="error",
+                            message=(
+                                f"Column '{col.table}.{col.name}' does not exist in "
+                                f"table '{physical}' — valid columns: "
+                                + ", ".join(sorted(tbl_schema.keys()))
+                            ),
+                            sql_context=sql[:200],
+                            suggested_repair=(
+                                f"Replace '{col.name}' with the correct column from '{physical}'"
+                            ),
+                        ))
+        return issues
+
 
     def _verify_group_by(self, tree: exp.Expression, sql: str) -> list[VerificationIssue]:
         """Detect SELECT columns that are not in GROUP BY and not aggregated."""
         issues: list[VerificationIssue] = []
         gb_names = _group_by_names(tree)
+
+        # Also collect SELECT aliases so GROUP BY alias-references are not flagged.
+        select_aliases: set[str] = set()
+        for select in tree.find_all(exp.Select):
+            for expr in select.expressions:
+                if isinstance(expr, exp.Alias):
+                    select_aliases.add(expr.alias.lower())
 
         for select in tree.find_all(exp.Select):
             # Skip sub-selects that live inside aggregates
@@ -209,19 +319,25 @@ class SQLSemanticVerifier:
             has_gb  = bool(select.find(exp.Group))
 
             if not (has_agg and has_gb):
-                continue  # no aggregation context — GROUP BY not required
+                continue  # no aggregation context â€” GROUP BY not required
 
             for col in non_agg_cols:
                 col_name = col.name.lower()
+                # Skip empty names (computed expressions parsed without a bare name)
+                if not col_name:
+                    continue
+                # Skip columns whose name matches a SELECT alias (already grouped by alias)
+                if col_name in select_aliases and col_name in gb_names:
+                    continue
                 if col_name not in gb_names:
                     issues.append(VerificationIssue(
                         category=VerificationCategory.GROUP_BY_MISMATCH,
                         severity="warning",
                         message=(
                             f"Column '{col.name}' appears in SELECT but is not in "
-                            "GROUP BY and is not aggregated — result grain may be wrong"
+                            "GROUP BY and is not aggregated â€” result grain may be wrong"
                         ),
-                        sql_context=f"SELECT … {col.sql()} …",
+                        sql_context=f"SELECT â€¦ {col.sql()} â€¦",
                         suggested_repair=f"Add '{col.name}' to GROUP BY or wrap in an aggregate",
                     ))
         return issues
@@ -240,7 +356,7 @@ class SQLSemanticVerifier:
                     severity="warning",
                     message=(
                         "Query mixes aggregate and non-aggregate SELECT columns without "
-                        "GROUP BY — will collapse all rows into one (wrong grain)"
+                        "GROUP BY â€” will collapse all rows into one (wrong grain)"
                     ),
                     sql_context=sql[:200],
                     suggested_repair="Add GROUP BY on all non-aggregate SELECT columns",
@@ -256,7 +372,7 @@ class SQLSemanticVerifier:
                 issues.append(VerificationIssue(
                     category=VerificationCategory.JOIN_FAN_OUT,
                     severity="error",
-                    message="JOIN has no ON clause — will produce a Cartesian product",
+                    message="JOIN has no ON clause â€” will produce a Cartesian product",
                     sql_context=sql[:200],
                     suggested_repair="Add an ON clause with an equality join condition",
                 ))
@@ -264,7 +380,7 @@ class SQLSemanticVerifier:
                 issues.append(VerificationIssue(
                     category=VerificationCategory.JOIN_FAN_OUT,
                     severity="warning",
-                    message="JOIN ON clause has no equality predicate — possible Cartesian product",
+                    message="JOIN ON clause has no equality predicate â€” possible Cartesian product",
                     sql_context=on_clause.sql(),
                     suggested_repair="Use an equality condition: ON a.id = b.id",
                 ))
@@ -293,7 +409,7 @@ class SQLSemanticVerifier:
                     category=VerificationCategory.EXPECTED_ROW_COUNT,
                     severity="info",
                     message=(
-                        f"Expected {expected_rc} rows but query has no GROUP BY — "
+                        f"Expected {expected_rc} rows but query has no GROUP BY â€” "
                         "will return at most 1 row"
                     ),
                     suggested_repair="Add GROUP BY to produce multiple rows",
@@ -324,7 +440,7 @@ class SQLSemanticVerifier:
                 severity="warning",
                 message=(
                     f"Result contains {actual} rows but {expected} expected "
-                    f"({ratio:.1f}× too many) — possible Cartesian product or missing WHERE"
+                    f"({ratio:.1f}Ã— too many) â€” possible Cartesian product or missing WHERE"
                 ),
                 suggested_repair="Check JOIN conditions and add WHERE filters to reduce duplicates",
             ))
@@ -334,7 +450,7 @@ class SQLSemanticVerifier:
                 severity="warning",
                 message=(
                     f"Result contains only {actual} rows but {expected} expected "
-                    f"({ratio:.2f}× too few) — possible over-filtering or missing JOIN"
+                    f"({ratio:.2f}Ã— too few) â€” possible over-filtering or missing JOIN"
                 ),
                 suggested_repair="Review WHERE filters and JOIN conditions",
             ))
@@ -358,19 +474,21 @@ class SQLSemanticVerifier:
                         category=VerificationCategory.METRIC_INCONSISTENCY,
                         severity="warning",
                         message=(
-                            f"Aggregate column '{col}' returned NULL — "
+                            f"Aggregate column '{col}' returned NULL â€” "
                             "possible no-match JOIN or all-NULL inputs"
                         ),
                         suggested_repair="Use COALESCE or verify JOIN conditions match data",
                     ))
         return issues
 
-    # ── repair helpers ───────────────────────────────────────────────────────
+    # â”€â”€ repair helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def generate_repair(self, issue: VerificationIssue, sql: str) -> str | None:
         """Attempt a targeted SQL repair for the given issue.
 
         Returns repaired SQL string or None if automatic repair is not feasible.
+        Hallucinated columns always return None (need LLM knowledge to pick the
+        right replacement column).
         """
         if issue.category == VerificationCategory.GROUP_BY_MISMATCH:
             return self._repair_group_by(issue, sql)
@@ -378,6 +496,8 @@ class SQLSemanticVerifier:
             return None  # requires schema knowledge to infer correct FK
         if issue.category == VerificationCategory.AGGREGATION_GRAIN:
             return self._repair_grain(issue, sql)
+        if issue.category == VerificationCategory.HALLUCINATED_COLUMN:
+            return None  # LLM must pick the correct column name
         return None
 
     def _repair_group_by(self, issue: VerificationIssue, sql: str) -> str | None:
