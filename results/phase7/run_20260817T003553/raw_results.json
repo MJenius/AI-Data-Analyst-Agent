@@ -1,0 +1,24 @@
+[
+  {
+    "query_id": "q000",
+    "question": "What is the total revenue generated?",
+    "actual_sql": null,
+    "expected_tables": [
+      "order_items"
+    ],
+    "actual_tables": [],
+    "table_precision": 0.0,
+    "table_recall": 0.0,
+    "result_correct": false,
+    "result_exact_match": false,
+    "result_equivalent_match": false,
+    "row_count_match": false,
+    "expected_row_count": 1,
+    "actual_row_count": 0,
+    "sql_execution_success": false,
+    "repair_attempted": false,
+    "repair_successful": false,
+    "latency_seconds": 0.6226,
+    "error": "unsupported operand type(s) for +: 'NoneType' and 'str'"
+  }
+]

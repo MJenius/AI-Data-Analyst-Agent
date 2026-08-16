@@ -17,6 +17,7 @@ from agent_platform.llms.repair_prompt import (
 )
 from agent_platform.llms.sql_generation_prompt import SYSTEM_PROMPT as SQL_SYSTEM_PROMPT
 from agent_platform.llms.sql_generation_prompt import build_sql_prompt
+from agent_platform.llms.sql_truncation import is_sql_truncated
 from agent_platform.orchestration.state import ExecutionState
 from agent_platform.rag.retriever import SchemaRetriever
 from agent_platform.tools.sql_tool import SQLTool, SQLValidationError
@@ -148,6 +149,13 @@ class AnalyticsExecutorAgent:
             reasoning = payload.get("reasoning", "")
             if sql is None:
                 break
+
+            # ── Phase 7: truncation detection ───────────────────────────────
+            is_trunc, trunc_reason = is_sql_truncated(sql)
+            if is_trunc:
+                last_error = f"SQL truncation detected: {trunc_reason}"
+                logger.warning("sql_truncated attempt=%d reason=%s", attempt + 1, trunc_reason)
+                continue  # retry with truncation error in context
 
             # ── Step 2: AST + schema validation ─────────────────────────────
             val_errors = self._validate_sql(sql, context)

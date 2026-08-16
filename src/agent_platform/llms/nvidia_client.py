@@ -50,7 +50,7 @@ class NvidiaClient:
     model: str | None = None
     base_url: str = "https://integrate.api.nvidia.com/v1/chat/completions"
     timeout_seconds: float = 60.0
-    max_tokens: int = 2048
+    max_tokens: int = 4096
     max_retries: int = 3
     backoff_seconds: float = 1.0
     transport: Callable[..., Any] | None = None
