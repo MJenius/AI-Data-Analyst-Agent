@@ -31,7 +31,7 @@ class GeminiClient:
 
     def __post_init__(self) -> None:
         self.api_key = self.api_key or os.getenv("GEMINI_API_KEY")
-        self.model = self.model or os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
+        self.model = self.model or os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
         self.transport = self.transport or request.urlopen
 
     @property

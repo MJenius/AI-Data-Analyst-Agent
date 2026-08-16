@@ -576,7 +576,6 @@ class AnalyticsEvaluatorAgent:
             if not isinstance(result, dict):
                 raise ValueError("Evaluator did not return a valid JSON object.")
             
-            # Require key structure fields
             summary = result.get("summary")
             if summary is None or not isinstance(summary, str):
                 raise KeyError("Evaluator output is missing 'summary' string.")
