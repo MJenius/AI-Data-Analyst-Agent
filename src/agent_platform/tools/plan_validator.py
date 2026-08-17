@@ -312,11 +312,12 @@ class PlanValidator:
         superlative_keywords = [
             "highest", "lowest", "most", "least", "best", "worst", "top", "bottom",
             "fastest", "slowest", "maximum", "max", "minimum", "min", "largest", "smallest",
+            "longest", "shortest",
         ]
         singular_superlative_keywords = [
             "which", "what is the", "highest", "lowest", "best", "worst",
             "largest", "smallest", "most", "least", "fastest", "slowest",
-            "maximum", "minimum",
+            "maximum", "minimum", "longest", "shortest",
         ]
         is_superlative = any(re.search(rf"\b{k}\b", q_low) for k in superlative_keywords)
         

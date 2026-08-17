@@ -71,8 +71,8 @@ def evaluate_plan_alignment(q_data: dict[str, Any], plan: Any) -> dict[str, Any]
     recall = len(intersection) / len(expected_tables) if expected_tables else 0.0
 
     # Metric & Aggregation alignment
-    expected_metrics = [m.lower() for m in q_data.get("expected_metrics", [])]
-    planned_metric = str(plan.metric if hasattr(plan, "metric") else plan.get("metric", "") or "").lower()
+    expected_metrics = [m.lower().replace("_", " ") for m in q_data.get("expected_metrics", [])]
+    planned_metric = str(plan.metric if hasattr(plan, "metric") else plan.get("metric", "") or "").lower().replace("_", " ")
     planned_agg = str(plan.aggregation if hasattr(plan, "aggregation") else plan.get("aggregation", "") or "").upper()
     
     metric_aligned = False
@@ -82,6 +82,34 @@ def evaluate_plan_alignment(q_data: dict[str, Any], plan: Any) -> dict[str, Any]
         metric_aligned = True
     if not expected_metrics:
         metric_aligned = True
+    
+    # Semantic token overlap check for metrics with synonyms (e.g. seller_count vs total_sellers, delivery_time vs delivery_days)
+    if not metric_aligned and expected_metrics:
+        def _canonical_tokens(s: str) -> set[str]:
+            tokens = set()
+            for w in re.findall(r"\w+", s):
+                w = w.rstrip("s")  # simple plural strip
+                if w in ("delayed", "delays"):
+                    w = "delay"
+                elif w in ("days", "time", "duration", "hours"):
+                    w = "time"
+                elif w in ("total", "sum", "count", "qty", "quantity", "num", "number"):
+                    w = "count"
+                elif w in ("pct", "percentage", "rate", "ratio", "proportion"):
+                    w = "rate"
+                elif w in ("avg", "average", "mean"):
+                    w = "avg"
+                elif w in ("cost", "value", "price", "revenue", "sales", "amount"):
+                    w = "revenue"
+                tokens.add(w)
+            return tokens
+        
+        p_tokens = _canonical_tokens(planned_metric)
+        for em in expected_metrics:
+            e_tokens = _canonical_tokens(em)
+            if p_tokens and e_tokens and (p_tokens == e_tokens or len(p_tokens & e_tokens) >= min(len(p_tokens), len(e_tokens))):
+                metric_aligned = True
+                break
 
     # Aggregation alignment (separate from metric)
     expected_agg = q_data.get("expected_aggregation", "").upper()

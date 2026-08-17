@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 import time
 from dataclasses import dataclass, field
 from queue import Empty, Queue
 from threading import Thread
+
+logger = logging.getLogger(__name__)
 from typing import Any, Callable, ClassVar
 from urllib import error, request
 
@@ -49,10 +52,10 @@ class NvidiaClient:
     api_key: str | None = None
     model: str | None = None
     base_url: str = "https://integrate.api.nvidia.com/v1/chat/completions"
-    timeout_seconds: float = 20.0
+    timeout_seconds: float = 45.0
     max_tokens: int = 4096
-    max_retries: int = 3
-    backoff_seconds: float = 1.0
+    max_retries: int = 5
+    backoff_seconds: float = 2.0
     transport: Callable[..., Any] | None = None
     sleep: Callable[[float], None] = time.sleep
     last_response_metadata: dict[str, Any] = field(default_factory=dict, init=False)
@@ -154,10 +157,21 @@ class NvidiaClient:
                 if exc.code == 429:
                     if attempt >= self.max_retries:
                         raise NvidiaRateLimitError("NVIDIA NIM rate limit persisted after bounded retries.") from exc
-                    self.sleep(min(self.backoff_seconds * (2**attempt), 16.0))
+                    import random
+                    jitter = random.uniform(0.1, 1.0)
+                    sleep_time = min(self.backoff_seconds * (2**attempt) + jitter, 32.0)
+                    logger.warning("nvidia_rate_limited attempt=%d/%d sleeping=%.1fs", attempt + 1, self.max_retries, sleep_time)
+                    self.sleep(sleep_time)
                     continue
                 if 500 <= exc.code < 600:
-                    raise NvidiaProviderError(f"NVIDIA NIM returned HTTP {exc.code}.") from exc
+                    if attempt >= self.max_retries:
+                        raise NvidiaProviderError(f"NVIDIA NIM returned HTTP {exc.code} after retries.") from exc
+                    import random
+                    jitter = random.uniform(0.5, 1.5)
+                    sleep_time = min(self.backoff_seconds * (2**attempt) + jitter, 32.0)
+                    logger.warning("nvidia_server_error http=%d attempt=%d/%d sleeping=%.1fs", exc.code, attempt + 1, self.max_retries, sleep_time)
+                    self.sleep(sleep_time)
+                    continue
                 raise NvidiaModelError(f"NVIDIA NIM returned HTTP {exc.code}.") from exc
             except (KeyError, IndexError, TypeError, json.JSONDecodeError) as exc:
                 raise NvidiaModelError("NVIDIA NIM response did not contain valid JSON content.") from exc
