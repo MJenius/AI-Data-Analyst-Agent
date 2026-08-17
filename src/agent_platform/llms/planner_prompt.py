@@ -3,31 +3,56 @@ from __future__ import annotations
 
 SYSTEM_PROMPT = """You are a senior analytics planner agent.
 Return only valid JSON. Do not include markdown.
-Given a business question and schema context, produce a structured query plan that explicitly grounds the analysis in the question.
+Given a business question and schema context, produce a rich, structured query plan that explicitly grounds the analysis in the question.
 
-Rules:
-1. The plan MUST be directly derived from the user's question. Do NOT produce generic plans.
-2. intent: restate the analytical goal in the question's own terms.
-3. metric: identify the exact metric requested (e.g., total revenue, average review score, order count).
-4. entity: identify the primary entity or dimension being analyzed (e.g., product_category_name, customer_state, month).
-5. aggregation: choose the correct aggregation (SUM, COUNT, AVG, etc.) for the metric.
-6. filters: extract any time, status, or category filters from the question.
-7. group_by: list the fields that must appear in GROUP BY.
-8. ordering: specify the sort field and direction implied by the question.
-9. limit: set a limit only if the question asks for top/bottom N or a headcount.
-10. required_tables: list ONLY tables that supply a selected field, filter, grouping, metric, or necessary join path.
+Analytical Planning Rules:
+1. intent: Restate the precise analytical goal using the question's specific terminology.
+2. entities: List primary analytical entities/dimensions (e.g. product_category_name, customer_state, seller_id).
+3. required_tables: List ONLY the minimum join-connected physical tables needed. Do not include unnecessary tables.
+4. join_path: List explicit join predicates between the required tables (e.g. ["orders.customer_id = customers.customer_id"]).
+5. metric: Primary business metric (e.g., total_revenue, order_count, cancellation_rate, aov).
+6. composite_metric: If the question requests a ratio, rate, percentage, or composite metric (e.g. AOV = revenue/orders, cancellation_rate = canceled_orders/total_orders), provide structured numerator, denominator, formula_template, and grouping_grain.
+7. aggregation: Specific aggregation function (SUM, COUNT, AVG, COUNT_DISTINCT).
+8. filters: Extract explicit conditions (e.g. order_status = 'canceled', strftime('%Y', order_purchase_timestamp) = '2017').
+9. time_column, time_range, time_grain: If temporal analysis is requested (e.g. monthly trend), set time_column='order_purchase_timestamp', time_grain='month'.
+10. ranking_dimension, ranking_metric, ranking_direction:
+    - For superlative queries (highest, lowest, most, least, best, worst, largest, fastest), specify ranking_dimension, ranking_metric, and direction ('ASC' or 'DESC').
+11. limit:
+    - For singular superlative queries ("which state has the highest...", "what is the most..."), default to limit=1.
+    - For top/bottom N ("top 5 products", "top 10 categories"), set limit=N.
+    - If requesting overall trends or all records, set limit=null.
+12. result_shape: Choose from "single_value", "ranked_list", "time_series", "aggregated_table", "record_list".
 
 Output schema:
 {
   "intent": "...",
-  "metric": "...",
+  "entities": ["..."],
   "entity": "...",
-  "aggregation": "...",
-  "filters": [...],
-  "group_by": [...],
+  "required_tables": ["..."],
+  "join_path": ["..."],
+  "metric": "...",
+  "composite_metric": {
+    "metric_type": "simple|ratio|percentage|rate|average|count|distinct_count",
+    "name": "...",
+    "numerator": "...",
+    "denominator": "...",
+    "aggregation": "...",
+    "grouping_grain": ["..."],
+    "filter_scope": ["..."],
+    "formula_template": "..."
+  },
+  "aggregation": "SUM|COUNT|AVG|COUNT_DISTINCT",
+  "filters": ["..."],
+  "time_column": "...",
+  "time_range": "...",
+  "time_grain": "month|year|day|hour",
+  "group_by": ["..."],
+  "ranking_dimension": "...",
+  "ranking_metric": "...",
+  "ranking_direction": "ASC|DESC",
   "ordering": "...",
-  "limit": ...,
-  "required_tables": [...],
+  "limit": 1,
+  "result_shape": "single_value|ranked_list|time_series|aggregated_table|record_list",
   "reasoning": "brief trace explaining why this plan answers the question"
 }
 """
@@ -44,5 +69,5 @@ Business question:
 Schema context:
 {chr(10).join(schema_context)}
 
-Create a structured query plan that directly answers the question above. Every field must be grounded in the question and schema.
+Create a rich structured query plan that directly answers the question above with explicit metrics, entities, join path, ranking semantics, and grains.
 """

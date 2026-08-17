@@ -65,7 +65,7 @@ class NvidiaClient:
     }
 
     def __post_init__(self) -> None:
-        self.model = self.model or os.getenv("NVIDIA_MODEL", "meta/llama-3.3-70b-instruct")
+        self.model = self.model or os.getenv("NVIDIA_MODEL", "nvidia/llama-3.3-nemotron-super-49b-v1.5")
         model_key_env = self.MODEL_KEY_ENV.get(self.model)
         self.api_key = self.api_key or (os.getenv(model_key_env) if model_key_env else None) or os.getenv("NVIDIA_API_KEY")
         self.base_url = os.getenv("NVIDIA_BASE_URL", self.base_url)

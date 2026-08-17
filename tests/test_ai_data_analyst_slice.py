@@ -54,8 +54,9 @@ class MockLLMClient:
         if model_name == "QueryPlanOutput":
             return {
                 "intent": "Identify top products by revenue growth",
-                "metric": "total revenue",
+                "entities": ["product_category_name"],
                 "entity": "product_category_name",
+                "metric": "total revenue",
                 "aggregation": "SUM",
                 "filters": ["order_status IN ('delivered', 'shipped', 'invoiced')"],
                 "group_by": ["product_category_name"],

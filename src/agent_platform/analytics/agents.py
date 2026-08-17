@@ -60,22 +60,59 @@ class AnalyticsPlannerAgent:
                     raise ValueError("Planner did not return a valid JSON object.")
                 plan = QueryPlanOutput(**result)
                 self.last_reasoning = plan.reasoning
-                return QueryPlan(
+                
+                from agent_platform.experiments.query_plan import CompositeMetric, MetricType
+                comp_metric = None
+                if plan.composite_metric:
+                    comp_metric = CompositeMetric(
+                        metric_type=MetricType(plan.composite_metric.metric_type) if plan.composite_metric.metric_type in MetricType.__members__.values() else MetricType.SIMPLE,
+                        name=plan.composite_metric.name,
+                        numerator=plan.composite_metric.numerator,
+                        denominator=plan.composite_metric.denominator,
+                        aggregation=plan.composite_metric.aggregation,
+                        grouping_grain=plan.composite_metric.grouping_grain,
+                        filter_scope=plan.composite_metric.filter_scope,
+                        formula_template=plan.composite_metric.formula_template,
+                    )
+
+                raw_plan = QueryPlan(
                     intent=plan.intent,
-                    metric=plan.metric,
+                    entities=plan.entities or ([plan.entity] if plan.entity else []),
                     entity=plan.entity,
+                    required_tables=plan.required_tables,
+                    join_path=plan.join_path,
+                    metric=plan.metric,
+                    composite_metric=comp_metric,
                     aggregation=plan.aggregation,
                     filters=plan.filters,
+                    time_column=plan.time_column,
+                    time_range=plan.time_range,
+                    time_grain=plan.time_grain,
                     group_by=plan.group_by,
+                    ranking_dimension=plan.ranking_dimension,
+                    ranking_metric=plan.ranking_metric,
+                    ranking_direction=plan.ranking_direction,
                     ordering=plan.ordering,
                     limit=plan.limit,
-                    required_tables=plan.required_tables,
+                    result_shape=plan.result_shape,
                     reasoning=plan.reasoning,
                 )
+
+                # Pre-SQL PlanValidator: validate and deterministically repair
+                from agent_platform.tools.plan_validator import PlanValidator
+                validator = PlanValidator()
+                val_res = validator.validate(raw_plan, question=task)
+                if val_res.repaired_plan:
+                    return val_res.repaired_plan
+                return raw_plan
             except Exception as exc:
                 logger.warning("planner_llm_fallback", extra={"error": str(exc)})
         self.last_reasoning = "Used deterministic fallback plan because LLM was unavailable."
-        return self._fallback_plan(task, context)
+        fallback_plan = self._fallback_plan(task, context)
+        from agent_platform.tools.plan_validator import PlanValidator
+        validator = PlanValidator()
+        val_res = validator.validate(fallback_plan, question=task)
+        return val_res.repaired_plan or fallback_plan
 
     def _derive_tables_from_question(self, task: str) -> list[str]:
         """Derive likely required tables from the question text."""
@@ -405,18 +442,45 @@ class AnalyticsExecutorAgent:
             return ""
         parts = [
             f"Question-specific plan: {query_plan.intent}",
-            f"Metric: {query_plan.aggregation}({query_plan.metric})" if query_plan.aggregation else f"Metric: {query_plan.metric}",
         ]
-        if query_plan.entity:
+        if query_plan.composite_metric:
+            cm = query_plan.composite_metric
+            parts.append(f"Composite Metric: {cm.name} (type: {cm.metric_type.value if hasattr(cm.metric_type, 'value') else cm.metric_type})")
+            if cm.formula_template:
+                parts.append(f"Formula template: {cm.formula_template}")
+            if cm.numerator:
+                parts.append(f"Numerator: {cm.numerator}")
+            if cm.denominator:
+                parts.append(f"Denominator: {cm.denominator}")
+        elif query_plan.aggregation and query_plan.metric.lower() != query_plan.aggregation.lower():
+            parts.append(f"Metric: {query_plan.aggregation}({query_plan.metric})")
+        else:
+            parts.append(f"Metric: {query_plan.metric}")
+
+        if query_plan.entities:
+            parts.append(f"Entities: {', '.join(query_plan.entities)}")
+        elif query_plan.entity:
             parts.append(f"Entity: {query_plan.entity}")
+
+        if query_plan.time_grain:
+            parts.append(f"Time Grain: {query_plan.time_grain} (on column {query_plan.time_column or 'order_purchase_timestamp'})")
+        if query_plan.time_range:
+            parts.append(f"Time Range: {query_plan.time_range}")
+
         if query_plan.filters:
             parts.append(f"Filters: {', '.join(query_plan.filters)}")
         if query_plan.group_by:
             parts.append(f"Group by: {', '.join(query_plan.group_by)}")
+        if query_plan.ranking_direction:
+            parts.append(f"Ranking: {query_plan.ranking_metric or query_plan.metric} {query_plan.ranking_direction}")
         if query_plan.ordering:
             parts.append(f"Ordering: {query_plan.ordering}")
         if query_plan.limit:
             parts.append(f"Limit: {query_plan.limit}")
+        if query_plan.result_shape:
+            parts.append(f"Expected Result Shape: {query_plan.result_shape.value if hasattr(query_plan.result_shape, 'value') else query_plan.result_shape}")
+        if query_plan.join_path:
+            parts.append(f"Join path: {', '.join(query_plan.join_path)}")
         parts.append(f"Required tables: {', '.join(query_plan.required_tables)}")
         return "\n".join(parts)
 
@@ -772,7 +836,13 @@ class AnalyticsEvaluatorAgent:
                 issues.append("Generated SQL was not read-only.")
             if result.get("row_count", 0) == 0:
                 issues.append("A generated query returned no rows.")
+        findings = [
+            f"Executed query returned {r.get('row_count', 0)} rows."
+            for r in sql_results if r.get("row_count", 0) > 0
+        ] or ["Analysis completed with SQL execution."]
         fallback = {
+            "summary": "Analysis completed with supporting SQL metrics.",
+            "key_findings": findings,
             "confidence": 0.92 if bool(state.intermediate_outputs) and not issues else 0.45,
             "issues": issues,
             "validated": bool(state.intermediate_outputs) and not issues,

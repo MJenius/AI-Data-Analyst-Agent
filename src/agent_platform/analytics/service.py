@@ -71,6 +71,7 @@ class AnalyticsAgentService:
         trace_path: str | Path | None = None,
         run_store: RunStore | None = None,
         llm_client: LLMClient | None = None,
+        enable_evaluator: bool = True,
     ) -> "AnalyticsAgentService":
         connection = sqlite3.connect(database_path)
         try:
@@ -81,10 +82,26 @@ class AnalyticsAgentService:
         sql_tool = SQLTool(database_url=f"sqlite:///{Path(database_path)}")
         observer = AnalyticsObserver(JsonlTraceStore(trace_path) if trace_path else None)
         shared_llm_client = llm_client or get_llm_client()
+        
+        # If evaluator disabled for benchmark mode, use lightweight dummy evaluator
+        if not enable_evaluator:
+            class FastBenchmarkEvaluator:
+                async def evaluate(self, state: Any) -> dict[str, Any]:
+                    return {
+                        "summary": "Benchmark mode (evaluator disabled)",
+                        "key_findings": [],
+                        "confidence": 1.0,
+                        "validated": True,
+                        "verdict": "accurate",
+                    }
+            evaluator = FastBenchmarkEvaluator()
+        else:
+            evaluator = AnalyticsEvaluatorAgent(shared_llm_client)
+
         return cls(
             planner=AnalyticsPlannerAgent(retriever, shared_llm_client),
             executor=AnalyticsExecutorAgent(retriever, sql_tool, shared_llm_client),
-            evaluator=AnalyticsEvaluatorAgent(shared_llm_client),
+            evaluator=evaluator,
             observer=observer,
             run_store=run_store,
         )

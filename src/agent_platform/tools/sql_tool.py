@@ -85,6 +85,9 @@ class SQLValidator:
         if not isinstance(expression, exp.Query):
             raise SQLSafetyError(["unsafe_sql: only SELECT and WITH queries are allowed"])
 
+        if isinstance(expression, exp.Select) and not expression.expressions:
+            raise SQLValidationError(["malformed_sql: SELECT clause has no expressions"])
+
         blocked_functions = {
             function.name.lower()
             for function in expression.find_all(exp.Anonymous)
