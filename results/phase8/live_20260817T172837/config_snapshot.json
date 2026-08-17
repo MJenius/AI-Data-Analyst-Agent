@@ -1,0 +1,18 @@
+{
+  "timestamp": "2026-08-17T19:59:56.574244",
+  "benchmark_path": "C:\\Users\\mjeni\\OneDrive\\Desktop\\Own Projects\\Data Analyst Agent\\tests\\evaluation\\benchmark_dataset_v2.json",
+  "benchmark_hash": "3b55106604bb4ce7",
+  "database_path": "C:\\Users\\mjeni\\OneDrive\\Desktop\\Own Projects\\Data Analyst Agent\\data\\analytics.db",
+  "llm_provider": "nvidia",
+  "nvidia_model": "nvidia/nemotron-3-super-120b-a12b",
+  "phase": "phase8_live",
+  "features": [
+    "improved_rag",
+    "column_grounding",
+    "truncation_detection",
+    "sqlglot_validation",
+    "plan_alignment_verification",
+    "one_targeted_repair",
+    "programmatic_repairs"
+  ]
+}

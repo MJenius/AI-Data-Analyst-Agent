@@ -104,6 +104,8 @@ class AnalyticsAgentService:
             "confidence_explanation": report.get("confidence_explanation"),
             "verdict": state.evaluation.get("verdict", "uncertain") if state.evaluation else "uncertain",
             "steps": report["execution_trace"]["steps"],
+            "query_plan": state.query_plan.model_dump() if state.query_plan else None,
+            "repair_events": state.repair_events,
             # Keep metadata for internal use if needed, but the primary response is above
             "run_id": state.run_id,
             "status": state.status.value,

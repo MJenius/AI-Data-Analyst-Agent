@@ -12,6 +12,8 @@ Design contract:
 
 from __future__ import annotations
 
+from typing import Any
+
 from agent_platform.tools.sql_verifier import VerificationCategory, VerificationIssue
 
 
@@ -44,6 +46,46 @@ _REPAIR_INSTRUCTIONS: dict[VerificationCategory, str] = {
         "Replace the non-existent column reference with the exact column name shown in the "
         "COLUMN REFERENCE block below. Do NOT invent column names."
     ),
+    # ── Phase 8: semantic alignment categories ─────────────────────────────
+    VerificationCategory.METRIC_MISMATCH: (
+        "The query's metric/aggregation does not match the planned metric. "
+        "Apply the planned aggregation function to the exact metric column from the "
+        "COLUMN REFERENCE block. Do not change the join structure."
+    ),
+    VerificationCategory.FILTER_MISMATCH: (
+        "A filter required by the question (per the plan) is missing or wrong. "
+        "Add the missing WHERE predicate using the exact column and filter value from the plan. "
+        "Do not alter other clauses."
+    ),
+    VerificationCategory.TIME_GRAIN_MISMATCH: (
+        "The time grain (month/day/hour/etc.) does not match the planned grain. "
+        "Truncate the correct timestamp column (orders.order_purchase_timestamp is the canonical "
+        "order date) to the planned grain using strftime/substr, and group by that truncation."
+    ),
+    VerificationCategory.GROUP_BY_GRAIN_MISMATCH: (
+        "The GROUP BY grain does not match the planned dimension. "
+        "Group by the planned dimension column from the COLUMN REFERENCE block. "
+        "Every non-aggregate SELECT column must be in GROUP BY."
+    ),
+    VerificationCategory.RANKING_MISMATCH: (
+        "The query is not ranked/truncated as the question requests. "
+        "Add ORDER BY on the metric with the correct direction and the LIMIT from the plan "
+        "(top-N means DESCENDING order)."
+    ),
+    VerificationCategory.ENTITY_MISMATCH: (
+        "The intended entity columns are missing from the query. "
+        "Reference the planned entity column(s) from the COLUMN REFERENCE block in SELECT or GROUP BY."
+    ),
+    VerificationCategory.JOIN_PATH_MISMATCH: (
+        "The join path does not match the plan's required tables. "
+        "Add missing tables with their exact join keys, or remove tables that are not in the plan "
+        "unless they supply a selected field, filter, grouping, or metric. Use ONLY the join "
+        "keys listed in the COLUMN REFERENCE block."
+    ),
+    VerificationCategory.RESULT_SHAPE_MISMATCH: (
+        "The output shape does not match the expected result. "
+        "Align SELECT output columns and row grain with the question's requested metric."
+    ),
 }
 
 SYSTEM_PROMPT = """You are a careful SQL repair agent for an analytics system.
@@ -75,6 +117,7 @@ def build_repair_prompt(
     original_sql: str,
     issues: list[VerificationIssue],
     schema_context: list[str],
+    query_plan: Any = None,
 ) -> str:
     """Build a targeted one-shot repair prompt.
 
@@ -88,6 +131,10 @@ def build_repair_prompt(
     schema_context:
         The same schema context strings already provided to the original
         SQL generation call.
+    query_plan:
+        Optional QueryPlan (model or dict) whose semantics the SQL must
+        satisfy — injected so the repair model aligns the fix to the
+        intended metric, filters, grain, and ranking (Phase 8).
 
     Returns
     -------
@@ -130,6 +177,42 @@ def build_repair_prompt(
     column_block = build_column_grounding_block(tables) if tables else ""
     column_section = f"\n{column_block}" if column_block else ""
 
+    # Plan context block (Phase 8): the repaired SQL must satisfy this plan.
+    plan_block = ""
+    if query_plan is not None:
+        if isinstance(query_plan, dict):
+            pv = lambda key, default=None: query_plan.get(key, default)  # noqa: E731
+        else:
+            pv = lambda key, default=None: getattr(query_plan, key, default)  # noqa: E731
+        plan_lines: list[str] = []
+        if pv("intent"):
+            plan_lines.append(f"- intent: {pv('intent')}")
+        metric = pv("metric")
+        if metric:
+            aggregation = pv("aggregation")
+            plan_lines.append(
+                f"- metric: {aggregation}({metric})" if aggregation else f"- metric: {metric}"
+            )
+        if pv("entity"):
+            plan_lines.append(f"- entity: {pv('entity')}")
+        if pv("filters"):
+            plan_lines.append(f"- filters: {', '.join(str(f) for f in pv('filters'))}")
+        if pv("group_by"):
+            plan_lines.append(f"- group_by: {', '.join(str(g) for g in pv('group_by'))}")
+        if pv("ordering"):
+            plan_lines.append(f"- ordering: {pv('ordering')}")
+        if pv("limit") is not None:
+            plan_lines.append(f"- limit: {pv('limit')}")
+        if pv("required_tables"):
+            plan_lines.append(f"- required_tables: {', '.join(str(t) for t in pv('required_tables'))}")
+        if plan_lines:
+            plan_block = (
+                "Planned semantics (the corrected SQL MUST satisfy this plan):\n"
+                + "\n".join(plan_lines)
+            )
+
+    plan_section = f"\n{plan_block}\n" if plan_block else ""
+
     return f"""Original SQL (broken):
 ```sql
 {original_sql.strip()}
@@ -138,10 +221,11 @@ def build_repair_prompt(
 Verification error(s) to fix:
 {error_block}
 
+{plan_section}
 Schema context:
 {chr(10).join(schema_context)}
 {column_section}
-Produce the corrected SQL that fixes ONLY the error(s) listed above.
+Produce the corrected SQL that fixes ONLY the error(s) listed above and stays aligned with the plan.
 """
 
 

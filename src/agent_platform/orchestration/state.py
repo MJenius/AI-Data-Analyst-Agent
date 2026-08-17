@@ -51,6 +51,7 @@ class ExecutionState:
     current_step_index: int = 0
     intermediate_outputs: dict[str, Any] = field(default_factory=dict)
     tool_results: list[dict[str, Any]] = field(default_factory=list)
+    repair_events: list[dict[str, Any]] = field(default_factory=list)
     errors: list[ExecutionError] = field(default_factory=list)
     retrieved_context: dict[str, list[Any]] = field(default_factory=dict)
     evaluation: dict[str, Any] | None = None

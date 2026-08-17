@@ -242,6 +242,7 @@ class AnalyticsExecutorAgent:
         last_error: str | None = None
         sql: str | None = None
         reasoning: str = ""
+        repair_event: dict[str, Any] | None = None
         query_plan_context = self._build_query_plan_context(state.query_plan) if state.query_plan else ""
 
         for attempt in range(2):   # attempt 0 = initial, attempt 1 = after execution error
@@ -270,10 +271,19 @@ class AnalyticsExecutorAgent:
             # ── Step 3: semantic verification (pre-execution) ────────────────
             verifier = self._sql_tool.verifier
             if verifier:
-                pre_verify = verifier.verify(sql, level=VerificationLevel.BALANCED)
+                pre_verify = verifier.verify(
+                    sql,
+                    level=VerificationLevel.BALANCED,
+                    query_plan=state.query_plan,
+                    question=state.task,
+                )
                 actionable = filter_actionable_issues(pre_verify.issues)
                 if actionable:
-                    repaired = self._attempt_repair(sql, actionable, schema_text, step)
+                    repaired, repair_event = self._attempt_repair(
+                        sql, actionable, schema_text, step,
+                        query_plan=state.query_plan, context=context,
+                    )
+                    state.repair_events.append(repair_event)
                     if repaired and repaired != sql:
                         logger.info("sql_repair_applied step=%s", step[:80])
                         # Re-validate repaired SQL before accepting
@@ -281,14 +291,20 @@ class AnalyticsExecutorAgent:
                         if not r_errors:
                             sql = repaired
                             reasoning = f"[repaired] {reasoning}"
+                            repair_event["re_validated"] = True
                         else:
                             logger.warning("sql_repair_validation_failed errors=%s", r_errors)
+                            repair_event["re_validated"] = False
+                            repair_event["reason"] = "repaired SQL failed re-validation"
 
             # ── Step 4: execute ──────────────────────────────────────────────
             try:
                 logger.info("sql_execute sql=%s", sql.strip()[:120])
                 sql_result = await asyncio.to_thread(self._sql_tool.execute, sql)
                 logger.info("sql_execute_ok rows=%d", sql_result.get("row_count", 0))
+                if repair_event is not None:
+                    repair_event["executed"] = True
+                    repair_event["final_sql"] = sql
 
                 # ── Step 5: post-execution semantic verification ─────────────
                 if verifier:
@@ -301,10 +317,16 @@ class AnalyticsExecutorAgent:
                         sql,
                         execution_result=exec_info,
                         level=VerificationLevel.BALANCED,
+                        query_plan=state.query_plan,
+                        question=state.task,
                     )
                     post_actionable = filter_actionable_issues(post_verify.issues)
                     if post_actionable:
-                        post_repaired = self._attempt_repair(sql, post_actionable, schema_text, step)
+                        post_repaired, post_event = self._attempt_repair(
+                            sql, post_actionable, schema_text, step,
+                            query_plan=state.query_plan, context=context,
+                        )
+                        state.repair_events.append(post_event)
                         if post_repaired and post_repaired != sql:
                             p_errors = self._validate_sql(post_repaired, context)
                             if not p_errors:
@@ -319,8 +341,14 @@ class AnalyticsExecutorAgent:
                                     sql        = post_repaired
                                     sql_result = post_result
                                     reasoning  = f"[post-repair] {reasoning}"
+                                    post_event["re_validated"] = True
+                                    post_event["executed"] = True
+                                    post_event["final_sql"] = sql
                                 except Exception as post_exc:
                                     logger.warning("sql_post_repair_exec_failed error=%s", post_exc)
+                            else:
+                                post_event["re_validated"] = False
+                                post_event["reason"] = "repaired SQL failed re-validation"
 
                 return {
                     "step": step,
@@ -392,7 +420,7 @@ class AnalyticsExecutorAgent:
         parts.append(f"Required tables: {', '.join(query_plan.required_tables)}")
         return "\n".join(parts)
 
-    # ── Phase 6 repair helper ─────────────────────────────────────────────────
+    # ── Phase 6/8 repair helper ───────────────────────────────────────────────
 
     def _attempt_repair(
         self,
@@ -400,15 +428,28 @@ class AnalyticsExecutorAgent:
         issues: list[Any],
         schema_text: list[str],
         step: str,
-    ) -> str | None:
-        """Issue ONE targeted repair LLM call.
+        query_plan: Any = None,
+        context: list[Any] | None = None,
+    ) -> tuple[str | None, dict[str, Any]]:
+        """Issue ONE targeted repair call.
 
         First tries the verifier's own programmatic repair (regex-based GROUP BY
-        fix) — fast, free, and deterministic.  Only falls back to an LLM call if
-        programmatic repair is unavailable or produces the same SQL.
+        or LIMIT fix) — fast, free, and deterministic.  Only falls back to an
+        LLM call if programmatic repair is unavailable, produces the same SQL,
+        or fails structural re-validation.
 
-        Returns the repaired SQL string, or None if repair was not possible.
+        Returns (repaired_sql_or_None, repair_event_dict).
         """
+        event: dict[str, Any] = {
+            "step": step,
+            "attempted": True,
+            "applied": False,
+            "method": None,
+            "categories": sorted({i.category.value for i in issues}),
+            "pre_repair_sql": sql,
+            "re_validated": None,
+            "executed": None,
+        }
         verifier = self._sql_tool.verifier
 
         # 1. Try programmatic repair (no LLM cost).
@@ -416,30 +457,55 @@ class AnalyticsExecutorAgent:
             for issue in issues:
                 candidate = verifier.generate_repair(issue, sql)
                 if candidate and candidate.strip() != sql.strip():
+                    # Programmatic candidates must still pass structural validation.
+                    if context is not None:
+                        r_errors = self._validate_sql(candidate, context)
+                        if r_errors:
+                            logger.warning(
+                                "sql_programmatic_repair_invalid category=%s errors=%s",
+                                issue.category.value, r_errors,
+                            )
+                            break
                     logger.info("sql_programmatic_repair category=%s", issue.category.value)
-                    return candidate
+                    event.update({
+                        "method": "programmatic",
+                        "category": issue.category.value,
+                        "applied": True,
+                        "post_repair_sql": candidate,
+                    })
+                    return candidate, event
 
         # 2. LLM repair — one call, no retries.
         if not self._llm_client.enabled:
-            return None
+            event["reason"] = "llm_disabled"
+            return None, event
         try:
             from agent_platform.llms.models import SQLOutput
 
-            repair_user_prompt = build_repair_prompt(sql, issues, schema_text)
+            repair_user_prompt = build_repair_prompt(sql, issues, schema_text, query_plan=query_plan)
             result = self._llm_client.complete_json(
                 system_prompt=REPAIR_SYSTEM_PROMPT,
                 user_prompt=repair_user_prompt,
                 response_model=SQLOutput,
             )
             if not isinstance(result, dict):
-                return None
+                event["reason"] = "non_dict_llm_response"
+                return None, event
             repaired_sql = result.get("sql")
-            if repaired_sql and isinstance(repaired_sql, str):
+            if repaired_sql and isinstance(repaired_sql, str) and repaired_sql.strip() != sql.strip():
                 logger.info("sql_llm_repair_ok step=%s", step[:80])
-                return repaired_sql
+                event.update({
+                    "method": "llm",
+                    "applied": True,
+                    "post_repair_sql": repaired_sql,
+                })
+                return repaired_sql, event
+            event["method"] = "llm"
+            event["reason"] = "llm_returned_no_change"
         except Exception as exc:
             logger.warning("sql_llm_repair_failed error=%s", exc)
-        return None
+            event["reason"] = str(exc)[:200]
+        return None, event
 
     def _validate_sql(self, sql: str, schema_context: list[Any]) -> list[str]:
         allowed_tables = {
