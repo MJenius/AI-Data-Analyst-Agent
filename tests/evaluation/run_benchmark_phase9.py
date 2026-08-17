@@ -351,7 +351,7 @@ async def run_benchmark_concurrent(
         except Exception as exc:
             logger.warning(f"Could not load checkpoint: {exc}")
 
-    service = AnalyticsAgentService.from_sqlite(database_path=db_path)
+    service = AnalyticsAgentService.from_sqlite(database_path=db_path, enable_evaluator=False)
     verifier = SQLSemanticVerifier(str(db_path))
 
     semaphore = asyncio.Semaphore(concurrency)
@@ -411,6 +411,31 @@ async def run_benchmark_concurrent(
         "repair_attempted_count": sum(1 for r in final_results if r["repair_attempted"]),
     }
 
+    config_snapshot = {
+        "timestamp": summary["timestamp"],
+        "benchmark_path": str(dataset_path),
+        "database_path": str(db_path),
+        "llm_provider": os.getenv("LLM_PROVIDER", "nvidia"),
+        "nvidia_model": os.getenv("NVIDIA_MODEL", "nvidia/nemotron-3-super-120b-a12b"),
+        "concurrency": concurrency,
+        "phase": "phase9_live",
+        "features": [
+            "improved_rag",
+            "column_grounding",
+            "structured_query_plan_v2",
+            "deterministic_plan_validator",
+            "superlative_limit_grounding",
+            "join_path_synthesis",
+            "composite_metrics",
+            "truncation_detection",
+            "sqlglot_validation",
+            "plan_alignment_verification",
+            "targeted_repair",
+            "evaluator_disabled_benchmark_mode",
+        ],
+    }
+    with open(out_dir / "config_snapshot.json", "w", encoding="utf-8") as f:
+        json.dump(config_snapshot, f, indent=2)
     with open(out_dir / "raw_results.json", "w", encoding="utf-8") as f:
         json.dump(final_results, f, indent=2, default=str)
     with open(out_dir / "summary.json", "w", encoding="utf-8") as f:
