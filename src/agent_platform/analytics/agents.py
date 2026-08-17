@@ -51,7 +51,8 @@ class AnalyticsPlannerAgent:
         if self._llm_client.enabled:
             try:
                 logger.info(f"Requesting plan from LLM (Provider: {type(self._llm_client).__name__})...")
-                result = self._llm_client.complete_json(
+                result = await asyncio.to_thread(
+                    self._llm_client.complete_json,
                     system_prompt=PLANNER_SYSTEM_PROMPT,
                     user_prompt=build_planner_prompt(task, context_text),
                     response_model=QueryPlanOutput,
