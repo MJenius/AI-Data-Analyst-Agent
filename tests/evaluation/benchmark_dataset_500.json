@@ -8890,5 +8890,5797 @@
       ],
       "row_count": 1
     }
+  },
+  {
+    "question": "What is the month-over-month percentage change in order count for 2017?",
+    "expected_tables": [
+      "orders"
+    ],
+    "expected_metrics": [
+      "month",
+      "order_count",
+      "prev_count",
+      "mom_growth_pct"
+    ],
+    "expected_sql": "\n        WITH monthly AS (\n            SELECT strftime('%Y-%m', order_purchase_timestamp) AS month,\n                   COUNT(*) AS order_count\n            FROM orders\n            WHERE strftime('%Y', order_purchase_timestamp) = '2017'\n            GROUP BY month\n        )\n        SELECT month,\n               order_count,\n               LAG(order_count, 1) OVER (ORDER BY month) AS prev_count,\n               ROUND(100.0 * (order_count - LAG(order_count, 1) OVER (ORDER BY month)) / LAG(order_count, 1) OVER (ORDER BY month), 2) AS mom_growth_pct\n        FROM monthly\n        ORDER BY month;\n        ",
+    "category": "Advanced Analytics",
+    "domain": "Revenue & Sales",
+    "query_type": "time_series",
+    "difficulty": "hard",
+    "expected_result": {
+      "columns": [
+        "month",
+        "order_count",
+        "prev_count",
+        "mom_growth_pct"
+      ],
+      "values": [
+        {
+          "month": "2017-01",
+          "order_count": 800,
+          "prev_count": null,
+          "mom_growth_pct": null
+        },
+        {
+          "month": "2017-02",
+          "order_count": 1780,
+          "prev_count": 800,
+          "mom_growth_pct": 122.5
+        },
+        {
+          "month": "2017-03",
+          "order_count": 2682,
+          "prev_count": 1780,
+          "mom_growth_pct": 50.67
+        },
+        {
+          "month": "2017-04",
+          "order_count": 2404,
+          "prev_count": 2682,
+          "mom_growth_pct": -10.37
+        },
+        {
+          "month": "2017-05",
+          "order_count": 3700,
+          "prev_count": 2404,
+          "mom_growth_pct": 53.91
+        },
+        {
+          "month": "2017-06",
+          "order_count": 3245,
+          "prev_count": 3700,
+          "mom_growth_pct": -12.3
+        },
+        {
+          "month": "2017-07",
+          "order_count": 4026,
+          "prev_count": 3245,
+          "mom_growth_pct": 24.07
+        },
+        {
+          "month": "2017-08",
+          "order_count": 4331,
+          "prev_count": 4026,
+          "mom_growth_pct": 7.58
+        },
+        {
+          "month": "2017-09",
+          "order_count": 4285,
+          "prev_count": 4331,
+          "mom_growth_pct": -1.06
+        },
+        {
+          "month": "2017-10",
+          "order_count": 4631,
+          "prev_count": 4285,
+          "mom_growth_pct": 8.07
+        },
+        {
+          "month": "2017-11",
+          "order_count": 7544,
+          "prev_count": 4631,
+          "mom_growth_pct": 62.9
+        },
+        {
+          "month": "2017-12",
+          "order_count": 5673,
+          "prev_count": 7544,
+          "mom_growth_pct": -24.8
+        }
+      ],
+      "row_count": 12
+    }
+  },
+  {
+    "question": "What is the 3-month moving average of monthly revenue in 2017?",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "month",
+      "revenue",
+      "moving_avg_3m"
+    ],
+    "expected_sql": "\n        WITH monthly AS (\n            SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month,\n                   SUM(oi.price) AS revenue\n            FROM orders o\n            JOIN order_items oi ON o.order_id = oi.order_id\n            WHERE strftime('%Y', o.order_purchase_timestamp) = '2017'\n            GROUP BY month\n        )\n        SELECT month,\n               revenue,\n               ROUND(AVG(revenue) OVER (ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW), 2) AS moving_avg_3m\n        FROM monthly\n        ORDER BY month;\n        ",
+    "category": "Advanced Analytics",
+    "domain": "Revenue & Sales",
+    "query_type": "time_series",
+    "difficulty": "hard",
+    "expected_result": {
+      "columns": [
+        "month",
+        "revenue",
+        "moving_avg_3m"
+      ],
+      "values": [
+        {
+          "month": "2017-01",
+          "revenue": 120312.87,
+          "moving_avg_3m": 120312.87
+        },
+        {
+          "month": "2017-02",
+          "revenue": 247303.02,
+          "moving_avg_3m": 183807.95
+        },
+        {
+          "month": "2017-03",
+          "revenue": 374344.3,
+          "moving_avg_3m": 247320.06
+        },
+        {
+          "month": "2017-04",
+          "revenue": 359927.23,
+          "moving_avg_3m": 327191.52
+        },
+        {
+          "month": "2017-05",
+          "revenue": 506071.14,
+          "moving_avg_3m": 413447.56
+        },
+        {
+          "month": "2017-06",
+          "revenue": 433038.6,
+          "moving_avg_3m": 433012.32
+        },
+        {
+          "month": "2017-07",
+          "revenue": 498031.48,
+          "moving_avg_3m": 479047.07
+        },
+        {
+          "month": "2017-08",
+          "revenue": 573971.68,
+          "moving_avg_3m": 501680.59
+        },
+        {
+          "month": "2017-09",
+          "revenue": 624401.69,
+          "moving_avg_3m": 565468.28
+        },
+        {
+          "month": "2017-10",
+          "revenue": 664219.43,
+          "moving_avg_3m": 620864.27
+        },
+        {
+          "month": "2017-11",
+          "revenue": 1010271.37,
+          "moving_avg_3m": 766297.5
+        },
+        {
+          "month": "2017-12",
+          "revenue": 743914.17,
+          "moving_avg_3m": 806134.99
+        }
+      ],
+      "row_count": 12
+    }
+  },
+  {
+    "question": "What is the rank of each product category by total revenue generated?",
+    "expected_tables": [
+      "order_items",
+      "products"
+    ],
+    "expected_metrics": [
+      "product_category_name",
+      "total_revenue",
+      "revenue_rank"
+    ],
+    "expected_sql": "\n        SELECT p.product_category_name,\n               ROUND(SUM(oi.price), 2) AS total_revenue,\n               RANK() OVER (ORDER BY SUM(oi.price) DESC) AS revenue_rank\n        FROM order_items oi\n        JOIN products p ON oi.product_id = p.product_id\n        WHERE p.product_category_name IS NOT NULL\n        GROUP BY p.product_category_name\n        ORDER BY revenue_rank ASC\n        LIMIT 20;\n        ",
+    "category": "Advanced Analytics",
+    "domain": "Products & Categories",
+    "query_type": "ranked_list",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "product_category_name",
+        "total_revenue",
+        "revenue_rank"
+      ],
+      "values": [
+        {
+          "product_category_name": "beleza_saude",
+          "total_revenue": 1258681.34,
+          "revenue_rank": 1
+        },
+        {
+          "product_category_name": "relogios_presentes",
+          "total_revenue": 1205005.68,
+          "revenue_rank": 2
+        },
+        {
+          "product_category_name": "cama_mesa_banho",
+          "total_revenue": 1036988.68,
+          "revenue_rank": 3
+        },
+        {
+          "product_category_name": "esporte_lazer",
+          "total_revenue": 988048.97,
+          "revenue_rank": 4
+        },
+        {
+          "product_category_name": "informatica_acessorios",
+          "total_revenue": 911954.32,
+          "revenue_rank": 5
+        },
+        {
+          "product_category_name": "moveis_decoracao",
+          "total_revenue": 729762.49,
+          "revenue_rank": 6
+        },
+        {
+          "product_category_name": "cool_stuff",
+          "total_revenue": 635290.85,
+          "revenue_rank": 7
+        },
+        {
+          "product_category_name": "utilidades_domesticas",
+          "total_revenue": 632248.66,
+          "revenue_rank": 8
+        },
+        {
+          "product_category_name": "automotivo",
+          "total_revenue": 592720.11,
+          "revenue_rank": 9
+        },
+        {
+          "product_category_name": "ferramentas_jardim",
+          "total_revenue": 485256.46,
+          "revenue_rank": 10
+        },
+        {
+          "product_category_name": "brinquedos",
+          "total_revenue": 483946.6,
+          "revenue_rank": 11
+        },
+        {
+          "product_category_name": "bebes",
+          "total_revenue": 411764.89,
+          "revenue_rank": 12
+        },
+        {
+          "product_category_name": "perfumaria",
+          "total_revenue": 399124.87,
+          "revenue_rank": 13
+        },
+        {
+          "product_category_name": "telefonia",
+          "total_revenue": 323667.53,
+          "revenue_rank": 14
+        },
+        {
+          "product_category_name": "moveis_escritorio",
+          "total_revenue": 273960.7,
+          "revenue_rank": 15
+        },
+        {
+          "product_category_name": "papelaria",
+          "total_revenue": 230943.23,
+          "revenue_rank": 16
+        },
+        {
+          "product_category_name": "pcs",
+          "total_revenue": 222963.13,
+          "revenue_rank": 17
+        },
+        {
+          "product_category_name": "pet_shop",
+          "total_revenue": 214315.41,
+          "revenue_rank": 18
+        },
+        {
+          "product_category_name": "instrumentos_musicais",
+          "total_revenue": 191498.88,
+          "revenue_rank": 19
+        },
+        {
+          "product_category_name": "eletroportateis",
+          "total_revenue": 190648.58,
+          "revenue_rank": 20
+        }
+      ],
+      "row_count": 20
+    }
+  },
+  {
+    "question": "What is the cumulative revenue generated up through each month of 2017?",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "month",
+      "monthly_revenue",
+      "cumulative_revenue"
+    ],
+    "expected_sql": "\n        WITH monthly AS (\n            SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month,\n                   ROUND(SUM(oi.price), 2) AS monthly_revenue\n            FROM orders o\n            JOIN order_items oi ON o.order_id = oi.order_id\n            WHERE strftime('%Y', o.order_purchase_timestamp) = '2017'\n            GROUP BY month\n        )\n        SELECT month,\n               monthly_revenue,\n               ROUND(SUM(monthly_revenue) OVER (ORDER BY month), 2) AS cumulative_revenue\n        FROM monthly\n        ORDER BY month;\n        ",
+    "category": "Advanced Analytics",
+    "domain": "Revenue & Sales",
+    "query_type": "time_series",
+    "difficulty": "hard",
+    "expected_result": {
+      "columns": [
+        "month",
+        "monthly_revenue",
+        "cumulative_revenue"
+      ],
+      "values": [
+        {
+          "month": "2017-01",
+          "monthly_revenue": 120312.87,
+          "cumulative_revenue": 120312.87
+        },
+        {
+          "month": "2017-02",
+          "monthly_revenue": 247303.02,
+          "cumulative_revenue": 367615.89
+        },
+        {
+          "month": "2017-03",
+          "monthly_revenue": 374344.3,
+          "cumulative_revenue": 741960.19
+        },
+        {
+          "month": "2017-04",
+          "monthly_revenue": 359927.23,
+          "cumulative_revenue": 1101887.42
+        },
+        {
+          "month": "2017-05",
+          "monthly_revenue": 506071.14,
+          "cumulative_revenue": 1607958.56
+        },
+        {
+          "month": "2017-06",
+          "monthly_revenue": 433038.6,
+          "cumulative_revenue": 2040997.16
+        },
+        {
+          "month": "2017-07",
+          "monthly_revenue": 498031.48,
+          "cumulative_revenue": 2539028.64
+        },
+        {
+          "month": "2017-08",
+          "monthly_revenue": 573971.68,
+          "cumulative_revenue": 3113000.32
+        },
+        {
+          "month": "2017-09",
+          "monthly_revenue": 624401.69,
+          "cumulative_revenue": 3737402.01
+        },
+        {
+          "month": "2017-10",
+          "monthly_revenue": 664219.43,
+          "cumulative_revenue": 4401621.44
+        },
+        {
+          "month": "2017-11",
+          "monthly_revenue": 1010271.37,
+          "cumulative_revenue": 5411892.81
+        },
+        {
+          "month": "2017-12",
+          "monthly_revenue": 743914.17,
+          "cumulative_revenue": 6155806.98
+        }
+      ],
+      "row_count": 12
+    }
+  },
+  {
+    "question": "Which sellers have cumulative revenue exceeding 100,000 across their sales history?",
+    "expected_tables": [
+      "order_items",
+      "sellers"
+    ],
+    "expected_metrics": [
+      "seller_id",
+      "total_revenue"
+    ],
+    "expected_sql": "\n        SELECT oi.seller_id,\n               ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        GROUP BY oi.seller_id\n        HAVING SUM(oi.price) > 100000\n        ORDER BY total_revenue DESC;\n        ",
+    "category": "Sellers & Fulfillment",
+    "domain": "Sellers",
+    "query_type": "ranked_list",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "seller_id",
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "seller_id": "4869f7a5dfa277a7dca6462dcf3b52b2",
+          "total_revenue": 229472.63
+        },
+        {
+          "seller_id": "53243585a1d6dc2643021fd1853d8905",
+          "total_revenue": 222776.05
+        },
+        {
+          "seller_id": "4a3ca9315b744ce9f8e9374361493884",
+          "total_revenue": 200472.92
+        },
+        {
+          "seller_id": "fa1c13f2614d7b5c4749cbc52fecda94",
+          "total_revenue": 194042.03
+        },
+        {
+          "seller_id": "7c67e1448b00f6e969d365cea6b010ab",
+          "total_revenue": 187923.89
+        },
+        {
+          "seller_id": "7e93a43ef30c4f03f38b393420bc753a",
+          "total_revenue": 176431.87
+        },
+        {
+          "seller_id": "da8622b14eb17ae2831f4ac5b9dab84a",
+          "total_revenue": 160236.57
+        },
+        {
+          "seller_id": "7a67c85e85bb2ce8582c35f2203ad736",
+          "total_revenue": 141745.53
+        },
+        {
+          "seller_id": "1025f0e2d44d7041d6cf58b6550e0bfa",
+          "total_revenue": 138968.55
+        },
+        {
+          "seller_id": "955fee9216a65b617aa5c0531780ce60",
+          "total_revenue": 135171.7
+        },
+        {
+          "seller_id": "46dc3b2cc0980fb8ec44634e21d2718e",
+          "total_revenue": 128111.19
+        },
+        {
+          "seller_id": "6560211a19b47992c3666cc44a7e94c0",
+          "total_revenue": 123304.83
+        },
+        {
+          "seller_id": "620c87c171fb2a6dd6e8bb4dec959fc6",
+          "total_revenue": 114774.5
+        },
+        {
+          "seller_id": "7d13fca15225358621be4086e1eb0964",
+          "total_revenue": 113628.97
+        },
+        {
+          "seller_id": "5dceca129747e92ff8ef7a997dc4f8ca",
+          "total_revenue": 112155.53
+        },
+        {
+          "seller_id": "1f50f920176fa81dab994f9023523100",
+          "total_revenue": 106939.21
+        },
+        {
+          "seller_id": "cc419e0650a3c5ba77189a1882b7556a",
+          "total_revenue": 104288.42
+        },
+        {
+          "seller_id": "a1043bafd471dff536d0c462352beb48",
+          "total_revenue": 101901.16
+        }
+      ],
+      "row_count": 18
+    }
+  },
+  {
+    "question": "What is the average number of items per order across each customer state?",
+    "expected_tables": [
+      "orders",
+      "order_items",
+      "customers"
+    ],
+    "expected_metrics": [
+      "customer_state",
+      "avg_items_per_order"
+    ],
+    "expected_sql": "\n        WITH order_counts AS (\n            SELECT o.order_id,\n                   c.customer_state,\n                   COUNT(oi.order_item_id) AS items_in_order\n            FROM orders o\n            JOIN customers c ON o.customer_id = c.customer_id\n            JOIN order_items oi ON o.order_id = oi.order_id\n            GROUP BY o.order_id, c.customer_state\n        )\n        SELECT customer_state,\n               ROUND(AVG(items_in_order), 2) AS avg_items_per_order\n        FROM order_counts\n        GROUP BY customer_state\n        ORDER BY avg_items_per_order DESC;\n        ",
+    "category": "Customers & Geography",
+    "domain": "Customers",
+    "query_type": "aggregated_table",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "customer_state",
+        "avg_items_per_order"
+      ],
+      "values": [
+        {
+          "customer_state": "AP",
+          "avg_items_per_order": 1.21
+        },
+        {
+          "customer_state": "MT",
+          "avg_items_per_order": 1.17
+        },
+        {
+          "customer_state": "SC",
+          "avg_items_per_order": 1.16
+        },
+        {
+          "customer_state": "MS",
+          "avg_items_per_order": 1.16
+        },
+        {
+          "customer_state": "GO",
+          "avg_items_per_order": 1.16
+        },
+        {
+          "customer_state": "SP",
+          "avg_items_per_order": 1.15
+        },
+        {
+          "customer_state": "RS",
+          "avg_items_per_order": 1.15
+        },
+        {
+          "customer_state": "PR",
+          "avg_items_per_order": 1.15
+        },
+        {
+          "customer_state": "RJ",
+          "avg_items_per_order": 1.14
+        },
+        {
+          "customer_state": "MG",
+          "avg_items_per_order": 1.14
+        },
+        {
+          "customer_state": "AC",
+          "avg_items_per_order": 1.14
+        },
+        {
+          "customer_state": "TO",
+          "avg_items_per_order": 1.13
+        },
+        {
+          "customer_state": "RR",
+          "avg_items_per_order": 1.13
+        },
+        {
+          "customer_state": "RO",
+          "avg_items_per_order": 1.13
+        },
+        {
+          "customer_state": "PB",
+          "avg_items_per_order": 1.13
+        },
+        {
+          "customer_state": "DF",
+          "avg_items_per_order": 1.13
+        },
+        {
+          "customer_state": "BA",
+          "avg_items_per_order": 1.13
+        },
+        {
+          "customer_state": "SE",
+          "avg_items_per_order": 1.12
+        },
+        {
+          "customer_state": "AM",
+          "avg_items_per_order": 1.12
+        },
+        {
+          "customer_state": "PA",
+          "avg_items_per_order": 1.11
+        },
+        {
+          "customer_state": "MA",
+          "avg_items_per_order": 1.11
+        },
+        {
+          "customer_state": "ES",
+          "avg_items_per_order": 1.11
+        },
+        {
+          "customer_state": "CE",
+          "avg_items_per_order": 1.11
+        },
+        {
+          "customer_state": "RN",
+          "avg_items_per_order": 1.1
+        },
+        {
+          "customer_state": "PI",
+          "avg_items_per_order": 1.1
+        },
+        {
+          "customer_state": "PE",
+          "avg_items_per_order": 1.1
+        },
+        {
+          "customer_state": "AL",
+          "avg_items_per_order": 1.08
+        }
+      ],
+      "row_count": 27
+    }
+  },
+  {
+    "question": "What is the average order delivery time in days for each seller state?",
+    "expected_tables": [
+      "orders",
+      "order_items",
+      "sellers"
+    ],
+    "expected_metrics": [
+      "seller_state",
+      "avg_delivery_days"
+    ],
+    "expected_sql": "\n        SELECT s.seller_state,\n               ROUND(AVG(JULIANDAY(o.order_delivered_customer_date) - JULIANDAY(o.order_purchase_timestamp)), 2) AS avg_delivery_days\n        FROM orders o\n        JOIN order_items oi ON o.order_id = oi.order_id\n        JOIN sellers s ON oi.seller_id = s.seller_id\n        WHERE o.order_delivered_customer_date IS NOT NULL\n        GROUP BY s.seller_state\n        ORDER BY avg_delivery_days ASC;\n        ",
+    "category": "Logistics & Operations",
+    "domain": "Logistics & Operations",
+    "query_type": "aggregated_table",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "seller_state",
+        "avg_delivery_days"
+      ],
+      "values": [
+        {
+          "seller_state": "RS",
+          "avg_delivery_days": 11.56
+        },
+        {
+          "seller_state": "RJ",
+          "avg_delivery_days": 12.01
+        },
+        {
+          "seller_state": "SP",
+          "avg_delivery_days": 12.28
+        },
+        {
+          "seller_state": "MS",
+          "avg_delivery_days": 12.33
+        },
+        {
+          "seller_state": "PB",
+          "avg_delivery_days": 12.52
+        },
+        {
+          "seller_state": "DF",
+          "avg_delivery_days": 12.53
+        },
+        {
+          "seller_state": "SE",
+          "avg_delivery_days": 12.7
+        },
+        {
+          "seller_state": "MG",
+          "avg_delivery_days": 12.8
+        },
+        {
+          "seller_state": "GO",
+          "avg_delivery_days": 12.83
+        },
+        {
+          "seller_state": "ES",
+          "avg_delivery_days": 12.88
+        },
+        {
+          "seller_state": "PE",
+          "avg_delivery_days": 12.91
+        },
+        {
+          "seller_state": "RN",
+          "avg_delivery_days": 13.02
+        },
+        {
+          "seller_state": "PR",
+          "avg_delivery_days": 13.38
+        },
+        {
+          "seller_state": "PA",
+          "avg_delivery_days": 13.43
+        },
+        {
+          "seller_state": "SC",
+          "avg_delivery_days": 13.57
+        },
+        {
+          "seller_state": "PI",
+          "avg_delivery_days": 13.79
+        },
+        {
+          "seller_state": "BA",
+          "avg_delivery_days": 13.85
+        },
+        {
+          "seller_state": "MT",
+          "avg_delivery_days": 14.75
+        },
+        {
+          "seller_state": "RO",
+          "avg_delivery_days": 17.41
+        },
+        {
+          "seller_state": "MA",
+          "avg_delivery_days": 17.74
+        },
+        {
+          "seller_state": "CE",
+          "avg_delivery_days": 17.89
+        },
+        {
+          "seller_state": "AM",
+          "avg_delivery_days": 47.84
+        }
+      ],
+      "row_count": 22
+    }
+  },
+  {
+    "question": "What percentage of reviews have a score of 5 stars in each customer state?",
+    "expected_tables": [
+      "orders",
+      "order_reviews",
+      "customers"
+    ],
+    "expected_metrics": [
+      "customer_state",
+      "five_star_pct"
+    ],
+    "expected_sql": "\n        SELECT c.customer_state,\n               ROUND(100.0 * SUM(CASE WHEN r.review_score = 5 THEN 1 ELSE 0 END) / COUNT(*), 2) AS five_star_pct\n        FROM orders o\n        JOIN customers c ON o.customer_id = c.customer_id\n        JOIN order_reviews r ON o.order_id = r.order_id\n        GROUP BY c.customer_state\n        ORDER BY five_star_pct DESC;\n        ",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews",
+    "query_type": "aggregated_table",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "customer_state",
+        "five_star_pct"
+      ],
+      "values": [
+        {
+          "customer_state": "AM",
+          "five_star_pct": 60.54
+        },
+        {
+          "customer_state": "SP",
+          "five_star_pct": 60.29
+        },
+        {
+          "customer_state": "PR",
+          "five_star_pct": 59.92
+        },
+        {
+          "customer_state": "MS",
+          "five_star_pct": 59.25
+        },
+        {
+          "customer_state": "MG",
+          "five_star_pct": 58.93
+        },
+        {
+          "customer_state": "RS",
+          "five_star_pct": 58.44
+        },
+        {
+          "customer_state": "RN",
+          "five_star_pct": 58.09
+        },
+        {
+          "customer_state": "SC",
+          "five_star_pct": 56.8
+        },
+        {
+          "customer_state": "MT",
+          "five_star_pct": 56.7
+        },
+        {
+          "customer_state": "RO",
+          "five_star_pct": 56.35
+        },
+        {
+          "customer_state": "DF",
+          "five_star_pct": 56.33
+        },
+        {
+          "customer_state": "PB",
+          "five_star_pct": 56.31
+        },
+        {
+          "customer_state": "PE",
+          "five_star_pct": 55.83
+        },
+        {
+          "customer_state": "AC",
+          "five_star_pct": 55.56
+        },
+        {
+          "customer_state": "ES",
+          "five_star_pct": 55.01
+        },
+        {
+          "customer_state": "GO",
+          "five_star_pct": 54.84
+        },
+        {
+          "customer_state": "TO",
+          "five_star_pct": 54.48
+        },
+        {
+          "customer_state": "RJ",
+          "five_star_pct": 54.3
+        },
+        {
+          "customer_state": "PI",
+          "five_star_pct": 51.93
+        },
+        {
+          "customer_state": "AP",
+          "five_star_pct": 50.75
+        },
+        {
+          "customer_state": "SE",
+          "five_star_pct": 50.72
+        },
+        {
+          "customer_state": "CE",
+          "five_star_pct": 50.49
+        },
+        {
+          "customer_state": "PA",
+          "five_star_pct": 50.1
+        },
+        {
+          "customer_state": "BA",
+          "five_star_pct": 48.91
+        },
+        {
+          "customer_state": "AL",
+          "five_star_pct": 47.58
+        },
+        {
+          "customer_state": "MA",
+          "five_star_pct": 47.32
+        },
+        {
+          "customer_state": "RR",
+          "five_star_pct": 43.48
+        }
+      ],
+      "row_count": 27
+    }
+  },
+  {
+    "question": "What is the average freight value paid per order by product category?",
+    "expected_tables": [
+      "order_items",
+      "products"
+    ],
+    "expected_metrics": [
+      "product_category_name",
+      "avg_freight_value"
+    ],
+    "expected_sql": "\n        SELECT p.product_category_name,\n               ROUND(AVG(oi.freight_value), 2) AS avg_freight_value\n        FROM order_items oi\n        JOIN products p ON oi.product_id = p.product_id\n        WHERE p.product_category_name IS NOT NULL\n        GROUP BY p.product_category_name\n        ORDER BY avg_freight_value DESC\n        LIMIT 15;\n        ",
+    "category": "Products & Categories",
+    "domain": "Products",
+    "query_type": "ranked_list",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "product_category_name",
+        "avg_freight_value"
+      ],
+      "values": [
+        {
+          "product_category_name": "pcs",
+          "avg_freight_value": 48.45
+        },
+        {
+          "product_category_name": "eletrodomesticos_2",
+          "avg_freight_value": 44.54
+        },
+        {
+          "product_category_name": "moveis_colchao_e_estofado",
+          "avg_freight_value": 42.91
+        },
+        {
+          "product_category_name": "moveis_cozinha_area_de_servico_jantar_e_jardim",
+          "avg_freight_value": 42.7
+        },
+        {
+          "product_category_name": "moveis_quarto",
+          "avg_freight_value": 42.5
+        },
+        {
+          "product_category_name": "moveis_escritorio",
+          "avg_freight_value": 40.55
+        },
+        {
+          "product_category_name": "portateis_casa_forno_e_cafe",
+          "avg_freight_value": 36.16
+        },
+        {
+          "product_category_name": "moveis_sala",
+          "avg_freight_value": 35.72
+        },
+        {
+          "product_category_name": "sinalizacao_e_seguranca",
+          "avg_freight_value": 32.7
+        },
+        {
+          "product_category_name": "industria_comercio_e_negocios",
+          "avg_freight_value": 29.42
+        },
+        {
+          "product_category_name": "malas_acessorios",
+          "avg_freight_value": 27.88
+        },
+        {
+          "product_category_name": "agro_industria_e_comercio",
+          "avg_freight_value": 27.56
+        },
+        {
+          "product_category_name": "instrumentos_musicais",
+          "avg_freight_value": 27.41
+        },
+        {
+          "product_category_name": "construcao_ferramentas_iluminacao",
+          "avg_freight_value": 24.95
+        },
+        {
+          "product_category_name": "la_cuisine",
+          "avg_freight_value": 23.82
+        }
+      ],
+      "row_count": 15
+    }
+  },
+  {
+    "question": "What is the proportion of total revenue paid via credit card versus boleto?",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "expected_metrics": [
+      "payment_type",
+      "total_payment_value",
+      "payment_share_pct"
+    ],
+    "expected_sql": "\n        WITH totals AS (\n            SELECT payment_type,\n                   SUM(payment_value) AS type_value\n            FROM order_payments\n            WHERE payment_type IN ('credit_card', 'boleto')\n            GROUP BY payment_type\n        ),\n        grand AS (\n            SELECT SUM(type_value) AS total_val FROM totals\n        )\n        SELECT t.payment_type,\n               ROUND(t.type_value, 2) AS total_payment_value,\n               ROUND(100.0 * t.type_value / g.total_val, 2) AS payment_share_pct\n        FROM totals t, grand g\n        ORDER BY t.type_value DESC;\n        ",
+    "category": "Payments & Installments",
+    "domain": "Payments",
+    "query_type": "aggregated_table",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "payment_type",
+        "total_payment_value",
+        "payment_share_pct"
+      ],
+      "values": [
+        {
+          "payment_type": "credit_card",
+          "total_payment_value": 12542084.19,
+          "payment_share_pct": 81.38
+        },
+        {
+          "payment_type": "boleto",
+          "total_payment_value": 2869361.27,
+          "payment_share_pct": 18.62
+        }
+      ],
+      "row_count": 2
+    }
+  },
+  {
+    "question": "What is the total revenue generated by customers in the state of SP?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM orders o\n        JOIN customers c ON o.customer_id = c.customer_id\n        JOIN order_items oi ON o.order_id = oi.order_id\n        WHERE c.customer_state = 'SP';",
+    "category": "Customers & Geography",
+    "domain": "Customers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 5202955.05
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue generated by customers in the state of RJ?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM orders o\n        JOIN customers c ON o.customer_id = c.customer_id\n        JOIN order_items oi ON o.order_id = oi.order_id\n        WHERE c.customer_state = 'RJ';",
+    "category": "Customers & Geography",
+    "domain": "Customers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 1824092.67
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue generated by customers in the state of MG?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM orders o\n        JOIN customers c ON o.customer_id = c.customer_id\n        JOIN order_items oi ON o.order_id = oi.order_id\n        WHERE c.customer_state = 'MG';",
+    "category": "Customers & Geography",
+    "domain": "Customers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 1585308.03
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue generated by customers in the state of RS?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM orders o\n        JOIN customers c ON o.customer_id = c.customer_id\n        JOIN order_items oi ON o.order_id = oi.order_id\n        WHERE c.customer_state = 'RS';",
+    "category": "Customers & Geography",
+    "domain": "Customers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 750304.02
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue generated by customers in the state of PR?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM orders o\n        JOIN customers c ON o.customer_id = c.customer_id\n        JOIN order_items oi ON o.order_id = oi.order_id\n        WHERE c.customer_state = 'PR';",
+    "category": "Customers & Geography",
+    "domain": "Customers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 683083.76
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue generated by customers in the state of SC?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM orders o\n        JOIN customers c ON o.customer_id = c.customer_id\n        JOIN order_items oi ON o.order_id = oi.order_id\n        WHERE c.customer_state = 'SC';",
+    "category": "Customers & Geography",
+    "domain": "Customers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 520553.34
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue generated by customers in the state of BA?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM orders o\n        JOIN customers c ON o.customer_id = c.customer_id\n        JOIN order_items oi ON o.order_id = oi.order_id\n        WHERE c.customer_state = 'BA';",
+    "category": "Customers & Geography",
+    "domain": "Customers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 511349.99
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue generated by customers in the state of DF?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM orders o\n        JOIN customers c ON o.customer_id = c.customer_id\n        JOIN order_items oi ON o.order_id = oi.order_id\n        WHERE c.customer_state = 'DF';",
+    "category": "Customers & Geography",
+    "domain": "Customers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 302603.94
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue generated by customers in the state of GO?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM orders o\n        JOIN customers c ON o.customer_id = c.customer_id\n        JOIN order_items oi ON o.order_id = oi.order_id\n        WHERE c.customer_state = 'GO';",
+    "category": "Customers & Geography",
+    "domain": "Customers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 294591.95
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue generated by customers in the state of PE?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM orders o\n        JOIN customers c ON o.customer_id = c.customer_id\n        JOIN order_items oi ON o.order_id = oi.order_id\n        WHERE c.customer_state = 'PE';",
+    "category": "Customers & Geography",
+    "domain": "Customers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 262788.03
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "How many unique orders were placed by customers residing in SP?",
+    "expected_tables": [
+      "orders",
+      "customers"
+    ],
+    "expected_metrics": [
+      "order_count"
+    ],
+    "expected_sql": "SELECT COUNT(DISTINCT o.order_id) AS order_count\n        FROM orders o\n        JOIN customers c ON o.customer_id = c.customer_id\n        WHERE c.customer_state = 'SP';",
+    "category": "Customers & Geography",
+    "domain": "Customers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "order_count"
+      ],
+      "values": [
+        {
+          "order_count": 41746
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "How many unique orders were placed by customers residing in RJ?",
+    "expected_tables": [
+      "orders",
+      "customers"
+    ],
+    "expected_metrics": [
+      "order_count"
+    ],
+    "expected_sql": "SELECT COUNT(DISTINCT o.order_id) AS order_count\n        FROM orders o\n        JOIN customers c ON o.customer_id = c.customer_id\n        WHERE c.customer_state = 'RJ';",
+    "category": "Customers & Geography",
+    "domain": "Customers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "order_count"
+      ],
+      "values": [
+        {
+          "order_count": 12852
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "How many unique orders were placed by customers residing in MG?",
+    "expected_tables": [
+      "orders",
+      "customers"
+    ],
+    "expected_metrics": [
+      "order_count"
+    ],
+    "expected_sql": "SELECT COUNT(DISTINCT o.order_id) AS order_count\n        FROM orders o\n        JOIN customers c ON o.customer_id = c.customer_id\n        WHERE c.customer_state = 'MG';",
+    "category": "Customers & Geography",
+    "domain": "Customers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "order_count"
+      ],
+      "values": [
+        {
+          "order_count": 11635
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "How many unique orders were placed by customers residing in RS?",
+    "expected_tables": [
+      "orders",
+      "customers"
+    ],
+    "expected_metrics": [
+      "order_count"
+    ],
+    "expected_sql": "SELECT COUNT(DISTINCT o.order_id) AS order_count\n        FROM orders o\n        JOIN customers c ON o.customer_id = c.customer_id\n        WHERE c.customer_state = 'RS';",
+    "category": "Customers & Geography",
+    "domain": "Customers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "order_count"
+      ],
+      "values": [
+        {
+          "order_count": 5466
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "How many unique orders were placed by customers residing in PR?",
+    "expected_tables": [
+      "orders",
+      "customers"
+    ],
+    "expected_metrics": [
+      "order_count"
+    ],
+    "expected_sql": "SELECT COUNT(DISTINCT o.order_id) AS order_count\n        FROM orders o\n        JOIN customers c ON o.customer_id = c.customer_id\n        WHERE c.customer_state = 'PR';",
+    "category": "Customers & Geography",
+    "domain": "Customers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "order_count"
+      ],
+      "values": [
+        {
+          "order_count": 5045
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "How many unique orders were placed by customers residing in SC?",
+    "expected_tables": [
+      "orders",
+      "customers"
+    ],
+    "expected_metrics": [
+      "order_count"
+    ],
+    "expected_sql": "SELECT COUNT(DISTINCT o.order_id) AS order_count\n        FROM orders o\n        JOIN customers c ON o.customer_id = c.customer_id\n        WHERE c.customer_state = 'SC';",
+    "category": "Customers & Geography",
+    "domain": "Customers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "order_count"
+      ],
+      "values": [
+        {
+          "order_count": 3637
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "How many unique orders were placed by customers residing in BA?",
+    "expected_tables": [
+      "orders",
+      "customers"
+    ],
+    "expected_metrics": [
+      "order_count"
+    ],
+    "expected_sql": "SELECT COUNT(DISTINCT o.order_id) AS order_count\n        FROM orders o\n        JOIN customers c ON o.customer_id = c.customer_id\n        WHERE c.customer_state = 'BA';",
+    "category": "Customers & Geography",
+    "domain": "Customers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "order_count"
+      ],
+      "values": [
+        {
+          "order_count": 3380
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "How many unique orders were placed by customers residing in DF?",
+    "expected_tables": [
+      "orders",
+      "customers"
+    ],
+    "expected_metrics": [
+      "order_count"
+    ],
+    "expected_sql": "SELECT COUNT(DISTINCT o.order_id) AS order_count\n        FROM orders o\n        JOIN customers c ON o.customer_id = c.customer_id\n        WHERE c.customer_state = 'DF';",
+    "category": "Customers & Geography",
+    "domain": "Customers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "order_count"
+      ],
+      "values": [
+        {
+          "order_count": 2140
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "How many unique orders were placed by customers residing in GO?",
+    "expected_tables": [
+      "orders",
+      "customers"
+    ],
+    "expected_metrics": [
+      "order_count"
+    ],
+    "expected_sql": "SELECT COUNT(DISTINCT o.order_id) AS order_count\n        FROM orders o\n        JOIN customers c ON o.customer_id = c.customer_id\n        WHERE c.customer_state = 'GO';",
+    "category": "Customers & Geography",
+    "domain": "Customers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "order_count"
+      ],
+      "values": [
+        {
+          "order_count": 2020
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "How many unique orders were placed by customers residing in PE?",
+    "expected_tables": [
+      "orders",
+      "customers"
+    ],
+    "expected_metrics": [
+      "order_count"
+    ],
+    "expected_sql": "SELECT COUNT(DISTINCT o.order_id) AS order_count\n        FROM orders o\n        JOIN customers c ON o.customer_id = c.customer_id\n        WHERE c.customer_state = 'PE';",
+    "category": "Customers & Geography",
+    "domain": "Customers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "order_count"
+      ],
+      "values": [
+        {
+          "order_count": 1652
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total sales revenue for product category 'cama_mesa_banho'?",
+    "expected_tables": [
+      "order_items",
+      "products"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN products p ON oi.product_id = p.product_id\n        WHERE p.product_category_name = 'cama_mesa_banho';",
+    "category": "Products & Categories",
+    "domain": "Products",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 1036988.68
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total sales revenue for product category 'beleza_saude'?",
+    "expected_tables": [
+      "order_items",
+      "products"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN products p ON oi.product_id = p.product_id\n        WHERE p.product_category_name = 'beleza_saude';",
+    "category": "Products & Categories",
+    "domain": "Products",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 1258681.34
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total sales revenue for product category 'esporte_lazer'?",
+    "expected_tables": [
+      "order_items",
+      "products"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN products p ON oi.product_id = p.product_id\n        WHERE p.product_category_name = 'esporte_lazer';",
+    "category": "Products & Categories",
+    "domain": "Products",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 988048.97
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total sales revenue for product category 'moveis_decoracao'?",
+    "expected_tables": [
+      "order_items",
+      "products"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN products p ON oi.product_id = p.product_id\n        WHERE p.product_category_name = 'moveis_decoracao';",
+    "category": "Products & Categories",
+    "domain": "Products",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 729762.49
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total sales revenue for product category 'informatica_acessorios'?",
+    "expected_tables": [
+      "order_items",
+      "products"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN products p ON oi.product_id = p.product_id\n        WHERE p.product_category_name = 'informatica_acessorios';",
+    "category": "Products & Categories",
+    "domain": "Products",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 911954.32
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total sales revenue for product category 'utilidades_domesticas'?",
+    "expected_tables": [
+      "order_items",
+      "products"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN products p ON oi.product_id = p.product_id\n        WHERE p.product_category_name = 'utilidades_domesticas';",
+    "category": "Products & Categories",
+    "domain": "Products",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 632248.66
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total sales revenue for product category 'relogios_presentes'?",
+    "expected_tables": [
+      "order_items",
+      "products"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN products p ON oi.product_id = p.product_id\n        WHERE p.product_category_name = 'relogios_presentes';",
+    "category": "Products & Categories",
+    "domain": "Products",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 1205005.68
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total sales revenue for product category 'telefonia'?",
+    "expected_tables": [
+      "order_items",
+      "products"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN products p ON oi.product_id = p.product_id\n        WHERE p.product_category_name = 'telefonia';",
+    "category": "Products & Categories",
+    "domain": "Products",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 323667.53
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total sales revenue for product category 'automotivo'?",
+    "expected_tables": [
+      "order_items",
+      "products"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN products p ON oi.product_id = p.product_id\n        WHERE p.product_category_name = 'automotivo';",
+    "category": "Products & Categories",
+    "domain": "Products",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 592720.11
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total sales revenue for product category 'brinquedos'?",
+    "expected_tables": [
+      "order_items",
+      "products"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN products p ON oi.product_id = p.product_id\n        WHERE p.product_category_name = 'brinquedos';",
+    "category": "Products & Categories",
+    "domain": "Products",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 483946.6
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average customer review rating for products in category 'cama_mesa_banho'?",
+    "expected_tables": [
+      "order_items",
+      "products",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_review_score"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(r.review_score), 2) AS avg_review_score\n        FROM order_items oi\n        JOIN products p ON oi.product_id = p.product_id\n        JOIN order_reviews r ON oi.order_id = r.order_id\n        WHERE p.product_category_name = 'cama_mesa_banho';",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_review_score"
+      ],
+      "values": [
+        {
+          "avg_review_score": 3.9
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average customer review rating for products in category 'beleza_saude'?",
+    "expected_tables": [
+      "order_items",
+      "products",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_review_score"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(r.review_score), 2) AS avg_review_score\n        FROM order_items oi\n        JOIN products p ON oi.product_id = p.product_id\n        JOIN order_reviews r ON oi.order_id = r.order_id\n        WHERE p.product_category_name = 'beleza_saude';",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_review_score"
+      ],
+      "values": [
+        {
+          "avg_review_score": 4.14
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average customer review rating for products in category 'esporte_lazer'?",
+    "expected_tables": [
+      "order_items",
+      "products",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_review_score"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(r.review_score), 2) AS avg_review_score\n        FROM order_items oi\n        JOIN products p ON oi.product_id = p.product_id\n        JOIN order_reviews r ON oi.order_id = r.order_id\n        WHERE p.product_category_name = 'esporte_lazer';",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_review_score"
+      ],
+      "values": [
+        {
+          "avg_review_score": 4.11
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average customer review rating for products in category 'moveis_decoracao'?",
+    "expected_tables": [
+      "order_items",
+      "products",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_review_score"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(r.review_score), 2) AS avg_review_score\n        FROM order_items oi\n        JOIN products p ON oi.product_id = p.product_id\n        JOIN order_reviews r ON oi.order_id = r.order_id\n        WHERE p.product_category_name = 'moveis_decoracao';",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_review_score"
+      ],
+      "values": [
+        {
+          "avg_review_score": 3.9
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average customer review rating for products in category 'informatica_acessorios'?",
+    "expected_tables": [
+      "order_items",
+      "products",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_review_score"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(r.review_score), 2) AS avg_review_score\n        FROM order_items oi\n        JOIN products p ON oi.product_id = p.product_id\n        JOIN order_reviews r ON oi.order_id = r.order_id\n        WHERE p.product_category_name = 'informatica_acessorios';",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_review_score"
+      ],
+      "values": [
+        {
+          "avg_review_score": 3.93
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average customer review rating for products in category 'utilidades_domesticas'?",
+    "expected_tables": [
+      "order_items",
+      "products",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_review_score"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(r.review_score), 2) AS avg_review_score\n        FROM order_items oi\n        JOIN products p ON oi.product_id = p.product_id\n        JOIN order_reviews r ON oi.order_id = r.order_id\n        WHERE p.product_category_name = 'utilidades_domesticas';",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_review_score"
+      ],
+      "values": [
+        {
+          "avg_review_score": 4.06
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average customer review rating for products in category 'relogios_presentes'?",
+    "expected_tables": [
+      "order_items",
+      "products",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_review_score"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(r.review_score), 2) AS avg_review_score\n        FROM order_items oi\n        JOIN products p ON oi.product_id = p.product_id\n        JOIN order_reviews r ON oi.order_id = r.order_id\n        WHERE p.product_category_name = 'relogios_presentes';",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_review_score"
+      ],
+      "values": [
+        {
+          "avg_review_score": 4.02
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average customer review rating for products in category 'telefonia'?",
+    "expected_tables": [
+      "order_items",
+      "products",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_review_score"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(r.review_score), 2) AS avg_review_score\n        FROM order_items oi\n        JOIN products p ON oi.product_id = p.product_id\n        JOIN order_reviews r ON oi.order_id = r.order_id\n        WHERE p.product_category_name = 'telefonia';",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_review_score"
+      ],
+      "values": [
+        {
+          "avg_review_score": 3.95
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average customer review rating for products in category 'automotivo'?",
+    "expected_tables": [
+      "order_items",
+      "products",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_review_score"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(r.review_score), 2) AS avg_review_score\n        FROM order_items oi\n        JOIN products p ON oi.product_id = p.product_id\n        JOIN order_reviews r ON oi.order_id = r.order_id\n        WHERE p.product_category_name = 'automotivo';",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_review_score"
+      ],
+      "values": [
+        {
+          "avg_review_score": 4.07
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average customer review rating for products in category 'brinquedos'?",
+    "expected_tables": [
+      "order_items",
+      "products",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_review_score"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(r.review_score), 2) AS avg_review_score\n        FROM order_items oi\n        JOIN products p ON oi.product_id = p.product_id\n        JOIN order_reviews r ON oi.order_id = r.order_id\n        WHERE p.product_category_name = 'brinquedos';",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_review_score"
+      ],
+      "values": [
+        {
+          "avg_review_score": 4.16
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average number of installments chosen when paying by credit_card?",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "expected_metrics": [
+      "avg_installments"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(payment_installments), 2) AS avg_installments\n        FROM order_payments\n        WHERE payment_type = 'credit_card';",
+    "category": "Payments & Installments",
+    "domain": "Payments",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "avg_installments"
+      ],
+      "values": [
+        {
+          "avg_installments": 3.51
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average number of installments chosen when paying by boleto?",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "expected_metrics": [
+      "avg_installments"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(payment_installments), 2) AS avg_installments\n        FROM order_payments\n        WHERE payment_type = 'boleto';",
+    "category": "Payments & Installments",
+    "domain": "Payments",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "avg_installments"
+      ],
+      "values": [
+        {
+          "avg_installments": 1.0
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average number of installments chosen when paying by voucher?",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "expected_metrics": [
+      "avg_installments"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(payment_installments), 2) AS avg_installments\n        FROM order_payments\n        WHERE payment_type = 'voucher';",
+    "category": "Payments & Installments",
+    "domain": "Payments",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "avg_installments"
+      ],
+      "values": [
+        {
+          "avg_installments": 1.0
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average number of installments chosen when paying by debit_card?",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "expected_metrics": [
+      "avg_installments"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(payment_installments), 2) AS avg_installments\n        FROM order_payments\n        WHERE payment_type = 'debit_card';",
+    "category": "Payments & Installments",
+    "domain": "Payments",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "avg_installments"
+      ],
+      "values": [
+        {
+          "avg_installments": 1.0
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What was the average order value (AOV) in the year 2016?",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "aov"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price) / COUNT(DISTINCT o.order_id), 2) AS aov\n        FROM orders o\n        JOIN order_items oi ON o.order_id = oi.order_id\n        WHERE strftime('%Y', o.order_purchase_timestamp) = '2016';",
+    "category": "Revenue & Sales",
+    "domain": "Revenue",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "aov"
+      ],
+      "values": [
+        {
+          "aov": 159.57
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What was the average order value (AOV) in the year 2017?",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "aov"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price) / COUNT(DISTINCT o.order_id), 2) AS aov\n        FROM orders o\n        JOIN order_items oi ON o.order_id = oi.order_id\n        WHERE strftime('%Y', o.order_purchase_timestamp) = '2017';",
+    "category": "Revenue & Sales",
+    "domain": "Revenue",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "aov"
+      ],
+      "values": [
+        {
+          "aov": 138.09
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What was the average order value (AOV) in the year 2018?",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "aov"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price) / COUNT(DISTINCT o.order_id), 2) AS aov\n        FROM orders o\n        JOIN order_items oi ON o.order_id = oi.order_id\n        WHERE strftime('%Y', o.order_purchase_timestamp) = '2018';",
+    "category": "Revenue & Sales",
+    "domain": "Revenue",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "aov"
+      ],
+      "values": [
+        {
+          "aov": 137.35
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "How many registered sellers operate out of the state of SP?",
+    "expected_tables": [
+      "sellers"
+    ],
+    "expected_metrics": [
+      "seller_count"
+    ],
+    "expected_sql": "SELECT COUNT(*) AS seller_count\n        FROM sellers\n        WHERE seller_state = 'SP';",
+    "category": "Sellers & Fulfillment",
+    "domain": "Sellers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "seller_count"
+      ],
+      "values": [
+        {
+          "seller_count": 1849
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "How many registered sellers operate out of the state of RJ?",
+    "expected_tables": [
+      "sellers"
+    ],
+    "expected_metrics": [
+      "seller_count"
+    ],
+    "expected_sql": "SELECT COUNT(*) AS seller_count\n        FROM sellers\n        WHERE seller_state = 'RJ';",
+    "category": "Sellers & Fulfillment",
+    "domain": "Sellers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "seller_count"
+      ],
+      "values": [
+        {
+          "seller_count": 171
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "How many registered sellers operate out of the state of MG?",
+    "expected_tables": [
+      "sellers"
+    ],
+    "expected_metrics": [
+      "seller_count"
+    ],
+    "expected_sql": "SELECT COUNT(*) AS seller_count\n        FROM sellers\n        WHERE seller_state = 'MG';",
+    "category": "Sellers & Fulfillment",
+    "domain": "Sellers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "seller_count"
+      ],
+      "values": [
+        {
+          "seller_count": 244
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "How many registered sellers operate out of the state of RS?",
+    "expected_tables": [
+      "sellers"
+    ],
+    "expected_metrics": [
+      "seller_count"
+    ],
+    "expected_sql": "SELECT COUNT(*) AS seller_count\n        FROM sellers\n        WHERE seller_state = 'RS';",
+    "category": "Sellers & Fulfillment",
+    "domain": "Sellers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "seller_count"
+      ],
+      "values": [
+        {
+          "seller_count": 129
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "How many registered sellers operate out of the state of PR?",
+    "expected_tables": [
+      "sellers"
+    ],
+    "expected_metrics": [
+      "seller_count"
+    ],
+    "expected_sql": "SELECT COUNT(*) AS seller_count\n        FROM sellers\n        WHERE seller_state = 'PR';",
+    "category": "Sellers & Fulfillment",
+    "domain": "Sellers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "seller_count"
+      ],
+      "values": [
+        {
+          "seller_count": 349
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "How many registered sellers operate out of the state of SC?",
+    "expected_tables": [
+      "sellers"
+    ],
+    "expected_metrics": [
+      "seller_count"
+    ],
+    "expected_sql": "SELECT COUNT(*) AS seller_count\n        FROM sellers\n        WHERE seller_state = 'SC';",
+    "category": "Sellers & Fulfillment",
+    "domain": "Sellers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "seller_count"
+      ],
+      "values": [
+        {
+          "seller_count": 190
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "How many registered sellers operate out of the state of BA?",
+    "expected_tables": [
+      "sellers"
+    ],
+    "expected_metrics": [
+      "seller_count"
+    ],
+    "expected_sql": "SELECT COUNT(*) AS seller_count\n        FROM sellers\n        WHERE seller_state = 'BA';",
+    "category": "Sellers & Fulfillment",
+    "domain": "Sellers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "seller_count"
+      ],
+      "values": [
+        {
+          "seller_count": 19
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "How many registered sellers operate out of the state of DF?",
+    "expected_tables": [
+      "sellers"
+    ],
+    "expected_metrics": [
+      "seller_count"
+    ],
+    "expected_sql": "SELECT COUNT(*) AS seller_count\n        FROM sellers\n        WHERE seller_state = 'DF';",
+    "category": "Sellers & Fulfillment",
+    "domain": "Sellers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "seller_count"
+      ],
+      "values": [
+        {
+          "seller_count": 30
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "How many registered sellers operate out of the state of GO?",
+    "expected_tables": [
+      "sellers"
+    ],
+    "expected_metrics": [
+      "seller_count"
+    ],
+    "expected_sql": "SELECT COUNT(*) AS seller_count\n        FROM sellers\n        WHERE seller_state = 'GO';",
+    "category": "Sellers & Fulfillment",
+    "domain": "Sellers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "seller_count"
+      ],
+      "values": [
+        {
+          "seller_count": 40
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "How many registered sellers operate out of the state of PE?",
+    "expected_tables": [
+      "sellers"
+    ],
+    "expected_metrics": [
+      "seller_count"
+    ],
+    "expected_sql": "SELECT COUNT(*) AS seller_count\n        FROM sellers\n        WHERE seller_state = 'PE';",
+    "category": "Sellers & Fulfillment",
+    "domain": "Sellers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "seller_count"
+      ],
+      "values": [
+        {
+          "seller_count": 9
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total sales revenue fulfilled by sellers located in SP?",
+    "expected_tables": [
+      "order_items",
+      "sellers"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN sellers s ON oi.seller_id = s.seller_id\n        WHERE s.seller_state = 'SP';",
+    "category": "Sellers & Fulfillment",
+    "domain": "Sellers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 8753396.21
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total sales revenue fulfilled by sellers located in RJ?",
+    "expected_tables": [
+      "order_items",
+      "sellers"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN sellers s ON oi.seller_id = s.seller_id\n        WHERE s.seller_state = 'RJ';",
+    "category": "Sellers & Fulfillment",
+    "domain": "Sellers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 843984.22
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total sales revenue fulfilled by sellers located in MG?",
+    "expected_tables": [
+      "order_items",
+      "sellers"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN sellers s ON oi.seller_id = s.seller_id\n        WHERE s.seller_state = 'MG';",
+    "category": "Sellers & Fulfillment",
+    "domain": "Sellers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 1011564.74
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total sales revenue fulfilled by sellers located in RS?",
+    "expected_tables": [
+      "order_items",
+      "sellers"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN sellers s ON oi.seller_id = s.seller_id\n        WHERE s.seller_state = 'RS';",
+    "category": "Sellers & Fulfillment",
+    "domain": "Sellers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 378559.54
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total sales revenue fulfilled by sellers located in PR?",
+    "expected_tables": [
+      "order_items",
+      "sellers"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN sellers s ON oi.seller_id = s.seller_id\n        WHERE s.seller_state = 'PR';",
+    "category": "Sellers & Fulfillment",
+    "domain": "Sellers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 1261887.21
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total sales revenue fulfilled by sellers located in SC?",
+    "expected_tables": [
+      "order_items",
+      "sellers"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN sellers s ON oi.seller_id = s.seller_id\n        WHERE s.seller_state = 'SC';",
+    "category": "Sellers & Fulfillment",
+    "domain": "Sellers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 632426.07
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total sales revenue fulfilled by sellers located in BA?",
+    "expected_tables": [
+      "order_items",
+      "sellers"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN sellers s ON oi.seller_id = s.seller_id\n        WHERE s.seller_state = 'BA';",
+    "category": "Sellers & Fulfillment",
+    "domain": "Sellers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 285561.56
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total sales revenue fulfilled by sellers located in DF?",
+    "expected_tables": [
+      "order_items",
+      "sellers"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN sellers s ON oi.seller_id = s.seller_id\n        WHERE s.seller_state = 'DF';",
+    "category": "Sellers & Fulfillment",
+    "domain": "Sellers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 97749.48
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total sales revenue fulfilled by sellers located in GO?",
+    "expected_tables": [
+      "order_items",
+      "sellers"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN sellers s ON oi.seller_id = s.seller_id\n        WHERE s.seller_state = 'GO';",
+    "category": "Sellers & Fulfillment",
+    "domain": "Sellers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 66399.21
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total sales revenue fulfilled by sellers located in PE?",
+    "expected_tables": [
+      "order_items",
+      "sellers"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN sellers s ON oi.seller_id = s.seller_id\n        WHERE s.seller_state = 'PE';",
+    "category": "Sellers & Fulfillment",
+    "domain": "Sellers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 91493.85
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total count of canceled orders in 2017?",
+    "expected_tables": [
+      "orders"
+    ],
+    "expected_metrics": [
+      "canceled_count"
+    ],
+    "expected_sql": "SELECT COUNT(*) AS canceled_count FROM orders WHERE order_status = 'canceled' AND strftime('%Y', order_purchase_timestamp) = '2017';",
+    "category": "Orders & Transactions",
+    "domain": "Orders & Transactions",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "canceled_count"
+      ],
+      "values": [
+        {
+          "canceled_count": 265
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total count of successfully delivered orders in 2018?",
+    "expected_tables": [
+      "orders"
+    ],
+    "expected_metrics": [
+      "delivered_count"
+    ],
+    "expected_sql": "SELECT COUNT(*) AS delivered_count FROM orders WHERE order_status = 'delivered' AND strftime('%Y', order_purchase_timestamp) = '2018';",
+    "category": "Orders & Transactions",
+    "domain": "Orders & Transactions",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "delivered_count"
+      ],
+      "values": [
+        {
+          "delivered_count": 52783
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What percentage of orders delivered to customers in SP were delayed beyond estimated delivery date?",
+    "expected_tables": [
+      "orders",
+      "customers"
+    ],
+    "expected_metrics": [
+      "delay_pct"
+    ],
+    "expected_sql": "SELECT ROUND(100.0 * SUM(CASE WHEN o.order_delivered_customer_date > o.order_estimated_delivery_date THEN 1 ELSE 0 END) / COUNT(*), 2) AS delay_pct FROM orders o JOIN customers c ON o.customer_id = c.customer_id WHERE c.customer_state = 'SP' AND o.order_delivered_customer_date IS NOT NULL;",
+    "category": "Logistics & Operations",
+    "domain": "Logistics & Operations",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "delay_pct"
+      ],
+      "values": [
+        {
+          "delay_pct": 5.89
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What percentage of orders delivered to customers in RJ were delayed beyond estimated delivery date?",
+    "expected_tables": [
+      "orders",
+      "customers"
+    ],
+    "expected_metrics": [
+      "delay_pct"
+    ],
+    "expected_sql": "SELECT ROUND(100.0 * SUM(CASE WHEN o.order_delivered_customer_date > o.order_estimated_delivery_date THEN 1 ELSE 0 END) / COUNT(*), 2) AS delay_pct FROM orders o JOIN customers c ON o.customer_id = c.customer_id WHERE c.customer_state = 'RJ' AND o.order_delivered_customer_date IS NOT NULL;",
+    "category": "Logistics & Operations",
+    "domain": "Logistics & Operations",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "delay_pct"
+      ],
+      "values": [
+        {
+          "delay_pct": 13.47
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "How many 1-star reviews were submitted in total?",
+    "expected_tables": [
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "one_star_count"
+    ],
+    "expected_sql": "SELECT COUNT(*) AS one_star_count FROM order_reviews WHERE review_score = 1;",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews & Satisfaction",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "one_star_count"
+      ],
+      "values": [
+        {
+          "one_star_count": 11424
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "How many 5-star reviews were submitted in total?",
+    "expected_tables": [
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "five_star_count"
+    ],
+    "expected_sql": "SELECT COUNT(*) AS five_star_count FROM order_reviews WHERE review_score = 5;",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews & Satisfaction",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "five_star_count"
+      ],
+      "values": [
+        {
+          "five_star_count": 57328
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average number of photos listed per product in the catalog?",
+    "expected_tables": [
+      "products"
+    ],
+    "expected_metrics": [
+      "avg_photos"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(product_photos_qty), 2) AS avg_photos FROM products WHERE product_photos_qty IS NOT NULL;",
+    "category": "Products & Categories",
+    "domain": "Products & Categories",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_photos"
+      ],
+      "values": [
+        {
+          "avg_photos": 2.19
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average product weight in grams across all catalog products?",
+    "expected_tables": [
+      "products"
+    ],
+    "expected_metrics": [
+      "avg_weight_g"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(product_weight_g), 2) AS avg_weight_g FROM products WHERE product_weight_g IS NOT NULL;",
+    "category": "Products & Categories",
+    "domain": "Products & Categories",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_weight_g"
+      ],
+      "values": [
+        {
+          "avg_weight_g": 2276.47
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "How many orders were paid using more than one payment sequence?",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "expected_metrics": [
+      "multi_payment_order_count"
+    ],
+    "expected_sql": "SELECT COUNT(*) AS multi_payment_order_count FROM (SELECT order_id FROM order_payments GROUP BY order_id HAVING COUNT(*) > 1);",
+    "category": "Payments & Installments",
+    "domain": "Payments & Installments",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "multi_payment_order_count"
+      ],
+      "values": [
+        {
+          "multi_payment_order_count": 2961
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "How many payments were made using voucher as payment type?",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "expected_metrics": [
+      "voucher_payment_count"
+    ],
+    "expected_sql": "SELECT COUNT(*) AS voucher_payment_count FROM order_payments WHERE payment_type = 'voucher';",
+    "category": "Payments & Installments",
+    "domain": "Payments & Installments",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "voucher_payment_count"
+      ],
+      "values": [
+        {
+          "voucher_payment_count": 5775
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue of 'cama_mesa_banho' products purchased by customers in SP?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items",
+      "products"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n            FROM orders o\n            JOIN customers c ON o.customer_id = c.customer_id\n            JOIN order_items oi ON o.order_id = oi.order_id\n            JOIN products p ON oi.product_id = p.product_id\n            WHERE c.customer_state = 'SP' AND p.product_category_name = 'cama_mesa_banho';",
+    "category": "Products & Categories",
+    "domain": "Products",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 478284.52
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue of 'cama_mesa_banho' products purchased by customers in RJ?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items",
+      "products"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n            FROM orders o\n            JOIN customers c ON o.customer_id = c.customer_id\n            JOIN order_items oi ON o.order_id = oi.order_id\n            JOIN products p ON oi.product_id = p.product_id\n            WHERE c.customer_state = 'RJ' AND p.product_category_name = 'cama_mesa_banho';",
+    "category": "Products & Categories",
+    "domain": "Products",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 148035.23
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue of 'cama_mesa_banho' products purchased by customers in MG?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items",
+      "products"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n            FROM orders o\n            JOIN customers c ON o.customer_id = c.customer_id\n            JOIN order_items oi ON o.order_id = oi.order_id\n            JOIN products p ON oi.product_id = p.product_id\n            WHERE c.customer_state = 'MG' AND p.product_category_name = 'cama_mesa_banho';",
+    "category": "Products & Categories",
+    "domain": "Products",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 129643.98
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue of 'cama_mesa_banho' products purchased by customers in RS?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items",
+      "products"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n            FROM orders o\n            JOIN customers c ON o.customer_id = c.customer_id\n            JOIN order_items oi ON o.order_id = oi.order_id\n            JOIN products p ON oi.product_id = p.product_id\n            WHERE c.customer_state = 'RS' AND p.product_category_name = 'cama_mesa_banho';",
+    "category": "Products & Categories",
+    "domain": "Products",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 60270.74
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue of 'cama_mesa_banho' products purchased by customers in PR?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items",
+      "products"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n            FROM orders o\n            JOIN customers c ON o.customer_id = c.customer_id\n            JOIN order_items oi ON o.order_id = oi.order_id\n            JOIN products p ON oi.product_id = p.product_id\n            WHERE c.customer_state = 'PR' AND p.product_category_name = 'cama_mesa_banho';",
+    "category": "Products & Categories",
+    "domain": "Products",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 45598.47
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue of 'beleza_saude' products purchased by customers in SP?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items",
+      "products"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n            FROM orders o\n            JOIN customers c ON o.customer_id = c.customer_id\n            JOIN order_items oi ON o.order_id = oi.order_id\n            JOIN products p ON oi.product_id = p.product_id\n            WHERE c.customer_state = 'SP' AND p.product_category_name = 'beleza_saude';",
+    "category": "Products & Categories",
+    "domain": "Products",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 462305.22
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue of 'beleza_saude' products purchased by customers in RJ?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items",
+      "products"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n            FROM orders o\n            JOIN customers c ON o.customer_id = c.customer_id\n            JOIN order_items oi ON o.order_id = oi.order_id\n            JOIN products p ON oi.product_id = p.product_id\n            WHERE c.customer_state = 'RJ' AND p.product_category_name = 'beleza_saude';",
+    "category": "Products & Categories",
+    "domain": "Products",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 145298.62
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue of 'beleza_saude' products purchased by customers in MG?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items",
+      "products"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n            FROM orders o\n            JOIN customers c ON o.customer_id = c.customer_id\n            JOIN order_items oi ON o.order_id = oi.order_id\n            JOIN products p ON oi.product_id = p.product_id\n            WHERE c.customer_state = 'MG' AND p.product_category_name = 'beleza_saude';",
+    "category": "Products & Categories",
+    "domain": "Products",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 157558.3
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue of 'beleza_saude' products purchased by customers in RS?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items",
+      "products"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n            FROM orders o\n            JOIN customers c ON o.customer_id = c.customer_id\n            JOIN order_items oi ON o.order_id = oi.order_id\n            JOIN products p ON oi.product_id = p.product_id\n            WHERE c.customer_state = 'RS' AND p.product_category_name = 'beleza_saude';",
+    "category": "Products & Categories",
+    "domain": "Products",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 51327.72
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue of 'beleza_saude' products purchased by customers in PR?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items",
+      "products"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n            FROM orders o\n            JOIN customers c ON o.customer_id = c.customer_id\n            JOIN order_items oi ON o.order_id = oi.order_id\n            JOIN products p ON oi.product_id = p.product_id\n            WHERE c.customer_state = 'PR' AND p.product_category_name = 'beleza_saude';",
+    "category": "Products & Categories",
+    "domain": "Products",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 54949.36
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue of 'esporte_lazer' products purchased by customers in SP?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items",
+      "products"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n            FROM orders o\n            JOIN customers c ON o.customer_id = c.customer_id\n            JOIN order_items oi ON o.order_id = oi.order_id\n            JOIN products p ON oi.product_id = p.product_id\n            WHERE c.customer_state = 'SP' AND p.product_category_name = 'esporte_lazer';",
+    "category": "Products & Categories",
+    "domain": "Products",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 386357.01
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue of 'esporte_lazer' products purchased by customers in RJ?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items",
+      "products"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n            FROM orders o\n            JOIN customers c ON o.customer_id = c.customer_id\n            JOIN order_items oi ON o.order_id = oi.order_id\n            JOIN products p ON oi.product_id = p.product_id\n            WHERE c.customer_state = 'RJ' AND p.product_category_name = 'esporte_lazer';",
+    "category": "Products & Categories",
+    "domain": "Products",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 125148.04
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue of 'esporte_lazer' products purchased by customers in MG?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items",
+      "products"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n            FROM orders o\n            JOIN customers c ON o.customer_id = c.customer_id\n            JOIN order_items oi ON o.order_id = oi.order_id\n            JOIN products p ON oi.product_id = p.product_id\n            WHERE c.customer_state = 'MG' AND p.product_category_name = 'esporte_lazer';",
+    "category": "Products & Categories",
+    "domain": "Products",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 112719.19
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue of 'esporte_lazer' products purchased by customers in RS?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items",
+      "products"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n            FROM orders o\n            JOIN customers c ON o.customer_id = c.customer_id\n            JOIN order_items oi ON o.order_id = oi.order_id\n            JOIN products p ON oi.product_id = p.product_id\n            WHERE c.customer_state = 'RS' AND p.product_category_name = 'esporte_lazer';",
+    "category": "Products & Categories",
+    "domain": "Products",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 53788.32
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue of 'esporte_lazer' products purchased by customers in PR?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items",
+      "products"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n            FROM orders o\n            JOIN customers c ON o.customer_id = c.customer_id\n            JOIN order_items oi ON o.order_id = oi.order_id\n            JOIN products p ON oi.product_id = p.product_id\n            WHERE c.customer_state = 'PR' AND p.product_category_name = 'esporte_lazer';",
+    "category": "Products & Categories",
+    "domain": "Products",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 58630.2
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue of 'moveis_decoracao' products purchased by customers in SP?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items",
+      "products"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n            FROM orders o\n            JOIN customers c ON o.customer_id = c.customer_id\n            JOIN order_items oi ON o.order_id = oi.order_id\n            JOIN products p ON oi.product_id = p.product_id\n            WHERE c.customer_state = 'SP' AND p.product_category_name = 'moveis_decoracao';",
+    "category": "Products & Categories",
+    "domain": "Products",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 286708.02
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue of 'moveis_decoracao' products purchased by customers in RJ?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items",
+      "products"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n            FROM orders o\n            JOIN customers c ON o.customer_id = c.customer_id\n            JOIN order_items oi ON o.order_id = oi.order_id\n            JOIN products p ON oi.product_id = p.product_id\n            WHERE c.customer_state = 'RJ' AND p.product_category_name = 'moveis_decoracao';",
+    "category": "Products & Categories",
+    "domain": "Products",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 98427.86
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue of 'moveis_decoracao' products purchased by customers in MG?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items",
+      "products"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n            FROM orders o\n            JOIN customers c ON o.customer_id = c.customer_id\n            JOIN order_items oi ON o.order_id = oi.order_id\n            JOIN products p ON oi.product_id = p.product_id\n            WHERE c.customer_state = 'MG' AND p.product_category_name = 'moveis_decoracao';",
+    "category": "Products & Categories",
+    "domain": "Products",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 78999.74
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue of 'moveis_decoracao' products purchased by customers in RS?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items",
+      "products"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n            FROM orders o\n            JOIN customers c ON o.customer_id = c.customer_id\n            JOIN order_items oi ON o.order_id = oi.order_id\n            JOIN products p ON oi.product_id = p.product_id\n            WHERE c.customer_state = 'RS' AND p.product_category_name = 'moveis_decoracao';",
+    "category": "Products & Categories",
+    "domain": "Products",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 54813.58
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue of 'moveis_decoracao' products purchased by customers in PR?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items",
+      "products"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n            FROM orders o\n            JOIN customers c ON o.customer_id = c.customer_id\n            JOIN order_items oi ON o.order_id = oi.order_id\n            JOIN products p ON oi.product_id = p.product_id\n            WHERE c.customer_state = 'PR' AND p.product_category_name = 'moveis_decoracao';",
+    "category": "Products & Categories",
+    "domain": "Products",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 49484.89
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue of 'informatica_acessorios' products purchased by customers in SP?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items",
+      "products"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n            FROM orders o\n            JOIN customers c ON o.customer_id = c.customer_id\n            JOIN order_items oi ON o.order_id = oi.order_id\n            JOIN products p ON oi.product_id = p.product_id\n            WHERE c.customer_state = 'SP' AND p.product_category_name = 'informatica_acessorios';",
+    "category": "Products & Categories",
+    "domain": "Products",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 350747.88
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue of 'informatica_acessorios' products purchased by customers in RJ?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items",
+      "products"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n            FROM orders o\n            JOIN customers c ON o.customer_id = c.customer_id\n            JOIN order_items oi ON o.order_id = oi.order_id\n            JOIN products p ON oi.product_id = p.product_id\n            WHERE c.customer_state = 'RJ' AND p.product_category_name = 'informatica_acessorios';",
+    "category": "Products & Categories",
+    "domain": "Products",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 120289.45
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue of 'informatica_acessorios' products purchased by customers in MG?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items",
+      "products"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n            FROM orders o\n            JOIN customers c ON o.customer_id = c.customer_id\n            JOIN order_items oi ON o.order_id = oi.order_id\n            JOIN products p ON oi.product_id = p.product_id\n            WHERE c.customer_state = 'MG' AND p.product_category_name = 'informatica_acessorios';",
+    "category": "Products & Categories",
+    "domain": "Products",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 111069.74
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue of 'informatica_acessorios' products purchased by customers in RS?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items",
+      "products"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n            FROM orders o\n            JOIN customers c ON o.customer_id = c.customer_id\n            JOIN order_items oi ON o.order_id = oi.order_id\n            JOIN products p ON oi.product_id = p.product_id\n            WHERE c.customer_state = 'RS' AND p.product_category_name = 'informatica_acessorios';",
+    "category": "Products & Categories",
+    "domain": "Products",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 52757.73
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue of 'informatica_acessorios' products purchased by customers in PR?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items",
+      "products"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue\n            FROM orders o\n            JOIN customers c ON o.customer_id = c.customer_id\n            JOIN order_items oi ON o.order_id = oi.order_id\n            JOIN products p ON oi.product_id = p.product_id\n            WHERE c.customer_state = 'PR' AND p.product_category_name = 'informatica_acessorios';",
+    "category": "Products & Categories",
+    "domain": "Products",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 44127.09
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average review score for items sold by sellers located in SP?",
+    "expected_tables": [
+      "order_items",
+      "sellers",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_seller_rating"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(r.review_score), 2) AS avg_seller_rating\n        FROM order_items oi\n        JOIN sellers s ON oi.seller_id = s.seller_id\n        JOIN order_reviews r ON oi.order_id = r.order_id\n        WHERE s.seller_state = 'SP';",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_seller_rating"
+      ],
+      "values": [
+        {
+          "avg_seller_rating": 4.01
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average review score for items sold by sellers located in RJ?",
+    "expected_tables": [
+      "order_items",
+      "sellers",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_seller_rating"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(r.review_score), 2) AS avg_seller_rating\n        FROM order_items oi\n        JOIN sellers s ON oi.seller_id = s.seller_id\n        JOIN order_reviews r ON oi.order_id = r.order_id\n        WHERE s.seller_state = 'RJ';",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_seller_rating"
+      ],
+      "values": [
+        {
+          "avg_seller_rating": 4.1
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average review score for items sold by sellers located in MG?",
+    "expected_tables": [
+      "order_items",
+      "sellers",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_seller_rating"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(r.review_score), 2) AS avg_seller_rating\n        FROM order_items oi\n        JOIN sellers s ON oi.seller_id = s.seller_id\n        JOIN order_reviews r ON oi.order_id = r.order_id\n        WHERE s.seller_state = 'MG';",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_seller_rating"
+      ],
+      "values": [
+        {
+          "avg_seller_rating": 4.11
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average review score for items sold by sellers located in RS?",
+    "expected_tables": [
+      "order_items",
+      "sellers",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_seller_rating"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(r.review_score), 2) AS avg_seller_rating\n        FROM order_items oi\n        JOIN sellers s ON oi.seller_id = s.seller_id\n        JOIN order_reviews r ON oi.order_id = r.order_id\n        WHERE s.seller_state = 'RS';",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_seller_rating"
+      ],
+      "values": [
+        {
+          "avg_seller_rating": 4.21
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average review score for items sold by sellers located in PR?",
+    "expected_tables": [
+      "order_items",
+      "sellers",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_seller_rating"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(r.review_score), 2) AS avg_seller_rating\n        FROM order_items oi\n        JOIN sellers s ON oi.seller_id = s.seller_id\n        JOIN order_reviews r ON oi.order_id = r.order_id\n        WHERE s.seller_state = 'PR';",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_seller_rating"
+      ],
+      "values": [
+        {
+          "avg_seller_rating": 4.07
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average review score for items sold by sellers located in SC?",
+    "expected_tables": [
+      "order_items",
+      "sellers",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_seller_rating"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(r.review_score), 2) AS avg_seller_rating\n        FROM order_items oi\n        JOIN sellers s ON oi.seller_id = s.seller_id\n        JOIN order_reviews r ON oi.order_id = r.order_id\n        WHERE s.seller_state = 'SC';",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_seller_rating"
+      ],
+      "values": [
+        {
+          "avg_seller_rating": 4.09
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average review score for items sold by sellers located in BA?",
+    "expected_tables": [
+      "order_items",
+      "sellers",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_seller_rating"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(r.review_score), 2) AS avg_seller_rating\n        FROM order_items oi\n        JOIN sellers s ON oi.seller_id = s.seller_id\n        JOIN order_reviews r ON oi.order_id = r.order_id\n        WHERE s.seller_state = 'BA';",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_seller_rating"
+      ],
+      "values": [
+        {
+          "avg_seller_rating": 4.09
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average review score for items sold by sellers located in DF?",
+    "expected_tables": [
+      "order_items",
+      "sellers",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_seller_rating"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(r.review_score), 2) AS avg_seller_rating\n        FROM order_items oi\n        JOIN sellers s ON oi.seller_id = s.seller_id\n        JOIN order_reviews r ON oi.order_id = r.order_id\n        WHERE s.seller_state = 'DF';",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_seller_rating"
+      ],
+      "values": [
+        {
+          "avg_seller_rating": 4.03
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average review score for items sold by sellers located in GO?",
+    "expected_tables": [
+      "order_items",
+      "sellers",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_seller_rating"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(r.review_score), 2) AS avg_seller_rating\n        FROM order_items oi\n        JOIN sellers s ON oi.seller_id = s.seller_id\n        JOIN order_reviews r ON oi.order_id = r.order_id\n        WHERE s.seller_state = 'GO';",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_seller_rating"
+      ],
+      "values": [
+        {
+          "avg_seller_rating": 4.25
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average review score for items sold by sellers located in PE?",
+    "expected_tables": [
+      "order_items",
+      "sellers",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_seller_rating"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(r.review_score), 2) AS avg_seller_rating\n        FROM order_items oi\n        JOIN sellers s ON oi.seller_id = s.seller_id\n        JOIN order_reviews r ON oi.order_id = r.order_id\n        WHERE s.seller_state = 'PE';",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_seller_rating"
+      ],
+      "values": [
+        {
+          "avg_seller_rating": 4.13
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What was the total payment volume using credit_card in 2017?",
+    "expected_tables": [
+      "orders",
+      "order_payments"
+    ],
+    "expected_metrics": [
+      "total_payment_value"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(op.payment_value), 2) AS total_payment_value\n        FROM orders o\n        JOIN order_payments op ON o.order_id = op.order_id\n        WHERE op.payment_type = 'credit_card' AND strftime('%Y', o.order_purchase_timestamp) = '2017';",
+    "category": "Payments & Installments",
+    "domain": "Payments",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "total_payment_value"
+      ],
+      "values": [
+        {
+          "total_payment_value": 5637373.94
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What was the total payment volume using boleto in 2017?",
+    "expected_tables": [
+      "orders",
+      "order_payments"
+    ],
+    "expected_metrics": [
+      "total_payment_value"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(op.payment_value), 2) AS total_payment_value\n        FROM orders o\n        JOIN order_payments op ON o.order_id = op.order_id\n        WHERE op.payment_type = 'boleto' AND strftime('%Y', o.order_purchase_timestamp) = '2017';",
+    "category": "Payments & Installments",
+    "domain": "Payments",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "total_payment_value"
+      ],
+      "values": [
+        {
+          "total_payment_value": 1396063.37
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What was the total payment volume using voucher in 2017?",
+    "expected_tables": [
+      "orders",
+      "order_payments"
+    ],
+    "expected_metrics": [
+      "total_payment_value"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(op.payment_value), 2) AS total_payment_value\n        FROM orders o\n        JOIN order_payments op ON o.order_id = op.order_id\n        WHERE op.payment_type = 'voucher' AND strftime('%Y', o.order_purchase_timestamp) = '2017';",
+    "category": "Payments & Installments",
+    "domain": "Payments",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "total_payment_value"
+      ],
+      "values": [
+        {
+          "total_payment_value": 172982.95
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What was the total payment volume using debit_card in 2017?",
+    "expected_tables": [
+      "orders",
+      "order_payments"
+    ],
+    "expected_metrics": [
+      "total_payment_value"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(op.payment_value), 2) AS total_payment_value\n        FROM orders o\n        JOIN order_payments op ON o.order_id = op.order_id\n        WHERE op.payment_type = 'debit_card' AND strftime('%Y', o.order_purchase_timestamp) = '2017';",
+    "category": "Payments & Installments",
+    "domain": "Payments",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "total_payment_value"
+      ],
+      "values": [
+        {
+          "total_payment_value": 43326.47
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average freight value for orders delivered to SP?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "avg_freight_value"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(oi.freight_value), 2) AS avg_freight_value\n        FROM orders o\n        JOIN customers c ON o.customer_id = c.customer_id\n        JOIN order_items oi ON o.order_id = oi.order_id\n        WHERE c.customer_state = 'SP';",
+    "category": "Logistics & Operations",
+    "domain": "Logistics",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "avg_freight_value"
+      ],
+      "values": [
+        {
+          "avg_freight_value": 15.15
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average freight value for orders delivered to RJ?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "avg_freight_value"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(oi.freight_value), 2) AS avg_freight_value\n        FROM orders o\n        JOIN customers c ON o.customer_id = c.customer_id\n        JOIN order_items oi ON o.order_id = oi.order_id\n        WHERE c.customer_state = 'RJ';",
+    "category": "Logistics & Operations",
+    "domain": "Logistics",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "avg_freight_value"
+      ],
+      "values": [
+        {
+          "avg_freight_value": 20.96
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average freight value for orders delivered to MG?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "avg_freight_value"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(oi.freight_value), 2) AS avg_freight_value\n        FROM orders o\n        JOIN customers c ON o.customer_id = c.customer_id\n        JOIN order_items oi ON o.order_id = oi.order_id\n        WHERE c.customer_state = 'MG';",
+    "category": "Logistics & Operations",
+    "domain": "Logistics",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "avg_freight_value"
+      ],
+      "values": [
+        {
+          "avg_freight_value": 20.63
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average freight value for orders delivered to RS?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "avg_freight_value"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(oi.freight_value), 2) AS avg_freight_value\n        FROM orders o\n        JOIN customers c ON o.customer_id = c.customer_id\n        JOIN order_items oi ON o.order_id = oi.order_id\n        WHERE c.customer_state = 'RS';",
+    "category": "Logistics & Operations",
+    "domain": "Logistics",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "avg_freight_value"
+      ],
+      "values": [
+        {
+          "avg_freight_value": 21.74
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average freight value for orders delivered to PR?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "avg_freight_value"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(oi.freight_value), 2) AS avg_freight_value\n        FROM orders o\n        JOIN customers c ON o.customer_id = c.customer_id\n        JOIN order_items oi ON o.order_id = oi.order_id\n        WHERE c.customer_state = 'PR';",
+    "category": "Logistics & Operations",
+    "domain": "Logistics",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "avg_freight_value"
+      ],
+      "values": [
+        {
+          "avg_freight_value": 20.53
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average freight value for orders delivered to SC?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "avg_freight_value"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(oi.freight_value), 2) AS avg_freight_value\n        FROM orders o\n        JOIN customers c ON o.customer_id = c.customer_id\n        JOIN order_items oi ON o.order_id = oi.order_id\n        WHERE c.customer_state = 'SC';",
+    "category": "Logistics & Operations",
+    "domain": "Logistics",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "avg_freight_value"
+      ],
+      "values": [
+        {
+          "avg_freight_value": 21.47
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average freight value for orders delivered to BA?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "avg_freight_value"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(oi.freight_value), 2) AS avg_freight_value\n        FROM orders o\n        JOIN customers c ON o.customer_id = c.customer_id\n        JOIN order_items oi ON o.order_id = oi.order_id\n        WHERE c.customer_state = 'BA';",
+    "category": "Logistics & Operations",
+    "domain": "Logistics",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "avg_freight_value"
+      ],
+      "values": [
+        {
+          "avg_freight_value": 26.36
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average freight value for orders delivered to DF?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "avg_freight_value"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(oi.freight_value), 2) AS avg_freight_value\n        FROM orders o\n        JOIN customers c ON o.customer_id = c.customer_id\n        JOIN order_items oi ON o.order_id = oi.order_id\n        WHERE c.customer_state = 'DF';",
+    "category": "Logistics & Operations",
+    "domain": "Logistics",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "avg_freight_value"
+      ],
+      "values": [
+        {
+          "avg_freight_value": 21.04
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average freight value for orders delivered to GO?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "avg_freight_value"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(oi.freight_value), 2) AS avg_freight_value\n        FROM orders o\n        JOIN customers c ON o.customer_id = c.customer_id\n        JOIN order_items oi ON o.order_id = oi.order_id\n        WHERE c.customer_state = 'GO';",
+    "category": "Logistics & Operations",
+    "domain": "Logistics",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "avg_freight_value"
+      ],
+      "values": [
+        {
+          "avg_freight_value": 22.77
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average freight value for orders delivered to PE?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "avg_freight_value"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(oi.freight_value), 2) AS avg_freight_value\n        FROM orders o\n        JOIN customers c ON o.customer_id = c.customer_id\n        JOIN order_items oi ON o.order_id = oi.order_id\n        WHERE c.customer_state = 'PE';",
+    "category": "Logistics & Operations",
+    "domain": "Logistics",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "avg_freight_value"
+      ],
+      "values": [
+        {
+          "avg_freight_value": 32.92
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average customer review rating for orders placed by buyers in SP?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_review_score"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(r.review_score), 2) AS avg_review_score\n        FROM orders o\n        JOIN customers c ON o.customer_id = c.customer_id\n        JOIN order_reviews r ON o.order_id = r.order_id\n        WHERE c.customer_state = 'SP';",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_review_score"
+      ],
+      "values": [
+        {
+          "avg_review_score": 4.17
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average customer review rating for orders placed by buyers in RJ?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_review_score"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(r.review_score), 2) AS avg_review_score\n        FROM orders o\n        JOIN customers c ON o.customer_id = c.customer_id\n        JOIN order_reviews r ON o.order_id = r.order_id\n        WHERE c.customer_state = 'RJ';",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_review_score"
+      ],
+      "values": [
+        {
+          "avg_review_score": 3.87
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average customer review rating for orders placed by buyers in MG?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_review_score"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(r.review_score), 2) AS avg_review_score\n        FROM orders o\n        JOIN customers c ON o.customer_id = c.customer_id\n        JOIN order_reviews r ON o.order_id = r.order_id\n        WHERE c.customer_state = 'MG';",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_review_score"
+      ],
+      "values": [
+        {
+          "avg_review_score": 4.14
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average customer review rating for orders placed by buyers in RS?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_review_score"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(r.review_score), 2) AS avg_review_score\n        FROM orders o\n        JOIN customers c ON o.customer_id = c.customer_id\n        JOIN order_reviews r ON o.order_id = r.order_id\n        WHERE c.customer_state = 'RS';",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_review_score"
+      ],
+      "values": [
+        {
+          "avg_review_score": 4.13
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average customer review rating for orders placed by buyers in PR?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_review_score"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(r.review_score), 2) AS avg_review_score\n        FROM orders o\n        JOIN customers c ON o.customer_id = c.customer_id\n        JOIN order_reviews r ON o.order_id = r.order_id\n        WHERE c.customer_state = 'PR';",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_review_score"
+      ],
+      "values": [
+        {
+          "avg_review_score": 4.18
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average customer review rating for orders placed by buyers in SC?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_review_score"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(r.review_score), 2) AS avg_review_score\n        FROM orders o\n        JOIN customers c ON o.customer_id = c.customer_id\n        JOIN order_reviews r ON o.order_id = r.order_id\n        WHERE c.customer_state = 'SC';",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_review_score"
+      ],
+      "values": [
+        {
+          "avg_review_score": 4.07
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average customer review rating for orders placed by buyers in BA?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_review_score"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(r.review_score), 2) AS avg_review_score\n        FROM orders o\n        JOIN customers c ON o.customer_id = c.customer_id\n        JOIN order_reviews r ON o.order_id = r.order_id\n        WHERE c.customer_state = 'BA';",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_review_score"
+      ],
+      "values": [
+        {
+          "avg_review_score": 3.86
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average customer review rating for orders placed by buyers in DF?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_review_score"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(r.review_score), 2) AS avg_review_score\n        FROM orders o\n        JOIN customers c ON o.customer_id = c.customer_id\n        JOIN order_reviews r ON o.order_id = r.order_id\n        WHERE c.customer_state = 'DF';",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_review_score"
+      ],
+      "values": [
+        {
+          "avg_review_score": 4.06
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average customer review rating for orders placed by buyers in GO?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_review_score"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(r.review_score), 2) AS avg_review_score\n        FROM orders o\n        JOIN customers c ON o.customer_id = c.customer_id\n        JOIN order_reviews r ON o.order_id = r.order_id\n        WHERE c.customer_state = 'GO';",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_review_score"
+      ],
+      "values": [
+        {
+          "avg_review_score": 4.04
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average customer review rating for orders placed by buyers in PE?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_review_score"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(r.review_score), 2) AS avg_review_score\n        FROM orders o\n        JOIN customers c ON o.customer_id = c.customer_id\n        JOIN order_reviews r ON o.order_id = r.order_id\n        WHERE c.customer_state = 'PE';",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_review_score"
+      ],
+      "values": [
+        {
+          "avg_review_score": 4.01
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue from orders placed in SP?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue FROM orders o JOIN customers c ON o.customer_id = c.customer_id JOIN order_items oi ON o.order_id = oi.order_id WHERE c.customer_state = 'SP'",
+    "category": "Customers & Geography",
+    "domain": "Customers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 5202955.05
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "How many unique orders were placed by customers in SP?",
+    "expected_tables": [
+      "orders",
+      "customers"
+    ],
+    "expected_metrics": [
+      "order_count"
+    ],
+    "expected_sql": "SELECT COUNT(DISTINCT o.order_id) AS order_count FROM orders o JOIN customers c ON o.customer_id = c.customer_id WHERE c.customer_state = 'SP'",
+    "category": "Customers & Geography",
+    "domain": "Customers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "order_count"
+      ],
+      "values": [
+        {
+          "order_count": 41746
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average review score for orders delivered to SP?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_score"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(r.review_score), 2) AS avg_score FROM orders o JOIN customers c ON o.customer_id = c.customer_id JOIN order_reviews r ON o.order_id = r.order_id WHERE c.customer_state = 'SP'",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_score"
+      ],
+      "values": [
+        {
+          "avg_score": 4.17
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total freight paid by customers in SP?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "total_freight"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.freight_value), 2) AS total_freight FROM orders o JOIN customers c ON o.customer_id = c.customer_id JOIN order_items oi ON o.order_id = oi.order_id WHERE c.customer_state = 'SP'",
+    "category": "Logistics & Operations",
+    "domain": "Logistics",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_freight"
+      ],
+      "values": [
+        {
+          "total_freight": 718723.07
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue from orders placed in RJ?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue FROM orders o JOIN customers c ON o.customer_id = c.customer_id JOIN order_items oi ON o.order_id = oi.order_id WHERE c.customer_state = 'RJ'",
+    "category": "Customers & Geography",
+    "domain": "Customers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 1824092.67
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "How many unique orders were placed by customers in RJ?",
+    "expected_tables": [
+      "orders",
+      "customers"
+    ],
+    "expected_metrics": [
+      "order_count"
+    ],
+    "expected_sql": "SELECT COUNT(DISTINCT o.order_id) AS order_count FROM orders o JOIN customers c ON o.customer_id = c.customer_id WHERE c.customer_state = 'RJ'",
+    "category": "Customers & Geography",
+    "domain": "Customers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "order_count"
+      ],
+      "values": [
+        {
+          "order_count": 12852
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average review score for orders delivered to RJ?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_score"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(r.review_score), 2) AS avg_score FROM orders o JOIN customers c ON o.customer_id = c.customer_id JOIN order_reviews r ON o.order_id = r.order_id WHERE c.customer_state = 'RJ'",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_score"
+      ],
+      "values": [
+        {
+          "avg_score": 3.87
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total freight paid by customers in RJ?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "total_freight"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.freight_value), 2) AS total_freight FROM orders o JOIN customers c ON o.customer_id = c.customer_id JOIN order_items oi ON o.order_id = oi.order_id WHERE c.customer_state = 'RJ'",
+    "category": "Logistics & Operations",
+    "domain": "Logistics",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_freight"
+      ],
+      "values": [
+        {
+          "total_freight": 305589.31
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue from orders placed in MG?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue FROM orders o JOIN customers c ON o.customer_id = c.customer_id JOIN order_items oi ON o.order_id = oi.order_id WHERE c.customer_state = 'MG'",
+    "category": "Customers & Geography",
+    "domain": "Customers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 1585308.03
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "How many unique orders were placed by customers in MG?",
+    "expected_tables": [
+      "orders",
+      "customers"
+    ],
+    "expected_metrics": [
+      "order_count"
+    ],
+    "expected_sql": "SELECT COUNT(DISTINCT o.order_id) AS order_count FROM orders o JOIN customers c ON o.customer_id = c.customer_id WHERE c.customer_state = 'MG'",
+    "category": "Customers & Geography",
+    "domain": "Customers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "order_count"
+      ],
+      "values": [
+        {
+          "order_count": 11635
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average review score for orders delivered to MG?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_score"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(r.review_score), 2) AS avg_score FROM orders o JOIN customers c ON o.customer_id = c.customer_id JOIN order_reviews r ON o.order_id = r.order_id WHERE c.customer_state = 'MG'",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_score"
+      ],
+      "values": [
+        {
+          "avg_score": 4.14
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total freight paid by customers in MG?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "total_freight"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.freight_value), 2) AS total_freight FROM orders o JOIN customers c ON o.customer_id = c.customer_id JOIN order_items oi ON o.order_id = oi.order_id WHERE c.customer_state = 'MG'",
+    "category": "Logistics & Operations",
+    "domain": "Logistics",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_freight"
+      ],
+      "values": [
+        {
+          "total_freight": 270853.46
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue from orders placed in RS?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue FROM orders o JOIN customers c ON o.customer_id = c.customer_id JOIN order_items oi ON o.order_id = oi.order_id WHERE c.customer_state = 'RS'",
+    "category": "Customers & Geography",
+    "domain": "Customers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 750304.02
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "How many unique orders were placed by customers in RS?",
+    "expected_tables": [
+      "orders",
+      "customers"
+    ],
+    "expected_metrics": [
+      "order_count"
+    ],
+    "expected_sql": "SELECT COUNT(DISTINCT o.order_id) AS order_count FROM orders o JOIN customers c ON o.customer_id = c.customer_id WHERE c.customer_state = 'RS'",
+    "category": "Customers & Geography",
+    "domain": "Customers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "order_count"
+      ],
+      "values": [
+        {
+          "order_count": 5466
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average review score for orders delivered to RS?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_score"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(r.review_score), 2) AS avg_score FROM orders o JOIN customers c ON o.customer_id = c.customer_id JOIN order_reviews r ON o.order_id = r.order_id WHERE c.customer_state = 'RS'",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_score"
+      ],
+      "values": [
+        {
+          "avg_score": 4.13
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total freight paid by customers in RS?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "total_freight"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.freight_value), 2) AS total_freight FROM orders o JOIN customers c ON o.customer_id = c.customer_id JOIN order_items oi ON o.order_id = oi.order_id WHERE c.customer_state = 'RS'",
+    "category": "Logistics & Operations",
+    "domain": "Logistics",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_freight"
+      ],
+      "values": [
+        {
+          "total_freight": 135522.74
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue from orders placed in PR?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue FROM orders o JOIN customers c ON o.customer_id = c.customer_id JOIN order_items oi ON o.order_id = oi.order_id WHERE c.customer_state = 'PR'",
+    "category": "Customers & Geography",
+    "domain": "Customers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 683083.76
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "How many unique orders were placed by customers in PR?",
+    "expected_tables": [
+      "orders",
+      "customers"
+    ],
+    "expected_metrics": [
+      "order_count"
+    ],
+    "expected_sql": "SELECT COUNT(DISTINCT o.order_id) AS order_count FROM orders o JOIN customers c ON o.customer_id = c.customer_id WHERE c.customer_state = 'PR'",
+    "category": "Customers & Geography",
+    "domain": "Customers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "order_count"
+      ],
+      "values": [
+        {
+          "order_count": 5045
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average review score for orders delivered to PR?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_score"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(r.review_score), 2) AS avg_score FROM orders o JOIN customers c ON o.customer_id = c.customer_id JOIN order_reviews r ON o.order_id = r.order_id WHERE c.customer_state = 'PR'",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_score"
+      ],
+      "values": [
+        {
+          "avg_score": 4.18
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total freight paid by customers in PR?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "total_freight"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.freight_value), 2) AS total_freight FROM orders o JOIN customers c ON o.customer_id = c.customer_id JOIN order_items oi ON o.order_id = oi.order_id WHERE c.customer_state = 'PR'",
+    "category": "Logistics & Operations",
+    "domain": "Logistics",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_freight"
+      ],
+      "values": [
+        {
+          "total_freight": 117851.68
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue from orders placed in SC?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue FROM orders o JOIN customers c ON o.customer_id = c.customer_id JOIN order_items oi ON o.order_id = oi.order_id WHERE c.customer_state = 'SC'",
+    "category": "Customers & Geography",
+    "domain": "Customers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 520553.34
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "How many unique orders were placed by customers in SC?",
+    "expected_tables": [
+      "orders",
+      "customers"
+    ],
+    "expected_metrics": [
+      "order_count"
+    ],
+    "expected_sql": "SELECT COUNT(DISTINCT o.order_id) AS order_count FROM orders o JOIN customers c ON o.customer_id = c.customer_id WHERE c.customer_state = 'SC'",
+    "category": "Customers & Geography",
+    "domain": "Customers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "order_count"
+      ],
+      "values": [
+        {
+          "order_count": 3637
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average review score for orders delivered to SC?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_score"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(r.review_score), 2) AS avg_score FROM orders o JOIN customers c ON o.customer_id = c.customer_id JOIN order_reviews r ON o.order_id = r.order_id WHERE c.customer_state = 'SC'",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_score"
+      ],
+      "values": [
+        {
+          "avg_score": 4.07
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total freight paid by customers in SC?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "total_freight"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.freight_value), 2) AS total_freight FROM orders o JOIN customers c ON o.customer_id = c.customer_id JOIN order_items oi ON o.order_id = oi.order_id WHERE c.customer_state = 'SC'",
+    "category": "Logistics & Operations",
+    "domain": "Logistics",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_freight"
+      ],
+      "values": [
+        {
+          "total_freight": 89660.26
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue from orders placed in BA?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue FROM orders o JOIN customers c ON o.customer_id = c.customer_id JOIN order_items oi ON o.order_id = oi.order_id WHERE c.customer_state = 'BA'",
+    "category": "Customers & Geography",
+    "domain": "Customers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 511349.99
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "How many unique orders were placed by customers in BA?",
+    "expected_tables": [
+      "orders",
+      "customers"
+    ],
+    "expected_metrics": [
+      "order_count"
+    ],
+    "expected_sql": "SELECT COUNT(DISTINCT o.order_id) AS order_count FROM orders o JOIN customers c ON o.customer_id = c.customer_id WHERE c.customer_state = 'BA'",
+    "category": "Customers & Geography",
+    "domain": "Customers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "order_count"
+      ],
+      "values": [
+        {
+          "order_count": 3380
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average review score for orders delivered to BA?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_score"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(r.review_score), 2) AS avg_score FROM orders o JOIN customers c ON o.customer_id = c.customer_id JOIN order_reviews r ON o.order_id = r.order_id WHERE c.customer_state = 'BA'",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_score"
+      ],
+      "values": [
+        {
+          "avg_score": 3.86
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total freight paid by customers in BA?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "total_freight"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.freight_value), 2) AS total_freight FROM orders o JOIN customers c ON o.customer_id = c.customer_id JOIN order_items oi ON o.order_id = oi.order_id WHERE c.customer_state = 'BA'",
+    "category": "Logistics & Operations",
+    "domain": "Logistics",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_freight"
+      ],
+      "values": [
+        {
+          "total_freight": 100156.68
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue from orders placed in DF?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue FROM orders o JOIN customers c ON o.customer_id = c.customer_id JOIN order_items oi ON o.order_id = oi.order_id WHERE c.customer_state = 'DF'",
+    "category": "Customers & Geography",
+    "domain": "Customers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 302603.94
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "How many unique orders were placed by customers in DF?",
+    "expected_tables": [
+      "orders",
+      "customers"
+    ],
+    "expected_metrics": [
+      "order_count"
+    ],
+    "expected_sql": "SELECT COUNT(DISTINCT o.order_id) AS order_count FROM orders o JOIN customers c ON o.customer_id = c.customer_id WHERE c.customer_state = 'DF'",
+    "category": "Customers & Geography",
+    "domain": "Customers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "order_count"
+      ],
+      "values": [
+        {
+          "order_count": 2140
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average review score for orders delivered to DF?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_score"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(r.review_score), 2) AS avg_score FROM orders o JOIN customers c ON o.customer_id = c.customer_id JOIN order_reviews r ON o.order_id = r.order_id WHERE c.customer_state = 'DF'",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_score"
+      ],
+      "values": [
+        {
+          "avg_score": 4.06
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total freight paid by customers in DF?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "total_freight"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.freight_value), 2) AS total_freight FROM orders o JOIN customers c ON o.customer_id = c.customer_id JOIN order_items oi ON o.order_id = oi.order_id WHERE c.customer_state = 'DF'",
+    "category": "Logistics & Operations",
+    "domain": "Logistics",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_freight"
+      ],
+      "values": [
+        {
+          "total_freight": 50625.5
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue from orders placed in GO?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue FROM orders o JOIN customers c ON o.customer_id = c.customer_id JOIN order_items oi ON o.order_id = oi.order_id WHERE c.customer_state = 'GO'",
+    "category": "Customers & Geography",
+    "domain": "Customers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 294591.95
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "How many unique orders were placed by customers in GO?",
+    "expected_tables": [
+      "orders",
+      "customers"
+    ],
+    "expected_metrics": [
+      "order_count"
+    ],
+    "expected_sql": "SELECT COUNT(DISTINCT o.order_id) AS order_count FROM orders o JOIN customers c ON o.customer_id = c.customer_id WHERE c.customer_state = 'GO'",
+    "category": "Customers & Geography",
+    "domain": "Customers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "order_count"
+      ],
+      "values": [
+        {
+          "order_count": 2020
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average review score for orders delivered to GO?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_score"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(r.review_score), 2) AS avg_score FROM orders o JOIN customers c ON o.customer_id = c.customer_id JOIN order_reviews r ON o.order_id = r.order_id WHERE c.customer_state = 'GO'",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_score"
+      ],
+      "values": [
+        {
+          "avg_score": 4.04
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total freight paid by customers in GO?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "total_freight"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.freight_value), 2) AS total_freight FROM orders o JOIN customers c ON o.customer_id = c.customer_id JOIN order_items oi ON o.order_id = oi.order_id WHERE c.customer_state = 'GO'",
+    "category": "Logistics & Operations",
+    "domain": "Logistics",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_freight"
+      ],
+      "values": [
+        {
+          "total_freight": 53114.98
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue from orders placed in PE?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue FROM orders o JOIN customers c ON o.customer_id = c.customer_id JOIN order_items oi ON o.order_id = oi.order_id WHERE c.customer_state = 'PE'",
+    "category": "Customers & Geography",
+    "domain": "Customers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 262788.03
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "How many unique orders were placed by customers in PE?",
+    "expected_tables": [
+      "orders",
+      "customers"
+    ],
+    "expected_metrics": [
+      "order_count"
+    ],
+    "expected_sql": "SELECT COUNT(DISTINCT o.order_id) AS order_count FROM orders o JOIN customers c ON o.customer_id = c.customer_id WHERE c.customer_state = 'PE'",
+    "category": "Customers & Geography",
+    "domain": "Customers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "order_count"
+      ],
+      "values": [
+        {
+          "order_count": 1652
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average review score for orders delivered to PE?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_score"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(r.review_score), 2) AS avg_score FROM orders o JOIN customers c ON o.customer_id = c.customer_id JOIN order_reviews r ON o.order_id = r.order_id WHERE c.customer_state = 'PE'",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_score"
+      ],
+      "values": [
+        {
+          "avg_score": 4.01
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total freight paid by customers in PE?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "total_freight"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.freight_value), 2) AS total_freight FROM orders o JOIN customers c ON o.customer_id = c.customer_id JOIN order_items oi ON o.order_id = oi.order_id WHERE c.customer_state = 'PE'",
+    "category": "Logistics & Operations",
+    "domain": "Logistics",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_freight"
+      ],
+      "values": [
+        {
+          "total_freight": 59449.66
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue from orders placed in CE?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue FROM orders o JOIN customers c ON o.customer_id = c.customer_id JOIN order_items oi ON o.order_id = oi.order_id WHERE c.customer_state = 'CE'",
+    "category": "Customers & Geography",
+    "domain": "Customers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "total_revenue": 227254.71
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "How many unique orders were placed by customers in CE?",
+    "expected_tables": [
+      "orders",
+      "customers"
+    ],
+    "expected_metrics": [
+      "order_count"
+    ],
+    "expected_sql": "SELECT COUNT(DISTINCT o.order_id) AS order_count FROM orders o JOIN customers c ON o.customer_id = c.customer_id WHERE c.customer_state = 'CE'",
+    "category": "Customers & Geography",
+    "domain": "Customers",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "order_count"
+      ],
+      "values": [
+        {
+          "order_count": 1336
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average review score for orders delivered to CE?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_score"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(r.review_score), 2) AS avg_score FROM orders o JOIN customers c ON o.customer_id = c.customer_id JOIN order_reviews r ON o.order_id = r.order_id WHERE c.customer_state = 'CE'",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_score"
+      ],
+      "values": [
+        {
+          "avg_score": 3.85
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total freight paid by customers in CE?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "total_freight"
+    ],
+    "expected_sql": "SELECT ROUND(SUM(oi.freight_value), 2) AS total_freight FROM orders o JOIN customers c ON o.customer_id = c.customer_id JOIN order_items oi ON o.order_id = oi.order_id WHERE c.customer_state = 'CE'",
+    "category": "Logistics & Operations",
+    "domain": "Logistics",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "total_freight"
+      ],
+      "values": [
+        {
+          "total_freight": 48351.59
+        }
+      ],
+      "row_count": 1
+    }
   }
 ]
