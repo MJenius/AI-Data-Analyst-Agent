@@ -15,6 +15,7 @@ from typing import Any
 from agent_platform.experiments.query_plan import QueryPlan, MetricType, ResultShape, CompositeMetric
 from agent_platform.rag.ingestion.schema_context import (
     CANONICAL_PRIMARY_KEYS,
+    EXACT_COLUMNS,
     JOIN_RELATIONSHIPS,
     TABLE_DESCRIPTIONS,
 )
@@ -22,6 +23,11 @@ from agent_platform.rag.ingestion.schema_context import (
 logger = logging.getLogger(__name__)
 
 KNOWN_TABLES = set(TABLE_DESCRIPTIONS.keys())
+
+# Flat set of all known column names per table
+ALL_COLUMNS: dict[str, set[str]] = {
+    table: set(cols) for table, cols in EXACT_COLUMNS.items()
+}
 
 # Build adjacency graph for schema relationships
 SCHEMA_GRAPH: dict[str, dict[str, str]] = {}
@@ -32,6 +38,19 @@ for from_t, from_c, to_t, to_c, kind, note in JOIN_RELATIONSHIPS:
         SCHEMA_GRAPH[to_t] = {}
     SCHEMA_GRAPH[from_t][to_t] = f"{from_t}.{from_c} = {to_t}.{to_c}"
     SCHEMA_GRAPH[to_t][from_t] = f"{to_t}.{to_c} = {from_t}.{from_c}"
+
+# Table → semantic concepts mapping for determining necessity
+TABLE_CONCEPTS: dict[str, set[str]] = {
+    "order_items": {"revenue", "price", "freight", "item", "sales", "gmv", "seller_id", "product_id", "aov", "average order value"},
+    "orders": {"order", "status", "delivered", "canceled", "cancelled", "cancellation", "month", "trend", "time", "delay", "year", "timestamp", "date"},
+    "customers": {"customer", "buyer", "customer_state", "customer_city", "repeat", "loyalty", "unique_id"},
+    "products": {"product", "category", "weight", "dimension", "photo"},
+    "order_payments": {"payment", "installment", "boleto", "credit_card", "voucher", "debit_card"},
+    "order_reviews": {"review", "rating", "score", "satisfaction"},
+    "sellers": {"seller", "seller_state", "seller_city"},
+    "geolocation": {"geolocation", "zip", "density", "lat", "lng", "coordinate"},
+    "product_category_name_translation": {"english", "translation", "category_english"},
+}
 
 
 class PlanValidationCategory(str, Enum):
@@ -47,6 +66,7 @@ class PlanValidationCategory(str, Enum):
     MISSING_TIME_GRAIN = "missing_time_grain"
     INCONSISTENT_FILTERS = "inconsistent_filters"
     INCOMPATIBLE_RESULT_SHAPE = "incompatible_result_shape"
+    GROUPBY_CONSISTENCY = "groupby_consistency"
 
 
 @dataclass(slots=True)
@@ -111,6 +131,27 @@ def find_minimum_join_path(tables: set[str] | list[str]) -> list[str]:
     return connected_joins
 
 
+def _tables_reachable_from(start: str, table_set: set[str]) -> set[str]:
+    """BFS to find all tables reachable from start within the table_set via SCHEMA_GRAPH."""
+    if start not in table_set:
+        return set()
+    visited = {start}
+    queue = [start]
+    while queue:
+        curr = queue.pop(0)
+        for neighbor in SCHEMA_GRAPH.get(curr, {}):
+            if neighbor in table_set and neighbor not in visited:
+                visited.add(neighbor)
+                queue.append(neighbor)
+    return visited
+
+
+def _question_needs_table(question_lower: str, table: str) -> bool:
+    """Check if the question text semantically requires a given table."""
+    concepts = TABLE_CONCEPTS.get(table, set())
+    return any(concept in question_lower for concept in concepts)
+
+
 class PlanValidator:
     """Deterministic validator and automatic plan repairer for structured QueryPlans."""
 
@@ -122,7 +163,7 @@ class PlanValidator:
         repaired: QueryPlan = plan.model_copy(deep=True)
         q_low = question.lower()
 
-        # 1. Metric check
+        # ── 1. Metric check ──────────────────────────────────────────────────
         if not plan.metric or plan.metric.strip() == "":
             issues.append(
                 PlanValidationIssue(
@@ -134,7 +175,7 @@ class PlanValidator:
             repaired.metric = "count"
             repaired.aggregation = "COUNT"
 
-        # 2. Required tables check
+        # ── 2. Required tables: remove unknown ────────────────────────────────
         unknown_tables = set(plan.required_tables) - self.known_tables
         if unknown_tables:
             issues.append(
@@ -146,14 +187,14 @@ class PlanValidator:
             )
             repaired.required_tables = [t for t in plan.required_tables if t in self.known_tables]
 
-        # 3. Minimum required tables detection
+        # ── 3. Minimum required tables: add missing ──────────────────────────
         needed_tables = set(repaired.required_tables)
         if any(k in q_low for k in ["revenue", "price", "freight", "item"]):
             needed_tables.add("order_items")
         if any(k in q_low for k in ["month", "trend", "status", "delivered", "canceled", "cancelled", "year", "delay"]):
             needed_tables.add("orders")
-        if any(k in q_low for k in ["customer", "buyer", "state", "city"]) and not any(k in q_low for k in ["seller"]):
-            if "customer" in q_low or "state" in q_low:
+        if any(k in q_low for k in ["customer", "buyer"]) and not any(k in q_low for k in ["seller"]):
+            if any(k in q_low for k in ["customer_state", "state", "city", "customer"]):
                 needed_tables.add("customers")
         if any(k in q_low for k in ["product", "category"]):
             needed_tables.add("products")
@@ -164,16 +205,17 @@ class PlanValidator:
         if any(k in q_low for k in ["seller"]):
             needed_tables.add("sellers")
 
-        # Table reduction / prune disconnected or unneeded
-        if "order_items" in needed_tables and "products" in needed_tables and "orders" not in needed_tables:
-            # direct connection exists between order_items and products
-            pass
-        elif len(needed_tables) > 1:
-            # Ensure bridge tables exist
-            if "customers" in needed_tables and "order_items" in needed_tables and "orders" not in needed_tables:
-                needed_tables.add("orders")
-            if "order_reviews" in needed_tables and "order_items" in needed_tables and "orders" not in needed_tables:
-                needed_tables.add("orders")
+        # Bridge table insertion: if two tables need a bridge (e.g. customers ↔ order_items needs orders)
+        if "customers" in needed_tables and "order_items" in needed_tables and "orders" not in needed_tables:
+            needed_tables.add("orders")
+        if "order_reviews" in needed_tables and "order_items" in needed_tables and "orders" not in needed_tables:
+            needed_tables.add("orders")
+        if "order_payments" in needed_tables and "order_items" in needed_tables and "orders" not in needed_tables:
+            needed_tables.add("orders")
+        if "sellers" in needed_tables and "orders" in needed_tables and "order_items" not in needed_tables:
+            # sellers connect via order_items, not directly to orders
+            if not any(k in q_low for k in ["item", "revenue", "price"]):
+                needed_tables.add("order_items")
 
         missing_tables = needed_tables - set(repaired.required_tables)
         if missing_tables:
@@ -186,18 +228,110 @@ class PlanValidator:
             )
             repaired.required_tables = list(dict.fromkeys(repaired.required_tables + list(missing_tables)))
 
-        # 4. Join path validation & completion
+        # ── 4. Unnecessary table pruning ─────────────────────────────────────
+        if len(repaired.required_tables) > 1:
+            essential_tables: set[str] = set()
+            for t in repaired.required_tables:
+                if _question_needs_table(q_low, t):
+                    essential_tables.add(t)
+            # Also keep tables referenced by plan fields
+            metric_lower = (repaired.metric or "").lower()
+            for t in repaired.required_tables:
+                if t in metric_lower:
+                    essential_tables.add(t)
+                if repaired.group_by and any(t in g for g in repaired.group_by):
+                    essential_tables.add(t)
+                if repaired.entities and any(t.replace("_", " ") in e.lower() or e.lower() in ALL_COLUMNS.get(t, set()) for e in repaired.entities):
+                    essential_tables.add(t)
+
+            # If we can determine essential tables, find the minimum connected set
+            # that includes all essential tables plus required bridge tables
+            if len(essential_tables) >= 2:
+                # Find all tables needed to connect essential tables via BFS paths
+                connected_set = set(essential_tables)
+                essential_list = list(essential_tables)
+                for i, t1 in enumerate(essential_list):
+                    for t2 in essential_list[i+1:]:
+                        # BFS from t1 to t2, finding shortest path through SCHEMA_GRAPH
+                        queue: list[tuple[str, list[str]]] = [(t1, [t1])]
+                        seen = {t1}
+                        while queue:
+                            curr, path = queue.pop(0)
+                            if curr == t2:
+                                connected_set.update(path)
+                                break
+                            for neighbor in SCHEMA_GRAPH.get(curr, {}):
+                                if neighbor not in seen:
+                                    seen.add(neighbor)
+                                    queue.append((neighbor, path + [neighbor]))
+
+                prunable = set(repaired.required_tables) - connected_set
+                if prunable:
+                    # Verify prunable tables aren't referenced in filters or group_by
+                    truly_unnecessary = set()
+                    for t in prunable:
+                        t_referenced = False
+                        for f in (repaired.filters or []):
+                            if t in f.lower():
+                                t_referenced = True
+                        for g in (repaired.group_by or []):
+                            if any(c in g for c in ALL_COLUMNS.get(t, set())):
+                                t_referenced = True
+                        if not t_referenced and not _question_needs_table(q_low, t):
+                            truly_unnecessary.add(t)
+                    if truly_unnecessary:
+                        issues.append(
+                            PlanValidationIssue(
+                                category=PlanValidationCategory.UNNECESSARY_TABLE,
+                                severity="info",
+                                message=f"Tables not needed by question/plan: {truly_unnecessary}",
+                            )
+                        )
+                        repaired.required_tables = [t for t in repaired.required_tables if t not in truly_unnecessary]
+
+        # ── 5. Disconnected table detection ──────────────────────────────────
+        if len(repaired.required_tables) > 1:
+            table_set = set(repaired.required_tables)
+            reachable = _tables_reachable_from(repaired.required_tables[0], table_set)
+            disconnected = table_set - reachable
+            if disconnected:
+                issues.append(
+                    PlanValidationIssue(
+                        category=PlanValidationCategory.DISCONNECTED_TABLES,
+                        severity="warning",
+                        message=f"Tables {disconnected} are not reachable from {repaired.required_tables[0]} via known joins.",
+                    )
+                )
+
+        # ── 6. Join path validation & completion ─────────────────────────────
         join_path = find_minimum_join_path(repaired.required_tables)
         if join_path:
             repaired.join_path = join_path
 
-        # 5. Superlative & Ranking semantics check
+        # ── 7. Superlative & Ranking semantics check ─────────────────────────
         superlative_keywords = [
             "highest", "lowest", "most", "least", "best", "worst", "top", "bottom",
             "fastest", "slowest", "maximum", "max", "minimum", "min", "largest", "smallest",
         ]
+        singular_superlative_keywords = [
+            "which", "what is the", "highest", "lowest", "best", "worst",
+            "largest", "smallest", "most", "least", "fastest", "slowest",
+            "maximum", "minimum",
+        ]
         is_superlative = any(re.search(rf"\b{k}\b", q_low) for k in superlative_keywords)
-        is_singular = any(re.search(rf"\b{k}\b", q_low) for k in ["which", "what is the top", "highest", "lowest", "best", "worst", "largest", "most"]) and not re.search(r"\btop\s+(\d+)\b", q_low)
+        
+        # Check for explicit top N in question first
+        top_n_match = re.search(r"\btop\s+(\d+)\b", q_low) or re.search(r"\bbottom\s+(\d+)\b", q_low) or re.search(r"\b(\d+)\s+most\b", q_low)
+        
+        is_singular = False
+        if not top_n_match:
+            is_singular = any(re.search(rf"\b{k}\b", q_low) for k in singular_superlative_keywords)
+            # But exclude cases that request "all" or lists
+            if is_singular and any(k in q_low for k in ["all", "list", "each", "every", "distribution"]):
+                is_singular = False
+            # Monthly/trend questions are not singular superlatives
+            if is_singular and any(k in q_low for k in ["monthly", "per month", "trend", "over time"]):
+                is_singular = False
 
         if is_superlative:
             if not repaired.ranking_direction:
@@ -206,8 +340,6 @@ class PlanValidator:
                 elif any(k in q_low for k in ["lowest", "least", "worst", "bottom", "slowest", "minimum", "min", "smallest"]):
                     repaired.ranking_direction = "ASC"
 
-            # Check for explicit top N in question (e.g. "top 5", "top 10")
-            top_n_match = re.search(r"\btop\s+(\d+)\b", q_low) or re.search(r"\bbottom\s+(\d+)\b", q_low) or re.search(r"\b(\d+)\s+most\b", q_low)
             if top_n_match:
                 explicit_limit = int(top_n_match.group(1))
                 if repaired.limit != explicit_limit:
@@ -220,22 +352,20 @@ class PlanValidator:
                     )
                     repaired.limit = explicit_limit
             elif is_singular and (repaired.limit is None or repaired.limit > 1):
-                # For singular superlative questions default to limit 1
-                if not any(k in q_low for k in ["top 3", "top 5", "top 10", "all", "list", "each", "every"]):
-                    issues.append(
-                        PlanValidationIssue(
-                            category=PlanValidationCategory.MISSING_RANKING_LIMIT,
-                            severity="warning",
-                            message="Singular superlative query should default to LIMIT 1.",
-                        )
+                issues.append(
+                    PlanValidationIssue(
+                        category=PlanValidationCategory.MISSING_RANKING_LIMIT,
+                        severity="warning",
+                        message="Singular superlative query should default to LIMIT 1.",
                     )
-                    repaired.limit = 1
+                )
+                repaired.limit = 1
 
             if repaired.limit is not None and not repaired.ordering:
                 direction = repaired.ranking_direction or "DESC"
-                repaired.ordering = f"{repaired.metric or 'metric'} {direction}"
+                repaired.ordering = f"{repaired.ranking_metric or repaired.metric or 'metric'} {direction}"
 
-        # 6. Composite Metric Validation
+        # ── 8. Composite Metric Validation ───────────────────────────────────
         if any(k in q_low for k in ["cancellation rate", "cancel rate", "cancellation %"]):
             repaired.composite_metric = CompositeMetric(
                 metric_type=MetricType.RATE,
@@ -264,7 +394,20 @@ class PlanValidator:
                 formula_template="CAST(SUM(CASE WHEN order_delivered_customer_date > order_estimated_delivery_date THEN 1.0 ELSE 0.0 END) AS REAL) / COUNT(*)",
             )
 
-        # 7. Time grain validation
+        # Composite metric completeness check
+        if repaired.composite_metric:
+            cm = repaired.composite_metric
+            if cm.metric_type in (MetricType.RATIO, MetricType.RATE, MetricType.PERCENTAGE):
+                if not cm.numerator or not cm.denominator:
+                    issues.append(
+                        PlanValidationIssue(
+                            category=PlanValidationCategory.MALFORMED_COMPOSITE_METRIC,
+                            severity="error",
+                            message=f"Composite metric '{cm.name}' of type {cm.metric_type.value} requires both numerator and denominator.",
+                        )
+                    )
+
+        # ── 9. Time grain validation ─────────────────────────────────────────
         if any(k in q_low for k in ["monthly", "per month", "by month", "month-over-month", "monthly trend"]):
             if repaired.time_grain != "month":
                 issues.append(
@@ -281,9 +424,38 @@ class PlanValidator:
                 repaired.group_by = ["month"]
             elif "month" not in [g.lower() for g in repaired.group_by]:
                 repaired.group_by.insert(0, "month")
+        elif any(k in q_low for k in ["yearly", "annual", "per year", "year-over-year"]):
+            if repaired.time_grain != "year":
+                issues.append(
+                    PlanValidationIssue(
+                        category=PlanValidationCategory.MISSING_TIME_GRAIN,
+                        severity="warning",
+                        message="Yearly trend requested; setting time_grain to 'year'.",
+                    )
+                )
+                repaired.time_grain = "year"
+            if not repaired.time_column:
+                repaired.time_column = "order_purchase_timestamp"
 
-        # 8. Result shape
-        if repaired.limit == 1 and not repaired.group_by:
+        # ── 10. Group-by consistency ─────────────────────────────────────────
+        if repaired.group_by and repaired.result_shape:
+            shape_str = repaired.result_shape.value if hasattr(repaired.result_shape, 'value') else str(repaired.result_shape)
+            if shape_str == "single_value" and len(repaired.group_by) > 0 and repaired.limit != 1:
+                issues.append(
+                    PlanValidationIssue(
+                        category=PlanValidationCategory.GROUPBY_CONSISTENCY,
+                        severity="warning",
+                        message=f"result_shape is single_value but group_by has {repaired.group_by}. Adjusting result_shape.",
+                    )
+                )
+                # Don't clear group_by — adjust result_shape instead
+                if repaired.limit and repaired.limit > 1:
+                    repaired.result_shape = ResultShape.RANKED_LIST
+                else:
+                    repaired.result_shape = ResultShape.AGGREGATED_TABLE
+
+        # ── 11. Result shape assignment ──────────────────────────────────────
+        if repaired.limit == 1 and not repaired.time_grain:
             repaired.result_shape = ResultShape.SINGLE_VALUE
         elif repaired.time_grain is not None:
             repaired.result_shape = ResultShape.TIME_SERIES
@@ -291,7 +463,7 @@ class PlanValidator:
             repaired.result_shape = ResultShape.RANKED_LIST
         elif repaired.group_by:
             repaired.result_shape = ResultShape.AGGREGATED_TABLE
-        else:
+        elif not repaired.group_by and not repaired.limit:
             repaired.result_shape = ResultShape.SINGLE_VALUE
 
         has_errors = any(i.severity == "error" for i in issues)

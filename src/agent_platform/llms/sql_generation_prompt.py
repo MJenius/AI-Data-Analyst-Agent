@@ -16,6 +16,13 @@ Grounding contract:
 - Check temporal bounds and sample values before writing literal filters.
 - If the requested concept is absent from the supplied schema, return sql=null instead of inventing it.
 
+QueryPlan integration rules:
+- If the analysis step includes a "Join path:" section, use EXACTLY those join predicates in your JOIN ON clauses.
+- If the step includes a "Formula template:" section, use that expression as your metric calculation.
+- If the step includes "Limit: N", apply LIMIT N to your query.
+- If the step includes "Required tables:", use ONLY those tables.
+- If the step includes "Composite Metric:", implement the metric using the specified numerator, denominator, and formula.
+
 CRITICAL: Use ONLY the column names listed in the COLUMN REFERENCE block below. Column names like
 'quantity', 'unit_price', 'discount_rate', 'order_date', 'product_name', 'category_name' do NOT exist.
 
