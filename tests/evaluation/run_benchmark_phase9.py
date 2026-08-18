@@ -139,7 +139,7 @@ def compare_results_extended(actual_rows: list[dict], expected_rows: list[dict],
         for i, (a_row, e_row) in enumerate(zip(actual_rows, expected_rows)):
             a_vals = [round(v, 2) if isinstance(v, (int, float)) else str(v).strip().lower() for v in a_row.values()]
             e_vals = [round(v, 2) if isinstance(v, (int, float)) else str(v).strip().lower() for v in e_row.values()]
-            if sorted(a_vals) != sorted(e_vals):
+            if sorted(a_vals, key=str) != sorted(e_vals, key=str):
                 equivalent = False
                 differences.append(f"Row {i}: values {a_vals} != {e_vals}")
 

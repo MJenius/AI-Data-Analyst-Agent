@@ -3,7 +3,10 @@ from __future__ import annotations
 import os
 import logging
 from typing import Any, Protocol
+from dotenv import load_dotenv
 from pydantic import BaseModel
+
+load_dotenv()
 from agent_platform.llms.groq_client import GroqClient
 from agent_platform.llms.ollama_client import OllamaClient
 from agent_platform.llms.gemini_client import GeminiClient

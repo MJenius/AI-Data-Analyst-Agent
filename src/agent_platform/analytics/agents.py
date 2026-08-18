@@ -107,7 +107,7 @@ class AnalyticsPlannerAgent:
                     return val_res.repaired_plan
                 return raw_plan
             except Exception as exc:
-                logger.warning("planner_llm_fallback", extra={"error": str(exc)})
+                logger.warning("planner_llm_fallback: %s", exc)
         self.last_reasoning = "Used deterministic fallback plan because LLM was unavailable."
         fallback_plan = self._fallback_plan(task, context)
         from agent_platform.tools.plan_validator import PlanValidator

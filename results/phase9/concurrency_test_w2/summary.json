@@ -1,0 +1,18 @@
+{
+  "timestamp": "2026-08-17T23:24:10.349770",
+  "total_queries": 5,
+  "concurrency": 2,
+  "total_elapsed_seconds": 199.48,
+  "result_correctness": 1.0,
+  "exact_match_rate": 0.2,
+  "equivalent_match_rate": 1.0,
+  "sql_execution_success_rate": 1.0,
+  "table_accuracy": 1.0,
+  "table_precision": 1.0,
+  "table_recall": 1.0,
+  "mean_latency_seconds": 87.77,
+  "p50_latency_seconds": 74.52,
+  "p95_latency_seconds": 124.38,
+  "repair_applied_count": 1,
+  "repair_attempted_count": 1
+}
