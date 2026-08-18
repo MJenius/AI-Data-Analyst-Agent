@@ -315,7 +315,7 @@ class PaperArtifactCompiler:
         plot_pareto_frontier(pareto_points, self.figures_dir / "fig3_pareto_frontier")
 
         # 5. Generate Domain Heatmap & Robustness Figures
-        ref_record = next((r for r in records if "rag_planner_verifier" in r.phase_id or "phase10" in r.phase_id or "phase8" in r.phase_id), None)
+        ref_record = next((r for r in records if "phase10_500" in r.phase_id), None) or next((r for r in records if "phase10" in r.phase_id or "rag_planner_verifier" in r.phase_id or "phase8" in r.phase_id), None)
         if ref_record and ref_record.raw_entries:
             subgroups = analyze_stratified_subgroups(ref_record.raw_entries, "category")
             plot_domain_difficulty_heatmap(subgroups, self.figures_dir / "fig5_domain_difficulty_heatmap")
