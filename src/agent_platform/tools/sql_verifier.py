@@ -1,4 +1,4 @@
-﻿"""SQL Semantic Verifier â€” result-level validation for aggregation grain,
+"""SQL Semantic Verifier â€” result-level validation for aggregation grain,
 GROUP BY correctness, join fan-out, duplicate-row detection, and metric
 consistency.  Used as a pre-acceptance checkpoint in the Phase 5 pipeline.
 """
@@ -703,7 +703,7 @@ class SQLSemanticVerifier:
         Only runs when a query plan is supplied AND the query touches real
         physical tables (schema-inspection steps are skipped).  Checks:
         join path, metric/aggregation, filters, time grain, GROUP BY grain,
-        ranking/top-N, and intended entity.
+        ranking/top-N, intended entity, and metric source column.
         """
         if not query_plan:
             return []
@@ -716,6 +716,7 @@ class SQLSemanticVerifier:
         issues: list[VerificationIssue] = []
         issues += self._check_join_path(tables, query_plan)
         issues += self._check_metric(facts, query_plan)
+        issues += self._check_metric_source(facts, query_plan)
         issues += self._check_filters(facts, query_plan, question_lower)
         issues += self._check_time_grain(facts["raw_text"], query_plan)
         issues += self._check_group_by_grain(facts, query_plan)
@@ -840,6 +841,49 @@ class SQLSemanticVerifier:
                 ),
                 suggested_repair="Use the exact metric column from the COLUMN REFERENCE block",
             ))
+        return issues
+
+    def _check_metric_source(
+        self,
+        facts: dict[str, Any],
+        query_plan: Any,
+    ) -> list[VerificationIssue]:
+        """Verify the SQL uses the correct physical column for the planned metric.
+
+        Catches the critical payment_value vs price confusion: if the plan says
+        metric_source_column='price' (revenue) but the SQL aggregates payment_value,
+        or vice versa, flag as a metric mismatch error.
+        """
+        planned_source = self._plan_value(query_plan, "metric_source_column")
+        if not planned_source:
+            return []
+
+        planned_source = planned_source.lower()
+        sql_columns = facts["columns"]
+        issues: list[VerificationIssue] = []
+
+        # Define conflicting pairs — columns that are semantically different
+        # and should never be substituted for each other.
+        CONFLICTING_PAIRS: dict[str, str] = {
+            "price": "payment_value",
+            "payment_value": "price",
+        }
+
+        conflicting = CONFLICTING_PAIRS.get(planned_source)
+        if conflicting and conflicting in sql_columns and planned_source not in sql_columns:
+            issues.append(VerificationIssue(
+                category=VerificationCategory.METRIC_MISMATCH,
+                severity="error",
+                message=(
+                    f"Plan metric uses '{planned_source}' but SQL aggregates '{conflicting}' — "
+                    "these are materially different measures (revenue vs payment). "
+                    f"Replace '{conflicting}' with '{planned_source}' in the aggregate expression."
+                ),
+                suggested_repair=(
+                    f"Replace '{conflicting}' with '{planned_source}' in the aggregate"
+                ),
+            ))
+
         return issues
 
     @staticmethod

@@ -1,0 +1,1649 @@
+{
+  "q001": {
+    "query_id": "q001",
+    "question": "What is the monthly revenue trend?",
+    "category": "Revenue & Sales",
+    "difficulty": "medium",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "actual_sql": "SELECT strftime('%Y-%m', orders.order_purchase_timestamp) AS month, SUM(order_items.price) AS revenue FROM order_items JOIN orders ON order_items.order_id = orders.order_id GROUP BY month ORDER BY month",
+    "sql_execution_success": true,
+    "exact_match": true,
+    "equivalent_match": true,
+    "table_accuracy": 1.0,
+    "latency_seconds": 233.12,
+    "error": null
+  },
+  "q002": {
+    "query_id": "q002",
+    "question": "Which month had the highest revenue?",
+    "category": "Revenue & Sales",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "actual_sql": "SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, SUM(oi.price) AS total_revenue FROM order_items oi JOIN orders o ON oi.order_id = o.order_id GROUP BY month ORDER BY total_revenue DESC LIMIT 1",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": true,
+    "table_accuracy": 1.0,
+    "latency_seconds": 233.889,
+    "error": null
+  },
+  "q003": {
+    "query_id": "q003",
+    "question": "Which month had the lowest revenue?",
+    "category": "Revenue & Sales",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "actual_sql": "SELECT strftime('%Y-%m', orders.order_purchase_timestamp) AS month, SUM(order_items.price) AS total_revenue FROM order_items JOIN orders ON order_items.order_id = orders.order_id GROUP BY month ORDER BY total_revenue ASC LIMIT 1",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": true,
+    "table_accuracy": 1.0,
+    "latency_seconds": 237.17,
+    "error": null
+  },
+  "q000": {
+    "query_id": "q000",
+    "question": "What is the total revenue generated?",
+    "category": "Revenue & Sales",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_items"
+    ],
+    "actual_sql": "SELECT SUM(price) AS total_revenue FROM order_items",
+    "sql_execution_success": true,
+    "exact_match": true,
+    "equivalent_match": true,
+    "table_accuracy": 1.0,
+    "latency_seconds": 237.832,
+    "error": null
+  },
+  "q004": {
+    "query_id": "q004",
+    "question": "What is the average order value (AOV)?",
+    "category": "Revenue & Sales",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_items"
+    ],
+    "actual_sql": "SELECT SUM(price) / COUNT(DISTINCT order_id) AS aov FROM order_items",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": true,
+    "table_accuracy": 1.0,
+    "latency_seconds": 297.232,
+    "error": null
+  },
+  "q006": {
+    "query_id": "q006",
+    "question": "What percentage of revenue comes from top 10% customers?",
+    "category": "Revenue & Sales",
+    "difficulty": "medium",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "actual_sql": null,
+    "sql_execution_success": false,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 0.0,
+    "latency_seconds": 240.0,
+    "error": ""
+  },
+  "q005": {
+    "query_id": "q005",
+    "question": "How has AOV changed over time?",
+    "category": "Revenue & Sales",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "actual_sql": null,
+    "sql_execution_success": false,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 0.0,
+    "latency_seconds": 240.0,
+    "error": ""
+  },
+  "q007": {
+    "query_id": "q007",
+    "question": "Which days of the week generate the most revenue?",
+    "category": "Revenue & Sales",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "actual_sql": null,
+    "sql_execution_success": false,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 0.0,
+    "latency_seconds": 240.0,
+    "error": ""
+  },
+  "q010": {
+    "query_id": "q010",
+    "question": "What is the cumulative revenue over time?",
+    "category": "Revenue & Sales",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "actual_sql": null,
+    "sql_execution_success": false,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 0.0,
+    "latency_seconds": 240.0,
+    "error": ""
+  },
+  "q009": {
+    "query_id": "q009",
+    "question": "What is the revenue growth rate month-over-month?",
+    "category": "Revenue & Sales",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "actual_sql": null,
+    "sql_execution_success": false,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 0.0,
+    "latency_seconds": 240.0,
+    "error": ""
+  },
+  "q008": {
+    "query_id": "q008",
+    "question": "What is the revenue distribution by hour of the day?",
+    "category": "Revenue & Sales",
+    "difficulty": "medium",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "actual_sql": null,
+    "sql_execution_success": false,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 0.0,
+    "latency_seconds": 240.0,
+    "error": ""
+  },
+  "q011": {
+    "query_id": "q011",
+    "question": "Which payment type contributes most to revenue?",
+    "category": "Revenue & Sales",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "actual_sql": null,
+    "sql_execution_success": false,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 0.0,
+    "latency_seconds": 240.0,
+    "error": ""
+  },
+  "q015": {
+    "query_id": "q015",
+    "question": "How many total orders are there?",
+    "category": "Orders & Transactions",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders"
+    ],
+    "actual_sql": "SELECT COUNT(*) AS total_orders FROM orders",
+    "sql_execution_success": true,
+    "exact_match": true,
+    "equivalent_match": true,
+    "table_accuracy": 1.0,
+    "latency_seconds": 258.551,
+    "error": null
+  },
+  "q014": {
+    "query_id": "q014",
+    "question": "What is the revenue per order?",
+    "category": "Revenue & Sales",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_items"
+    ],
+    "actual_sql": null,
+    "sql_execution_success": false,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 0.0,
+    "latency_seconds": 240.0,
+    "error": ""
+  },
+  "q013": {
+    "query_id": "q013",
+    "question": "What is the revenue per customer?",
+    "category": "Revenue & Sales",
+    "difficulty": "medium",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "actual_sql": null,
+    "sql_execution_success": false,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 0.0,
+    "latency_seconds": 240.0,
+    "error": ""
+  },
+  "q012": {
+    "query_id": "q012",
+    "question": "What is the median order value?",
+    "category": "Revenue & Sales",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_items"
+    ],
+    "actual_sql": null,
+    "sql_execution_success": false,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 0.0,
+    "latency_seconds": 240.0,
+    "error": ""
+  },
+  "q016": {
+    "query_id": "q016",
+    "question": "How many orders per month?",
+    "category": "Orders & Transactions",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders"
+    ],
+    "actual_sql": "SELECT strftime('%Y-%m', order_purchase_timestamp) AS month, COUNT(*) AS order_count FROM orders GROUP BY strftime('%Y-%m', order_purchase_timestamp), month ORDER BY month ASC, order_count ASC",
+    "sql_execution_success": true,
+    "exact_match": true,
+    "equivalent_match": true,
+    "table_accuracy": 1.0,
+    "latency_seconds": 102.328,
+    "error": null
+  },
+  "q019": {
+    "query_id": "q019",
+    "question": "How many orders are completed vs cancelled?",
+    "category": "Orders & Transactions",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders"
+    ],
+    "actual_sql": "SELECT orders.order_status, COUNT(orders.order_id) AS order_count FROM orders WHERE orders.order_status IN ('delivered', 'canceled') GROUP BY orders.order_status",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 1.0,
+    "latency_seconds": 102.438,
+    "error": null
+  },
+  "q017": {
+    "query_id": "q017",
+    "question": "What is the average number of items per order?",
+    "category": "Orders & Transactions",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_items"
+    ],
+    "actual_sql": "SELECT COUNT(*) / COUNT(DISTINCT order_id) AS average_items_per_order FROM order_items",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 1.0,
+    "latency_seconds": 147.509,
+    "error": null
+  },
+  "q018": {
+    "query_id": "q018",
+    "question": "What is the distribution of order sizes?",
+    "category": "Orders & Transactions",
+    "difficulty": "medium",
+    "expected_tables": [
+      "order_items"
+    ],
+    "actual_sql": "SELECT COUNT(orders.order_id) AS order_count FROM orders",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 0.0,
+    "latency_seconds": 147.56,
+    "error": null
+  },
+  "q021": {
+    "query_id": "q021",
+    "question": "How long does it take to deliver orders on average?",
+    "category": "Orders & Transactions",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders"
+    ],
+    "actual_sql": "SELECT AVG(julianday(order_delivered_customer_date) - julianday(order_purchase_timestamp)) AS average_delivery_time FROM orders WHERE order_delivered_customer_date IS NOT NULL",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": true,
+    "table_accuracy": 1.0,
+    "latency_seconds": 156.991,
+    "error": null
+  },
+  "q023": {
+    "query_id": "q023",
+    "question": "What percentage of orders are delivered late?",
+    "category": "Orders & Transactions",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders"
+    ],
+    "actual_sql": "SELECT CAST(SUM(CASE WHEN orders.order_delivered_customer_date > orders.order_estimated_delivery_date THEN 1.0 ELSE 0.0 END) AS REAL) / COUNT(*) * 100 AS late_delivery_percentage FROM orders",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 1.0,
+    "latency_seconds": 147.741,
+    "error": null
+  },
+  "q020": {
+    "query_id": "q020",
+    "question": "What is the cancellation rate?",
+    "category": "Orders & Transactions",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders"
+    ],
+    "actual_sql": "SELECT\n                o.order_status,\n                COUNT(DISTINCT o.order_id) AS order_count,\n                ROUND(SUM(oi.price), 2) AS total_price\n            FROM orders o\n            LEFT JOIN order_items oi ON o.order_id = oi.order_id\n            WHERE o.order_status = 'canceled'\n            GROUP BY o.order_status",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 1.0,
+    "latency_seconds": 207.282,
+    "error": null
+  },
+  "q022": {
+    "query_id": "q022",
+    "question": "What is the order processing time (purchase -> shipped)?",
+    "category": "Orders & Transactions",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders"
+    ],
+    "actual_sql": "SELECT COUNT(*) AS order_count FROM orders WHERE order_status IN ('delivered', 'shipped', 'invoiced')",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 1.0,
+    "latency_seconds": 181.162,
+    "error": null
+  },
+  "q025": {
+    "query_id": "q025",
+    "question": "What is the busiest day for orders?",
+    "category": "Orders & Transactions",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders"
+    ],
+    "actual_sql": "SELECT date(order_purchase_timestamp) AS order_day, COUNT(*) AS order_count FROM orders GROUP BY order_day ORDER BY order_count DESC LIMIT 1",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 1.0,
+    "latency_seconds": 120.35,
+    "error": null
+  },
+  "q027": {
+    "query_id": "q027",
+    "question": "What is the average time between orders for a customer?",
+    "category": "Orders & Transactions",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders"
+    ],
+    "actual_sql": null,
+    "sql_execution_success": false,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 0.0,
+    "latency_seconds": 240.0,
+    "error": ""
+  },
+  "q026": {
+    "query_id": "q026",
+    "question": "What is the peak hour for order placement?",
+    "category": "Orders & Transactions",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders"
+    ],
+    "actual_sql": null,
+    "sql_execution_success": false,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 0.0,
+    "latency_seconds": 240.0,
+    "error": ""
+  },
+  "q024": {
+    "query_id": "q024",
+    "question": "What is the trend of late deliveries over time?",
+    "category": "Orders & Transactions",
+    "difficulty": "medium",
+    "expected_tables": [
+      "orders"
+    ],
+    "actual_sql": null,
+    "sql_execution_success": false,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 0.0,
+    "latency_seconds": 240.0,
+    "error": ""
+  },
+  "q028": {
+    "query_id": "q028",
+    "question": "What is the repeat order rate?",
+    "category": "Orders & Transactions",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders"
+    ],
+    "actual_sql": null,
+    "sql_execution_success": false,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 0.0,
+    "latency_seconds": 240.0,
+    "error": ""
+  },
+  "q030": {
+    "query_id": "q030",
+    "question": "How many unique customers are there?",
+    "category": "Customers",
+    "difficulty": "easy",
+    "expected_tables": [
+      "customers"
+    ],
+    "actual_sql": "SELECT COUNT(DISTINCT customer_unique_id) AS unique_customer_count FROM customers",
+    "sql_execution_success": true,
+    "exact_match": true,
+    "equivalent_match": true,
+    "table_accuracy": 1.0,
+    "latency_seconds": 204.751,
+    "error": null
+  },
+  "q029": {
+    "query_id": "q029",
+    "question": "How many orders contain multiple sellers?",
+    "category": "Orders & Transactions",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_items"
+    ],
+    "actual_sql": "WITH multi_seller_orders AS (\n  SELECT oi.order_id\n  FROM order_items oi\n  JOIN sellers s ON oi.seller_id = s.seller_id\n  JOIN orders o ON oi.order_id = o.order_id\n  GROUP BY oi.order_id\n  HAVING COUNT(DISTINCT s.seller_id) > 1\n)\nSELECT COUNT(*) AS orders_with_multiple_sellers\nFROM multi_seller_orders",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": true,
+    "table_accuracy": 1.0,
+    "latency_seconds": 208.905,
+    "error": null
+  },
+  "q031": {
+    "query_id": "q031",
+    "question": "How many new customers per month?",
+    "category": "Customers",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders"
+    ],
+    "actual_sql": "WITH first_purchase AS (\n  SELECT o.customer_id,\n         MIN(o.order_purchase_timestamp) AS first_purchase_ts\n  FROM orders o\n  JOIN customers c ON o.customer_id = c.customer_id\n  GROUP BY o.customer_id\n)\nSELECT\n  strftime('%Y-%m', first_purchase_ts) AS month,\n  COUNT(DISTINCT customer_id) AS new_customer_count\nFROM first_purchase\nGROUP BY month\nORDER BY month",
+    "sql_execution_success": true,
+    "exact_match": true,
+    "equivalent_match": true,
+    "table_accuracy": 1.0,
+    "latency_seconds": 209.821,
+    "error": null
+  },
+  "q032": {
+    "query_id": "q032",
+    "question": "What is the customer retention rate?",
+    "category": "Customers",
+    "difficulty": "hard",
+    "expected_tables": [
+      "orders"
+    ],
+    "actual_sql": "SELECT\n                c.customer_unique_id,\n                COUNT(o.order_id) AS order_count\n            FROM orders o\n            JOIN customers c ON c.customer_id = o.customer_id\n            GROUP BY c.customer_unique_id\n            HAVING order_count > 1\n            ORDER BY order_count DESC\n            LIMIT 10",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 1.0,
+    "latency_seconds": 191.464,
+    "error": null
+  },
+  "q034": {
+    "query_id": "q034",
+    "question": "What is the average number of orders per customer?",
+    "category": "Customers",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders"
+    ],
+    "actual_sql": "SELECT COUNT(o.order_id) * 1.0 / COUNT(DISTINCT c.customer_unique_id) AS average_orders_per_customer FROM customers c JOIN orders o ON c.customer_id = o.customer_id",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 1.0,
+    "latency_seconds": 211.997,
+    "error": null
+  },
+  "q033": {
+    "query_id": "q033",
+    "question": "What is the churn rate?",
+    "category": "Customers",
+    "difficulty": "hard",
+    "expected_tables": [
+      "orders"
+    ],
+    "actual_sql": "SELECT (COUNT(DISTINCT order_id) - COUNT(DISTINCT CASE WHEN order_item_id > 1 THEN order_id END)) * 1.0 / COUNT(DISTINCT order_id) AS churn_rate FROM order_items",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 0.0,
+    "latency_seconds": 214.189,
+    "error": null
+  },
+  "q035": {
+    "query_id": "q035",
+    "question": "What percentage of customers are repeat buyers?",
+    "category": "Customers",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders"
+    ],
+    "actual_sql": "WITH cust_order_counts AS (\n  SELECT\n    c.customer_unique_id,\n    COUNT(DISTINCT o.order_id) AS order_cnt\n  FROM customers c\n  JOIN orders o ON o.customer_id = c.customer_id\n  GROUP BY c.customer_unique_id\n)\nSELECT\n  (COUNT(CASE WHEN order_cnt > 1 THEN 1 END) * 100.0) / COUNT(*) AS repeat_buyer_percentage\nFROM cust_order_counts",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 1.0,
+    "latency_seconds": 212.832,
+    "error": null
+  },
+  "q036": {
+    "query_id": "q036",
+    "question": "Which regions have the most customers?",
+    "category": "Customers",
+    "difficulty": "easy",
+    "expected_tables": [
+      "customers"
+    ],
+    "actual_sql": "SELECT customer_state, COUNT(DISTINCT customer_unique_id) AS customer_count FROM customers GROUP BY customer_state ORDER BY customer_count DESC LIMIT 10",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 1.0,
+    "latency_seconds": 110.478,
+    "error": null
+  },
+  "q037": {
+    "query_id": "q037",
+    "question": "What is the distribution of customers by state?",
+    "category": "Customers",
+    "difficulty": "medium",
+    "expected_tables": [
+      "customers"
+    ],
+    "actual_sql": "SELECT customers.customer_state, COUNT(DISTINCT customers.customer_unique_id) AS unique_customer_count FROM customers GROUP BY customers.customer_state ORDER BY unique_customer_count DESC",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": true,
+    "table_accuracy": 1.0,
+    "latency_seconds": 191.531,
+    "error": null
+  },
+  "q038": {
+    "query_id": "q038",
+    "question": "What is the average revenue per customer (ARPU)?",
+    "category": "Customers",
+    "difficulty": "medium",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "actual_sql": "SELECT SUM(oi.price) / COUNT(DISTINCT c.customer_unique_id) AS average_revenue_per_customer FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id JOIN order_items AS oi ON o.order_id = oi.order_id",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 1.0,
+    "latency_seconds": 191.704,
+    "error": null
+  },
+  "q040": {
+    "query_id": "q040",
+    "question": "What is the lifetime value (LTV) of customers?",
+    "category": "Customers",
+    "difficulty": "medium",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "actual_sql": "SELECT COUNT(o.order_id) * 1.0 / COUNT(DISTINCT c.customer_id) AS average_orders_per_customer FROM customers c JOIN orders o ON c.customer_id = o.customer_id",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 0.5,
+    "latency_seconds": 223.681,
+    "error": null
+  },
+  "q039": {
+    "query_id": "q039",
+    "question": "Who are the top 10 customers by revenue?",
+    "category": "Customers",
+    "difficulty": "medium",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "actual_sql": "SELECT c.customer_state, SUM(oi.price) AS total_revenue\nFROM customers c\nJOIN orders o ON c.customer_id = o.customer_id\nJOIN order_items oi ON o.order_id = oi.order_id\nGROUP BY c.customer_state\nORDER BY total_revenue DESC\nLIMIT 10",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 1.0,
+    "latency_seconds": 235.22,
+    "error": null
+  },
+  "q041": {
+    "query_id": "q041",
+    "question": "How long do customers stay active?",
+    "category": "Customers",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders"
+    ],
+    "actual_sql": "WITH cust_lifespan AS (\n  SELECT\n    c.customer_unique_id,\n    (julianday(MAX(o.order_purchase_timestamp)) - julianday(MIN(o.order_purchase_timestamp))) AS lifespan_days\n  FROM customers c\n  JOIN orders o ON o.customer_id = c.customer_id\n  GROUP BY c.customer_unique_id\n)\nSELECT\n  SUM(lifespan_days) / COUNT(*) AS average_customer_lifespan_days\nFROM cust_lifespan",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 1.0,
+    "latency_seconds": 164.244,
+    "error": null
+  },
+  "q043": {
+    "query_id": "q043",
+    "question": "What percentage of customers make only one purchase?",
+    "category": "Customers",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders"
+    ],
+    "actual_sql": "WITH cust_order_counts AS (\n  SELECT\n    c.customer_unique_id,\n    COUNT(o.order_id) AS order_cnt\n  FROM customers c\n  JOIN orders o ON o.customer_id = c.customer_id\n  GROUP BY c.customer_unique_id\n)\nSELECT\n  SUM(CASE WHEN order_cnt = 1 THEN 1 ELSE 0 END) * 100.0 / COUNT(*) AS percentage_single_purchase_customers\nFROM cust_order_counts",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 1.0,
+    "latency_seconds": 200.585,
+    "error": null
+  },
+  "q044": {
+    "query_id": "q044",
+    "question": "What is the geographic distribution of high-value customers?",
+    "category": "Customers",
+    "difficulty": "medium",
+    "expected_tables": [
+      "orders"
+    ],
+    "actual_sql": "SELECT\n                c.customer_state AS state,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN customers c ON c.customer_id = o.customer_id\n            \n            GROUP BY state\n            ORDER BY revenue DESC\n            LIMIT 10",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 1.0,
+    "latency_seconds": 186.923,
+    "error": null
+  },
+  "q042": {
+    "query_id": "q042",
+    "question": "What is the average time between first and last purchase?",
+    "category": "Customers",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders"
+    ],
+    "actual_sql": null,
+    "sql_execution_success": false,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 0.0,
+    "latency_seconds": 240.0,
+    "error": ""
+  },
+  "q045": {
+    "query_id": "q045",
+    "question": "Which product categories generate the most revenue?",
+    "category": "Products & Categories",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_items",
+      "products"
+    ],
+    "actual_sql": "SELECT p.product_category_name, SUM(oi.price) AS total_revenue FROM order_items oi JOIN products p ON oi.product_id = p.product_id GROUP BY p.product_category_name ORDER BY total_revenue DESC LIMIT 1",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 1.0,
+    "latency_seconds": 175.903,
+    "error": null
+  },
+  "q046": {
+    "query_id": "q046",
+    "question": "Which product categories have the most orders?",
+    "category": "Products & Categories",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_items",
+      "products"
+    ],
+    "actual_sql": "SELECT p.product_category_name AS product_category, COUNT(DISTINCT o.order_id) AS order_count FROM orders o JOIN order_items oi ON o.order_id = oi.order_id JOIN products p ON oi.product_id = p.product_id GROUP BY p.product_category_name ORDER BY order_count DESC LIMIT 1",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 1.0,
+    "latency_seconds": 161.624,
+    "error": null
+  },
+  "q047": {
+    "query_id": "q047",
+    "question": "What is the average price per product category?",
+    "category": "Products & Categories",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_items",
+      "products"
+    ],
+    "actual_sql": "SELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 1.0,
+    "latency_seconds": 163.025,
+    "error": null
+  },
+  "q048": {
+    "query_id": "q048",
+    "question": "Which products are most frequently purchased?",
+    "category": "Products & Categories",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_items"
+    ],
+    "actual_sql": "SELECT p.product_id, COUNT(*) AS purchase_count FROM products p JOIN order_items oi ON p.product_id = oi.product_id GROUP BY p.product_id ORDER BY purchase_count DESC LIMIT 10",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": true,
+    "table_accuracy": 1.0,
+    "latency_seconds": 181.46,
+    "error": null
+  },
+  "q049": {
+    "query_id": "q049",
+    "question": "Which products generate the most revenue?",
+    "category": "Products & Categories",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_items"
+    ],
+    "actual_sql": "SELECT p.product_id, SUM(oi.price) AS total_revenue FROM order_items AS oi JOIN products AS p ON oi.product_id = p.product_id GROUP BY p.product_id ORDER BY total_revenue DESC LIMIT 10",
+    "sql_execution_success": true,
+    "exact_match": true,
+    "equivalent_match": true,
+    "table_accuracy": 1.0,
+    "latency_seconds": 94.79,
+    "error": null
+  },
+  "q051": {
+    "query_id": "q051",
+    "question": "Which categories have the highest AOV?",
+    "category": "Products & Categories",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_items",
+      "products"
+    ],
+    "actual_sql": "SELECT p.product_category_name AS category, SUM(oi.price) / COUNT(DISTINCT oi.order_id) AS aov FROM order_items oi JOIN products p ON oi.product_id = p.product_id GROUP BY p.product_category_name ORDER BY aov DESC LIMIT 10",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": true,
+    "table_accuracy": 1.0,
+    "latency_seconds": 205.485,
+    "error": null
+  },
+  "q052": {
+    "query_id": "q052",
+    "question": "Which categories have declining sales trends?",
+    "category": "Products & Categories",
+    "difficulty": "medium",
+    "expected_tables": [
+      "products",
+      "order_items",
+      "orders"
+    ],
+    "actual_sql": null,
+    "sql_execution_success": false,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 0.0,
+    "latency_seconds": 240.0,
+    "error": ""
+  },
+  "q053": {
+    "query_id": "q053",
+    "question": "Which categories have the fastest growth?",
+    "category": "Products & Categories",
+    "difficulty": "medium",
+    "expected_tables": [
+      "orders",
+      "order_items",
+      "products"
+    ],
+    "actual_sql": "SELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 1.0,
+    "latency_seconds": 243.459,
+    "error": null
+  },
+  "q050": {
+    "query_id": "q050",
+    "question": "What is the distribution of product prices?",
+    "category": "Products & Categories",
+    "difficulty": "medium",
+    "expected_tables": [
+      "order_items"
+    ],
+    "actual_sql": null,
+    "sql_execution_success": false,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 0.0,
+    "latency_seconds": 240.0,
+    "error": ""
+  },
+  "q054": {
+    "query_id": "q054",
+    "question": "What is the average number of items sold per product?",
+    "category": "Products & Categories",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_items"
+    ],
+    "actual_sql": "SELECT COUNT(*) * 1.0 / COUNT(DISTINCT oi.product_id) AS avg_items_per_product FROM order_items oi JOIN products p ON oi.product_id = p.product_id",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 1.0,
+    "latency_seconds": 207.006,
+    "error": null
+  },
+  "q056": {
+    "query_id": "q056",
+    "question": "What is the revenue contribution of top categories?",
+    "category": "Products & Categories",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_items",
+      "products"
+    ],
+    "actual_sql": "SELECT products.product_category_name, SUM(order_items.price) AS total_revenue FROM order_items JOIN products ON order_items.product_id = products.product_id GROUP BY products.product_category_name ORDER BY total_revenue DESC LIMIT 1",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 1.0,
+    "latency_seconds": 212.989,
+    "error": null
+  },
+  "q057": {
+    "query_id": "q057",
+    "question": "Which products have the highest return/cancellation rate?",
+    "category": "Products & Categories",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "actual_sql": "SELECT p.product_id, CAST(COUNT(DISTINCT CASE WHEN o.order_status = 'canceled' THEN o.order_id END) AS REAL) / COUNT(DISTINCT o.order_id) AS cancellation_rate FROM products p JOIN order_items oi ON p.product_id = oi.product_id JOIN orders o ON oi.order_id = o.order_id GROUP BY p.product_id ORDER BY cancellation_rate DESC LIMIT 10",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 1.0,
+    "latency_seconds": 222.411,
+    "error": null
+  },
+  "q055": {
+    "query_id": "q055",
+    "question": "Which products are often bought together? (basic co-occurrence)",
+    "category": "Products & Categories",
+    "difficulty": "hard",
+    "expected_tables": [
+      "order_items"
+    ],
+    "actual_sql": "SELECT p1.product_id AS product_id_1,\n       p2.product_id AS product_id_2,\n       COUNT(DISTINCT oi1.order_id) AS co_occurrence_count\nFROM order_items oi1\nJOIN order_items oi2 ON oi1.order_id = oi2.order_id\nJOIN products p1 ON oi1.product_id = p1.product_id\nJOIN products p2 ON oi2.product_id = p2.product_id\nWHERE oi1.product_id < oi2.product_id\nGROUP BY p1.product_id, p2.product_id\nORDER BY co_occurrence_count DESC\nLIMIT 10",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": true,
+    "table_accuracy": 1.0,
+    "latency_seconds": 225.256,
+    "error": null
+  },
+  "q058": {
+    "query_id": "q058",
+    "question": "What is the price vs sales relationship?",
+    "category": "Products & Categories",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_items"
+    ],
+    "actual_sql": "SELECT SUM(order_items.price) AS total_sales FROM order_items",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 1.0,
+    "latency_seconds": 82.608,
+    "error": null
+  },
+  "q059": {
+    "query_id": "q059",
+    "question": "Which categories have seasonal demand patterns?",
+    "category": "Products & Categories",
+    "difficulty": "hard",
+    "expected_tables": [
+      "orders",
+      "order_items",
+      "products"
+    ],
+    "actual_sql": "SELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 1.0,
+    "latency_seconds": 232.672,
+    "error": null
+  },
+  "q060": {
+    "query_id": "q060",
+    "question": "What is the average delivery time?",
+    "category": "Logistics & Delivery",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders"
+    ],
+    "actual_sql": null,
+    "sql_execution_success": false,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 0.0,
+    "latency_seconds": 240.0,
+    "error": ""
+  },
+  "q061": {
+    "query_id": "q061",
+    "question": "What is the average shipping delay?",
+    "category": "Logistics & Delivery",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders"
+    ],
+    "actual_sql": null,
+    "sql_execution_success": false,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 0.0,
+    "latency_seconds": 240.0,
+    "error": ""
+  },
+  "q062": {
+    "query_id": "q062",
+    "question": "Which states have the longest delivery times?",
+    "category": "Logistics & Delivery",
+    "difficulty": "easy",
+    "expected_tables": [
+      "customers",
+      "orders"
+    ],
+    "actual_sql": null,
+    "sql_execution_success": false,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 0.0,
+    "latency_seconds": 240.0,
+    "error": ""
+  },
+  "q063": {
+    "query_id": "q063",
+    "question": "Which sellers deliver the fastest?",
+    "category": "Logistics & Delivery",
+    "difficulty": "medium",
+    "expected_tables": [
+      "order_items",
+      "orders"
+    ],
+    "actual_sql": null,
+    "sql_execution_success": false,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 0.0,
+    "latency_seconds": 240.0,
+    "error": ""
+  },
+  "q064": {
+    "query_id": "q064",
+    "question": "What percentage of deliveries are delayed?",
+    "category": "Logistics & Delivery",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders"
+    ],
+    "actual_sql": "SELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 1.0,
+    "latency_seconds": 216.527,
+    "error": null
+  },
+  "q065": {
+    "query_id": "q065",
+    "question": "What is the trend of delivery delays over time?",
+    "category": "Logistics & Delivery",
+    "difficulty": "medium",
+    "expected_tables": [
+      "orders"
+    ],
+    "actual_sql": "SELECT strftime('%Y-%m', orders.order_purchase_timestamp) AS month, AVG(julianday(orders.order_delivered_customer_date) - julianday(orders.order_estimated_delivery_date)) AS avg_delivery_delay_days FROM orders WHERE orders.order_delivered_customer_date IS NOT NULL GROUP BY month ORDER BY month",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 1.0,
+    "latency_seconds": 217.61,
+    "error": null
+  },
+  "q066": {
+    "query_id": "q066",
+    "question": "How does distance affect delivery time? (approx via location)",
+    "category": "Logistics & Delivery",
+    "difficulty": "medium",
+    "expected_tables": [
+      "sellers",
+      "orders",
+      "customers",
+      "order_items"
+    ],
+    "actual_sql": "WITH geo_agg AS (\n  SELECT\n    geolocation_zip_code_prefix,\n    AVG(geolocation_lat) AS lat,\n    AVG(geolocation_lng) AS lng\n  FROM geolocation\n  GROUP BY geolocation_zip_code_prefix\n),\norder_data AS (\n  SELECT\n    o.order_id,\n    (julianday(o.order_delivered_customer_date) - julianday(o.order_purchase_timestamp)) * 24.0 AS delivery_hours,\n    c.customer_zip_code_prefix\n  FROM orders o\n  JOIN customers c ON o.customer_id = c.customer_id\n  WHERE o.order_delivered_customer_date IS NOT NULL\n    AND o.order_purchase_timestamp IS NOT NULL\n)\nSELECT\n  ROUND(SQRT(POW(g.lat, 2) + POW(g.lng, 2)) * 111.045, 2) AS distance_km,\n  AVG(od.delivery_hours) AS avg_delivery_time\nFROM order_data od\nJOIN geo_agg g ON od.customer_zip_code_prefix = g.geolocation_zip_code_prefix\nGROUP BY distance_km\nORDER BY distance_km",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 0.5,
+    "latency_seconds": 214.583,
+    "error": null
+  },
+  "q068": {
+    "query_id": "q068",
+    "question": "What is the distribution of delivery times?",
+    "category": "Logistics & Delivery",
+    "difficulty": "medium",
+    "expected_tables": [
+      "orders"
+    ],
+    "actual_sql": null,
+    "sql_execution_success": false,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 0.0,
+    "latency_seconds": 240.0,
+    "error": ""
+  },
+  "q070": {
+    "query_id": "q070",
+    "question": "How many sellers are there?",
+    "category": "Sellers",
+    "difficulty": "easy",
+    "expected_tables": [
+      "sellers"
+    ],
+    "actual_sql": null,
+    "sql_execution_success": false,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 0.0,
+    "latency_seconds": 240.0,
+    "error": ""
+  },
+  "q069": {
+    "query_id": "q069",
+    "question": "Are late deliveries increasing or decreasing?",
+    "category": "Logistics & Delivery",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders"
+    ],
+    "actual_sql": null,
+    "sql_execution_success": false,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 0.0,
+    "latency_seconds": 240.0,
+    "error": ""
+  },
+  "q067": {
+    "query_id": "q067",
+    "question": "Which regions have the best delivery performance?",
+    "category": "Logistics & Delivery",
+    "difficulty": "easy",
+    "expected_tables": [
+      "customers",
+      "orders"
+    ],
+    "actual_sql": null,
+    "sql_execution_success": false,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 0.0,
+    "latency_seconds": 240.0,
+    "error": ""
+  },
+  "q071": {
+    "query_id": "q071",
+    "question": "Which sellers generate the most revenue?",
+    "category": "Sellers",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_items"
+    ],
+    "actual_sql": "SELECT s.seller_id, SUM(o.price) AS total_revenue FROM order_items o JOIN sellers s ON o.seller_id = s.seller_id GROUP BY s.seller_id ORDER BY total_revenue DESC LIMIT 10",
+    "sql_execution_success": true,
+    "exact_match": true,
+    "equivalent_match": true,
+    "table_accuracy": 1.0,
+    "latency_seconds": 180.775,
+    "error": null
+  },
+  "q073": {
+    "query_id": "q073",
+    "question": "What is the average revenue per seller?",
+    "category": "Sellers",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_items"
+    ],
+    "actual_sql": "SELECT SUM(order_items.price) / COUNT(DISTINCT sellers.seller_id) AS average_revenue_per_seller FROM order_items JOIN sellers ON order_items.seller_id = sellers.seller_id",
+    "sql_execution_success": true,
+    "exact_match": true,
+    "equivalent_match": true,
+    "table_accuracy": 1.0,
+    "latency_seconds": 200.451,
+    "error": null
+  },
+  "q074": {
+    "query_id": "q074",
+    "question": "Which sellers have the highest ratings?",
+    "category": "Sellers",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_items"
+    ],
+    "actual_sql": "SELECT s.seller_id, AVG(r.review_score) AS avg_review_score FROM sellers s JOIN order_items oi ON s.seller_id = oi.seller_id JOIN orders o ON oi.order_id = o.order_id JOIN order_reviews r ON o.order_id = r.order_id GROUP BY s.seller_id ORDER BY avg_review_score DESC LIMIT 10",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": true,
+    "table_accuracy": 1.0,
+    "latency_seconds": 211.347,
+    "error": null
+  },
+  "q072": {
+    "query_id": "q072",
+    "question": "Which sellers have the most orders?",
+    "category": "Sellers",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_items"
+    ],
+    "actual_sql": "SELECT s.seller_id, COUNT(DISTINCT o.order_id) AS order_count FROM orders o JOIN order_items oi ON o.order_id = oi.order_id JOIN sellers s ON oi.seller_id = s.seller_id GROUP BY s.seller_id ORDER BY order_count DESC LIMIT 10",
+    "sql_execution_success": true,
+    "exact_match": true,
+    "equivalent_match": true,
+    "table_accuracy": 1.0,
+    "latency_seconds": 214.522,
+    "error": null
+  },
+  "q075": {
+    "query_id": "q075",
+    "question": "Which sellers have the most delayed deliveries?",
+    "category": "Sellers",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "actual_sql": "SELECT\n                oi.seller_id,\n                COUNT(DISTINCT oi.order_id) AS total_orders,\n                ROUND(SUM(oi.price), 2) AS total_sales\n            FROM order_items oi\n            GROUP BY oi.seller_id\n            ORDER BY total_sales DESC\n            LIMIT 10",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 0.5,
+    "latency_seconds": 166.438,
+    "error": null
+  },
+  "q076": {
+    "query_id": "q076",
+    "question": "What is the distribution of sellers by region?",
+    "category": "Sellers",
+    "difficulty": "medium",
+    "expected_tables": [
+      "sellers"
+    ],
+    "actual_sql": null,
+    "sql_execution_success": false,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 0.0,
+    "latency_seconds": 240.0,
+    "error": ""
+  },
+  "q077": {
+    "query_id": "q077",
+    "question": "Which sellers are growing fastest?",
+    "category": "Sellers",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_items",
+      "orders"
+    ],
+    "actual_sql": null,
+    "sql_execution_success": false,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 0.0,
+    "latency_seconds": 240.0,
+    "error": ""
+  },
+  "q078": {
+    "query_id": "q078",
+    "question": "What is the average delivery time per seller?",
+    "category": "Sellers",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "actual_sql": "SELECT s.seller_id, (SUM(julianday(o.order_delivered_customer_date) - julianday(o.order_purchase_timestamp)) / COUNT(*)) AS average_delivery_time FROM orders AS o JOIN order_items AS oi ON o.order_id = oi.order_id JOIN sellers AS s ON oi.seller_id = s.seller_id WHERE o.order_delivered_customer_date IS NOT NULL GROUP BY s.seller_id",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 1.0,
+    "latency_seconds": 220.33,
+    "error": null
+  },
+  "q079": {
+    "query_id": "q079",
+    "question": "Which sellers have the highest cancellation rate?",
+    "category": "Sellers",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "actual_sql": null,
+    "sql_execution_success": false,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 0.0,
+    "latency_seconds": 240.0,
+    "error": ""
+  },
+  "q081": {
+    "query_id": "q081",
+    "question": "What is the revenue by payment type?",
+    "category": "Payments",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "actual_sql": null,
+    "sql_execution_success": false,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 0.0,
+    "latency_seconds": 240.0,
+    "error": ""
+  },
+  "q080": {
+    "query_id": "q080",
+    "question": "Which payment method is most used?",
+    "category": "Payments",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "actual_sql": null,
+    "sql_execution_success": false,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 0.0,
+    "latency_seconds": 240.0,
+    "error": ""
+  },
+  "q082": {
+    "query_id": "q082",
+    "question": "What is the average payment value?",
+    "category": "Payments",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "actual_sql": "SELECT AVG(payment_value) AS average_payment_value FROM order_payments",
+    "sql_execution_success": true,
+    "exact_match": true,
+    "equivalent_match": true,
+    "table_accuracy": 1.0,
+    "latency_seconds": 237.128,
+    "error": null
+  },
+  "q083": {
+    "query_id": "q083",
+    "question": "How many installments are used on average?",
+    "category": "Payments",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "actual_sql": "SELECT AVG(payment_installments) AS average_installments FROM order_payments",
+    "sql_execution_success": true,
+    "exact_match": true,
+    "equivalent_match": true,
+    "table_accuracy": 1.0,
+    "latency_seconds": 212.418,
+    "error": null
+  },
+  "q085": {
+    "query_id": "q085",
+    "question": "Do installment payments affect order value?",
+    "category": "Payments",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "actual_sql": "WITH payments_agg AS (\n  SELECT\n    order_id,\n    MIN(payment_installments) AS installment_count\n  FROM order_payments\n  GROUP BY order_id\n)\nSELECT\n  pa.installment_count,\n  SUM(op.payment_value) AS total_price,\n  COUNT(DISTINCT o.order_id) AS order_count,\n  SUM(op.payment_value) * 1.0 / COUNT(DISTINCT o.order_id) AS average_order_value\nFROM payments_agg pa\nJOIN orders o ON pa.order_id = o.order_id\nJOIN order_payments op ON o.order_id = op.order_id\nGROUP BY pa.installment_count\nORDER BY pa.installment_count",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 1.0,
+    "latency_seconds": 223.685,
+    "error": null
+  },
+  "q086": {
+    "query_id": "q086",
+    "question": "What is the failure rate of payments?",
+    "category": "Payments",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "actual_sql": "SELECT CAST(SUM(CASE WHEN order_payments.payment_type = 'not_defined' THEN 1 ELSE 0 END) AS REAL) / COUNT(*) AS failure_rate FROM order_payments",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 1.0,
+    "latency_seconds": 213.474,
+    "error": null
+  },
+  "q084": {
+    "query_id": "q084",
+    "question": "What is the distribution of installment payments?",
+    "category": "Payments",
+    "difficulty": "medium",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "actual_sql": null,
+    "sql_execution_success": false,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 0.0,
+    "latency_seconds": 240.0,
+    "error": ""
+  },
+  "q088": {
+    "query_id": "q088",
+    "question": "How does payment method vary by region?",
+    "category": "Payments",
+    "difficulty": "medium",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_payments"
+    ],
+    "actual_sql": "SELECT customers.customer_state, order_payments.payment_type, COUNT(*) AS payment_count FROM order_payments JOIN orders ON order_payments.order_id = orders.order_id JOIN customers ON orders.customer_id = customers.customer_id GROUP BY customers.customer_state, order_payments.payment_type",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 1.0,
+    "latency_seconds": 218.184,
+    "error": null
+  },
+  "q087": {
+    "query_id": "q087",
+    "question": "Which payment types have highest order value?",
+    "category": "Payments",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "actual_sql": null,
+    "sql_execution_success": false,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 0.0,
+    "latency_seconds": 240.0,
+    "error": ""
+  },
+  "q090": {
+    "query_id": "q090",
+    "question": "What is the average review score?",
+    "category": "Reviews & Satisfaction",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_reviews"
+    ],
+    "actual_sql": "SELECT AVG(review_score) AS average_review_score FROM order_reviews",
+    "sql_execution_success": true,
+    "exact_match": true,
+    "equivalent_match": true,
+    "table_accuracy": 1.0,
+    "latency_seconds": 161.948,
+    "error": null
+  },
+  "q089": {
+    "query_id": "q089",
+    "question": "What is the trend of payment methods over time?",
+    "category": "Payments",
+    "difficulty": "medium",
+    "expected_tables": [
+      "orders",
+      "order_payments"
+    ],
+    "actual_sql": "SELECT strftime('%Y-%m', orders.order_purchase_timestamp) AS month, order_payments.payment_type, COUNT(*) AS payment_transactions FROM order_payments JOIN orders ON order_payments.order_id = orders.order_id GROUP BY month, order_payments.payment_type ORDER BY month, order_payments.payment_type",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 1.0,
+    "latency_seconds": 164.33,
+    "error": null
+  },
+  "q091": {
+    "query_id": "q091",
+    "question": "What is the distribution of review scores?",
+    "category": "Reviews & Satisfaction",
+    "difficulty": "medium",
+    "expected_tables": [
+      "order_reviews"
+    ],
+    "actual_sql": "SELECT review_score, COUNT(*) AS review_count FROM order_reviews GROUP BY review_score ORDER BY review_score",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": true,
+    "table_accuracy": 1.0,
+    "latency_seconds": 202.373,
+    "error": null
+  },
+  "q092": {
+    "query_id": "q092",
+    "question": "Which products have the best reviews?",
+    "category": "Reviews & Satisfaction",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_reviews",
+      "order_items"
+    ],
+    "actual_sql": null,
+    "sql_execution_success": false,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 0.0,
+    "latency_seconds": 240.0,
+    "error": ""
+  },
+  "q093": {
+    "query_id": "q093",
+    "question": "Which sellers have the worst reviews?",
+    "category": "Reviews & Satisfaction",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_reviews",
+      "order_items"
+    ],
+    "actual_sql": null,
+    "sql_execution_success": false,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 0.0,
+    "latency_seconds": 240.0,
+    "error": ""
+  },
+  "q094": {
+    "query_id": "q094",
+    "question": "What is the relationship between delivery time and review score?",
+    "category": "Reviews & Satisfaction",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders",
+      "order_reviews"
+    ],
+    "actual_sql": null,
+    "sql_execution_success": false,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 0.0,
+    "latency_seconds": 240.0,
+    "error": ""
+  },
+  "q095": {
+    "query_id": "q095",
+    "question": "Do late deliveries lead to lower ratings?",
+    "category": "Reviews & Satisfaction",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders",
+      "order_reviews"
+    ],
+    "actual_sql": "SELECT\n  CASE\n    WHEN o.order_delivered_customer_date > o.order_estimated_delivery_date THEN 1\n    ELSE 0\n  END AS is_late,\n  AVG(r.review_score) AS avg_review_score\nFROM order_reviews r\nJOIN orders o ON r.order_id = o.order_id\nWHERE o.order_delivered_customer_date IS NOT NULL\nGROUP BY is_late",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": true,
+    "table_accuracy": 1.0,
+    "latency_seconds": 205.598,
+    "error": null
+  },
+  "q096": {
+    "query_id": "q096",
+    "question": "What percentage of orders receive reviews?",
+    "category": "Reviews & Satisfaction",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders",
+      "order_reviews"
+    ],
+    "actual_sql": "SELECT (COUNT(DISTINCT CASE WHEN orv.order_id IS NOT NULL THEN orv.order_id END) * 100.0) / COUNT(DISTINCT o.order_id) AS percentage_orders_with_reviews FROM orders o LEFT JOIN order_reviews orv ON o.order_id = orv.order_id",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 1.0,
+    "latency_seconds": 153.565,
+    "error": null
+  },
+  "q098": {
+    "query_id": "q098",
+    "question": "Which categories have the highest satisfaction?",
+    "category": "Reviews & Satisfaction",
+    "difficulty": "medium",
+    "expected_tables": [
+      "order_items",
+      "order_reviews",
+      "products"
+    ],
+    "actual_sql": "SELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 0.6666666666666666,
+    "latency_seconds": 206.392,
+    "error": null
+  },
+  "q097": {
+    "query_id": "q097",
+    "question": "What is the trend of review scores over time?",
+    "category": "Reviews & Satisfaction",
+    "difficulty": "medium",
+    "expected_tables": [
+      "order_reviews"
+    ],
+    "actual_sql": "SELECT strftime('%Y-%m', orv.review_creation_date) AS month, AVG(orv.review_score) AS avg_review_score FROM order_reviews orv JOIN orders o ON orv.order_id = o.order_id GROUP BY month ORDER BY month",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": true,
+    "table_accuracy": 1.0,
+    "latency_seconds": 213.75,
+    "error": null
+  },
+  "q099": {
+    "query_id": "q099",
+    "question": "Which categories have the lowest satisfaction?",
+    "category": "Reviews & Satisfaction",
+    "difficulty": "medium",
+    "expected_tables": [
+      "order_items",
+      "order_reviews",
+      "products"
+    ],
+    "actual_sql": "SELECT products.product_category_name, AVG(order_items.price) AS average_price FROM order_items JOIN products ON order_items.product_id = products.product_id GROUP BY products.product_category_name ORDER BY average_price ASC LIMIT 10",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": false,
+    "table_accuracy": 0.6666666666666666,
+    "latency_seconds": 104.53,
+    "error": null
+  }
+}

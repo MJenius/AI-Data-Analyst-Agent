@@ -40,6 +40,10 @@ class CompositeMetric(BaseModel):
     grouping_grain: list[str] = Field(default_factory=list, description="Grain at which metric is computed")
     filter_scope: list[str] = Field(default_factory=list, description="Specific filters bounding this metric")
     formula_template: str | None = Field(default=None, description="SQL/Math formula template (e.g. CAST(SUM(...) AS REAL) / COUNT(...))")
+    source_columns: list[str] = Field(
+        default_factory=list,
+        description="Exact physical columns this metric reads from (e.g. ['order_items.price'])"
+    )
 
 
 class QueryPlan(BaseModel):
@@ -50,7 +54,7 @@ class QueryPlan(BaseModel):
     entity: str | None = Field(default=None, description="Primary entity column or alias (for backward compatibility)")
     required_tables: list[str] = Field(description="Minimum tables required to answer the question")
     join_path: list[str] = Field(default_factory=list, description="Explicit join predicates linking required tables (e.g. orders.order_id = order_items.order_id)")
-    metric: str = Field(description="Primary metric being calculated (e.g., revenue, count, average)")
+    metric: str = Field(default="", description="Primary metric being calculated (e.g., revenue, count, average)")
     composite_metric: CompositeMetric | None = Field(default=None, description="Detailed composite metric definition if applicable")
     aggregation: str | None = Field(default=None, description="Aggregation function used (e.g., SUM, COUNT, AVG, COUNT_DISTINCT)")
     filters: list[str] = Field(default_factory=list, description="Filters applied to the data")
@@ -64,6 +68,7 @@ class QueryPlan(BaseModel):
     ordering: str | None = Field(default=None, description="Full ordering expression (e.g. revenue DESC)")
     limit: int | None = Field(default=None, description="Result limit if applicable")
     result_shape: ResultShape | str | None = Field(default=None, description="Expected shape of analytical output")
+    metric_source_column: str | None = Field(default=None, description="Primary physical column for the metric (e.g. 'price', 'payment_value', 'review_score')")
     reasoning: str = Field(default="", description="Explanation of how this plan answers the question")
 
     def model_post_init(self, __context: Any) -> None:

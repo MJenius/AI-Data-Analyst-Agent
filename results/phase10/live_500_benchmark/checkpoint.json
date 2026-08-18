@@ -1,0 +1,109 @@
+{
+  "q000": {
+    "query_id": "q000",
+    "question": "What is the total revenue generated?",
+    "category": "Revenue & Sales",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items"
+    ],
+    "actual_sql": "SELECT SUM(price) AS total_revenue FROM order_items",
+    "sql_execution_success": true,
+    "exact_match": true,
+    "equivalent_match": true,
+    "table_precision": 1.0,
+    "table_recall": 1.0,
+    "table_exact_match": true,
+    "latency_seconds": 141.413,
+    "error": null,
+    "repair_events": []
+  },
+  "q003": {
+    "query_id": "q003",
+    "question": "Which month had the highest revenue?",
+    "category": "Revenue & Sales",
+    "difficulty": "medium",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "queried_tables": [
+      "orders",
+      "order_items"
+    ],
+    "actual_sql": "SELECT strftime('%Y-%m', orders.order_purchase_timestamp) AS month, SUM(order_items.price) AS total_revenue FROM order_items JOIN orders ON order_items.order_id = orders.order_id GROUP BY month ORDER BY total_revenue DESC LIMIT 1",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": true,
+    "table_precision": 1.0,
+    "table_recall": 1.0,
+    "table_exact_match": true,
+    "latency_seconds": 141.439,
+    "error": null,
+    "repair_events": [
+      {
+        "step": "Summarize findings for Identify the month with the highest total revenue. with supporting metrics",
+        "attempted": true,
+        "applied": true,
+        "method": "llm",
+        "categories": [
+          "group_by_grain_mismatch"
+        ],
+        "pre_repair_sql": "SELECT strftime('%Y-%m', orders.order_purchase_timestamp) AS month, SUM(order_items.price) AS total_revenue FROM order_items JOIN orders ON order_items.order_id = orders.order_id GROUP BY strftime('%Y-%m', orders.order_purchase_timestamp) ORDER BY total_revenue DESC LIMIT 1;",
+        "re_validated": true,
+        "executed": true,
+        "post_repair_sql": "SELECT strftime('%Y-%m', orders.order_purchase_timestamp) AS month, SUM(order_items.price) AS total_revenue FROM order_items JOIN orders ON order_items.order_id = orders.order_id GROUP BY month ORDER BY total_revenue DESC LIMIT 1;",
+        "final_sql": "SELECT strftime('%Y-%m', orders.order_purchase_timestamp) AS month, SUM(order_items.price) AS total_revenue FROM order_items JOIN orders ON order_items.order_id = orders.order_id GROUP BY month ORDER BY total_revenue DESC LIMIT 1;"
+      }
+    ]
+  },
+  "q002": {
+    "query_id": "q002",
+    "question": "What is the monthly revenue trend?",
+    "category": "Revenue & Sales",
+    "difficulty": "medium",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "queried_tables": [
+      "orders",
+      "order_items"
+    ],
+    "actual_sql": "SELECT strftime('%Y-%m', orders.order_purchase_timestamp) AS month, SUM(order_items.price) AS total_revenue FROM order_items JOIN orders ON order_items.order_id = orders.order_id GROUP BY month ORDER BY month",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": true,
+    "table_precision": 1.0,
+    "table_recall": 1.0,
+    "table_exact_match": true,
+    "latency_seconds": 142.594,
+    "error": null,
+    "repair_events": []
+  },
+  "q001": {
+    "query_id": "q001",
+    "question": "What is the total freight value paid across all orders?",
+    "category": "Revenue & Sales",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items"
+    ],
+    "actual_sql": "SELECT SUM(oi.freight_value) AS total_freight_value FROM order_items oi",
+    "sql_execution_success": true,
+    "exact_match": false,
+    "equivalent_match": true,
+    "table_precision": 1.0,
+    "table_recall": 1.0,
+    "table_exact_match": true,
+    "latency_seconds": 144.017,
+    "error": null,
+    "repair_events": []
+  }
+}

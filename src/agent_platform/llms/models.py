@@ -14,6 +14,7 @@ class CompositeMetricOutput(BaseModel):
     grouping_grain: list[str] = Field(default_factory=list, description="Grain at which metric is computed")
     filter_scope: list[str] = Field(default_factory=list, description="Specific filters bounding this metric")
     formula_template: str | None = Field(default=None, description="SQL/Math formula template")
+    source_columns: list[str] = Field(default_factory=list, description="Exact physical columns this metric reads from")
 
 
 class QueryPlanOutput(BaseModel):
@@ -23,7 +24,7 @@ class QueryPlanOutput(BaseModel):
     entity: str | None = Field(default=None, description="Primary entity column or alias")
     required_tables: list[str] = Field(description="Minimum tables required to answer the question")
     join_path: list[str] = Field(default_factory=list, description="Explicit join predicates linking required tables")
-    metric: str = Field(description="Primary metric being calculated")
+    metric: str | None = Field(default=None, description="Primary metric being calculated")
     composite_metric: CompositeMetricOutput | None = Field(default=None, description="Detailed composite metric definition if applicable")
     aggregation: str | None = Field(default=None, description="Aggregation function used (e.g., SUM, COUNT, AVG, COUNT_DISTINCT)")
     filters: list[str] = Field(default_factory=list, description="Filters applied to the data")
@@ -37,6 +38,7 @@ class QueryPlanOutput(BaseModel):
     ordering: str | None = Field(default=None, description="Ordering direction and field")
     limit: int | None = Field(default=None, description="Result limit if applicable")
     result_shape: str | None = Field(default=None, description="Expected shape: single_value, ranked_list, time_series, aggregated_table, record_list")
+    metric_source_column: str | None = Field(default=None, description="Primary physical column for the metric (e.g. price, payment_value, review_score)")
     reasoning: str = Field(description="Brief trace explaining why this plan answers the question")
 
 

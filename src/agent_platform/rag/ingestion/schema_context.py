@@ -187,6 +187,48 @@ BUSINESS_TERMS = {
         "tables": ("orders",),
         "columns": ("orders.order_purchase_timestamp",),
     },
+    "purchase time order time": {
+        "description": "orders.order_purchase_timestamp is the canonical order/purchase time. "
+                       "Do NOT use order_approved_at or order_delivered_carrier_date unless explicitly asked. "
+                       "There is no 'order_date' column.",
+        "tables": ("orders",),
+        "columns": ("orders.order_purchase_timestamp",),
+    },
+    "shipping deadline shipping limit": {
+        "description": "order_items.shipping_limit_date is the seller's shipping deadline for each item. "
+                       "Use this only when the question asks about shipping deadlines or seller fulfillment windows.",
+        "tables": ("order_items",),
+        "columns": ("order_items.shipping_limit_date",),
+    },
+    "category name product category name": {
+        "description": "products.product_category_name is the canonical Portuguese category name. "
+                       "Use this for grouping and ranking by default. Only join the translation table "
+                       "when the question explicitly requests English category names.",
+        "tables": ("products",),
+        "columns": ("products.product_category_name",),
+    },
+    "english category category english translation": {
+        "description": "product_category_name_translation.product_category_name_english provides "
+                       "English translations. Only use when the question explicitly asks for English names. "
+                       "JOIN ON products.product_category_name = product_category_name_translation.product_category_name.",
+        "tables": ("product_category_name_translation", "products"),
+        "columns": ("product_category_name_translation.product_category_name_english",),
+    },
+    "sales total sales gmv": {
+        "description": "Revenue, sales, and GMV all map to SUM(order_items.price). "
+                       "This is DIFFERENT from payment_value which is the recorded payment amount. "
+                       "Do not substitute payment_value for price when the question asks about revenue or sales.",
+        "tables": ("order_items",),
+        "columns": ("order_items.price",),
+    },
+    "payment value total payment paid amount": {
+        "description": "order_payments.payment_value is the amount recorded for one payment sequence. "
+                       "This is DIFFERENT from order_items.price (revenue). Use payment_value only when "
+                       "the question explicitly asks about payments, payment amounts, or total paid. "
+                       "Aggregate payment rows per order before joining item-level facts.",
+        "tables": ("order_payments",),
+        "columns": ("order_payments.payment_value",),
+    },
 }
 
 CATEGORICAL_COLUMNS = {

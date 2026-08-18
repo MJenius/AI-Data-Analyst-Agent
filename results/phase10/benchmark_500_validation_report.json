@@ -1,0 +1,122 @@
+{
+  "dataset_path": "C:\\Users\\mjeni\\OneDrive\\Desktop\\Own Projects\\Data Analyst Agent\\tests\\evaluation\\benchmark_dataset_500.json",
+  "total_queries": 456,
+  "valid_structure": true,
+  "error_count": 0,
+  "warning_count": 0,
+  "sql_executable_count": 456,
+  "sql_failed_count": 0,
+  "ground_truth_mismatch_count": 0,
+  "table_hallucination_count": 0,
+  "empty_result_count": 0,
+  "exact_duplicates_count": 0,
+  "near_duplicates_count": 1639,
+  "category_distribution": {
+    "Revenue & Sales": 24,
+    "Customers & Geography": 106,
+    "Reviews & Satisfaction": 63,
+    "Products & Categories": 94,
+    "Payments & Installments": 43,
+    "Logistics & Operations": 53,
+    "Sellers & Fulfillment": 66,
+    "Advanced Analytics": 5,
+    "Orders & Transactions": 2
+  },
+  "difficulty_distribution": {
+    "easy": 170,
+    "medium": 282,
+    "hard": 4
+  },
+  "domain_distribution": {
+    "Revenue & Sales": 24,
+    "Customers & Geography": 85,
+    "Reviews & Satisfaction": 32,
+    "Products & Categories": 59,
+    "Payments & Installments": 34,
+    "Logistics & Operations": 43,
+    "Sellers & Fulfillment": 45,
+    "Advanced Analytics": 1,
+    "Sellers": 21,
+    "Customers": 21,
+    "Reviews": 31,
+    "Products": 36,
+    "Payments": 9,
+    "Revenue": 3,
+    "Orders & Transactions": 2,
+    "Logistics": 10
+  },
+  "exact_duplicates": [],
+  "near_duplicates_sample": [
+    [
+      5,
+      8,
+      1.0,
+      "What is the total revenue from customers in state SP?",
+      "What is the total revenue from customers in state RJ?"
+    ],
+    [
+      6,
+      9,
+      1.0,
+      "How many unique customers are located in state SP?",
+      "How many unique customers are located in state RJ?"
+    ],
+    [
+      7,
+      10,
+      1.0,
+      "What is the average review score for orders in state SP?",
+      "What is the average review score for orders in state RJ?"
+    ],
+    [
+      5,
+      11,
+      1.0,
+      "What is the total revenue from customers in state SP?",
+      "What is the total revenue from customers in state MG?"
+    ],
+    [
+      8,
+      11,
+      1.0,
+      "What is the total revenue from customers in state RJ?",
+      "What is the total revenue from customers in state MG?"
+    ],
+    [
+      6,
+      12,
+      1.0,
+      "How many unique customers are located in state SP?",
+      "How many unique customers are located in state MG?"
+    ],
+    [
+      9,
+      12,
+      1.0,
+      "How many unique customers are located in state RJ?",
+      "How many unique customers are located in state MG?"
+    ],
+    [
+      7,
+      13,
+      1.0,
+      "What is the average review score for orders in state SP?",
+      "What is the average review score for orders in state MG?"
+    ],
+    [
+      10,
+      13,
+      1.0,
+      "What is the average review score for orders in state RJ?",
+      "What is the average review score for orders in state MG?"
+    ],
+    [
+      5,
+      14,
+      1.0,
+      "What is the total revenue from customers in state SP?",
+      "What is the total revenue from customers in state RS?"
+    ]
+  ],
+  "issues_sample": []
+}

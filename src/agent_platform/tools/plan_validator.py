@@ -314,31 +314,70 @@ class PlanValidator:
             "fastest", "slowest", "maximum", "max", "minimum", "min", "largest", "smallest",
             "longest", "shortest",
         ]
-        singular_superlative_keywords = [
-            "which", "what is the", "highest", "lowest", "best", "worst",
-            "largest", "smallest", "most", "least", "fastest", "slowest",
-            "maximum", "minimum", "longest", "shortest",
-        ]
+        desc_keywords = ["highest", "most", "best", "top", "fastest", "maximum", "max", "largest"]
+        asc_keywords = ["lowest", "least", "worst", "bottom", "slowest", "minimum", "min", "smallest"]
+
         is_superlative = any(re.search(rf"\b{k}\b", q_low) for k in superlative_keywords)
-        
-        # Check for explicit top N in question first
-        top_n_match = re.search(r"\btop\s+(\d+)\b", q_low) or re.search(r"\bbottom\s+(\d+)\b", q_low) or re.search(r"\b(\d+)\s+most\b", q_low)
-        
+
+        # ── Explicit top-N is always authoritative ───────────────────────────
+        top_n_match = (
+            re.search(r"\btop\s+(\d+)\b", q_low)
+            or re.search(r"\bbottom\s+(\d+)\b", q_low)
+            or re.search(r"\b(\d+)\s+(?:most|least|best|worst)\b", q_low)
+        )
+
+        # ── Singular vs plural subject detection ─────────────────────────────
+        # Uses grammatical signals: noun form + verb agreement.
+        # Plural signals:
+        # 1) 'what are', 'which are'
+        # 2) 'which categories', 'what products', 'which sellers', 'which states'
+        # 3) 'what/which <plural_noun> have/are/do/get'
+        has_plural_subject = bool(
+            re.search(r"\b(?:which|what)\s+are\b", q_low)
+            or re.search(r"\b(?:which|what)\s+(?!is\b|has\b|was\b)\w+(?:ies|s)\b", q_low)
+            or re.search(r"\b(?:which|what)\s+\w+\s+(?:have|are|do|get|show|had|were)\b", q_low)
+        )
+
+        # Singular signals:
+        # 1) 'what is', 'which is', 'what was'
+        # 2) 'which category/state/... has/is/generates'
+        has_singular_subject = bool(
+            re.search(r"\b(?:which|what)\s+(?:is|was)\b", q_low)
+            or re.search(
+                r"\b(?:which|what)\s+(?:category|state|product|seller|customer|city|order|payment|review|type|method|score|month|year|day)\b",
+                q_low,
+            )
+        )
+
+        # ── Determine singularity ────────────────────────────────────────────
         is_singular = False
-        if not top_n_match:
-            is_singular = any(re.search(rf"\b{k}\b", q_low) for k in singular_superlative_keywords)
-            # But exclude cases that request "all" or lists
-            if is_singular and any(k in q_low for k in ["all", "list", "each", "every", "distribution"]):
+        if not top_n_match and is_superlative:
+            if has_plural_subject and not has_singular_subject:
                 is_singular = False
-            # Monthly/trend questions are not singular superlatives
-            if is_singular and any(k in q_low for k in ["monthly", "per month", "trend", "over time"]):
+            elif has_singular_subject and not has_plural_subject:
+                is_singular = True
+            elif has_singular_subject and has_plural_subject:
+                if re.search(r"\b(?:what|which)\s+are\b", q_low) or re.search(r"\b(?:which|what)\s+(?!is\b|has\b|was\b)\w+(?:ies|s)\b", q_low):
+                    is_singular = False
+                else:
+                    is_singular = True
+            else:
+                is_singular = is_superlative and not has_plural_subject
+
+            # Exclusions: lists, distributions, trends override singularity (use whole-word matching)
+            exclusion_keywords = [
+                "all", "list", "each", "every", "distribution",
+                "monthly", "per month", "trend", "over time",
+                "compare", "breakdown", "by each",
+            ]
+            if is_singular and any(re.search(rf"\b{re.escape(k)}\b", q_low) for k in exclusion_keywords):
                 is_singular = False
 
         if is_superlative:
             if not repaired.ranking_direction:
-                if any(k in q_low for k in ["highest", "most", "best", "top", "fastest", "maximum", "max", "largest"]):
+                if any(k in q_low for k in desc_keywords):
                     repaired.ranking_direction = "DESC"
-                elif any(k in q_low for k in ["lowest", "least", "worst", "bottom", "slowest", "minimum", "min", "smallest"]):
+                elif any(k in q_low for k in asc_keywords):
                     repaired.ranking_direction = "ASC"
 
             if top_n_match:
@@ -361,10 +400,56 @@ class PlanValidator:
                     )
                 )
                 repaired.limit = 1
+            elif not is_singular and not top_n_match and repaired.limit is None:
+                # Bare "top" without a number and plural context → default to 10
+                if re.search(r"\btop\b", q_low) and not top_n_match:
+                    repaired.limit = 10
 
             if repaired.limit is not None and not repaired.ordering:
                 direction = repaired.ranking_direction or "DESC"
                 repaired.ordering = f"{repaired.ranking_metric or repaired.metric or 'metric'} {direction}"
+
+        # ── 7b. Metric source column resolution ──────────────────────────────
+        METRIC_SOURCE_MAP = {
+            "revenue": "price",
+            "sales": "price",
+            "gmv": "price",
+            "total_revenue": "price",
+            "total revenue": "price",
+            "total sales": "price",
+            "item revenue": "price",
+            "price": "price",
+            "payment": "payment_value",
+            "payment_value": "payment_value",
+            "payment value": "payment_value",
+            "total_paid": "payment_value",
+            "total paid": "payment_value",
+            "payment amount": "payment_value",
+            "review_score": "review_score",
+            "review score": "review_score",
+            "rating": "review_score",
+            "average_review_score": "review_score",
+            "average review score": "review_score",
+            "aov": "price",
+            "average_order_value": "price",
+            "average order value": "price",
+            "order_value": "price",
+            "order value": "price",
+            "freight": "freight_value",
+            "freight_value": "freight_value",
+            "shipping cost": "freight_value",
+        }
+        if repaired.metric and not repaired.metric_source_column:
+            metric_key = repaired.metric.lower().replace("_", " ").strip()
+            source = METRIC_SOURCE_MAP.get(metric_key)
+            if not source:
+                # Try partial match for compound metric names
+                for key, col in METRIC_SOURCE_MAP.items():
+                    if key in metric_key or metric_key in key:
+                        source = col
+                        break
+            if source:
+                repaired.metric_source_column = source
 
         # ── 8. Composite Metric Validation ───────────────────────────────────
         if any(k in q_low for k in ["cancellation rate", "cancel rate", "cancellation %"]):

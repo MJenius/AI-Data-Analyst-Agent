@@ -1,0 +1,79 @@
+{
+  "timestamp": "2026-08-18T11:25:26.845815",
+  "provider": "NvidiaClient",
+  "total_queries": 100,
+  "error_count": 0,
+  "elapsed_seconds": 252.31,
+  "all_core_alignment_rate": 0.59,
+  "table_exact_rate": 0.49,
+  "table_mean_precision": 0.7658,
+  "table_mean_recall": 0.9483,
+  "metric_alignment_rate": 0.64,
+  "aggregation_alignment_rate": 1.0,
+  "limit_alignment_rate": 0.98,
+  "ranking_direction_alignment_rate": 0.99,
+  "time_grain_alignment_rate": 1.0,
+  "join_path_alignment_rate": 1.0,
+  "result_shape_alignment_rate": 1.0,
+  "composite_alignment_rate": 0.89,
+  "entity_alignment_rate": 1.0,
+  "filter_alignment_rate": 1.0,
+  "category_breakdown": {
+    "Customers": {
+      "count": 15,
+      "all_core_rate": 0.4667,
+      "table_exact_rate": 0.2667,
+      "limit_rate": 1.0,
+      "metric_rate": 0.4667
+    },
+    "Logistics & Delivery": {
+      "count": 10,
+      "all_core_rate": 0.1,
+      "table_exact_rate": 0.6,
+      "limit_rate": 1.0,
+      "metric_rate": 0.1
+    },
+    "Orders & Transactions": {
+      "count": 15,
+      "all_core_rate": 0.6,
+      "table_exact_rate": 0.6667,
+      "limit_rate": 0.8667,
+      "metric_rate": 0.7333
+    },
+    "Payments": {
+      "count": 10,
+      "all_core_rate": 0.8,
+      "table_exact_rate": 0.7,
+      "limit_rate": 1.0,
+      "metric_rate": 0.8
+    },
+    "Products & Categories": {
+      "count": 15,
+      "all_core_rate": 0.5333,
+      "table_exact_rate": 0.5333,
+      "limit_rate": 1.0,
+      "metric_rate": 0.5333
+    },
+    "Revenue & Sales": {
+      "count": 15,
+      "all_core_rate": 0.8,
+      "table_exact_rate": 0.4667,
+      "limit_rate": 1.0,
+      "metric_rate": 1.0
+    },
+    "Reviews & Satisfaction": {
+      "count": 10,
+      "all_core_rate": 0.7,
+      "table_exact_rate": 0.5,
+      "limit_rate": 1.0,
+      "metric_rate": 0.7
+    },
+    "Sellers": {
+      "count": 10,
+      "all_core_rate": 0.7,
+      "table_exact_rate": 0.2,
+      "limit_rate": 1.0,
+      "metric_rate": 0.7
+    }
+  }
+}

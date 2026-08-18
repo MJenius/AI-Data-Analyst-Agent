@@ -31,33 +31,57 @@ Given a business question and schema context, produce a rich, structured query p
 
 ═══ SUPERLATIVE & RANKING RULES (CRITICAL) ═══
 6. Superlative keywords: highest, lowest, most, least, best, worst, top, bottom, largest, smallest, fastest, slowest, maximum, minimum, which, what is the.
-7. For SINGULAR superlative questions ("Which state has the highest revenue?", "What is the most popular category?", "What product has the lowest rating?"):
-   - ranking_dimension: the dimension being ranked (e.g. "customer_state", "product_category_name")
-   - ranking_metric: the metric used for ranking (e.g. "total_revenue", "order_count")
-   - ranking_direction: "DESC" for highest/most/best/top/largest/fastest/maximum, "ASC" for lowest/least/worst/bottom/smallest/slowest/minimum
-   - limit: 1  ← ALWAYS set limit=1 for singular superlative questions
+7. For SINGULAR superlative questions (singular noun + singular verb):
+   - "Which category has the highest revenue?" → limit: 1, ranking_direction: "DESC"
+   - "What is the most popular category?" → limit: 1, ranking_direction: "DESC"
+   - "What product has the lowest rating?" → limit: 1, ranking_direction: "ASC"
+   - ranking_dimension: the dimension being ranked
+   - ranking_metric: the metric used for ranking
    - result_shape: "single_value"
-8. For TOP-N questions ("Top 5 categories", "Top 10 sellers", "Bottom 3 states"):
-   - limit: N (the explicit number from the question)
+8. For PLURAL superlative questions (plural noun + plural verb):
+   - "Which categories have the most orders?" → limit: 10 (default), ranking_direction: "DESC"
+   - "What are the least popular categories?" → limit: 10 (default), ranking_direction: "ASC"
+   - "What are the worst performing sellers?" → limit: 10, ranking_direction: "ASC"
    - result_shape: "ranked_list"
-9. For general "top" without a number ("top categories"), use limit=10 as default.
-10. If the question does NOT request ranking/superlative/top/bottom, set limit=null.
+9. For TOP-N questions (explicit number in question):
+   - "Top 5 categories" → limit: 5 (AUTHORITATIVE, always use exact number)
+   - "Top 10 sellers" → limit: 10
+   - "Bottom 3 states" → limit: 3
+   - result_shape: "ranked_list"
+10. For general "top" without a number → limit: 10 default.
+11. If the question does NOT request ranking/superlative/top/bottom, set limit=null.
+
+═══ SCHEMA PREFERENCE RULES (CRITICAL) ═══
+12. Time columns:
+    - "when was the order placed" / "order date" / "purchase date" / "purchase time" → order_purchase_timestamp
+    - "shipping deadline" / "shipping date" / "seller deadline" → shipping_limit_date
+    - "delivery date" / "when was it delivered" → order_delivered_customer_date
+    - Default time column for any time-based analysis: order_purchase_timestamp
+13. Category naming:
+    - Default: products.product_category_name (Portuguese source form)
+    - Only use the translation table when the question explicitly says "in English" or "English category"
+14. Revenue vs Payment (CRITICAL DISTINCTION):
+    - "revenue" / "sales" / "GMV" / "total sales" → SUM(order_items.price)
+    - "payment value" / "total paid" / "payment amount" → SUM(order_payments.payment_value)
+    - These are MATERIALLY DIFFERENT measures from different tables. Never substitute one for the other.
+    - order_items.price = item selling price (revenue measure)
+    - order_payments.payment_value = payment recording (may differ from item prices)
 
 ═══ TIME SERIES RULES ═══
-11. time_column: Use "order_purchase_timestamp" for time-based analysis unless another timestamp is explicitly requested.
-12. time_grain: "month" for monthly/per month/month-over-month, "year" for yearly/annual, "day" for daily, null otherwise.
-13. time_range: Explicit time bounds if mentioned (e.g. "2017", "2017-01 to 2018-06").
-14. If the question requests a trend, time series, or "over time" analysis:
+15. time_column: Use "order_purchase_timestamp" for time-based analysis unless another timestamp is explicitly requested.
+16. time_grain: "month" for monthly/per month/month-over-month, "year" for yearly/annual, "day" for daily, null otherwise.
+17. time_range: Explicit time bounds if mentioned (e.g. "2017", "2017-01 to 2018-06").
+18. If the question requests a trend, time series, or "over time" analysis:
     - Set time_grain appropriately
     - Include the time column in group_by
     - result_shape: "time_series"
 
 ═══ GROUP BY & RESULT SHAPE ═══
-15. group_by: List the columns that form the analytical grain of the output.
+19. group_by: List the columns that form the analytical grain of the output.
     - Must include ALL non-aggregate dimensions in the output.
     - For time series: include the time expression (e.g. "month").
     - For ranking: include the ranking dimension.
-16. result_shape: Choose from:
+20. result_shape: Choose from:
     - "single_value": One scalar answer (e.g. total revenue, overall AOV)
     - "ranked_list": Ordered list with limit (e.g. top 5 categories)
     - "time_series": Data points over time
@@ -65,11 +89,19 @@ Given a business question and schema context, produce a rich, structured query p
     - "record_list": Raw record listing
 
 ═══ FILTER RULES ═══
-17. filters: Extract explicit conditions from the question.
+21. filters: Extract explicit conditions from the question.
     - Use exact column names and values from the schema context.
     - For year filters: strftime('%Y', order_purchase_timestamp) = '2017'
     - For status filters: order_status = 'delivered', order_status = 'canceled'
     - Do NOT add filters that the question does not request.
+
+═══ METRIC SOURCE COLUMN ═══
+22. metric_source_column: The exact physical column used for the metric calculation.
+    - "revenue" / "sales" → "price"
+    - "payment" / "payment value" → "payment_value"
+    - "rating" / "review score" → "review_score"
+    - "aov" / "order value" → "price"
+    - This field tracks which physical column the metric reads from.
 
 ═══ OUTPUT SCHEMA ═══
 {
@@ -87,7 +119,8 @@ Given a business question and schema context, produce a rich, structured query p
     "aggregation": "primary aggregation",
     "grouping_grain": ["grain columns"],
     "filter_scope": ["scoping filters"],
-    "formula_template": "SQL expression template"
+    "formula_template": "SQL expression template",
+    "source_columns": ["table.column"]
   },
   "aggregation": "SUM|COUNT|AVG|COUNT_DISTINCT",
   "filters": ["explicit conditions"],
@@ -101,6 +134,7 @@ Given a business question and schema context, produce a rich, structured query p
   "ordering": "full ORDER BY expression or null",
   "limit": 1,
   "result_shape": "single_value|ranked_list|time_series|aggregated_table|record_list",
+  "metric_source_column": "physical column name (price, payment_value, review_score, etc.) or null",
   "reasoning": "brief trace explaining why this plan answers the question"
 }
 """

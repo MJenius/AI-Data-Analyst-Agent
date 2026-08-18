@@ -74,6 +74,7 @@ class AnalyticsPlannerAgent:
                         grouping_grain=plan.composite_metric.grouping_grain,
                         filter_scope=plan.composite_metric.filter_scope,
                         formula_template=plan.composite_metric.formula_template,
+                        source_columns=getattr(plan.composite_metric, 'source_columns', []),
                     )
 
                 raw_plan = QueryPlan(
@@ -96,6 +97,7 @@ class AnalyticsPlannerAgent:
                     ordering=plan.ordering,
                     limit=plan.limit,
                     result_shape=plan.result_shape,
+                    metric_source_column=getattr(plan, 'metric_source_column', None),
                     reasoning=plan.reasoning,
                 )
 

@@ -120,11 +120,31 @@ def evaluate_plan_alignment(q_data: dict[str, Any], plan: Any) -> dict[str, Any]
     # Limit & Ranking alignment
     question = q_data["question"].lower()
     expected_limit = None
-    top_match = re.search(r"\btop\s+(\d+)\b", question) or re.search(r"\bbottom\s+(\d+)\b", question)
+    top_match = re.search(r"\btop\s+(\d+)\b", question) or re.search(r"\bbottom\s+(\d+)\b", question) or re.search(r"\b(\d+)\s+(?:most|least|best|worst)\b", question)
     if top_match:
         expected_limit = int(top_match.group(1))
-    elif any(k in question for k in ["which", "what is the highest", "what is the lowest", "highest", "lowest", "most", "least"]):
-        if not any(k in question for k in ["top 3", "top 5", "top 10", "all", "each", "every", "monthly", "trend", "distribution"]):
+    else:
+        superlative_keywords = ["highest", "lowest", "most", "least", "best", "worst", "top", "bottom", "fastest", "slowest", "maximum", "max", "minimum", "min", "largest", "smallest"]
+        is_sup = any(re.search(rf"\b{k}\b", question) for k in superlative_keywords)
+        has_pl = bool(re.search(r"\b(?:which|what)\s+are\b", question) or re.search(r"\b(?:which|what)\s+(?!is\b|has\b|was\b)\w+(?:ies|s)\b", question) or re.search(r"\b(?:which|what)\s+\w+\s+(?:have|are|do|get|show|had|were)\b", question))
+        has_sg = bool(re.search(r"\b(?:which|what)\s+(?:is|was)\b", question) or re.search(r"\b(?:which|what)\s+(?:category|state|product|seller|customer|city|order|payment|review|type|method|score|month|year|day)\b", question))
+        
+        is_sg_eval = False
+        if is_sup:
+            if has_pl and not has_sg:
+                is_sg_eval = False
+            elif has_sg and not has_pl:
+                is_sg_eval = True
+            elif has_sg and has_pl:
+                is_sg_eval = False if (re.search(r"\b(?:what|which)\s+are\b", question) or re.search(r"\b(?:which|what)\s+(?!is\b|has\b|was\b)\w+(?:ies|s)\b", question)) else True
+            else:
+                is_sg_eval = not has_pl
+            
+            excl = ["all", "list", "each", "every", "distribution", "monthly", "per month", "trend", "over time", "compare", "breakdown", "by each"]
+            if is_sg_eval and any(re.search(rf"\b{re.escape(k)}\b", question) for k in excl):
+                is_sg_eval = False
+
+        if is_sg_eval:
             expected_limit = 1
 
     planned_limit = plan.limit if hasattr(plan, "limit") else plan.get("limit")
