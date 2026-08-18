@@ -1,6 +1,6 @@
 {
   "dataset_path": "C:\\Users\\mjeni\\OneDrive\\Desktop\\Own Projects\\Data Analyst Agent\\tests\\evaluation\\benchmark_dataset_500.json",
-  "sha256_hash": "64640710e804b657c6a8dceb83e2cf1956a1004b2e461fec275ecd078af33168",
+  "sha256_hash": "0c9807d5867ff9cb6a9252437dab31660b62b2e6c9d09c5e54b1dfc7edc43e04",
   "total_queries": 500,
   "valid_structure": true,
   "error_count": 0,
@@ -12,44 +12,35 @@
   "empty_result_count": 0,
   "exact_duplicates_count": 0,
   "domain_distribution": {
-    "Revenue & Sales": 30,
-    "Customers & Geography": 92,
-    "Reviews & Satisfaction": 39,
-    "Products & Categories": 66,
-    "Payments & Installments": 39,
-    "Logistics & Operations": 50,
-    "Sellers & Fulfillment": 50,
-    "Advanced Analytics": 1,
-    "Sellers": 21,
-    "Customers": 21,
-    "Reviews": 31,
-    "Products": 36,
-    "Payments": 9,
-    "Revenue": 3,
-    "Orders & Transactions": 2,
-    "Logistics": 10
+    "Revenue & Sales": 65,
+    "Orders & Transactions": 65,
+    "Customers & Geography": 65,
+    "Products & Categories": 65,
+    "Logistics & Operations": 60,
+    "Sellers & Fulfillment": 60,
+    "Payments & Installments": 60,
+    "Reviews & Satisfaction": 60
   },
   "category_distribution": {
-    "Revenue & Sales": 30,
-    "Customers & Geography": 113,
-    "Reviews & Satisfaction": 70,
-    "Products & Categories": 101,
-    "Payments & Installments": 48,
+    "Revenue & Sales": 65,
+    "Orders & Transactions": 65,
+    "Customers & Geography": 65,
+    "Products & Categories": 65,
     "Logistics & Operations": 60,
-    "Sellers & Fulfillment": 71,
-    "Advanced Analytics": 5,
-    "Orders & Transactions": 2
+    "Sellers & Fulfillment": 60,
+    "Payments & Installments": 60,
+    "Reviews & Satisfaction": 60
   },
   "query_type_distribution": {
-    "single_value": 449,
-    "time_series": 11,
-    "ranked_list": 29,
-    "aggregated_table": 11
+    "single_value": 268,
+    "time_series": 49,
+    "aggregated_table": 43,
+    "ranked_list": 140
   },
   "difficulty_distribution": {
-    "easy": 176,
-    "medium": 301,
-    "hard": 23
+    "easy": 114,
+    "medium": 276,
+    "hard": 110
   },
   "exact_duplicates": [],
   "issues": []
