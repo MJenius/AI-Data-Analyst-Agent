@@ -13505,5 +13505,1853 @@
       ],
       "row_count": 1
     }
+  },
+  {
+    "question": "What is the quarterly revenue trend across all years?",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "quarter",
+      "revenue"
+    ],
+    "expected_sql": "SELECT (strftime('%Y', o.order_purchase_timestamp) || '-Q' || ((CAST(strftime('%m', o.order_purchase_timestamp) AS INTEGER) - 1) / 3 + 1)) AS quarter, ROUND(SUM(oi.price), 2) AS revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id GROUP BY quarter ORDER BY quarter;",
+    "category": "Revenue & Sales",
+    "domain": "Revenue & Sales",
+    "query_type": "time_series",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "quarter",
+        "revenue"
+      ],
+      "values": [
+        {
+          "quarter": "2016-Q3",
+          "revenue": 267.36
+        },
+        {
+          "quarter": "2016-Q4",
+          "revenue": 49518.56
+        },
+        {
+          "quarter": "2017-Q1",
+          "revenue": 741960.19
+        },
+        {
+          "quarter": "2017-Q2",
+          "revenue": 1299036.97
+        },
+        {
+          "quarter": "2017-Q3",
+          "revenue": 1696404.85
+        },
+        {
+          "quarter": "2017-Q4",
+          "revenue": 2418404.97
+        },
+        {
+          "quarter": "2018-Q1",
+          "revenue": 2777422.51
+        },
+        {
+          "quarter": "2018-Q2",
+          "revenue": 2858289.74
+        },
+        {
+          "quarter": "2018-Q3",
+          "revenue": 1750338.55
+        }
+      ],
+      "row_count": 9
+    }
+  },
+  {
+    "question": "What is the monthly average order value (AOV) trend for 2017?",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "month",
+      "aov"
+    ],
+    "expected_sql": "SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, ROUND(SUM(oi.price) / COUNT(DISTINCT o.order_id), 2) AS aov FROM orders o JOIN order_items oi ON o.order_id = oi.order_id WHERE strftime('%Y', o.order_purchase_timestamp) = '2017' GROUP BY month ORDER BY month;",
+    "category": "Revenue & Sales",
+    "domain": "Revenue & Sales",
+    "query_type": "time_series",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "month",
+        "aov"
+      ],
+      "values": [
+        {
+          "month": "2017-01",
+          "aov": 152.49
+        },
+        {
+          "month": "2017-02",
+          "aov": 142.7
+        },
+        {
+          "month": "2017-03",
+          "aov": 141.74
+        },
+        {
+          "month": "2017-04",
+          "aov": 150.53
+        },
+        {
+          "month": "2017-05",
+          "aov": 138.27
+        },
+        {
+          "month": "2017-06",
+          "aov": 134.61
+        },
+        {
+          "month": "2017-07",
+          "aov": 125.48
+        },
+        {
+          "month": "2017-08",
+          "aov": 133.7
+        },
+        {
+          "month": "2017-09",
+          "aov": 147.16
+        },
+        {
+          "month": "2017-10",
+          "aov": 145.41
+        },
+        {
+          "month": "2017-11",
+          "aov": 135.59
+        },
+        {
+          "month": "2017-12",
+          "aov": 132.27
+        }
+      ],
+      "row_count": 12
+    }
+  },
+  {
+    "question": "What is the cumulative total revenue by month throughout 2017?",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "month",
+      "monthly_revenue",
+      "cumulative_revenue"
+    ],
+    "expected_sql": "WITH monthly_sales AS (\n    SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month,\n           ROUND(SUM(oi.price), 2) AS monthly_revenue\n    FROM orders o\n    JOIN order_items oi ON o.order_id = oi.order_id\n    WHERE strftime('%Y', o.order_purchase_timestamp) = '2017'\n    GROUP BY month\n)\nSELECT month,\n       monthly_revenue,\n       ROUND(SUM(monthly_revenue) OVER (ORDER BY month), 2) AS cumulative_revenue\nFROM monthly_sales\nORDER BY month;",
+    "category": "Revenue & Sales",
+    "domain": "Revenue & Sales",
+    "query_type": "time_series",
+    "difficulty": "hard",
+    "expected_result": {
+      "columns": [
+        "month",
+        "monthly_revenue",
+        "cumulative_revenue"
+      ],
+      "values": [
+        {
+          "month": "2017-01",
+          "monthly_revenue": 120312.87,
+          "cumulative_revenue": 120312.87
+        },
+        {
+          "month": "2017-02",
+          "monthly_revenue": 247303.02,
+          "cumulative_revenue": 367615.89
+        },
+        {
+          "month": "2017-03",
+          "monthly_revenue": 374344.3,
+          "cumulative_revenue": 741960.19
+        },
+        {
+          "month": "2017-04",
+          "monthly_revenue": 359927.23,
+          "cumulative_revenue": 1101887.42
+        },
+        {
+          "month": "2017-05",
+          "monthly_revenue": 506071.14,
+          "cumulative_revenue": 1607958.56
+        },
+        {
+          "month": "2017-06",
+          "monthly_revenue": 433038.6,
+          "cumulative_revenue": 2040997.16
+        },
+        {
+          "month": "2017-07",
+          "monthly_revenue": 498031.48,
+          "cumulative_revenue": 2539028.64
+        },
+        {
+          "month": "2017-08",
+          "monthly_revenue": 573971.68,
+          "cumulative_revenue": 3113000.32
+        },
+        {
+          "month": "2017-09",
+          "monthly_revenue": 624401.69,
+          "cumulative_revenue": 3737402.01
+        },
+        {
+          "month": "2017-10",
+          "monthly_revenue": 664219.43,
+          "cumulative_revenue": 4401621.44
+        },
+        {
+          "month": "2017-11",
+          "monthly_revenue": 1010271.37,
+          "cumulative_revenue": 5411892.81
+        },
+        {
+          "month": "2017-12",
+          "monthly_revenue": 743914.17,
+          "cumulative_revenue": 6155806.98
+        }
+      ],
+      "row_count": 12
+    }
+  },
+  {
+    "question": "What was the month-over-month revenue growth percentage during the first half of 2018?",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "month",
+      "revenue",
+      "prev_revenue",
+      "mom_growth_pct"
+    ],
+    "expected_sql": "WITH monthly AS (\n    SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month,\n           ROUND(SUM(oi.price), 2) AS revenue\n    FROM orders o\n    JOIN order_items oi ON o.order_id = oi.order_id\n    WHERE o.order_purchase_timestamp >= '2018-01-01' AND o.order_purchase_timestamp < '2018-07-01'\n    GROUP BY month\n)\nSELECT month,\n       revenue,\n       LAG(revenue) OVER (ORDER BY month) AS prev_revenue,\n       ROUND(100.0 * (revenue - LAG(revenue) OVER (ORDER BY month)) / LAG(revenue) OVER (ORDER BY month), 2) AS mom_growth_pct\nFROM monthly\nORDER BY month;",
+    "category": "Revenue & Sales",
+    "domain": "Revenue & Sales",
+    "query_type": "time_series",
+    "difficulty": "hard",
+    "expected_result": {
+      "columns": [
+        "month",
+        "revenue",
+        "prev_revenue",
+        "mom_growth_pct"
+      ],
+      "values": [
+        {
+          "month": "2018-01",
+          "revenue": 950030.36,
+          "prev_revenue": null,
+          "mom_growth_pct": null
+        },
+        {
+          "month": "2018-02",
+          "revenue": 844178.71,
+          "prev_revenue": 950030.36,
+          "mom_growth_pct": -11.14
+        },
+        {
+          "month": "2018-03",
+          "revenue": 983213.44,
+          "prev_revenue": 844178.71,
+          "mom_growth_pct": 16.47
+        },
+        {
+          "month": "2018-04",
+          "revenue": 996647.75,
+          "prev_revenue": 983213.44,
+          "mom_growth_pct": 1.37
+        },
+        {
+          "month": "2018-05",
+          "revenue": 996517.68,
+          "prev_revenue": 996647.75,
+          "mom_growth_pct": -0.01
+        },
+        {
+          "month": "2018-06",
+          "revenue": 865124.31,
+          "prev_revenue": 996517.68,
+          "mom_growth_pct": -13.19
+        }
+      ],
+      "row_count": 6
+    }
+  },
+  {
+    "question": "What is the distribution of total revenue by day of the week?",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "day_of_week",
+      "order_count",
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT CASE CAST(strftime('%w', o.order_purchase_timestamp) AS INTEGER) WHEN 0 THEN 'Sunday' WHEN 1 THEN 'Monday' WHEN 2 THEN 'Tuesday' WHEN 3 THEN 'Wednesday' WHEN 4 THEN 'Thursday' WHEN 5 THEN 'Friday' WHEN 6 THEN 'Saturday' END AS day_of_week, COUNT(DISTINCT o.order_id) AS order_count, ROUND(SUM(oi.price), 2) AS total_revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id GROUP BY strftime('%w', o.order_purchase_timestamp) ORDER BY CAST(strftime('%w', o.order_purchase_timestamp) AS INTEGER);",
+    "category": "Revenue & Sales",
+    "domain": "Revenue & Sales",
+    "query_type": "aggregated_table",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "day_of_week",
+        "order_count",
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "day_of_week": "Sunday",
+          "order_count": 11888,
+          "total_revenue": 1589278.89
+        },
+        {
+          "day_of_week": "Monday",
+          "order_count": 16068,
+          "total_revenue": 2230812.51
+        },
+        {
+          "day_of_week": "Tuesday",
+          "order_count": 15831,
+          "total_revenue": 2172647.82
+        },
+        {
+          "day_of_week": "Wednesday",
+          "order_count": 15425,
+          "total_revenue": 2113843.59
+        },
+        {
+          "day_of_week": "Thursday",
+          "order_count": 14639,
+          "total_revenue": 2018615.78
+        },
+        {
+          "day_of_week": "Friday",
+          "order_count": 14002,
+          "total_revenue": 1962426.75
+        },
+        {
+          "day_of_week": "Saturday",
+          "order_count": 10813,
+          "total_revenue": 1504018.36
+        }
+      ],
+      "row_count": 7
+    }
+  },
+  {
+    "question": "What is the distribution of order purchasing volume by hour of the day?",
+    "expected_tables": [
+      "orders"
+    ],
+    "expected_metrics": [
+      "hour",
+      "order_count"
+    ],
+    "expected_sql": "SELECT CAST(strftime('%H', order_purchase_timestamp) AS INTEGER) AS hour, COUNT(*) AS order_count FROM orders GROUP BY hour ORDER BY hour;",
+    "category": "Revenue & Sales",
+    "domain": "Revenue & Sales",
+    "query_type": "aggregated_table",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "hour",
+        "order_count"
+      ],
+      "values": [
+        {
+          "hour": 0,
+          "order_count": 2394
+        },
+        {
+          "hour": 1,
+          "order_count": 1170
+        },
+        {
+          "hour": 2,
+          "order_count": 510
+        },
+        {
+          "hour": 3,
+          "order_count": 272
+        },
+        {
+          "hour": 4,
+          "order_count": 206
+        },
+        {
+          "hour": 5,
+          "order_count": 188
+        },
+        {
+          "hour": 6,
+          "order_count": 502
+        },
+        {
+          "hour": 7,
+          "order_count": 1231
+        },
+        {
+          "hour": 8,
+          "order_count": 2967
+        },
+        {
+          "hour": 9,
+          "order_count": 4785
+        },
+        {
+          "hour": 10,
+          "order_count": 6177
+        },
+        {
+          "hour": 11,
+          "order_count": 6578
+        },
+        {
+          "hour": 12,
+          "order_count": 5995
+        },
+        {
+          "hour": 13,
+          "order_count": 6518
+        },
+        {
+          "hour": 14,
+          "order_count": 6569
+        },
+        {
+          "hour": 15,
+          "order_count": 6454
+        },
+        {
+          "hour": 16,
+          "order_count": 6675
+        },
+        {
+          "hour": 17,
+          "order_count": 6150
+        },
+        {
+          "hour": 18,
+          "order_count": 5769
+        },
+        {
+          "hour": 19,
+          "order_count": 5982
+        },
+        {
+          "hour": 20,
+          "order_count": 6193
+        },
+        {
+          "hour": 21,
+          "order_count": 6217
+        },
+        {
+          "hour": 22,
+          "order_count": 5816
+        },
+        {
+          "hour": 23,
+          "order_count": 4123
+        }
+      ],
+      "row_count": 24
+    }
+  },
+  {
+    "question": "What are the top 10 product categories by total sales revenue in English translation?",
+    "expected_tables": [
+      "products",
+      "order_items",
+      "product_category_name_translation"
+    ],
+    "expected_metrics": [
+      "english_category",
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT t.product_category_name_english AS english_category, ROUND(SUM(oi.price), 2) AS total_revenue FROM order_items oi JOIN products p ON oi.product_id = p.product_id JOIN product_category_name_translation t ON p.product_category_name = t.product_category_name GROUP BY english_category ORDER BY total_revenue DESC LIMIT 10;",
+    "category": "Products & Categories",
+    "domain": "Products & Categories",
+    "query_type": "ranked_list",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "english_category",
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "english_category": "health_beauty",
+          "total_revenue": 1258681.34
+        },
+        {
+          "english_category": "watches_gifts",
+          "total_revenue": 1205005.68
+        },
+        {
+          "english_category": "bed_bath_table",
+          "total_revenue": 1036988.68
+        },
+        {
+          "english_category": "sports_leisure",
+          "total_revenue": 988048.97
+        },
+        {
+          "english_category": "computers_accessories",
+          "total_revenue": 911954.32
+        },
+        {
+          "english_category": "furniture_decor",
+          "total_revenue": 729762.49
+        },
+        {
+          "english_category": "cool_stuff",
+          "total_revenue": 635290.85
+        },
+        {
+          "english_category": "housewares",
+          "total_revenue": 632248.66
+        },
+        {
+          "english_category": "auto",
+          "total_revenue": 592720.11
+        },
+        {
+          "english_category": "garden_tools",
+          "total_revenue": 485256.46
+        }
+      ],
+      "row_count": 10
+    }
+  },
+  {
+    "question": "What are the top 5 product categories with the highest average product price?",
+    "expected_tables": [
+      "products",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "category",
+      "avg_price",
+      "total_items_sold"
+    ],
+    "expected_sql": "SELECT p.product_category_name AS category, ROUND(AVG(oi.price), 2) AS avg_price, COUNT(*) AS total_items_sold FROM products p JOIN order_items oi ON p.product_id = oi.product_id WHERE p.product_category_name IS NOT NULL GROUP BY category HAVING COUNT(*) >= 50 ORDER BY avg_price DESC LIMIT 5;",
+    "category": "Products & Categories",
+    "domain": "Products & Categories",
+    "query_type": "ranked_list",
+    "difficulty": "hard",
+    "expected_result": {
+      "columns": [
+        "category",
+        "avg_price",
+        "total_items_sold"
+      ],
+      "values": [
+        {
+          "category": "pcs",
+          "avg_price": 1098.34,
+          "total_items_sold": 203
+        },
+        {
+          "category": "portateis_casa_forno_e_cafe",
+          "avg_price": 624.29,
+          "total_items_sold": 76
+        },
+        {
+          "category": "eletrodomesticos_2",
+          "avg_price": 476.12,
+          "total_items_sold": 238
+        },
+        {
+          "category": "agro_industria_e_comercio",
+          "avg_price": 342.12,
+          "total_items_sold": 212
+        },
+        {
+          "category": "instrumentos_musicais",
+          "avg_price": 281.62,
+          "total_items_sold": 680
+        }
+      ],
+      "row_count": 5
+    }
+  },
+  {
+    "question": "What are the top 5 product categories with the highest freight-to-price ratio?",
+    "expected_tables": [
+      "products",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "category",
+      "freight_ratio_pct"
+    ],
+    "expected_sql": "SELECT p.product_category_name AS category, ROUND(100.0 * SUM(oi.freight_value) / SUM(oi.price), 2) AS freight_ratio_pct FROM products p JOIN order_items oi ON p.product_id = oi.product_id WHERE p.product_category_name IS NOT NULL GROUP BY category HAVING COUNT(*) >= 100 ORDER BY freight_ratio_pct DESC LIMIT 5;",
+    "category": "Products & Categories",
+    "domain": "Products & Categories",
+    "query_type": "ranked_list",
+    "difficulty": "hard",
+    "expected_result": {
+      "columns": [
+        "category",
+        "freight_ratio_pct"
+      ],
+      "values": [
+        {
+          "category": "artigos_de_natal",
+          "freight_ratio_pct": 36.69
+        },
+        {
+          "category": "sinalizacao_e_seguranca",
+          "freight_ratio_pct": 30.26
+        },
+        {
+          "category": "alimentos_bebidas",
+          "freight_ratio_pct": 29.7
+        },
+        {
+          "category": "eletronicos",
+          "freight_ratio_pct": 29.07
+        },
+        {
+          "category": "moveis_sala",
+          "freight_ratio_pct": 26.07
+        }
+      ],
+      "row_count": 5
+    }
+  },
+  {
+    "question": "Which 10 individual products generated the highest gross revenue?",
+    "expected_tables": [
+      "products",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "product_id",
+      "category",
+      "units_sold",
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT p.product_id, p.product_category_name AS category, COUNT(*) AS units_sold, ROUND(SUM(oi.price), 2) AS total_revenue FROM order_items oi JOIN products p ON oi.product_id = p.product_id GROUP BY p.product_id ORDER BY total_revenue DESC LIMIT 10;",
+    "category": "Products & Categories",
+    "domain": "Products & Categories",
+    "query_type": "ranked_list",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "product_id",
+        "category",
+        "units_sold",
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "product_id": "bb50f2e236e5eea0100680137654686c",
+          "category": "beleza_saude",
+          "units_sold": 195,
+          "total_revenue": 63885.0
+        },
+        {
+          "product_id": "6cdd53843498f92890544667809f1595",
+          "category": "beleza_saude",
+          "units_sold": 156,
+          "total_revenue": 54730.2
+        },
+        {
+          "product_id": "d6160fb7873f184099d9bc95e30376af",
+          "category": "pcs",
+          "units_sold": 35,
+          "total_revenue": 48899.34
+        },
+        {
+          "product_id": "d1c427060a0f73f6b889a5c7c61f2ac4",
+          "category": "informatica_acessorios",
+          "units_sold": 343,
+          "total_revenue": 47214.51
+        },
+        {
+          "product_id": "99a4788cb24856965c36a24e339b6058",
+          "category": "cama_mesa_banho",
+          "units_sold": 488,
+          "total_revenue": 43025.56
+        },
+        {
+          "product_id": "3dd2a17168ec895c781a9191c1e95ad7",
+          "category": "informatica_acessorios",
+          "units_sold": 274,
+          "total_revenue": 41082.6
+        },
+        {
+          "product_id": "25c38557cf793876c5abdd5931f922db",
+          "category": "bebes",
+          "units_sold": 38,
+          "total_revenue": 38907.32
+        },
+        {
+          "product_id": "5f504b3a1c75b73d6151be81eb05bdc9",
+          "category": "cool_stuff",
+          "units_sold": 63,
+          "total_revenue": 37733.9
+        },
+        {
+          "product_id": "53b36df67ebb7c41585e8d54d6772e08",
+          "category": "relogios_presentes",
+          "units_sold": 323,
+          "total_revenue": 37683.42
+        },
+        {
+          "product_id": "aca2eb7d00ea1a7b8ebd4e68314663af",
+          "category": "moveis_decoracao",
+          "units_sold": 527,
+          "total_revenue": 37608.9
+        }
+      ],
+      "row_count": 10
+    }
+  },
+  {
+    "question": "What are the 5 product categories with the lowest average customer review score?",
+    "expected_tables": [
+      "products",
+      "order_items",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "category",
+      "avg_review_score",
+      "review_count"
+    ],
+    "expected_sql": "SELECT p.product_category_name AS category, ROUND(AVG(r.review_score), 2) AS avg_review_score, COUNT(r.review_score) AS review_count FROM products p JOIN order_items oi ON p.product_id = oi.product_id JOIN order_reviews r ON oi.order_id = r.order_id WHERE p.product_category_name IS NOT NULL GROUP BY category HAVING COUNT(r.review_score) >= 100 ORDER BY avg_review_score ASC LIMIT 5;",
+    "category": "Products & Categories",
+    "domain": "Products & Categories",
+    "query_type": "ranked_list",
+    "difficulty": "hard",
+    "expected_result": {
+      "columns": [
+        "category",
+        "avg_review_score",
+        "review_count"
+      ],
+      "values": [
+        {
+          "category": "moveis_escritorio",
+          "avg_review_score": 3.49,
+          "review_count": 1687
+        },
+        {
+          "category": "fashion_roupa_masculina",
+          "avg_review_score": 3.64,
+          "review_count": 131
+        },
+        {
+          "category": "telefonia_fixa",
+          "avg_review_score": 3.68,
+          "review_count": 262
+        },
+        {
+          "category": "audio",
+          "avg_review_score": 3.83,
+          "review_count": 361
+        },
+        {
+          "category": "casa_conforto",
+          "avg_review_score": 3.83,
+          "review_count": 435
+        }
+      ],
+      "row_count": 5
+    }
+  },
+  {
+    "question": "How many distinct product categories exist in the product catalog?",
+    "expected_tables": [
+      "products"
+    ],
+    "expected_metrics": [
+      "category_count"
+    ],
+    "expected_sql": "SELECT COUNT(DISTINCT product_category_name) AS category_count FROM products WHERE product_category_name IS NOT NULL;",
+    "category": "Products & Categories",
+    "domain": "Products & Categories",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "category_count"
+      ],
+      "values": [
+        {
+          "category_count": 73
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the overall repeat customer rate (percentage of unique customers who placed more than 1 order)?",
+    "expected_tables": [
+      "customers",
+      "orders"
+    ],
+    "expected_metrics": [
+      "repeat_customer_rate"
+    ],
+    "expected_sql": "WITH customer_orders AS (\n    SELECT c.customer_unique_id, COUNT(DISTINCT o.order_id) AS order_count\n    FROM customers c\n    JOIN orders o ON c.customer_id = o.customer_id\n    GROUP BY c.customer_unique_id\n)\nSELECT ROUND(100.0 * SUM(CASE WHEN order_count > 1 THEN 1 ELSE 0 END) / COUNT(*), 2) AS repeat_customer_rate\nFROM customer_orders;",
+    "category": "Customers & Geography",
+    "domain": "Customers & Geography",
+    "query_type": "single_value",
+    "difficulty": "hard",
+    "expected_result": {
+      "columns": [
+        "repeat_customer_rate"
+      ],
+      "values": [
+        {
+          "repeat_customer_rate": 3.12
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What are the top 10 cities by total revenue generated?",
+    "expected_tables": [
+      "customers",
+      "orders",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "city",
+      "state",
+      "total_revenue"
+    ],
+    "expected_sql": "SELECT c.customer_city AS city, c.customer_state AS state, ROUND(SUM(oi.price), 2) AS total_revenue FROM customers c JOIN orders o ON c.customer_id = o.customer_id JOIN order_items oi ON o.order_id = oi.order_id GROUP BY c.customer_city, c.customer_state ORDER BY total_revenue DESC LIMIT 10;",
+    "category": "Customers & Geography",
+    "domain": "Customers & Geography",
+    "query_type": "ranked_list",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "city",
+        "state",
+        "total_revenue"
+      ],
+      "values": [
+        {
+          "city": "sao paulo",
+          "state": "SP",
+          "total_revenue": 1914924.54
+        },
+        {
+          "city": "rio de janeiro",
+          "state": "RJ",
+          "total_revenue": 992538.86
+        },
+        {
+          "city": "belo horizonte",
+          "state": "MG",
+          "total_revenue": 355611.13
+        },
+        {
+          "city": "brasilia",
+          "state": "DF",
+          "total_revenue": 301920.25
+        },
+        {
+          "city": "curitiba",
+          "state": "PR",
+          "total_revenue": 211738.06
+        },
+        {
+          "city": "porto alegre",
+          "state": "RS",
+          "total_revenue": 190562.08
+        },
+        {
+          "city": "campinas",
+          "state": "SP",
+          "total_revenue": 187844.53
+        },
+        {
+          "city": "salvador",
+          "state": "BA",
+          "total_revenue": 181104.42
+        },
+        {
+          "city": "guarulhos",
+          "state": "SP",
+          "total_revenue": 144268.39
+        },
+        {
+          "city": "niteroi",
+          "state": "RJ",
+          "total_revenue": 117907.12
+        }
+      ],
+      "row_count": 10
+    }
+  },
+  {
+    "question": "What are the top 5 states by average revenue per customer?",
+    "expected_tables": [
+      "customers",
+      "orders",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "state",
+      "avg_revenue_per_customer"
+    ],
+    "expected_sql": "SELECT c.customer_state AS state, ROUND(SUM(oi.price) / COUNT(DISTINCT c.customer_unique_id), 2) AS avg_revenue_per_customer FROM customers c JOIN orders o ON c.customer_id = o.customer_id JOIN order_items oi ON o.order_id = oi.order_id GROUP BY state HAVING COUNT(DISTINCT c.customer_unique_id) >= 100 ORDER BY avg_revenue_per_customer DESC LIMIT 5;",
+    "category": "Customers & Geography",
+    "domain": "Customers & Geography",
+    "query_type": "ranked_list",
+    "difficulty": "hard",
+    "expected_result": {
+      "columns": [
+        "state",
+        "avg_revenue_per_customer"
+      ],
+      "values": [
+        {
+          "state": "PB",
+          "avg_revenue_per_customer": 223.39
+        },
+        {
+          "state": "AL",
+          "avg_revenue_per_customer": 201.29
+        },
+        {
+          "state": "RO",
+          "avg_revenue_per_customer": 196.34
+        },
+        {
+          "state": "PA",
+          "avg_revenue_per_customer": 189.56
+        },
+        {
+          "state": "TO",
+          "avg_revenue_per_customer": 182.43
+        }
+      ],
+      "row_count": 5
+    }
+  },
+  {
+    "question": "What is the maximum number of orders placed by any single unique customer?",
+    "expected_tables": [
+      "customers",
+      "orders"
+    ],
+    "expected_metrics": [
+      "max_orders"
+    ],
+    "expected_sql": "SELECT MAX(order_cnt) AS max_orders FROM (SELECT COUNT(DISTINCT o.order_id) AS order_cnt FROM customers c JOIN orders o ON c.customer_id = o.customer_id GROUP BY c.customer_unique_id);",
+    "category": "Customers & Geography",
+    "domain": "Customers & Geography",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "max_orders"
+      ],
+      "values": [
+        {
+          "max_orders": 17
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average customer lifetime spend among repeat customers?",
+    "expected_tables": [
+      "customers",
+      "orders",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "avg_repeat_customer_spend"
+    ],
+    "expected_sql": "WITH customer_spend AS (\n    SELECT c.customer_unique_id,\n           COUNT(DISTINCT o.order_id) AS order_cnt,\n           SUM(oi.price) AS total_spend\n    FROM customers c\n    JOIN orders o ON c.customer_id = o.customer_id\n    JOIN order_items oi ON o.order_id = oi.order_id\n    GROUP BY c.customer_unique_id\n    HAVING order_cnt > 1\n)\nSELECT ROUND(AVG(total_spend), 2) AS avg_repeat_customer_spend\nFROM customer_spend;",
+    "category": "Customers & Geography",
+    "domain": "Customers & Geography",
+    "query_type": "single_value",
+    "difficulty": "hard",
+    "expected_result": {
+      "columns": [
+        "avg_repeat_customer_spend"
+      ],
+      "values": [
+        {
+          "avg_repeat_customer_spend": 262.03
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What percentage of unique customers are based in the state of Sao Paulo (SP)?",
+    "expected_tables": [
+      "customers"
+    ],
+    "expected_metrics": [
+      "sp_customer_pct"
+    ],
+    "expected_sql": "SELECT ROUND(100.0 * COUNT(DISTINCT CASE WHEN customer_state = 'SP' THEN customer_unique_id END) / COUNT(DISTINCT customer_unique_id), 2) AS sp_customer_pct FROM customers;",
+    "category": "Customers & Geography",
+    "domain": "Customers & Geography",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "sp_customer_pct"
+      ],
+      "values": [
+        {
+          "sp_customer_pct": 41.94
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "How many distinct cities are represented across all customers?",
+    "expected_tables": [
+      "customers"
+    ],
+    "expected_metrics": [
+      "unique_cities"
+    ],
+    "expected_sql": "SELECT COUNT(DISTINCT customer_city) AS unique_cities FROM customers;",
+    "category": "Customers & Geography",
+    "domain": "Customers & Geography",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "unique_cities"
+      ],
+      "values": [
+        {
+          "unique_cities": 4119
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What are the top 5 product categories with the highest total freight revenue generated?",
+    "expected_tables": [
+      "products",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "category",
+      "total_freight"
+    ],
+    "expected_sql": "SELECT p.product_category_name AS category, ROUND(SUM(oi.freight_value), 2) AS total_freight FROM products p JOIN order_items oi ON p.product_id = oi.product_id WHERE p.product_category_name IS NOT NULL GROUP BY category ORDER BY total_freight DESC LIMIT 5;",
+    "category": "Products & Categories",
+    "domain": "Products & Categories",
+    "query_type": "ranked_list",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "category",
+        "total_freight"
+      ],
+      "values": [
+        {
+          "category": "cama_mesa_banho",
+          "total_freight": 204693.04
+        },
+        {
+          "category": "beleza_saude",
+          "total_freight": 182566.73
+        },
+        {
+          "category": "moveis_decoracao",
+          "total_freight": 172749.3
+        },
+        {
+          "category": "esporte_lazer",
+          "total_freight": 168607.51
+        },
+        {
+          "category": "informatica_acessorios",
+          "total_freight": 147318.08
+        }
+      ],
+      "row_count": 5
+    }
+  },
+  {
+    "question": "What is the average number of items sold per seller?",
+    "expected_tables": [
+      "sellers",
+      "order_items"
+    ],
+    "expected_metrics": [
+      "avg_items_per_seller"
+    ],
+    "expected_sql": "SELECT ROUND(CAST(COUNT(oi.order_item_id) AS REAL) / COUNT(DISTINCT s.seller_id), 2) AS avg_items_per_seller FROM sellers s JOIN order_items oi ON s.seller_id = oi.seller_id;",
+    "category": "Sellers & Fulfillment",
+    "domain": "Sellers & Fulfillment",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_items_per_seller"
+      ],
+      "values": [
+        {
+          "avg_items_per_seller": 36.4
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What are the top 5 seller states by average fulfillment speed (days from purchase to carrier delivery)?",
+    "expected_tables": [
+      "sellers",
+      "order_items",
+      "orders"
+    ],
+    "expected_metrics": [
+      "seller_state",
+      "avg_carrier_delivery_days"
+    ],
+    "expected_sql": "SELECT s.seller_state, ROUND(AVG(JULIANDAY(o.order_delivered_carrier_date) - JULIANDAY(o.order_purchase_timestamp)), 2) AS avg_carrier_delivery_days FROM sellers s JOIN order_items oi ON s.seller_id = oi.seller_id JOIN orders o ON oi.order_id = o.order_id WHERE o.order_delivered_carrier_date IS NOT NULL GROUP BY s.seller_state HAVING COUNT(DISTINCT o.order_id) >= 100 ORDER BY avg_carrier_delivery_days ASC LIMIT 5;",
+    "category": "Sellers & Fulfillment",
+    "domain": "Sellers & Fulfillment",
+    "query_type": "ranked_list",
+    "difficulty": "hard",
+    "expected_result": {
+      "columns": [
+        "seller_state",
+        "avg_carrier_delivery_days"
+      ],
+      "values": [
+        {
+          "seller_state": "PE",
+          "avg_carrier_delivery_days": 2.29
+        },
+        {
+          "seller_state": "ES",
+          "avg_carrier_delivery_days": 2.54
+        },
+        {
+          "seller_state": "GO",
+          "avg_carrier_delivery_days": 2.66
+        },
+        {
+          "seller_state": "RJ",
+          "avg_carrier_delivery_days": 2.9
+        },
+        {
+          "seller_state": "DF",
+          "avg_carrier_delivery_days": 3.07
+        }
+      ],
+      "row_count": 5
+    }
+  },
+  {
+    "question": "What percentage of sellers are located in the state of SP?",
+    "expected_tables": [
+      "sellers"
+    ],
+    "expected_metrics": [
+      "sp_seller_pct"
+    ],
+    "expected_sql": "SELECT ROUND(100.0 * COUNT(CASE WHEN seller_state = 'SP' THEN 1 END) / COUNT(*), 2) AS sp_seller_pct FROM sellers;",
+    "category": "Sellers & Fulfillment",
+    "domain": "Sellers & Fulfillment",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "sp_seller_pct"
+      ],
+      "values": [
+        {
+          "sp_seller_pct": 59.74
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "How many sellers have fulfilled orders totaling over 50,000 in revenue?",
+    "expected_tables": [
+      "order_items"
+    ],
+    "expected_metrics": [
+      "seller_count"
+    ],
+    "expected_sql": "SELECT COUNT(*) AS seller_count FROM (SELECT seller_id, SUM(price) AS revenue FROM order_items GROUP BY seller_id HAVING revenue > 50000);",
+    "category": "Sellers & Fulfillment",
+    "domain": "Sellers & Fulfillment",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "seller_count"
+      ],
+      "values": [
+        {
+          "seller_count": 40
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average review score of sellers with more than 500 orders fulfilled?",
+    "expected_tables": [
+      "sellers",
+      "order_items",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_rating_top_sellers"
+    ],
+    "expected_sql": "WITH high_volume_sellers AS (\n    SELECT seller_id\n    FROM order_items\n    GROUP BY seller_id\n    HAVING COUNT(DISTINCT order_id) >= 500\n)\nSELECT ROUND(AVG(r.review_score), 2) AS avg_rating_top_sellers\nFROM high_volume_sellers hvs\nJOIN order_items oi ON hvs.seller_id = oi.seller_id\nJOIN order_reviews r ON oi.order_id = r.order_id;",
+    "category": "Sellers & Fulfillment",
+    "domain": "Sellers & Fulfillment",
+    "query_type": "single_value",
+    "difficulty": "hard",
+    "expected_result": {
+      "columns": [
+        "avg_rating_top_sellers"
+      ],
+      "values": [
+        {
+          "avg_rating_top_sellers": 3.99
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total revenue breakdown and share by payment type?",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "expected_metrics": [
+      "payment_type",
+      "total_value",
+      "percentage_share"
+    ],
+    "expected_sql": "SELECT payment_type, ROUND(SUM(payment_value), 2) AS total_value, ROUND(100.0 * SUM(payment_value) / (SELECT SUM(payment_value) FROM order_payments), 2) AS percentage_share FROM order_payments GROUP BY payment_type ORDER BY total_value DESC;",
+    "category": "Payments & Installments",
+    "domain": "Payments & Installments",
+    "query_type": "aggregated_table",
+    "difficulty": "hard",
+    "expected_result": {
+      "columns": [
+        "payment_type",
+        "total_value",
+        "percentage_share"
+      ],
+      "values": [
+        {
+          "payment_type": "credit_card",
+          "total_value": 12542084.19,
+          "percentage_share": 78.34
+        },
+        {
+          "payment_type": "boleto",
+          "total_value": 2869361.27,
+          "percentage_share": 17.92
+        },
+        {
+          "payment_type": "voucher",
+          "total_value": 379436.87,
+          "percentage_share": 2.37
+        },
+        {
+          "payment_type": "debit_card",
+          "total_value": 217989.79,
+          "percentage_share": 1.36
+        },
+        {
+          "payment_type": "not_defined",
+          "total_value": 0.0,
+          "percentage_share": 0.0
+        }
+      ],
+      "row_count": 5
+    }
+  },
+  {
+    "question": "What is the average payment value per installment for credit card transactions with at least 5 installments?",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "expected_metrics": [
+      "avg_installment_amount"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(payment_value / payment_installments), 2) AS avg_installment_amount FROM order_payments WHERE payment_type = 'credit_card' AND payment_installments >= 5;",
+    "category": "Payments & Installments",
+    "domain": "Payments & Installments",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_installment_amount"
+      ],
+      "values": [
+        {
+          "avg_installment_amount": 36.56
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What percentage of credit card transactions use single installment vs multiple installments?",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "expected_metrics": [
+      "single_installment_pct",
+      "multi_installment_pct"
+    ],
+    "expected_sql": "SELECT ROUND(100.0 * SUM(CASE WHEN payment_installments = 1 THEN 1 ELSE 0 END) / COUNT(*), 2) AS single_installment_pct, ROUND(100.0 * SUM(CASE WHEN payment_installments > 1 THEN 1 ELSE 0 END) / COUNT(*), 2) AS multi_installment_pct FROM order_payments WHERE payment_type = 'credit_card';",
+    "category": "Payments & Installments",
+    "domain": "Payments & Installments",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "single_installment_pct",
+        "multi_installment_pct"
+      ],
+      "values": [
+        {
+          "single_installment_pct": 33.15,
+          "multi_installment_pct": 66.85
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the maximum number of installments recorded for any single payment?",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "expected_metrics": [
+      "max_installments"
+    ],
+    "expected_sql": "SELECT MAX(payment_installments) AS max_installments FROM order_payments;",
+    "category": "Payments & Installments",
+    "domain": "Payments & Installments",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "max_installments"
+      ],
+      "values": [
+        {
+          "max_installments": 24
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the total value refunded or processed via vouchers in orders with multiple payment methods?",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "expected_metrics": [
+      "total_voucher_split_value"
+    ],
+    "expected_sql": "WITH multi_pay_orders AS (\n    SELECT order_id\n    FROM order_payments\n    GROUP BY order_id\n    HAVING COUNT(DISTINCT payment_type) > 1\n)\nSELECT ROUND(SUM(op.payment_value), 2) AS total_voucher_split_value\nFROM order_payments op\nJOIN multi_pay_orders mpo ON op.order_id = mpo.order_id\nWHERE op.payment_type = 'voucher';",
+    "category": "Payments & Installments",
+    "domain": "Payments & Installments",
+    "query_type": "single_value",
+    "difficulty": "hard",
+    "expected_result": {
+      "columns": [
+        "total_voucher_split_value"
+      ],
+      "values": [
+        {
+          "total_voucher_split_value": 194014.59
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average total delivery time in days across all delivered orders?",
+    "expected_tables": [
+      "orders"
+    ],
+    "expected_metrics": [
+      "avg_delivery_days"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(JULIANDAY(order_delivered_customer_date) - JULIANDAY(order_purchase_timestamp)), 2) AS avg_delivery_days FROM orders WHERE order_status = 'delivered' AND order_delivered_customer_date IS NOT NULL;",
+    "category": "Logistics & Operations",
+    "domain": "Logistics & Operations",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "avg_delivery_days"
+      ],
+      "values": [
+        {
+          "avg_delivery_days": 12.56
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What are the 5 customer states with the longest average delivery times in days?",
+    "expected_tables": [
+      "orders",
+      "customers"
+    ],
+    "expected_metrics": [
+      "state",
+      "avg_delivery_days"
+    ],
+    "expected_sql": "SELECT c.customer_state AS state, ROUND(AVG(JULIANDAY(o.order_delivered_customer_date) - JULIANDAY(o.order_purchase_timestamp)), 2) AS avg_delivery_days FROM orders o JOIN customers c ON o.customer_id = c.customer_id WHERE o.order_status = 'delivered' AND o.order_delivered_customer_date IS NOT NULL GROUP BY state HAVING COUNT(*) >= 50 ORDER BY avg_delivery_days DESC LIMIT 5;",
+    "category": "Logistics & Operations",
+    "domain": "Logistics & Operations",
+    "query_type": "ranked_list",
+    "difficulty": "hard",
+    "expected_result": {
+      "columns": [
+        "state",
+        "avg_delivery_days"
+      ],
+      "values": [
+        {
+          "state": "AP",
+          "avg_delivery_days": 27.19
+        },
+        {
+          "state": "AM",
+          "avg_delivery_days": 26.43
+        },
+        {
+          "state": "AL",
+          "avg_delivery_days": 24.54
+        },
+        {
+          "state": "PA",
+          "avg_delivery_days": 23.77
+        },
+        {
+          "state": "MA",
+          "avg_delivery_days": 21.57
+        }
+      ],
+      "row_count": 5
+    }
+  },
+  {
+    "question": "What are the 5 customer states with the shortest average delivery times in days?",
+    "expected_tables": [
+      "orders",
+      "customers"
+    ],
+    "expected_metrics": [
+      "state",
+      "avg_delivery_days"
+    ],
+    "expected_sql": "SELECT c.customer_state AS state, ROUND(AVG(JULIANDAY(o.order_delivered_customer_date) - JULIANDAY(o.order_purchase_timestamp)), 2) AS avg_delivery_days FROM orders o JOIN customers c ON o.customer_id = c.customer_id WHERE o.order_status = 'delivered' AND o.order_delivered_customer_date IS NOT NULL GROUP BY state HAVING COUNT(*) >= 50 ORDER BY avg_delivery_days ASC LIMIT 5;",
+    "category": "Logistics & Operations",
+    "domain": "Logistics & Operations",
+    "query_type": "ranked_list",
+    "difficulty": "hard",
+    "expected_result": {
+      "columns": [
+        "state",
+        "avg_delivery_days"
+      ],
+      "values": [
+        {
+          "state": "SP",
+          "avg_delivery_days": 8.76
+        },
+        {
+          "state": "PR",
+          "avg_delivery_days": 11.99
+        },
+        {
+          "state": "MG",
+          "avg_delivery_days": 12.01
+        },
+        {
+          "state": "DF",
+          "avg_delivery_days": 12.97
+        },
+        {
+          "state": "SC",
+          "avg_delivery_days": 14.95
+        }
+      ],
+      "row_count": 5
+    }
+  },
+  {
+    "question": "What percentage of all delivered orders were delivered ahead of the estimated delivery date?",
+    "expected_tables": [
+      "orders"
+    ],
+    "expected_metrics": [
+      "early_delivery_pct"
+    ],
+    "expected_sql": "SELECT ROUND(100.0 * SUM(CASE WHEN order_delivered_customer_date < order_estimated_delivery_date THEN 1 ELSE 0 END) / COUNT(*), 2) AS early_delivery_pct FROM orders WHERE order_status = 'delivered' AND order_delivered_customer_date IS NOT NULL AND order_estimated_delivery_date IS NOT NULL;",
+    "category": "Logistics & Operations",
+    "domain": "Logistics & Operations",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "early_delivery_pct"
+      ],
+      "values": [
+        {
+          "early_delivery_pct": 91.89
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average freight cost for orders shipped interstate versus intrastate (same state)?",
+    "expected_tables": [
+      "orders",
+      "customers",
+      "order_items",
+      "sellers"
+    ],
+    "expected_metrics": [
+      "shipping_route_type",
+      "avg_freight"
+    ],
+    "expected_sql": "SELECT CASE WHEN c.customer_state = s.seller_state THEN 'Same State' ELSE 'Interstate' END AS shipping_route_type, ROUND(AVG(oi.freight_value), 2) AS avg_freight FROM orders o JOIN customers c ON o.customer_id = c.customer_id JOIN order_items oi ON o.order_id = oi.order_id JOIN sellers s ON oi.seller_id = s.seller_id GROUP BY shipping_route_type ORDER BY shipping_route_type;",
+    "category": "Logistics & Operations",
+    "domain": "Logistics & Operations",
+    "query_type": "aggregated_table",
+    "difficulty": "hard",
+    "expected_result": {
+      "columns": [
+        "shipping_route_type",
+        "avg_freight"
+      ],
+      "values": [
+        {
+          "shipping_route_type": "Interstate",
+          "avg_freight": 23.69
+        },
+        {
+          "shipping_route_type": "Same State",
+          "avg_freight": 13.46
+        }
+      ],
+      "row_count": 2
+    }
+  },
+  {
+    "question": "What is the total order cancellation rate across all recorded orders?",
+    "expected_tables": [
+      "orders"
+    ],
+    "expected_metrics": [
+      "cancellation_rate_pct"
+    ],
+    "expected_sql": "SELECT ROUND(100.0 * SUM(CASE WHEN order_status = 'canceled' THEN 1 ELSE 0 END) / COUNT(*), 2) AS cancellation_rate_pct FROM orders;",
+    "category": "Logistics & Operations",
+    "domain": "Logistics & Operations",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "cancellation_rate_pct"
+      ],
+      "values": [
+        {
+          "cancellation_rate_pct": 0.63
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "How many orders were shipped with multiple items in the same order?",
+    "expected_tables": [
+      "order_items"
+    ],
+    "expected_metrics": [
+      "multi_item_order_count"
+    ],
+    "expected_sql": "SELECT COUNT(*) AS multi_item_order_count FROM (SELECT order_id FROM order_items GROUP BY order_id HAVING COUNT(*) > 1);",
+    "category": "Logistics & Operations",
+    "domain": "Logistics & Operations",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "multi_item_order_count"
+      ],
+      "values": [
+        {
+          "multi_item_order_count": 9803
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the overall average customer review score across all reviews?",
+    "expected_tables": [
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_review_score"
+    ],
+    "expected_sql": "SELECT ROUND(AVG(review_score), 2) AS avg_review_score FROM order_reviews;",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews & Satisfaction",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_result": {
+      "columns": [
+        "avg_review_score"
+      ],
+      "values": [
+        {
+          "avg_review_score": 4.09
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the distribution and percentage breakdown of review scores from 1 to 5?",
+    "expected_tables": [
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "review_score",
+      "count",
+      "percentage"
+    ],
+    "expected_sql": "SELECT review_score, COUNT(*) AS count, ROUND(100.0 * COUNT(*) / (SELECT COUNT(*) FROM order_reviews), 2) AS percentage FROM order_reviews GROUP BY review_score ORDER BY review_score;",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews & Satisfaction",
+    "query_type": "aggregated_table",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "review_score",
+        "count",
+        "percentage"
+      ],
+      "values": [
+        {
+          "review_score": 1,
+          "count": 11424,
+          "percentage": 11.51
+        },
+        {
+          "review_score": 2,
+          "count": 3151,
+          "percentage": 3.18
+        },
+        {
+          "review_score": 3,
+          "count": 8179,
+          "percentage": 8.24
+        },
+        {
+          "review_score": 4,
+          "count": 19142,
+          "percentage": 19.29
+        },
+        {
+          "review_score": 5,
+          "count": 57328,
+          "percentage": 57.78
+        }
+      ],
+      "row_count": 5
+    }
+  },
+  {
+    "question": "What is the average review score for on-time deliveries versus late deliveries?",
+    "expected_tables": [
+      "orders",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "delivery_status",
+      "avg_review_score",
+      "review_count"
+    ],
+    "expected_sql": "SELECT CASE WHEN o.order_delivered_customer_date <= o.order_estimated_delivery_date THEN 'On-Time' ELSE 'Late' END AS delivery_status, ROUND(AVG(r.review_score), 2) AS avg_review_score, COUNT(*) AS review_count FROM orders o JOIN order_reviews r ON o.order_id = r.order_id WHERE o.order_delivered_customer_date IS NOT NULL AND o.order_estimated_delivery_date IS NOT NULL GROUP BY delivery_status ORDER BY delivery_status;",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews & Satisfaction",
+    "query_type": "aggregated_table",
+    "difficulty": "hard",
+    "expected_result": {
+      "columns": [
+        "delivery_status",
+        "avg_review_score",
+        "review_count"
+      ],
+      "values": [
+        {
+          "delivery_status": "Late",
+          "avg_review_score": 2.57,
+          "review_count": 7701
+        },
+        {
+          "delivery_status": "On-Time",
+          "avg_review_score": 4.29,
+          "review_count": 88658
+        }
+      ],
+      "row_count": 2
+    }
+  },
+  {
+    "question": "What percentage of customer reviews included a written comment title or message?",
+    "expected_tables": [
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "comment_rate_pct"
+    ],
+    "expected_sql": "SELECT ROUND(100.0 * SUM(CASE WHEN (review_comment_message IS NOT NULL AND TRIM(review_comment_message) != '') OR (review_comment_title IS NOT NULL AND TRIM(review_comment_title) != '') THEN 1 ELSE 0 END) / COUNT(*), 2) AS comment_rate_pct FROM order_reviews;",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews & Satisfaction",
+    "query_type": "single_value",
+    "difficulty": "medium",
+    "expected_result": {
+      "columns": [
+        "comment_rate_pct"
+      ],
+      "values": [
+        {
+          "comment_rate_pct": 43.03
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average review response latency in hours between review creation and review survey response?",
+    "expected_tables": [
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "avg_response_hours"
+    ],
+    "expected_sql": "SELECT ROUND(AVG((JULIANDAY(review_answer_timestamp) - JULIANDAY(review_creation_date)) * 24.0), 2) AS avg_response_hours FROM order_reviews WHERE review_answer_timestamp IS NOT NULL AND review_creation_date IS NOT NULL;",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews & Satisfaction",
+    "query_type": "single_value",
+    "difficulty": "hard",
+    "expected_result": {
+      "columns": [
+        "avg_response_hours"
+      ],
+      "values": [
+        {
+          "avg_response_hours": 75.58
+        }
+      ],
+      "row_count": 1
+    }
+  },
+  {
+    "question": "What is the average review score for orders with total payment greater than 500 versus less than or equal to 500?",
+    "expected_tables": [
+      "orders",
+      "order_payments",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "order_value_tier",
+      "avg_review_score"
+    ],
+    "expected_sql": "WITH order_totals AS (\n    SELECT order_id, SUM(payment_value) AS total_payment\n    FROM order_payments\n    GROUP BY order_id\n)\nSELECT CASE WHEN ot.total_payment > 500 THEN 'High Value (>500)' ELSE 'Standard (<=500)' END AS order_value_tier,\n       ROUND(AVG(r.review_score), 2) AS avg_review_score\nFROM order_totals ot\nJOIN order_reviews r ON ot.order_id = r.order_id\nGROUP BY order_value_tier\nORDER BY order_value_tier;",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews & Satisfaction",
+    "query_type": "aggregated_table",
+    "difficulty": "hard",
+    "expected_result": {
+      "columns": [
+        "order_value_tier",
+        "avg_review_score"
+      ],
+      "values": [
+        {
+          "order_value_tier": "High Value (>500)",
+          "avg_review_score": 3.88
+        },
+        {
+          "order_value_tier": "Standard (<=500)",
+          "avg_review_score": 4.1
+        }
+      ],
+      "row_count": 2
+    }
+  },
+  {
+    "question": "What is the average review score for orders fulfilled by multiple distinct sellers?",
+    "expected_tables": [
+      "orders",
+      "order_items",
+      "order_reviews"
+    ],
+    "expected_metrics": [
+      "multi_seller_avg_review"
+    ],
+    "expected_sql": "WITH multi_seller_orders AS (\n    SELECT order_id\n    FROM order_items\n    GROUP BY order_id\n    HAVING COUNT(DISTINCT seller_id) > 1\n)\nSELECT ROUND(AVG(r.review_score), 2) AS multi_seller_avg_review\nFROM multi_seller_orders mso\nJOIN order_reviews r ON mso.order_id = r.order_id;",
+    "category": "Reviews & Satisfaction",
+    "domain": "Reviews & Satisfaction",
+    "query_type": "single_value",
+    "difficulty": "hard",
+    "expected_result": {
+      "columns": [
+        "multi_seller_avg_review"
+      ],
+      "values": [
+        {
+          "multi_seller_avg_review": 2.85
+        }
+      ],
+      "row_count": 1
+    }
   }
 ]

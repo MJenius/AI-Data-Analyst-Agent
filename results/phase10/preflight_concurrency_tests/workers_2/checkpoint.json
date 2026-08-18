@@ -1,0 +1,59 @@
+{
+  "status": "in_progress",
+  "timestamp": "2026-08-18T18:37:03.754830",
+  "dataset_path": "C:\\Users\\mjeni\\OneDrive\\Desktop\\Own Projects\\Data Analyst Agent\\tests\\evaluation\\benchmark_dataset_500.json",
+  "dataset_sha256": "64640710e804b657c6a8dceb83e2cf1956a1004b2e461fec275ecd078af33168",
+  "total_queries": 10,
+  "completed_count": 2,
+  "workers": 2,
+  "entries": {
+    "q_001": {
+      "query_id": "q_001",
+      "question": "What is the total revenue generated?",
+      "category": "Revenue & Sales",
+      "difficulty": "easy",
+      "expected_tables": [
+        "order_items"
+      ],
+      "queried_tables": [
+        "order_items"
+      ],
+      "actual_sql": "SELECT SUM(price) AS total_revenue FROM order_items",
+      "sql_execution_success": true,
+      "exact_match": true,
+      "equivalent_match": true,
+      "table_precision": 1.0,
+      "table_recall": 1.0,
+      "table_exact_match": true,
+      "latency_seconds": 79.456,
+      "error": null,
+      "error_category": "none",
+      "is_provider_error": false,
+      "repair_events": []
+    },
+    "q_002": {
+      "query_id": "q_002",
+      "question": "What is the total freight value paid across all orders?",
+      "category": "Revenue & Sales",
+      "difficulty": "easy",
+      "expected_tables": [
+        "order_items"
+      ],
+      "queried_tables": [
+        "order_items"
+      ],
+      "actual_sql": "SELECT SUM(freight_value) AS total_freight_value FROM order_items",
+      "sql_execution_success": true,
+      "exact_match": false,
+      "equivalent_match": true,
+      "table_precision": 1.0,
+      "table_recall": 1.0,
+      "table_exact_match": true,
+      "latency_seconds": 79.503,
+      "error": null,
+      "error_category": "none",
+      "is_provider_error": false,
+      "repair_events": []
+    }
+  }
+}

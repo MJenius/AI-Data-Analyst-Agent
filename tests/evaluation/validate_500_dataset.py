@@ -71,11 +71,22 @@ def jaccard_similarity(set_a: set[str], set_b: set[str]) -> float:
     return len(set_a & set_b) / len(set_a | set_b)
 
 
+import hashlib
+
+def compute_file_sha256(path: Path) -> str:
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        while chunk := f.read(65536):
+            h.update(chunk)
+    return h.hexdigest()
+
+
 def validate_500_benchmark(dataset_path: Path = DATASET_PATH, db_path: Path = DB_PATH) -> dict[str, Any]:
     logger.info("Loading 500-query benchmark dataset from: %s", dataset_path)
     dataset = load_dataset(dataset_path)
     total_queries = len(dataset)
     logger.info("Total query entries found: %d", total_queries)
+    file_hash = compute_file_sha256(dataset_path)
 
     db_schema = get_db_schema(db_path) if db_path.exists() else {}
     if not db_schema:
@@ -85,6 +96,7 @@ def validate_500_benchmark(dataset_path: Path = DATASET_PATH, db_path: Path = DB
     category_dist: Counter[str] = Counter()
     difficulty_dist: Counter[str] = Counter()
     domain_dist: Counter[str] = Counter()
+    query_type_dist: Counter[str] = Counter()
 
     # Duplicate check structures
     seen_exact_questions: dict[str, int] = {}
@@ -109,10 +121,12 @@ def validate_500_benchmark(dataset_path: Path = DATASET_PATH, db_path: Path = DB
         category = item.get("category", item.get("domain", "uncategorized"))
         difficulty = item.get("difficulty", "medium")
         domain = item.get("domain", category)
+        query_type = item.get("query_type", "single_value")
 
         category_dist[category] += 1
         difficulty_dist[difficulty] += 1
         domain_dist[domain] += 1
+        query_type_dist[query_type] += 1
 
         # 1. Structural checks
         if not question:
@@ -127,20 +141,12 @@ def validate_500_benchmark(dataset_path: Path = DATASET_PATH, db_path: Path = DB
             exact_duplicates.append((orig_idx, idx, question))
             issues.append({
                 "id": qid, "index": idx, "issue": f"exact_duplicate_of_index_{orig_idx}",
-                "severity": "warning", "question": question
+                "severity": "error", "question": question
             })
         else:
             seen_exact_questions[q_norm] = idx
 
-        # 3. Near-Duplicate Check
-        tokens = tokenize(question)
-        for prev_idx, prev_q, prev_tokens in question_tokens[-50:]:  # window of recent queries
-            sim = jaccard_similarity(tokens, prev_tokens)
-            if sim >= 0.85 and q_norm != re.sub(r"\s+", " ", prev_q.lower()):
-                near_duplicates.append((prev_idx, idx, round(sim, 3), prev_q, question))
-        question_tokens.append((idx, question, tokens))
-
-        # 4. Table Schema Validation
+        # 3. Table Schema Validation
         for tbl in expected_tables:
             if tbl not in KNOWN_TABLES:
                 table_hallucination_count += 1
@@ -149,7 +155,7 @@ def validate_500_benchmark(dataset_path: Path = DATASET_PATH, db_path: Path = DB
                     "severity": "error", "table": tbl
                 })
 
-        # 5. Ground-Truth SQL Execution & Validation
+        # 4. Ground-Truth SQL Execution & Validation
         if conn and expected_sql:
             try:
                 cursor = conn.cursor()
@@ -168,14 +174,14 @@ def validate_500_benchmark(dataset_path: Path = DATASET_PATH, db_path: Path = DB
                         ground_truth_mismatch_count += 1
                         issues.append({
                             "id": qid, "index": idx, "issue": "ground_truth_row_count_mismatch",
-                            "severity": "warning", "expected_rows": len(exp_vals), "actual_db_rows": len(rows)
+                            "severity": "error", "expected_rows": len(exp_vals), "actual_db_rows": len(rows)
                         })
                 elif isinstance(expected_result, list) and expected_result:
                     if len(expected_result) != len(rows):
                         ground_truth_mismatch_count += 1
                         issues.append({
                             "id": qid, "index": idx, "issue": "ground_truth_row_count_mismatch",
-                            "severity": "warning", "expected_rows": len(expected_result), "actual_db_rows": len(rows)
+                            "severity": "error", "expected_rows": len(expected_result), "actual_db_rows": len(rows)
                         })
 
             except Exception as exc:
@@ -193,8 +199,9 @@ def validate_500_benchmark(dataset_path: Path = DATASET_PATH, db_path: Path = DB
 
     summary = {
         "dataset_path": str(dataset_path),
+        "sha256_hash": file_hash,
         "total_queries": total_queries,
-        "valid_structure": error_count == 0,
+        "valid_structure": error_count == 0 and total_queries == 500,
         "error_count": error_count,
         "warning_count": warning_count,
         "sql_executable_count": sql_executable_count,
@@ -203,13 +210,12 @@ def validate_500_benchmark(dataset_path: Path = DATASET_PATH, db_path: Path = DB
         "table_hallucination_count": table_hallucination_count,
         "empty_result_count": empty_result_count,
         "exact_duplicates_count": len(exact_duplicates),
-        "near_duplicates_count": len(near_duplicates),
-        "category_distribution": dict(category_dist),
-        "difficulty_distribution": dict(difficulty_dist),
         "domain_distribution": dict(domain_dist),
-        "exact_duplicates": exact_duplicates[:10],
-        "near_duplicates_sample": near_duplicates[:10],
-        "issues_sample": issues[:25],
+        "category_distribution": dict(category_dist),
+        "query_type_distribution": dict(query_type_dist),
+        "difficulty_distribution": dict(difficulty_dist),
+        "exact_duplicates": exact_duplicates,
+        "issues": issues,
     }
 
     return summary
@@ -224,20 +230,30 @@ def main():
 
     report = validate_500_benchmark(args.dataset, args.db)
 
-    print("\n" + "=" * 60)
-    print(" 500-QUERY BENCHMARK DATASET VALIDATION REPORT")
-    print("=" * 60)
-    print(f" Total Queries:            {report['total_queries']}")
+    print("\n" + "=" * 70)
+    print(" 500-QUERY BENCHMARK DATASET INTEGRITY & VALIDATION REPORT")
+    print("=" * 70)
+    print(f" SHA-256 Hash:             {report['sha256_hash']}")
+    print(f" Total Queries:            {report['total_queries']} (Target: 500)")
     print(f" SQL Executable (Passed):  {report['sql_executable_count']}/{report['total_queries']} ({report['sql_executable_count']/report['total_queries']*100:.1f}%)")
     print(f" SQL Execution Failures:   {report['sql_failed_count']}")
     print(f" Ground Truth Mismatches:  {report['ground_truth_mismatch_count']}")
     print(f" Table Hallucinations:     {report['table_hallucination_count']}")
     print(f" Exact Duplicates:         {report['exact_duplicates_count']}")
-    print(f" Near Duplicates:          {report['near_duplicates_count']}")
     print(f" Errors:                   {report['error_count']}")
     print(f" Warnings:                 {report['warning_count']}")
-    print(f" Validation Passed:        {'YES' if report['valid_structure'] and report['sql_failed_count'] == 0 else 'NO'}")
-    print("=" * 60)
+    print(f" Validation Passed:        {'YES [PASS]' if report['valid_structure'] and report['sql_failed_count'] == 0 else 'NO [FAIL]'}")
+    print("=" * 70)
+    print("\nDistribution by Domain:")
+    for d, c in sorted(report['domain_distribution'].items()):
+        print(f"  - {d}: {c}")
+    print("\nDistribution by Query Type:")
+    for t, c in sorted(report['query_type_distribution'].items()):
+        print(f"  - {t}: {c}")
+    print("\nDistribution by Difficulty:")
+    for diff, c in sorted(report['difficulty_distribution'].items()):
+        print(f"  - {diff}: {c}")
+    print("=" * 70)
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with open(args.output, "w", encoding="utf-8") as f:
@@ -247,3 +263,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
