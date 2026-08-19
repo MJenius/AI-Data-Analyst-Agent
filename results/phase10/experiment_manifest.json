@@ -1,6 +1,6 @@
 {
   "experiment_id": "phase10_500_benchmark_experiment",
-  "timestamp_utc": "2026-08-19T11:26:08.465798+00:00",
+  "timestamp_utc": "2026-08-19T11:31:24.764476+00:00",
   "title": "Phase 10: 500-Query Benchmark Reproducibility Manifest",
   "description": "Cryptographically sealed configuration and environment manifest for the 500-query benchmark.",
   "dataset": {
@@ -56,7 +56,7 @@
     "python_version": "3.14.7",
     "python_compiler": "MSC v.1944 64 bit (AMD64)",
     "python_executable": "C:\\Users\\mjeni\\OneDrive\\Desktop\\Own Projects\\Data Analyst Agent\\.venv\\Scripts\\python.exe",
-    "git_commit_sha": "eb451211a621883afdf8dbcf0f09a3154ef098d2",
+    "git_commit_sha": "f07e7eaf057c55ad6a081217d86d450684b22016",
     "git_branch": "feat/research-grade-upgrade",
     "git_is_dirty": true,
     "dependencies_hash": "5fdfb67c6385b92c370d7ed7c5b082a048b6a731ad518ce46be8d4608d4e3594"
