@@ -133,7 +133,7 @@ def generate_manifest():
     manifest = {
         "title": "Frozen Publication Artifact Manifest",
         "paper_title": "Engineering Reliable LLM-Based Data Analysis: An Empirical Study of Schema Grounding, Planning, Verification, and SQL Repair",
-        "version": "1.0.0",
+        "version": "1.0.1",
         "timestamp_utc": "2026-08-19T10:00:00Z",
         "status": "FROZEN_FOR_PUBLICATION",
         "author": "Mevin Jose",

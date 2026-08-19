@@ -75,10 +75,10 @@ def main() -> None:
         print("\n" + "=" * 80)
         print("REPRODUCIBILITY AUDIT VERIFICATION")
         print("=" * 80)
-        print(f"Overall Valid:    {'✅ PASSED' if result.is_valid else '❌ FAILED'}")
-        print(f"Dataset Match:    {'✅ MATCHED' if result.dataset_match else '❌ MISMATCH'}")
-        print(f"Database Match:   {'✅ MATCHED' if result.database_match else '❌ MISMATCH'}")
-        print(f"Git Clean:        {'✅ CLEAN' if result.git_clean else '⚠️ UNCOMMITTED CHANGES'}")
+        print(f"Overall Valid:    {'[PASSED]' if result.is_valid else '[FAILED]'}")
+        print(f"Dataset Match:    {'[MATCHED]' if result.dataset_match else '[MISMATCH]'}")
+        print(f"Database Match:   {'[MATCHED]' if result.database_match else '[MISMATCH]'}")
+        print(f"Git Clean:        {'[CLEAN]' if result.git_clean else '[UNCOMMITTED CHANGES]'}")
         if result.discrepancies:
             print("Discrepancies:")
             for d in result.discrepancies:
