@@ -42,7 +42,7 @@ Evaluated over a public relational e-commerce data warehouse (the Olist Brazilia
 ## 🔬 Key Scientific Insights
 
 1. **Controlled Component Ablation**: In a 100-query matched evaluation, activating AST-based structural verification significantly increases execution reliability from **34.0% to 65.0%** and result equivalence from **15.0% to 26.0%** over unverified planners (McNemar exact $p=0.0192$, $\text{Odds Ratio}=3.75$).
-2. **The Self-Repair Trade-Off**: An exhaustive audit of 101 repair events demonstrates that compiler execution success must not be equated with semantic repair: while repair maintained 96.0% syntactic validity and preserved 49 valid queries, aggressive repair rules caused **22 false-positive regressions** against only **4 genuine recoveries**.
+2. **The Self-Repair Trade-Off**: An exhaustive audit of 101 repair events demonstrates that compiler execution success must not be equated with semantic repair: while 97 of 101 post-repair queries (96.0%) were syntactically valid and preserved 49 valid queries, aggressive repair rules caused **22 false-positive regressions** against only **4 genuine recoveries**.
 3. **AST Failure Taxonomy**: Diagnostic diffing of all 133 non-equivalent queries identifies missing join paths (27.8%), filter omissions/errors (24.8%), and aggregation mismatches (24.1%) as the dominant remaining failure modes.
 4. **Controlled Synthetic Perturbation Robustness**: Evaluated across 5 perturbation vectors ($N=50$), demonstrating high retention under paraphrasing, synonym replacement, and ranking variants, with pronounced vulnerability under typographical noise (57.1% retention).
 

@@ -14,9 +14,7 @@
 
 ## Abstract
 
-While Large Language Models (LLMs) demonstrate notable code-generation capabilities, translating natural language questions into reliable analytical SQL over relational databases (Text-to-SQL) remains brittle in practice. Queries frequently fail due to schema hallucinations, invalid join topologies, aggregation grain mismatch, and SQL dialect incompatibilities. In this paper, we present an empirical reliability study investigating which architectural mechanisms improve the reliability of LLM-generated analytical SQL, and what failure modes persist across grounding, planning, structural verification, and automated repair. We evaluate a multi-stage reliability pipeline on a frozen 500-query benchmark across 8 business domains over a public relational e-commerce data warehouse (the Olist dataset, 9 tables, 100,000+ orders).
-
-Our system achieves a **73.40% Result Equivalence Rate** (367/500 queries, 95% Wilson Score CI: `[69.26%, 77.18%]`, Clopper-Pearson Exact CI: `[69.30%, 77.22%]`), **31.00% Exact Match**, and **100.00% SQL Execution Success** with a mean latency of 64.04s ($p50$: 56.47s, $p95$: 121.92s). In a controlled 4-way 100-query ablation, activating AST-based structural verification significantly improves result equivalence over unverified planners (Config C 26.0% vs. Config B 15.0%, McNemar exact $p=0.0192$, $\text{Odds Ratio}=3.75$). An exhaustive audit of all 101 repair events reveals that automated self-repair is a double-edged mechanism: while repair maintained 96.0% syntactic validity and preserved 49 already-correct queries, it yielded only 4 genuine recoveries while inducing **22 false-positive regressions** (21.8% of repair events) where previously correct queries were degraded. In a controlled 50-query synthetic perturbation robustness study across 5 vectors, the pipeline remains resilient to paraphrasing, synonyms, and ranking variants, but degrades under typographical noise (57.1% retention). We conclude that conservative, uncertainty-aware structural verification is preferable to unrestricted automated repair, and document the persistent structural failure modes across complex analytical queries.
+While Large Language Models (LLMs) demonstrate notable code-generation capabilities, translating natural language questions into reliable analytical SQL over relational databases (Text-to-SQL) remains brittle in practice. Queries frequently fail due to schema hallucinations, invalid join topologies, aggregation grain mismatch, and SQL dialect incompatibilities. In this paper, we present an empirical reliability study investigating which architectural mechanisms improve the reliability of LLM-generated analytical SQL, and what failure modes persist across grounding, planning, structural verification, and automated repair. We evaluate a multi-stage reliability pipeline on a frozen 500-query benchmark across 8 business domains over a public relational e-commerce data warehouse (the Olist dataset, 9 tables, 100,000+ orders).Our system achieves a **73.40% Result Equivalence Rate** (367/500 queries, 95% Wilson Score CI: `[69.26%, 77.18%]`, Clopper-Pearson Exact CI: `[69.30%, 77.22%]`), **31.00% Exact Match**, and **100.00% SQL Execution Success** with a mean latency of 64.04s ($p50$: 56.47s, $p95$: 121.92s). In a controlled 4-way 100-query ablation, activating AST-based structural verification significantly improves result equivalence over unverified planners (Config C 26.0% vs. Config B 15.0%, McNemar exact $p=0.0192$, $\text{Odds Ratio}=3.75$). An exhaustive audit of all 101 repair events reveals that automated self-repair is a double-edged mechanism: while 97 of 101 post-repair queries (96.0%) were syntactically valid and preserved 49 already-correct queries, repair yielded only 4 genuine recoveries while inducing **22 false-positive regressions** (21.8% of repair events) where previously correct queries were degraded. In a controlled 50-query synthetic perturbation robustness study across 5 vectors, the pipeline remains resilient to paraphrasing, synonyms, and ranking variants, but degrades under typographical noise (57.1% retention). We conclude that conservative, uncertainty-aware structural verification is preferable to unrestricted automated repair, and document the persistent structural failure modes across complex analytical queries.
 
 ---
 
@@ -87,7 +85,7 @@ We evaluate our system on an enterprise-style relational schema constructed from
 - **Benchmark Corpus:** A frozen 500-query benchmark dataset (`benchmark_dataset_500.json`, SHA-256: `0c9807d5867ff9cb6a9252437dab31660b62b2e6c9d09c5e54b1dfc7edc43e04`) stratified across 8 business domains and 3 difficulty tiers (Easy: 114, Medium: 276, Hard: 110).
 
 ### 4.2 Evaluation Metrics & Methodological Definitions
-- **Result Equivalence Rate (95% Wilson CI):** Evaluates whether executed SQL results match ground-truth result sets under row-order invariance (comparing row multisets via item Counters) with numerical tolerance ($\epsilon=0.01$) and string whitespace normalization. Positional column semantics are preserved. *Result equivalence is an empirical evaluation criterion, not a formal mathematical proof of semantic correctness.*
+- **Result Equivalence Rate under the Study Comparator (95% Wilson CI):** Evaluates whether executed SQL results match ground-truth result sets under row-order invariance (comparing row multisets via item Counters) with numerical tolerance ($\epsilon=0.01$) and string whitespace normalization. Positional column semantics are preserved. *Result equivalence is an empirical evaluation criterion under the study comparator, not a formal mathematical proof of semantic correctness.*
 - **Exact Match Rate:** Strict character-for-character equality of raw SQL output rows and column headers.
 - **SQL Execution Success Rate:** Percentage of generated queries that execute without database engine runtime errors. Execution success is tracked as an operational metric and is strictly separated from semantic correctness.
 - **Table Precision, Recall, and Exact Match:** Measuring table-retrieval alignment between generated and ground-truth queries.
@@ -99,13 +97,13 @@ We evaluate our system on an enterprise-style relational schema constructed from
 ### 5.1 Headline Performance
 Table 1 summarizes the headline results audited directly from raw per-query benchmark records (`results/phase10/live_500_benchmark_run/summary.json`).
 
-| Metric | Phase 10 Empirical Value | 95% Confidence Interval | Method |
+| Metric | Phase 10 Live Run ($N=500$) | 95% Confidence Interval | Methodological Verification |
 | :--- | :---: | :---: | :--- |
-| **Result Equivalence Rate** | **73.40%** (367 / 500) | **[69.26%, 77.18%]** | Wilson Score (continuity-corrected) |
-| *Clopper-Pearson Exact CI* | 73.40% (367 / 500) | [69.30%, 77.22%] | Clopper-Pearson Exact |
-| **Exact Match Rate** | **31.00%** (155 / 500) | [27.01%, 35.29%] | Wilson Score (cc) |
-| **SQL Execution Success Rate** | **100.00%** (500 / 500) | [99.05%, 100.00%] | Wilson Score (cc) |
-| **Table Exact Match Accuracy** | **82.60%** (413 / 500) | [78.96%, 85.74%] | Wilson Score (cc) |
+| **Result Equivalence Rate under Study Comparator** | **73.40%** (367 / 500) | **[69.26%, 77.18%]** | Wilson Score (continuity-corrected) |
+| *Clopper-Pearson Exact CI* | 73.40% (367 / 500) | [69.30%, 77.22%] | Clopper-Pearson Exact Binomial |
+| **Exact Match Rate** | **31.00%** (155 / 500) | [27.01%, 35.29%] | Wilson Score (continuity-corrected) |
+| **SQL Execution Success Rate** | **100.00%** (500 / 500) | [99.05%, 100.00%] | Zero Database Runtime Exceptions |
+| **Table Exact Match Accuracy** | **82.60%** (413 / 500) | [78.96%, 85.74%] | Wilson Score (continuity-corrected) |
 | **Table Precision** | **93.07%** | — | Mean Macro Precision |
 | **Table Recall** | **95.33%** | — | Mean Macro Recall |
 | **Mean Latency** | **64.04s** | [61.27s, 66.90s] | BCa Bootstrap ($N=2000$) |
@@ -157,9 +155,9 @@ To measure the marginal impact of each architectural stage, we evaluated four co
 
 ### Statistical Hypothesis Testing:
 - **Matched Paired McNemar Test ($N=100$ identical queries):**
-  - **Config C vs Config B:** McNemar Exact Binomial **$p = 0.0192 < 0.05$**, **Odds Ratio: 3.75** (15 queries solved only by Config C vs 4 queries solved only by Config B). This demonstrates a statistically significant stability improvement for AST structural verification over unverified planning.
+  - **Config C vs Config B:** McNemar Exact Binomial **$p = 0.0192 < 0.05$**, **Odds Ratio: 3.75** (15 queries solved only by Config C vs 4 queries solved only by Config B), establishing that AST-based structural verification significantly improves performance over unverified planning.
   - **Config C vs Config A:** McNemar Exact Binomial $p = 0.2100$, Odds Ratio: 1.88.
-- **Framing Note:** This ablation confirms that planning alone can introduce structural failures and deterministic verification partially restores reliability. We do not claim the ablation proves the entire live system architecture causally superior.
+- **Framing Note:** This controlled comparison demonstrates a significant improvement specifically attributable to adding AST-based structural verification over unverified planning (Config C 26.0% vs. Config B 15.0%, $p=0.0192$). However, this ablation does not establish that planning itself improves performance over direct RAG (Config B 15.0% vs. Config A 19.0%), nor does it prove that the full multi-stage architecture is causally superior.
 
 ---
 
@@ -183,7 +181,7 @@ We conducted an exhaustive audit across all 101 repair events in the 500-query b
 | **— Truly Recovered ($\text{False} \rightarrow \text{True}$)** | **4** | **4.0%** | Broken query rescued to correct (`q_291`, `q_346`, `q_442`, `q_476`) |
 
 ### Critical Empirical Takeaways on Self-Repair Dynamics:
-1. **Execution Success $\neq$ Semantic Repair:** While 96.0% of post-repair queries executed without SQLite syntax errors, only 52.5% produced semantically correct results. Describing execution success as repair recovery is methodologically invalid.
+1. **Execution Success $\neq$ Semantic Repair:** While 97 of 101 post-repair queries (96.0%) executed cleanly on SQLite, only 52.5% produced correct result sets. Describing compiler execution validity as repair recovery is methodologically invalid.
 2. **False-Positive Repair Regressions:** Across the 101 verifier-triggered cases, 71 were already semantically correct before repair; among these, 22 were degraded by repair (e.g., when the repair agent introduced errors by altering `WHERE` date filters or modifying join keys). This demonstrates that rule-based verifiers risk inducing regressions when applied indiscriminately.
 
 ---
@@ -230,7 +228,7 @@ To examine pipeline sensitivity to controlled lexical and semantic shifts, we ev
 4. **Hard Query Complexity Ceiling:** Result equivalence drops to **44.55%** on hard-tier queries and **32.56%** on complex aggregated multi-column tables, reflecting persistent challenges in multi-step CTE nesting and window-function synthesis.
 5. **Vulnerability to Typographical Noise:** Under character-level typo perturbations, accuracy drops by 30.0% (57.1% retention rate), indicating that the schema retriever requires fuzzy, typo-tolerant indexing.
 6. **False-Positive Repair Regressions:** 21.8% of repair attempts degraded previously correct queries, underscoring the need for uncertainty-gated verification.
-7. **Empirical Comparator Limits:** The row-multiset comparator is an empirical evaluation metric, not a formal proof of semantic correctness.
+7. **Empirical Comparator Limits:** The row-multiset comparator is an empirical evaluation metric under the study comparator, not a formal proof of semantic correctness.
 8. **Sub-study Sample Sizes:** Component ablations ($N=100$) and synthetic perturbation tests ($N=50$) use smaller samples than the main 500-query benchmark.
 
 ---
@@ -247,4 +245,4 @@ All code, benchmark definitions, evaluation scripts, and manuscript sources are 
 
 ## 12. Conclusion
 
-In this study, we investigated the architectural mechanisms governing the reliability of LLM-generated analytical SQL over a public relational e-commerce data warehouse. On an audited 500-query benchmark, our multi-stage pipeline achieved a **73.40% Result Equivalence Rate** and **100.00% SQL Execution Reliability**. Our controlled component ablation demonstrated that AST-based structural verification significantly stabilizes unverified query planners ($p=0.0192$). However, an exhaustive audit of 101 repair cases revealed that automated self-repair is a double-edged mechanism, producing **22 harmful false-positive regressions** against only **4 genuine recoveries**. These findings demonstrate that while reliability-oriented grounding, planning, and structural verification significantly improve analytical SQL synthesis, conservative, uncertainty-aware verification is critical to prevent automated repair regressions.
+In this study, we investigated the architectural mechanisms governing the reliability of LLM-generated analytical SQL over a public relational e-commerce data warehouse. On an audited 500-query benchmark, our multi-stage pipeline achieved a **73.40% Result Equivalence Rate under the study comparator** and **100.00% SQL Execution Success**. Our controlled component ablation demonstrated that adding AST-based structural verification provides a statistically significant improvement over unverified planning (Config C 26.0% vs. Config B 15.0%, exact $p=0.0192$, $\text{OR}=3.75$). However, the ablation does not establish that planning itself improves performance over basic RAG (Config B 15.0% vs. Config A 19.0%) or that the full system is causally superior. Furthermore, an exhaustive audit of 101 repair cases revealed that automated self-repair is a double-edged mechanism, producing **22 harmful false-positive regressions** against only **4 genuine recoveries**. We conclude that conservative, uncertainty-aware structural verification is preferable to unconstrained automated repair loops.
