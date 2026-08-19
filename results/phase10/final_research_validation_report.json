@@ -1,0 +1,1021 @@
+{
+  "title": "Phase 10 Benchmark: Final Research Validation & Scientific Evidence Package",
+  "timestamp_utc": "2026-08-19T05:30:00Z",
+  "headline_metrics": {
+    "total_queries": 500,
+    "equivalent_matches": 367,
+    "equivalent_rate": 0.734,
+    "equivalent_ci_wilson_95": {
+      "estimate": 0.734,
+      "ci_lower": 0.6926,
+      "ci_upper": 0.7718,
+      "confidence_level": 0.95,
+      "method": "wilson_cc",
+      "sample_size": 500,
+      "successes": 367,
+      "formatted": "73.4% [69.3%, 77.2%]"
+    },
+    "equivalent_ci_clopper_pearson_95": {
+      "estimate": 0.734,
+      "ci_lower": 0.693,
+      "ci_upper": 0.7722,
+      "confidence_level": 0.95,
+      "method": "clopper_pearson",
+      "sample_size": 500,
+      "successes": 367,
+      "formatted": "73.4% [69.3%, 77.2%]"
+    },
+    "exact_matches": 155,
+    "exact_rate": 0.31,
+    "exact_ci_wilson_95": {
+      "estimate": 0.31,
+      "ci_lower": 0.2701,
+      "ci_upper": 0.3529,
+      "confidence_level": 0.95,
+      "method": "wilson_cc",
+      "sample_size": 500,
+      "successes": 155,
+      "formatted": "31.0% [27.0%, 35.3%]"
+    },
+    "sql_execution_successes": 500,
+    "sql_execution_success_rate": 1.0,
+    "sql_success_ci_wilson_95": {
+      "estimate": 1.0,
+      "ci_lower": 0.9905,
+      "ci_upper": 1.0,
+      "confidence_level": 0.95,
+      "method": "wilson_cc",
+      "sample_size": 500,
+      "successes": 500,
+      "formatted": "100.0% [99.0%, 100.0%]"
+    },
+    "table_exact_matches": 413,
+    "table_exact_accuracy": 0.826,
+    "table_precision": 0.9307,
+    "table_recall": 0.9533,
+    "latency_profile": {
+      "mean": 64.04,
+      "p50": 56.47,
+      "p90": 105.77,
+      "p95": 121.92,
+      "min": 14.15,
+      "max": 234.06,
+      "mean_bootstrap_ci_95": {
+        "estimate": 64.0413,
+        "ci_lower": 61.2678,
+        "ci_upper": 66.9037,
+        "confidence_level": 0.95,
+        "method": "bootstrap_bca",
+        "sample_size": 500,
+        "successes": null,
+        "formatted": "64.04 [61.27, 66.90]"
+      }
+    },
+    "error_counts": {
+      "provider_errors": 0,
+      "rate_limited": 0,
+      "timeouts": 0
+    },
+    "hashes": {
+      "dataset_sha256": "0c9807d5867ff9cb6a9252437dab31660b62b2e6c9d09c5e54b1dfc7edc43e04",
+      "database_sha256": "8550c4cc6d670aa0441bc898e47a57a40001858fc3f13dc5cb16fb90ca11c130",
+      "dataset_verified": true
+    }
+  },
+  "repair_lifecycle_audit": {
+    "total_repair_triggered": 101,
+    "total_repair_applied": 88,
+    "pre_repair_syntax_valid": 101,
+    "post_repair_syntax_valid": 97,
+    "post_repair_syntax_valid_rate": 0.9604,
+    "pre_repair_semantic_equivalent": 71,
+    "pre_repair_semantic_rate": 0.703,
+    "post_repair_semantic_equivalent": 53,
+    "post_repair_semantic_rate": 0.5248,
+    "semantic_transitions": {
+      "truly_recovered_count": 4,
+      "truly_recovered_rate": 0.0396,
+      "truly_recovered_query_ids": [
+        "q_291",
+        "q_346",
+        "q_442",
+        "q_476"
+      ],
+      "maintained_correct_count": 49,
+      "maintained_correct_rate": 0.4851,
+      "maintained_correct_query_ids": [
+        "q_011",
+        "q_012",
+        "q_016",
+        "q_017",
+        "q_019",
+        "q_024",
+        "q_030",
+        "q_034",
+        "q_038",
+        "q_070",
+        "q_071",
+        "q_072",
+        "q_073",
+        "q_074",
+        "q_079",
+        "q_082",
+        "q_083",
+        "q_084",
+        "q_085",
+        "q_086",
+        "q_087",
+        "q_088",
+        "q_089",
+        "q_090",
+        "q_138",
+        "q_199",
+        "q_203",
+        "q_268",
+        "q_325",
+        "q_351",
+        "q_354",
+        "q_357",
+        "q_358",
+        "q_359",
+        "q_360",
+        "q_362",
+        "q_363",
+        "q_364",
+        "q_365",
+        "q_366",
+        "q_367",
+        "q_368",
+        "q_369",
+        "q_370",
+        "q_386",
+        "q_408",
+        "q_412",
+        "q_441",
+        "q_446"
+      ],
+      "harmed_false_positive_count": 22,
+      "harmed_false_positive_rate": 0.2178,
+      "harmed_false_positive_query_ids": [
+        "q_026",
+        "q_027",
+        "q_043",
+        "q_137",
+        "q_140",
+        "q_143",
+        "q_144",
+        "q_146",
+        "q_147",
+        "q_149",
+        "q_213",
+        "q_217",
+        "q_221",
+        "q_225",
+        "q_229",
+        "q_276",
+        "q_280",
+        "q_330",
+        "q_334",
+        "q_342",
+        "q_345",
+        "q_350"
+      ],
+      "remained_incorrect_count": 26,
+      "remained_incorrect_rate": 0.2574,
+      "remained_incorrect_query_ids": [
+        "q_009",
+        "q_022",
+        "q_028",
+        "q_031",
+        "q_032",
+        "q_035",
+        "q_036",
+        "q_039",
+        "q_040",
+        "q_044",
+        "q_049",
+        "q_053",
+        "q_054",
+        "q_060",
+        "q_100",
+        "q_121",
+        "q_123",
+        "q_154",
+        "q_184",
+        "q_265",
+        "q_269",
+        "q_270",
+        "q_302",
+        "q_396",
+        "q_449",
+        "q_450"
+      ]
+    },
+    "trigger_category_distribution": {
+      "group_by_grain_mismatch": 159,
+      "join_path_mismatch": 41,
+      "filter_mismatch": 3,
+      "group_by_mismatch": 3,
+      "entity_mismatch": 18,
+      "ranking_mismatch": 1
+    },
+    "sample_detailed_cases": [
+      {
+        "query_id": "q_009",
+        "question": "What is the monthly revenue trend in 2017?",
+        "category": "Revenue & Sales",
+        "events_count": 1,
+        "applied": true,
+        "trigger_categories": [
+          "group_by_grain_mismatch"
+        ],
+        "pre_repair_executable": true,
+        "post_repair_executable": true,
+        "pre_repair_equivalent": false,
+        "post_repair_equivalent": false,
+        "transition": "remained_incorrect",
+        "pre_sql": "SELECT strftime('%m', orders.order_purchase_timestamp) AS month, strftime('%Y-%m', orders.order_purchase_timestamp) AS year_month, SUM(order_items.price) AS monthly_revenue FROM order_items JOIN orders ON order_items.order_id = orders.order_id WHERE strftime('%Y', orders.order_purchase_timestamp) = '2017' GROUP BY strftime('%m', orders.order_purchase_timestamp), strftime('%Y-%m', orders.order_purchase_timestamp) ORDER BY year_month;",
+        "post_sql": "SELECT strftime('%m', orders.order_purchase_timestamp) AS month, strftime('%Y-%m', orders.order_purchase_timestamp) AS year_month, SUM(order_items.price) AS monthly_revenue FROM order_items JOIN orders ON order_items.order_id = orders.order_id WHERE strftime('%Y', orders.order_purchase_timestamp) = '2017' GROUP BY strftime('%m', orders.order_purchase_timestamp), strftime('%Y-%m', orders.order_purchase_timestamp), month ORDER BY year_month;"
+      },
+      {
+        "query_id": "q_011",
+        "question": "What is the monthly revenue trend for customers in state SP in 2017?",
+        "category": "Revenue & Sales",
+        "events_count": 2,
+        "applied": true,
+        "trigger_categories": [
+          "group_by_grain_mismatch",
+          "group_by_grain_mismatch"
+        ],
+        "pre_repair_executable": true,
+        "post_repair_executable": true,
+        "pre_repair_equivalent": true,
+        "post_repair_equivalent": true,
+        "transition": "maintained_correct",
+        "pre_sql": "SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, SUM(oi.price) AS total_revenue FROM customers c JOIN orders o ON c.customer_id = o.customer_id JOIN order_items oi ON o.order_id = oi.order_id WHERE c.customer_state = 'SP' AND strftime('%Y', o.order_purchase_timestamp) = '2017' GROUP BY strftime('%Y-%m', o.order_purchase_timestamp) ORDER BY strftime('%Y-%m', o.order_purchase_timestamp) ASC;",
+        "post_sql": "SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, SUM(oi.price) AS total_revenue FROM customers c JOIN orders o ON c.customer_id = o.customer_id JOIN order_items oi ON o.order_id = oi.order_id WHERE c.customer_state = 'SP' AND strftime('%Y', o.order_purchase_timestamp) = '2017' GROUP BY strftime('%Y-%m', o.order_purchase_timestamp), month ORDER BY strftime('%Y-%m', o.order_purchase_timestamp) ASC;"
+      },
+      {
+        "query_id": "q_012",
+        "question": "What is the monthly revenue trend for customers in state RJ in 2017?",
+        "category": "Revenue & Sales",
+        "events_count": 2,
+        "applied": true,
+        "trigger_categories": [
+          "group_by_grain_mismatch",
+          "group_by_grain_mismatch"
+        ],
+        "pre_repair_executable": true,
+        "post_repair_executable": true,
+        "pre_repair_equivalent": true,
+        "post_repair_equivalent": true,
+        "transition": "maintained_correct",
+        "pre_sql": "SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, SUM(oi.price) AS total_revenue FROM customers c JOIN orders o ON o.customer_id = c.customer_id JOIN order_items oi ON oi.order_id = o.order_id WHERE c.customer_state = 'RJ' AND strftime('%Y', o.order_purchase_timestamp) = '2017' GROUP BY strftime('%Y-%m', o.order_purchase_timestamp) ORDER BY strftime('%Y-%m', o.order_purchase_timestamp) ASC;",
+        "post_sql": "SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, SUM(oi.price) AS total_revenue FROM customers c JOIN orders o ON c.customer_id = o.customer_id JOIN order_items oi ON o.order_id = oi.order_id WHERE c.customer_state = 'RJ' AND strftime('%Y', o.order_purchase_timestamp) = '2017' GROUP BY strftime('%Y-%m', o.order_purchase_timestamp), month ORDER BY month ASC;"
+      },
+      {
+        "query_id": "q_016",
+        "question": "What is the monthly revenue trend for customers in state SC in 2017?",
+        "category": "Revenue & Sales",
+        "events_count": 2,
+        "applied": true,
+        "trigger_categories": [
+          "group_by_grain_mismatch",
+          "group_by_grain_mismatch"
+        ],
+        "pre_repair_executable": true,
+        "post_repair_executable": true,
+        "pre_repair_equivalent": true,
+        "post_repair_equivalent": true,
+        "transition": "maintained_correct",
+        "pre_sql": "SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, SUM(oi.price) AS total_revenue FROM customers c JOIN orders o ON c.customer_id = o.customer_id JOIN order_items oi ON o.order_id = oi.order_id WHERE c.customer_state = 'SC' AND strftime('%Y', o.order_purchase_timestamp) = '2017' GROUP BY strftime('%Y-%m', o.order_purchase_timestamp) ORDER BY month ASC;",
+        "post_sql": "SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, SUM(oi.price) AS total_revenue FROM customers c JOIN orders o ON o.customer_id = c.customer_id JOIN order_items oi ON oi.order_id = o.order_id WHERE c.customer_state = 'SC' AND strftime('%Y', o.order_purchase_timestamp) = '2017' GROUP BY strftime('%Y-%m', o.order_purchase_timestamp), month ORDER BY month ASC;"
+      },
+      {
+        "query_id": "q_017",
+        "question": "What is the monthly revenue trend for customers in state BA in 2017?",
+        "category": "Revenue & Sales",
+        "events_count": 1,
+        "applied": true,
+        "trigger_categories": [
+          "group_by_grain_mismatch"
+        ],
+        "pre_repair_executable": true,
+        "post_repair_executable": true,
+        "pre_repair_equivalent": true,
+        "post_repair_equivalent": true,
+        "transition": "maintained_correct",
+        "pre_sql": "SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, SUM(oi.price) AS revenue FROM customers c JOIN orders o ON c.customer_id = o.customer_id JOIN order_items oi ON o.order_id = oi.order_id WHERE c.customer_state = 'BA' AND strftime('%Y', o.order_purchase_timestamp) = '2017' GROUP BY strftime('%Y-%m', o.order_purchase_timestamp) ORDER BY month;",
+        "post_sql": "SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, SUM(oi.price) AS revenue FROM customers c JOIN orders o ON c.customer_id = o.customer_id JOIN order_items oi ON o.order_id = oi.order_id WHERE c.customer_state = 'BA' AND strftime('%Y', o.order_purchase_timestamp) = '2017' GROUP BY strftime('%Y-%m', o.order_purchase_timestamp), month ORDER BY month;"
+      },
+      {
+        "query_id": "q_019",
+        "question": "What is the monthly revenue trend for customers in state GO in 2017?",
+        "category": "Revenue & Sales",
+        "events_count": 1,
+        "applied": true,
+        "trigger_categories": [
+          "group_by_grain_mismatch"
+        ],
+        "pre_repair_executable": true,
+        "post_repair_executable": true,
+        "pre_repair_equivalent": true,
+        "post_repair_equivalent": true,
+        "transition": "maintained_correct",
+        "pre_sql": "SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, SUM(oi.price) AS total_revenue FROM customers c JOIN orders o ON c.customer_id = o.customer_id JOIN order_items oi ON o.order_id = oi.order_id WHERE c.customer_state = 'GO' AND strftime('%Y', o.order_purchase_timestamp) = '2017' GROUP BY strftime('%Y-%m', o.order_purchase_timestamp) ORDER BY month;",
+        "post_sql": "SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, SUM(oi.price) AS total_revenue FROM customers c JOIN orders o ON c.customer_id = o.customer_id JOIN order_items oi ON o.order_id = oi.order_id WHERE c.customer_state = 'GO' AND strftime('%Y', o.order_purchase_timestamp) = '2017' GROUP BY strftime('%Y-%m', o.order_purchase_timestamp), month ORDER BY month;"
+      },
+      {
+        "query_id": "q_022",
+        "question": "What is the quarterly revenue breakdown for 2018?",
+        "category": "Revenue & Sales",
+        "events_count": 2,
+        "applied": false,
+        "trigger_categories": [
+          "group_by_grain_mismatch",
+          "group_by_grain_mismatch"
+        ],
+        "pre_repair_executable": true,
+        "post_repair_executable": true,
+        "pre_repair_equivalent": false,
+        "post_repair_equivalent": false,
+        "transition": "remained_incorrect",
+        "pre_sql": "SELECT\n    strftime('%Y', orders.order_purchase_timestamp) AS year,\n    CASE\n        WHEN CAST(strftime('%m', orders.order_purchase_timestamp) AS INTEGER) BETWEEN 1 AND 3 THEN 1\n        WHEN CAST(strftime('%m', orders.order_purchase_timestamp) AS INTEGER) BETWEEN 4 AND 6 THEN 2\n        WHEN CAST(strftime('%m', orders.order_purchase_timestamp) AS INTEGER) BETWEEN 7 AND 9 THEN 3\n        ELSE 4\n    END AS quarter,\n    SUM(order_items.price) AS revenue\nFROM order_items\nJOIN orders ON order_items.order_id = orders.order_id\nWHERE strftime('%Y', orders.order_purchase_timestamp) = '2018'\nGROUP BY\n    strftime('%Y', orders.order_purchase_timestamp),\n    CASE\n        WHEN CAST(strftime('%m', orders.order_purchase_timestamp) AS INTEGER) BETWEEN 1 AND 3 THEN 1\n        WHEN CAST(strftime('%m', orders.order_purchase_timestamp) AS INTEGER) BETWEEN 4 AND 6 THEN 2\n        WHEN CAST(strftime('%m', orders.order_purchase_timestamp) AS INTEGER) BETWEEN 7 AND 9 THEN 3\n        ELSE 4\n    END;",
+        "post_sql": "SELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10"
+      },
+      {
+        "query_id": "q_024",
+        "question": "What is the distribution of total revenue and order count across days of the week?",
+        "category": "Revenue & Sales",
+        "events_count": 4,
+        "applied": true,
+        "trigger_categories": [
+          "group_by_grain_mismatch",
+          "group_by_grain_mismatch",
+          "group_by_grain_mismatch",
+          "group_by_grain_mismatch"
+        ],
+        "pre_repair_executable": true,
+        "post_repair_executable": true,
+        "pre_repair_equivalent": true,
+        "post_repair_equivalent": true,
+        "transition": "maintained_correct",
+        "pre_sql": "SELECT strftime('%w', o.order_purchase_timestamp) AS day_of_week, SUM(oi.price) AS total_revenue, COUNT(DISTINCT o.order_id) AS order_count FROM order_items oi JOIN orders o ON oi.order_id = o.order_id GROUP BY strftime('%w', o.order_purchase_timestamp) ORDER BY day_of_week;",
+        "post_sql": "SELECT strftime('%w', orders.order_purchase_timestamp) AS day_of_week, SUM(order_items.price) AS total_revenue, COUNT(DISTINCT orders.order_id) AS order_count FROM order_items JOIN orders ON order_items.order_id = orders.order_id GROUP BY day_of_week ORDER BY day_of_week;"
+      },
+      {
+        "query_id": "q_026",
+        "question": "What are the top 3 months by total sales revenue?",
+        "category": "Revenue & Sales",
+        "events_count": 2,
+        "applied": true,
+        "trigger_categories": [
+          "group_by_grain_mismatch",
+          "group_by_grain_mismatch"
+        ],
+        "pre_repair_executable": true,
+        "post_repair_executable": false,
+        "pre_repair_equivalent": true,
+        "post_repair_equivalent": false,
+        "transition": "harmed_false_positive",
+        "pre_sql": "SELECT strftime('%Y-%m', orders.order_purchase_timestamp) AS month, SUM(order_items.price) AS total_revenue FROM order_items JOIN orders ON order_items.order_id = orders.order_id GROUP BY strftime('%Y-%m', orders.order_purchase_timestamp) ORDER BY total_revenue DESC LIMIT 3;",
+        "post_sql": "SELECT strftime('%Y-%m', orders.order_purchase_timestamp) AS month, SUM(order_items.price) AS total_revenue FROM order_items JOIN orders ON order_items.order_id = orders.order_id GROUP BY strftime('%Y-%m', orders.order_purchase_timestamp) AS month ORDER BY total_revenue DESC LIMIT 3;"
+      },
+      {
+        "query_id": "q_027",
+        "question": "What are the top 3 highest revenue days in 2017?",
+        "category": "Revenue & Sales",
+        "events_count": 4,
+        "applied": true,
+        "trigger_categories": [
+          "join_path_mismatch",
+          "filter_mismatch",
+          "filter_mismatch",
+          "filter_mismatch"
+        ],
+        "pre_repair_executable": true,
+        "post_repair_executable": false,
+        "pre_repair_equivalent": true,
+        "post_repair_equivalent": false,
+        "transition": "harmed_false_positive",
+        "pre_sql": "SELECT strftime('%Y-%m-%d', orders.order_purchase_timestamp) AS day, SUM(order_items.price) AS total_revenue FROM order_items JOIN orders ON order_items.order_id = orders.order_id WHERE strftime('%Y', orders.order_purchase_timestamp) = '2017' GROUP BY day ORDER BY total_revenue DESC LIMIT 3;",
+        "post_sql": "SELECT\n  strftime('%Y-%m-%d', shipping_limit_date) AS day,\n  SUM(price) AS total_revenue\nFROM order_items\nWHERE strftime('%Y', shipping_limit_date) = '2017'\n  AND strftime('%Y', order_purchase_timestamp) = '2017'\nGROUP BY day\nORDER BY total_revenue DESC\nLIMIT 3;"
+      }
+    ]
+  },
+  "statistical_analysis": {
+    "subgroups": {
+      "by_domain": {
+        "Customers & Geography": {
+          "group_name": "Customers & Geography",
+          "sample_size": 65,
+          "success_count": 52,
+          "accuracy": 0.8,
+          "ci_lower": 0.6788,
+          "ci_upper": 0.8852,
+          "ci_formatted": "80.0% [67.9%, 88.5%]",
+          "mean_latency": 56.73,
+          "p95_latency": 107.88,
+          "sql_success_rate": 1.0,
+          "table_precision": 0.9949,
+          "table_recall": 0.9744
+        },
+        "Logistics & Operations": {
+          "group_name": "Logistics & Operations",
+          "sample_size": 60,
+          "success_count": 34,
+          "accuracy": 0.5667,
+          "ci_lower": 0.433,
+          "ci_upper": 0.6918,
+          "ci_formatted": "56.7% [43.3%, 69.2%]",
+          "mean_latency": 61.69,
+          "p95_latency": 120.01,
+          "sql_success_rate": 1.0,
+          "table_precision": 0.9417,
+          "table_recall": 1.0
+        },
+        "Orders & Transactions": {
+          "group_name": "Orders & Transactions",
+          "sample_size": 65,
+          "success_count": 59,
+          "accuracy": 0.9077,
+          "ci_lower": 0.8034,
+          "ci_upper": 0.9619,
+          "ci_formatted": "90.8% [80.3%, 96.2%]",
+          "mean_latency": 68.41,
+          "p95_latency": 144.07,
+          "sql_success_rate": 1.0,
+          "table_precision": 0.9923,
+          "table_recall": 1.0
+        },
+        "Payments & Installments": {
+          "group_name": "Payments & Installments",
+          "sample_size": 60,
+          "success_count": 43,
+          "accuracy": 0.7167,
+          "ci_lower": 0.5836,
+          "ci_upper": 0.8218,
+          "ci_formatted": "71.7% [58.4%, 82.2%]",
+          "mean_latency": 54.86,
+          "p95_latency": 104.81,
+          "sql_success_rate": 1.0,
+          "table_precision": 0.8083,
+          "table_recall": 0.8167
+        },
+        "Products & Categories": {
+          "group_name": "Products & Categories",
+          "sample_size": 65,
+          "success_count": 50,
+          "accuracy": 0.7692,
+          "ci_lower": 0.6452,
+          "ci_upper": 0.861,
+          "ci_formatted": "76.9% [64.5%, 86.1%]",
+          "mean_latency": 63.19,
+          "p95_latency": 108.73,
+          "sql_success_rate": 1.0,
+          "table_precision": 0.941,
+          "table_recall": 1.0
+        },
+        "Revenue & Sales": {
+          "group_name": "Revenue & Sales",
+          "sample_size": 65,
+          "success_count": 46,
+          "accuracy": 0.7077,
+          "ci_lower": 0.58,
+          "ci_upper": 0.8106,
+          "ci_formatted": "70.8% [58.0%, 81.1%]",
+          "mean_latency": 74.83,
+          "p95_latency": 138.72,
+          "sql_success_rate": 1.0,
+          "table_precision": 0.9769,
+          "table_recall": 0.9231
+        },
+        "Reviews & Satisfaction": {
+          "group_name": "Reviews & Satisfaction",
+          "sample_size": 60,
+          "success_count": 28,
+          "accuracy": 0.4667,
+          "ci_lower": 0.3386,
+          "ci_upper": 0.599,
+          "ci_formatted": "46.7% [33.9%, 59.9%]",
+          "mean_latency": 66.6,
+          "p95_latency": 119.92,
+          "sql_success_rate": 1.0,
+          "table_precision": 0.8889,
+          "table_recall": 0.9056
+        },
+        "Sellers & Fulfillment": {
+          "group_name": "Sellers & Fulfillment",
+          "sample_size": 60,
+          "success_count": 55,
+          "accuracy": 0.9167,
+          "ci_lower": 0.8088,
+          "ci_upper": 0.9689,
+          "ci_formatted": "91.7% [80.9%, 96.9%]",
+          "mean_latency": 65.43,
+          "p95_latency": 113.29,
+          "sql_success_rate": 1.0,
+          "table_precision": 0.8861,
+          "table_recall": 1.0
+        }
+      },
+      "by_difficulty": {
+        "easy": {
+          "group_name": "easy",
+          "sample_size": 114,
+          "success_count": 101,
+          "accuracy": 0.886,
+          "ci_lower": 0.8095,
+          "ci_upper": 0.9355,
+          "ci_formatted": "88.6% [80.9%, 93.5%]",
+          "mean_latency": 60.79,
+          "p95_latency": 108.79,
+          "sql_success_rate": 1.0,
+          "table_precision": 0.9444,
+          "table_recall": 0.9649
+        },
+        "hard": {
+          "group_name": "hard",
+          "sample_size": 110,
+          "success_count": 52,
+          "accuracy": 0.4727,
+          "ci_lower": 0.3776,
+          "ci_upper": 0.5698,
+          "ci_formatted": "47.3% [37.8%, 57.0%]",
+          "mean_latency": 65.78,
+          "p95_latency": 119.92,
+          "sql_success_rate": 1.0,
+          "table_precision": 0.9349,
+          "table_recall": 0.953
+        },
+        "medium": {
+          "group_name": "medium",
+          "sample_size": 276,
+          "success_count": 214,
+          "accuracy": 0.7754,
+          "ci_lower": 0.7206,
+          "ci_upper": 0.8223,
+          "ci_formatted": "77.5% [72.1%, 82.2%]",
+          "mean_latency": 64.69,
+          "p95_latency": 130.73,
+          "sql_success_rate": 1.0,
+          "table_precision": 0.9233,
+          "table_recall": 0.9487
+        }
+      },
+      "by_query_type": {
+        "aggregated_table": {
+          "group_name": "aggregated_table",
+          "sample_size": 43,
+          "success_count": 14,
+          "accuracy": 0.3256,
+          "ci_lower": 0.1954,
+          "ci_upper": 0.4866,
+          "ci_formatted": "32.6% [19.5%, 48.7%]",
+          "mean_latency": 74.03,
+          "p95_latency": 135.47,
+          "sql_success_rate": 1.0,
+          "table_precision": 0.9767,
+          "table_recall": 0.9884
+        },
+        "ranked_list": {
+          "group_name": "ranked_list",
+          "sample_size": 140,
+          "success_count": 68,
+          "accuracy": 0.4857,
+          "ci_lower": 0.401,
+          "ci_upper": 0.5713,
+          "ci_formatted": "48.6% [40.1%, 57.1%]",
+          "mean_latency": 73.73,
+          "p95_latency": 143.85,
+          "sql_success_rate": 1.0,
+          "table_precision": 0.856,
+          "table_recall": 0.8726
+        },
+        "single_value": {
+          "group_name": "single_value",
+          "sample_size": 268,
+          "success_count": 242,
+          "accuracy": 0.903,
+          "ci_lower": 0.8595,
+          "ci_upper": 0.9345,
+          "ci_formatted": "90.3% [86.0%, 93.4%]",
+          "mean_latency": 58.99,
+          "p95_latency": 106.18,
+          "sql_success_rate": 1.0,
+          "table_precision": 0.9639,
+          "table_recall": 0.9813
+        },
+        "time_series": {
+          "group_name": "time_series",
+          "sample_size": 49,
+          "success_count": 43,
+          "accuracy": 0.8776,
+          "ci_lower": 0.7454,
+          "ci_upper": 0.9492,
+          "ci_formatted": "87.8% [74.5%, 94.9%]",
+          "mean_latency": 55.21,
+          "p95_latency": 96.77,
+          "sql_success_rate": 1.0,
+          "table_precision": 0.9218,
+          "table_recall": 1.0
+        }
+      }
+    },
+    "phase_records": {
+      "ablation_a": {
+        "phase_id": "ablation_a",
+        "label": "Ablation A: RAG Only",
+        "total_queries": 100,
+        "equivalent_matches": 19,
+        "equivalent_rate": 0.19,
+        "equivalent_ci": "19.0% [12.1%, 28.3%]",
+        "exact_matches": 7,
+        "exact_rate": 0.07,
+        "exact_ci": "7.0% [3.1%, 14.4%]",
+        "sql_execution_successes": 99,
+        "sql_success_rate": 0.99,
+        "sql_success_ci": "99.0% [93.8%, 99.9%]",
+        "table_precision": 0.0,
+        "table_recall": 0.0,
+        "mean_latency": 152.97,
+        "p50_latency": 121.77,
+        "p95_latency": 309.14
+      },
+      "ablation_b": {
+        "phase_id": "ablation_b",
+        "label": "Ablation B: RAG+Planner",
+        "total_queries": 100,
+        "equivalent_matches": 15,
+        "equivalent_rate": 0.15,
+        "equivalent_ci": "15.0% [8.9%, 23.9%]",
+        "exact_matches": 7,
+        "exact_rate": 0.07,
+        "exact_ci": "7.0% [3.1%, 14.4%]",
+        "sql_execution_successes": 34,
+        "sql_success_rate": 0.34,
+        "sql_success_ci": "34.0% [25.0%, 44.2%]",
+        "table_precision": 0.0,
+        "table_recall": 0.0,
+        "mean_latency": 85.81,
+        "p50_latency": 90.0,
+        "p95_latency": 93.08
+      },
+      "ablation_c": {
+        "phase_id": "ablation_c",
+        "label": "Ablation C: RAG+Plan+Verify",
+        "total_queries": 100,
+        "equivalent_matches": 26,
+        "equivalent_rate": 0.26,
+        "equivalent_ci": "26.0% [18.0%, 35.9%]",
+        "exact_matches": 13,
+        "exact_rate": 0.13,
+        "exact_ci": "13.0% [7.4%, 21.6%]",
+        "sql_execution_successes": 65,
+        "sql_success_rate": 0.65,
+        "sql_success_ci": "65.0% [54.7%, 74.1%]",
+        "table_precision": 0.0,
+        "table_recall": 0.0,
+        "mean_latency": 209.38,
+        "p50_latency": 219.26,
+        "p95_latency": 240.0
+      },
+      "ablation_d": {
+        "phase_id": "ablation_d",
+        "label": "Ablation D: Full System",
+        "total_queries": 100,
+        "equivalent_matches": 14,
+        "equivalent_rate": 0.14,
+        "equivalent_ci": "14.0% [8.1%, 22.7%]",
+        "exact_matches": 10,
+        "exact_rate": 0.1,
+        "exact_ci": "10.0% [5.2%, 18.0%]",
+        "sql_execution_successes": 45,
+        "sql_success_rate": 0.45,
+        "sql_success_ci": "45.0% [35.1%, 55.2%]",
+        "table_precision": 0.0,
+        "table_recall": 0.0,
+        "mean_latency": 232.63,
+        "p50_latency": 240.0,
+        "p95_latency": 271.32
+      },
+      "phase10_500": {
+        "phase_id": "phase10_500",
+        "label": "Phase 10: 500-Query Live",
+        "total_queries": 500,
+        "equivalent_matches": 367,
+        "equivalent_rate": 0.734,
+        "equivalent_ci": "73.4% [69.3%, 77.2%]",
+        "exact_matches": 155,
+        "exact_rate": 0.31,
+        "exact_ci": "31.0% [27.0%, 35.3%]",
+        "sql_execution_successes": 500,
+        "sql_success_rate": 1.0,
+        "sql_success_ci": "100.0% [99.0%, 100.0%]",
+        "table_precision": 0.9307,
+        "table_recall": 0.9533,
+        "mean_latency": 64.04,
+        "p50_latency": 56.47,
+        "p95_latency": 121.92
+      }
+    },
+    "matched_paired_tests": {
+      "ablation_c_vs_b": {
+        "test_name": "McNemar (Exact Binomial)",
+        "statistic": 4.0,
+        "p_value": 0.0192108,
+        "is_significant": true,
+        "alpha": 0.05,
+        "effect_size": 3.75,
+        "interpretation": "System A outperformed the other (statistically significant, p=0.0192). Odds Ratio: 3.75",
+        "details": {
+          "a_both_correct": 11,
+          "b_only_a_correct": 15,
+          "c_only_b_correct": 4,
+          "d_both_incorrect": 70,
+          "discordant_total": 19,
+          "odds_ratio": 3.75,
+          "overlapping_queries": 100,
+          "phase_a": "ablation_c",
+          "phase_b": "ablation_b"
+        }
+      },
+      "ablation_c_vs_a": {
+        "test_name": "McNemar (Exact Binomial)",
+        "statistic": 8.0,
+        "p_value": 0.21004,
+        "is_significant": false,
+        "alpha": 0.05,
+        "effect_size": 1.875,
+        "interpretation": "System A outperformed the other (not statistically significant, p=0.2100). Odds Ratio: 1.88",
+        "details": {
+          "a_both_correct": 11,
+          "b_only_a_correct": 15,
+          "c_only_b_correct": 8,
+          "d_both_incorrect": 66,
+          "discordant_total": 23,
+          "odds_ratio": 1.875,
+          "overlapping_queries": 100,
+          "phase_a": "ablation_c",
+          "phase_b": "ablation_a"
+        }
+      },
+      "phase10_500_vs_ablation_c_matched": {
+        "test_name": "McNemar (No Overlap)",
+        "statistic": 0.0,
+        "p_value": 1.0,
+        "is_significant": false,
+        "alpha": 0.05,
+        "effect_size": null,
+        "interpretation": "No overlapping query IDs found.",
+        "details": {
+          "overlap_count": 0
+        }
+      }
+    },
+    "independent_proportion_tests": {
+      "phase10_500_vs_ablation_c_independent": {
+        "test_name": "Fisher's Exact Test / Chi-Square (Independent)",
+        "statistic": 80.77,
+        "p_value": 9.22313e-19,
+        "is_significant": true,
+        "alpha": 0.050000000000000044,
+        "effect_size": 7.8537,
+        "interpretation": "Statistically significant difference in proportions (Group A: 73.4%, Group B: 26.0%, Fisher p=9.223e-19, OR=7.85).",
+        "details": {
+          "group_a": {
+            "successes": 367,
+            "total": 500,
+            "rate": 0.734
+          },
+          "group_b": {
+            "successes": 26,
+            "total": 100,
+            "rate": 0.26
+          },
+          "rate_difference": 0.474,
+          "odds_ratio": 7.853672643146328,
+          "fisher_p_value": 9.223130354795278e-19,
+          "chi2_statistic": 80.76999668104878,
+          "chi2_p_value": 2.5357897468393495e-19,
+          "phase_a": "phase10_500",
+          "phase_b": "ablation_c"
+        }
+      }
+    }
+  },
+  "ood_robustness": {
+    "seed": 42,
+    "control_sample_size": 50,
+    "perturbed_sample_size": 50,
+    "degradation_metrics": {
+      "paraphrase": {
+        "perturbation_type": "paraphrase",
+        "sample_size": 10,
+        "clean_accuracy": 0.5,
+        "perturbed_accuracy": 0.4,
+        "absolute_drop": 0.1,
+        "retention_rate": 0.8,
+        "degradation_percent": "20.0%"
+      },
+      "ranking_variant": {
+        "perturbation_type": "ranking_variant",
+        "sample_size": 10,
+        "clean_accuracy": 0.7,
+        "perturbed_accuracy": 0.7,
+        "absolute_drop": 0.0,
+        "retention_rate": 1.0,
+        "degradation_percent": "0.0%"
+      },
+      "synonym": {
+        "perturbation_type": "synonym",
+        "sample_size": 10,
+        "clean_accuracy": 0.8,
+        "perturbed_accuracy": 0.8,
+        "absolute_drop": 0.0,
+        "retention_rate": 1.0,
+        "degradation_percent": "0.0%"
+      },
+      "temporal_variant": {
+        "perturbation_type": "temporal_variant",
+        "sample_size": 10,
+        "clean_accuracy": 0.7,
+        "perturbed_accuracy": 0.6,
+        "absolute_drop": 0.1,
+        "retention_rate": 0.8571,
+        "degradation_percent": "14.3%"
+      },
+      "typo": {
+        "perturbation_type": "typo",
+        "sample_size": 10,
+        "clean_accuracy": 0.7,
+        "perturbed_accuracy": 0.4,
+        "absolute_drop": 0.3,
+        "retention_rate": 0.5714,
+        "degradation_percent": "42.9%"
+      }
+    }
+  },
+  "failure_taxonomy": {
+    "total_analyzed": 500,
+    "total_failures": 133,
+    "failure_summary": {
+      "total_analyzed": 500,
+      "failure_counts": {
+        "semantic_filter_omission_or_error": 33,
+        "success": 367,
+        "semantic_aggregation_mismatch": 32,
+        "schema_missing_join_path": 37,
+        "semantic_grain_group_by_mismatch": 14,
+        "semantic_ranking_order_mismatch": 2,
+        "schema_hallucinated_table": 15
+      },
+      "failure_percentages": {
+        "semantic_filter_omission_or_error": 6.6,
+        "success": 73.4,
+        "semantic_aggregation_mismatch": 6.4,
+        "schema_missing_join_path": 7.4,
+        "semantic_grain_group_by_mismatch": 2.8,
+        "semantic_ranking_order_mismatch": 0.4,
+        "schema_hallucinated_table": 3.0
+      },
+      "by_domain_category": {
+        "Revenue & Sales": {
+          "semantic_filter_omission_or_error": 4,
+          "success": 46,
+          "semantic_aggregation_mismatch": 2,
+          "schema_missing_join_path": 9,
+          "semantic_grain_group_by_mismatch": 4
+        },
+        "Orders & Transactions": {
+          "success": 59,
+          "semantic_aggregation_mismatch": 1,
+          "semantic_grain_group_by_mismatch": 5
+        },
+        "Customers & Geography": {
+          "success": 52,
+          "schema_missing_join_path": 5,
+          "semantic_filter_omission_or_error": 7,
+          "semantic_grain_group_by_mismatch": 1
+        },
+        "Products & Categories": {
+          "success": 50,
+          "semantic_aggregation_mismatch": 8,
+          "semantic_ranking_order_mismatch": 1,
+          "schema_hallucinated_table": 3,
+          "semantic_filter_omission_or_error": 2,
+          "semantic_grain_group_by_mismatch": 1
+        },
+        "Logistics & Operations": {
+          "success": 34,
+          "semantic_filter_omission_or_error": 6,
+          "semantic_aggregation_mismatch": 8,
+          "schema_hallucinated_table": 10,
+          "semantic_ranking_order_mismatch": 1,
+          "semantic_grain_group_by_mismatch": 1
+        },
+        "Sellers & Fulfillment": {
+          "success": 55,
+          "semantic_filter_omission_or_error": 4,
+          "semantic_aggregation_mismatch": 1
+        },
+        "Payments & Installments": {
+          "success": 43,
+          "semantic_aggregation_mismatch": 1,
+          "semantic_filter_omission_or_error": 3,
+          "schema_missing_join_path": 11,
+          "semantic_grain_group_by_mismatch": 2
+        },
+        "Reviews & Satisfaction": {
+          "success": 28,
+          "semantic_filter_omission_or_error": 7,
+          "schema_hallucinated_table": 2,
+          "semantic_aggregation_mismatch": 11,
+          "schema_missing_join_path": 12
+        }
+      },
+      "by_difficulty": {
+        "easy": {
+          "semantic_filter_omission_or_error": 1,
+          "success": 101,
+          "semantic_aggregation_mismatch": 2,
+          "semantic_grain_group_by_mismatch": 5,
+          "schema_missing_join_path": 4,
+          "schema_hallucinated_table": 1
+        },
+        "medium": {
+          "success": 214,
+          "semantic_filter_omission_or_error": 27,
+          "schema_missing_join_path": 22,
+          "semantic_grain_group_by_mismatch": 9,
+          "semantic_aggregation_mismatch": 3,
+          "schema_hallucinated_table": 1
+        },
+        "hard": {
+          "success": 52,
+          "semantic_aggregation_mismatch": 27,
+          "semantic_ranking_order_mismatch": 2,
+          "schema_hallucinated_table": 13,
+          "semantic_filter_omission_or_error": 5,
+          "schema_missing_join_path": 11
+        }
+      }
+    },
+    "case_studies": {
+      "semantic_filter_omission_or_error": {
+        "query_id": "q_001",
+        "question": "What is the total revenue generated across all completed order items?",
+        "domain": "Revenue & Sales",
+        "difficulty": "easy",
+        "root_cause": "WHERE filter predicates omitted or misaligned.",
+        "actual_sql": "SELECT SUM(oi.price) AS total_revenue FROM order_items oi JOIN orders o ON oi.order_id = o.order_id WHERE o.order_status = 'delivered'",
+        "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS total_revenue FROM order_items oi"
+      },
+      "semantic_aggregation_mismatch": {
+        "query_id": "q_021",
+        "question": "What is the quarterly revenue breakdown for 2017?",
+        "domain": "Revenue & Sales",
+        "difficulty": "hard",
+        "root_cause": "Aggregation mismatch: expected ['sum'], got ['count', 'sum']",
+        "actual_sql": "SELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+        "expected_sql": "SELECT CASE WHEN strftime('%m', o.order_purchase_timestamp) BETWEEN '01' AND '03' THEN '2017-Q1' WHEN strftime('%m', o.order_purchase_timestamp) BETWEEN '04' AND '06' THEN '2017-Q2' WHEN strftime('%m', o.order_purchase_timestamp) BETWEEN '07' AND '09' THEN '2017-Q3' ELSE '2017-Q4' END AS quarter, ROUND(SUM(oi.price), 2) AS total_revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id WHERE strftime('%Y', o.order_purchase_timestamp) = '2017' GROUP BY quarter ORDER BY quarter"
+      },
+      "schema_missing_join_path": {
+        "query_id": "q_027",
+        "question": "What are the top 3 highest revenue days in 2017?",
+        "domain": "Revenue & Sales",
+        "difficulty": "medium",
+        "root_cause": "Query missed required join tables: {'orders'}",
+        "actual_sql": "SELECT\n  strftime('%Y-%m-%d', shipping_limit_date) AS day,\n  SUM(price) AS total_revenue\nFROM order_items\nWHERE strftime('%Y', shipping_limit_date) = '2017'\nGROUP BY day\nORDER BY total_revenue DESC\nLIMIT 3",
+        "expected_sql": "SELECT strftime('%Y-%m-%d', o.order_purchase_timestamp) AS day, ROUND(SUM(oi.price), 2) AS total_revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id WHERE strftime('%Y', o.order_purchase_timestamp) = '2017' GROUP BY day ORDER BY total_revenue DESC LIMIT 3"
+      },
+      "semantic_grain_group_by_mismatch": {
+        "query_id": "q_049",
+        "question": "What was the total revenue in month 2017-04?",
+        "domain": "Revenue & Sales",
+        "difficulty": "medium",
+        "root_cause": "Mismatch in GROUP BY grain or presence.",
+        "actual_sql": "SELECT substr(o.order_purchase_timestamp, 1, 7) AS month, SUM(oi.price) AS total_revenue FROM order_items oi JOIN orders o ON oi.order_id = o.order_id WHERE substr(o.order_purchase_timestamp, 1, 7) = '2017-04' GROUP BY month",
+        "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS monthly_revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id WHERE strftime('%Y-%m', o.order_purchase_timestamp) = '2017-04'"
+      },
+      "semantic_ranking_order_mismatch": {
+        "query_id": "q_205",
+        "question": "What is the revenue and units sold summary by English category translation?",
+        "domain": "Products & Categories",
+        "difficulty": "hard",
+        "root_cause": "Mismatch in ORDER BY / ranking clause.",
+        "actual_sql": "SELECT t.product_category_name_english AS english_category, SUM(i.price) AS revenue, COUNT(*) AS units_sold FROM order_items i JOIN products p ON i.product_id = p.product_id JOIN product_category_name_translation t ON p.product_category_name = t.product_category_name GROUP BY t.product_category_name_english",
+        "expected_sql": "SELECT t.product_category_name_english, COUNT(*) AS units_sold, ROUND(SUM(oi.price), 2) AS total_revenue FROM products p JOIN order_items oi ON p.product_id = oi.product_id JOIN product_category_name_translation t ON p.product_category_name = t.product_category_name GROUP BY t.product_category_name_english ORDER BY total_revenue DESC"
+      },
+      "schema_hallucinated_table": {
+        "query_id": "q_206",
+        "question": "What is the average product weight (in grams) and item count for the top 3 highest revenue categories?",
+        "domain": "Products & Categories",
+        "difficulty": "hard",
+        "root_cause": "Query joined hallucinated tables: {'top_categories', 'revenue'}",
+        "actual_sql": "WITH revenue AS (\n  SELECT p.product_category_name,\n         SUM(oi.price) AS revenue\n  FROM order_items oi\n  JOIN products p ON oi.product_id = p.product_id\n  GROUP BY p.product_category_name\n),\ntop_categories AS (\n  SELECT product_category_name, revenue\n  FROM revenue\n  ORDER BY revenue DESC\n  LIMIT 3\n)\nSELECT tc.product_category_name,\n       AVG(p.product_weight_g) AS avg_product_weight_g,\n       COUNT(*) AS item_count\nFROM order_items oi\nJOIN products p ON oi.product_id = p.product_id\nJOIN top_categories tc ON p.product_category_name = tc.product_category_name\nGROUP BY tc.product_category_name\nORDER BY tc.revenue DESC",
+        "expected_sql": "SELECT p.product_category_name, ROUND(AVG(p.product_weight_g), 2) AS avg_weight_g, ROUND(SUM(oi.price), 2) AS total_revenue FROM products p JOIN order_items oi ON p.product_id = oi.product_id WHERE p.product_category_name IS NOT NULL GROUP BY p.product_category_name ORDER BY total_revenue DESC LIMIT 3"
+      }
+    }
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "config": "config5_plan_rag_sql_feedback",
+  "total_queries": 3,
+  "result_correctness_pct": 0.0,
+  "result_equivalence_pct": 0.0,
+  "table_accuracy_pct": 100.0,
+  "table_match_pct": 100.0,
+  "sql_execution_success_pct": 0.0,
+  "invalid_sql_rate_pct": 100.0,
+  "hallucinated_schema_rate_pct": 66.67,
+  "unsafe_sql_rate_pct": 0.0,
+  "avg_latency_seconds": 34.98,
+  "min_latency_seconds": 34.05,
+  "max_latency_seconds": 35.98,
+  "failure_breakdown": {
+    "sql_execution_error": 1,
+    "sql_gen_hallucination": 2
+  },
+  "by_query_type": {
+    "single_value": {
+      "total": 2,
+      "correct": 0,
+      "correct_pct": 0.0,
+      "exec": 0
+    },
+    "time_series": {
+      "total": 1,
+      "correct": 0,
+      "correct_pct": 0.0,
+      "exec": 0
+    }
+  },
+  "by_difficulty": {
+    "easy": {
+      "total": 2,
+      "correct": 0,
+      "correct_pct": 0.0,
+      "exec": 0
+    },
+    "medium": {
+      "total": 1,
+      "correct": 0,
+      "correct_pct": 0.0,
+      "exec": 0
+    }
+  }
+}

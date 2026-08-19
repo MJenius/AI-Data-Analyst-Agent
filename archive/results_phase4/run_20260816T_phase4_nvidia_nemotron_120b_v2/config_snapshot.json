@@ -1,0 +1,24 @@
+{
+  "phase": 4,
+  "run_id": "run_20260816T_phase4_nvidia_nemotron_120b_v2",
+  "created_at_utc": "2026-08-16T12:49:17.239373+00:00",
+  "provider": "nvidia",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "database": "C:\\Users\\mjeni\\OneDrive\\Desktop\\Own Projects\\Data Analyst Agent\\data\\analytics.db",
+  "benchmark": "C:\\Users\\mjeni\\OneDrive\\Desktop\\Own Projects\\Data Analyst Agent\\tests\\evaluation\\benchmark_dataset_v2.json",
+  "benchmark_sha256": "3B55106604BB4CE7E3580A4A838AC29F8EBCF6A2F1B49442644437698B79F209",
+  "benchmark_queries": 100,
+  "sqlglot_version": "30.17.0",
+  "configs": [
+    "phase4_full_schema",
+    "phase4_current_top5",
+    "phase4_improved_rag",
+    "phase4_plan_improved_rag"
+  ],
+  "retrieval": {
+    "current": "unchanged vector index search with top_k=5",
+    "improved": "hybrid table/column/business-term evidence + shortest relationship paths; max_tables=6",
+    "full": "all table packets, relationships, business terms, and schema summary; duplicate column search documents omitted"
+  },
+  "execution_feedback": "No benchmark retry. Production permits one repair only for concrete AST/schema/SQLite diagnostics."
+}

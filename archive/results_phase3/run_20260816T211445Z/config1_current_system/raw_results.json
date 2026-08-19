@@ -1,0 +1,95 @@
+[
+  {
+    "config": "config1_current_system",
+    "index": 1,
+    "question": "What is the total revenue generated?",
+    "domain": "Revenue & Sales",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_items"
+    ],
+    "expected_sql": "SELECT SUM(oi.price) AS total_revenue FROM order_items oi",
+    "generated_sql": "SELECT SUM(price) AS total_revenue FROM order_items",
+    "run_latency_seconds": 8.11,
+    "failure_category": "correct",
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": true,
+    "result_correctness_reason": "single_value_match",
+    "result_equivalence": true,
+    "result_equivalence_reason": "single_value_match",
+    "queried_tables": [
+      "order_items"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_precision_pct": 100.0,
+    "table_match": true,
+    "invalid_sql": false,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "validation_errors": [],
+    "pre_execution_blocked": false,
+    "gold_exec_success": true,
+    "token_usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "all_sql": [
+      "SELECT SUM(price) AS total_revenue FROM order_items",
+      "SELECT SUM(price) AS total_revenue FROM order_items",
+      "SELECT SUM(price) AS total_revenue FROM order_items"
+    ],
+    "latency_seconds": 8.11,
+    "status": "completed",
+    "verdict": "accurate",
+    "confidence": 1.0
+  },
+  {
+    "config": "config1_current_system",
+    "index": 2,
+    "question": "What is the monthly revenue trend?",
+    "domain": "Revenue & Sales",
+    "query_type": "time_series",
+    "difficulty": "medium",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "expected_sql": "SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, SUM(oi.price) AS revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id GROUP BY month ORDER BY month",
+    "generated_sql": "SELECT name, type FROM sqlite_master WHERE type='table' ORDER BY name",
+    "run_latency_seconds": 203.1,
+    "failure_category": "table_selection_error",
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "row_count_mismatch: got 9, expected 24",
+    "result_equivalence": false,
+    "result_equivalence_reason": "row_count_mismatch: got 9, expected 24",
+    "queried_tables": [],
+    "table_accuracy_pct": 0.0,
+    "table_precision_pct": 0.0,
+    "table_match": false,
+    "invalid_sql": false,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "validation_errors": [],
+    "pre_execution_blocked": false,
+    "gold_exec_success": true,
+    "token_usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "all_sql": [
+      "SELECT name, type FROM sqlite_master WHERE type='table' ORDER BY name",
+      "SELECT\n                substr(o.order_purchase_timestamp, 1, 7) AS month,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY month\n            ORDER BY month",
+      "SELECT\n                substr(o.order_purchase_timestamp, 1, 7) AS month,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY month\n            ORDER BY month"
+    ],
+    "latency_seconds": 203.1,
+    "status": "completed",
+    "verdict": "accurate",
+    "confidence": 0.9
+  }
+]

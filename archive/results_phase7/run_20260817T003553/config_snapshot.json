@@ -1,0 +1,15 @@
+{
+  "timestamp": "2026-08-17T00:35:55.416145",
+  "benchmark_path": "tests/evaluation/benchmark_dataset_v2.json",
+  "database_path": "data/analytics.db",
+  "llm_provider": "auto",
+  "nvidia_model": "meta/llama-3.3-70b-instruct",
+  "phase": "phase7_live",
+  "features": [
+    "improved_rag",
+    "column_grounding",
+    "truncation_detection",
+    "semantic_verification",
+    "targeted_repair"
+  ]
+}

@@ -1,0 +1,125 @@
+[
+  {
+    "config": "config1_current_system",
+    "index": 1,
+    "question": "What is the total revenue generated?",
+    "domain": "Revenue & Sales",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_items"
+    ],
+    "expected_sql": "SELECT SUM(oi.price) AS total_revenue FROM order_items oi",
+    "generated_sql": "SELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "run_latency_seconds": 12.45,
+    "failure_category": "sql_semantic_error",
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "column_mismatch",
+    "result_equivalence": false,
+    "result_equivalence_reason": "column_mismatch",
+    "queried_tables": [
+      "order_items",
+      "products",
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "invalid_sql": false,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "gold_exec_success": true,
+    "all_sql": [
+      "SELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+      "SELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10"
+    ],
+    "latency_seconds": 12.45,
+    "status": "completed",
+    "verdict": "uncertain",
+    "confidence": 0.5
+  },
+  {
+    "config": "config1_current_system",
+    "index": 2,
+    "question": "What is the monthly revenue trend?",
+    "domain": "Revenue & Sales",
+    "query_type": "time_series",
+    "difficulty": "medium",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "expected_sql": "SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, SUM(oi.price) AS revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id GROUP BY month ORDER BY month",
+    "generated_sql": "SELECT\n                substr(o.order_purchase_timestamp, 1, 7) AS month,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY month\n            ORDER BY month",
+    "run_latency_seconds": 86.41,
+    "failure_category": "sql_semantic_error",
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "timeseries_value_mismatch: 15 differences",
+    "result_equivalence": false,
+    "result_equivalence_reason": "timeseries_value_mismatch: 15 differences",
+    "queried_tables": [
+      "order_items",
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "invalid_sql": false,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "gold_exec_success": true,
+    "all_sql": [
+      "SELECT\n                substr(o.order_purchase_timestamp, 1, 7) AS month,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY month\n            ORDER BY month",
+      "SELECT\n                substr(o.order_purchase_timestamp, 1, 7) AS month,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY month\n            ORDER BY month"
+    ],
+    "latency_seconds": 86.41,
+    "status": "completed",
+    "verdict": "uncertain",
+    "confidence": 0.8
+  },
+  {
+    "config": "config1_current_system",
+    "index": 3,
+    "question": "Which month had the highest revenue?",
+    "domain": "Revenue & Sales",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "expected_sql": "SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS peak_month, SUM(oi.price) AS revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id GROUP BY peak_month ORDER BY revenue DESC LIMIT 1",
+    "generated_sql": "SELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10",
+    "run_latency_seconds": 133.07,
+    "failure_category": "sql_semantic_error",
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "column_mismatch",
+    "result_equivalence": false,
+    "result_equivalence_reason": "column_mismatch",
+    "queried_tables": [
+      "order_items",
+      "products",
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "invalid_sql": false,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "gold_exec_success": true,
+    "all_sql": [
+      "SELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10",
+      "SELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10",
+      "SELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10",
+      "SELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10"
+    ],
+    "latency_seconds": 133.07,
+    "status": "completed",
+    "verdict": "uncertain",
+    "confidence": 0.0
+  }
+]

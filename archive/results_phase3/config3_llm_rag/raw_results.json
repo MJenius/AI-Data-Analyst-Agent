@@ -1,0 +1,44 @@
+[
+  {
+    "config": "config3_llm_rag",
+    "index": 1,
+    "question": "What is the total revenue generated?",
+    "domain": "Revenue & Sales",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_items"
+    ],
+    "expected_sql": "SELECT SUM(oi.price) AS total_revenue FROM order_items oi",
+    "generated_sql": "SELECT SUM(quantity * unit_price * (1 - discount_rate)) AS total_revenue FROM order_items",
+    "run_latency_seconds": 7.46,
+    "failure_category": "sql_execution_error",
+    "sql_execution_success": false,
+    "sql_execution_error": "no such column: quantity",
+    "result_correctness": false,
+    "result_correctness_reason": "not_evaluated",
+    "result_equivalence": false,
+    "result_equivalence_reason": "not_evaluated",
+    "queried_tables": [
+      "order_items"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "invalid_sql": true,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "gold_exec_success": true,
+    "retrieved_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "raw_llm": {
+      "reasoning": "Calculate total revenue by summing the product of quantity, unit_price, and (1 - discount_rate) across all order_items.",
+      "sql": "SELECT SUM(quantity * unit_price * (1 - discount_rate)) AS total_revenue FROM order_items",
+      "expected_result": "The total revenue generated across all orders."
+    },
+    "latency_seconds": 7.46,
+    "llm_calls": 1
+  }
+]

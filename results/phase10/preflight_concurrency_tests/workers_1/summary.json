@@ -1,0 +1,345 @@
+{
+  "status": "completed",
+  "timestamp": "2026-08-18T18:35:41.209424",
+  "dataset_path": "C:\\Users\\mjeni\\OneDrive\\Desktop\\Own Projects\\Data Analyst Agent\\tests\\evaluation\\benchmark_dataset_500.json",
+  "dataset_sha256": "64640710e804b657c6a8dceb83e2cf1956a1004b2e461fec275ecd078af33168",
+  "total_queries": 10,
+  "workers": 1,
+  "dry_run": false,
+  "llm_provider": "nvidia",
+  "model_name": "nvidia/nemotron-3-super-120b-a12b",
+  "total_elapsed_seconds": 565.95,
+  "queries_per_minute": 1.06,
+  "equivalent_match_rate": 1.0,
+  "exact_match_rate": 0.5,
+  "sql_execution_success_rate": 1.0,
+  "table_accuracy": 0.9,
+  "table_precision": 1.0,
+  "table_recall": 0.95,
+  "mean_latency_seconds": 56.18,
+  "p50_latency_seconds": 61.32,
+  "p95_latency_seconds": 100.48,
+  "provider_errors_count": 0,
+  "rate_limited_count": 0,
+  "timeout_count": 0,
+  "results": [
+    {
+      "query_id": "q_001",
+      "question": "What is the total revenue generated?",
+      "category": "Revenue & Sales",
+      "difficulty": "easy",
+      "expected_tables": [
+        "order_items"
+      ],
+      "queried_tables": [
+        "order_items"
+      ],
+      "actual_sql": "SELECT SUM(price) AS total_revenue FROM order_items",
+      "sql_execution_success": true,
+      "exact_match": true,
+      "equivalent_match": true,
+      "table_precision": 1.0,
+      "table_recall": 1.0,
+      "table_exact_match": true,
+      "latency_seconds": 25.27,
+      "error": null,
+      "error_category": "none",
+      "is_provider_error": false,
+      "repair_events": []
+    },
+    {
+      "query_id": "q_002",
+      "question": "What is the total freight value paid across all orders?",
+      "category": "Revenue & Sales",
+      "difficulty": "easy",
+      "expected_tables": [
+        "order_items"
+      ],
+      "queried_tables": [
+        "order_items"
+      ],
+      "actual_sql": "SELECT SUM(freight_value) AS total_freight_value FROM order_items",
+      "sql_execution_success": true,
+      "exact_match": false,
+      "equivalent_match": true,
+      "table_precision": 1.0,
+      "table_recall": 1.0,
+      "table_exact_match": true,
+      "latency_seconds": 27.115,
+      "error": null,
+      "error_category": "none",
+      "is_provider_error": false,
+      "repair_events": []
+    },
+    {
+      "query_id": "q_003",
+      "question": "What is the monthly revenue trend?",
+      "category": "Revenue & Sales",
+      "difficulty": "medium",
+      "expected_tables": [
+        "order_items",
+        "orders"
+      ],
+      "queried_tables": [
+        "order_items",
+        "orders"
+      ],
+      "actual_sql": "SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, SUM(oi.price) AS total_revenue FROM order_items oi JOIN orders o ON oi.order_id = o.order_id GROUP BY strftime('%Y-%m', o.order_purchase_timestamp), month ORDER BY strftime('%Y-%m', o.order_purchase_timestamp) ASC",
+      "sql_execution_success": true,
+      "exact_match": false,
+      "equivalent_match": true,
+      "table_precision": 1.0,
+      "table_recall": 1.0,
+      "table_exact_match": true,
+      "latency_seconds": 86.844,
+      "error": null,
+      "error_category": "none",
+      "is_provider_error": false,
+      "repair_events": [
+        {
+          "step": "SUM(total_revenue) by month, revenue at month grain grouped by month, strftime('%Y-%m', orders.order_purchase_timestamp) ordered by strftime('%Y-%m', orders.order_purchase_timestamp) ASC",
+          "attempted": true,
+          "applied": true,
+          "method": "programmatic",
+          "categories": [
+            "group_by_grain_mismatch"
+          ],
+          "pre_repair_sql": "SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, SUM(oi.price) AS total_revenue FROM order_items AS oi JOIN orders AS o ON oi.order_id = o.order_id GROUP BY strftime('%Y-%m', o.order_purchase_timestamp) ORDER BY strftime('%Y-%m', o.order_purchase_timestamp) ASC;",
+          "re_validated": true,
+          "executed": true,
+          "category": "group_by_grain_mismatch",
+          "post_repair_sql": "SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, SUM(oi.price) AS total_revenue FROM order_items AS oi JOIN orders AS o ON oi.order_id = o.order_id GROUP BY strftime('%Y-%m', o.order_purchase_timestamp), month ORDER BY strftime('%Y-%m', o.order_purchase_timestamp) ASC;",
+          "final_sql": "SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, SUM(oi.price) AS total_revenue FROM order_items AS oi JOIN orders AS o ON oi.order_id = o.order_id GROUP BY strftime('%Y-%m', o.order_purchase_timestamp), month ORDER BY strftime('%Y-%m', o.order_purchase_timestamp) ASC;"
+        },
+        {
+          "step": "Summarize findings for Calculate the monthly trend of revenue (sum of item prices) over time. with supporting metrics",
+          "attempted": true,
+          "applied": true,
+          "method": "programmatic",
+          "categories": [
+            "group_by_grain_mismatch"
+          ],
+          "pre_repair_sql": "SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, SUM(oi.price) AS total_revenue FROM order_items oi JOIN orders o ON oi.order_id = o.order_id GROUP BY strftime('%Y-%m', o.order_purchase_timestamp) ORDER BY strftime('%Y-%m', o.order_purchase_timestamp) ASC;",
+          "re_validated": true,
+          "executed": true,
+          "category": "group_by_grain_mismatch",
+          "post_repair_sql": "SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, SUM(oi.price) AS total_revenue FROM order_items oi JOIN orders o ON oi.order_id = o.order_id GROUP BY strftime('%Y-%m', o.order_purchase_timestamp), month ORDER BY strftime('%Y-%m', o.order_purchase_timestamp) ASC;",
+          "final_sql": "SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, SUM(oi.price) AS total_revenue FROM order_items oi JOIN orders o ON oi.order_id = o.order_id GROUP BY strftime('%Y-%m', o.order_purchase_timestamp), month ORDER BY strftime('%Y-%m', o.order_purchase_timestamp) ASC;"
+        }
+      ]
+    },
+    {
+      "query_id": "q_004",
+      "question": "Which month had the highest revenue?",
+      "category": "Revenue & Sales",
+      "difficulty": "medium",
+      "expected_tables": [
+        "order_items",
+        "orders"
+      ],
+      "queried_tables": [
+        "order_items",
+        "orders"
+      ],
+      "actual_sql": "SELECT strftime('%Y-%m', orders.order_purchase_timestamp) AS month, SUM(order_items.price) AS total_revenue FROM order_items JOIN orders ON order_items.order_id = orders.order_id GROUP BY month ORDER BY total_revenue DESC LIMIT 1",
+      "sql_execution_success": true,
+      "exact_match": false,
+      "equivalent_match": true,
+      "table_precision": 1.0,
+      "table_recall": 1.0,
+      "table_exact_match": true,
+      "latency_seconds": 61.318,
+      "error": null,
+      "error_category": "none",
+      "is_provider_error": false,
+      "repair_events": [
+        {
+          "step": "SUM(total_revenue) by month at month grain grouped by strftime('%Y-%m', orders.order_purchase_timestamp) AS month ordered by total_revenue DESC limited to 1",
+          "attempted": true,
+          "applied": true,
+          "method": "llm",
+          "categories": [
+            "group_by_grain_mismatch"
+          ],
+          "pre_repair_sql": "SELECT strftime('%Y-%m', orders.order_purchase_timestamp) AS month, SUM(order_items.price) AS total_revenue FROM order_items JOIN orders ON order_items.order_id = orders.order_id GROUP BY strftime('%Y-%m', orders.order_purchase_timestamp) ORDER BY total_revenue DESC LIMIT 1;",
+          "re_validated": false,
+          "executed": true,
+          "post_repair_sql": "SELECT strftime('%Y-%m', orders.order_purchase_timestamp) AS month, SUM(order_items.price) AS total_revenue FROM order_items JOIN orders ON order_items.order_id = orders.order_id GROUP BY strftime('%Y-%m', orders.order_purchase_timestamp) AS month ORDER BY total_revenue DESC LIMIT 1;",
+          "reason": "repaired SQL failed re-validation",
+          "final_sql": "SELECT strftime('%Y-%m', orders.order_purchase_timestamp) AS month, SUM(order_items.price) AS total_revenue FROM order_items JOIN orders ON order_items.order_id = orders.order_id GROUP BY strftime('%Y-%m', orders.order_purchase_timestamp) ORDER BY total_revenue DESC LIMIT 1;"
+        },
+        {
+          "step": "SUM(total_revenue) by month at month grain grouped by strftime('%Y-%m', orders.order_purchase_timestamp) AS month ordered by total_revenue DESC limited to 1",
+          "attempted": true,
+          "applied": true,
+          "method": "llm",
+          "categories": [
+            "group_by_grain_mismatch"
+          ],
+          "pre_repair_sql": "SELECT strftime('%Y-%m', orders.order_purchase_timestamp) AS month, SUM(order_items.price) AS total_revenue FROM order_items JOIN orders ON order_items.order_id = orders.order_id GROUP BY strftime('%Y-%m', orders.order_purchase_timestamp) ORDER BY total_revenue DESC LIMIT 1;",
+          "re_validated": false,
+          "executed": null,
+          "post_repair_sql": "SELECT strftime('%Y-%m', orders.order_purchase_timestamp) AS month, SUM(order_items.price) AS total_revenue FROM order_items JOIN orders ON order_items.order_id = orders.order_id GROUP BY strftime('%Y-%m', orders.order_purchase_timestamp) AS month ORDER BY total_revenue DESC LIMIT 1;",
+          "reason": "repaired SQL failed re-validation"
+        }
+      ]
+    },
+    {
+      "query_id": "q_005",
+      "question": "What is the average order value (AOV)?",
+      "category": "Revenue & Sales",
+      "difficulty": "medium",
+      "expected_tables": [
+        "order_items",
+        "orders"
+      ],
+      "queried_tables": [
+        "order_items"
+      ],
+      "actual_sql": "SELECT SUM(price) * 1.0 / COUNT(DISTINCT order_id) AS aov FROM order_items",
+      "sql_execution_success": true,
+      "exact_match": true,
+      "equivalent_match": true,
+      "table_precision": 1.0,
+      "table_recall": 0.5,
+      "table_exact_match": false,
+      "latency_seconds": 65.901,
+      "error": null,
+      "error_category": "none",
+      "is_provider_error": false,
+      "repair_events": []
+    },
+    {
+      "query_id": "q_006",
+      "question": "What is the total revenue from customers in state SP?",
+      "category": "Customers & Geography",
+      "difficulty": "medium",
+      "expected_tables": [
+        "order_items",
+        "orders",
+        "customers"
+      ],
+      "queried_tables": [
+        "customers",
+        "order_items",
+        "orders"
+      ],
+      "actual_sql": "SELECT SUM(oi.price) AS total_revenue FROM customers c JOIN orders o ON c.customer_id = o.customer_id JOIN order_items oi ON o.order_id = oi.order_id WHERE c.customer_state = 'SP'",
+      "sql_execution_success": true,
+      "exact_match": true,
+      "equivalent_match": true,
+      "table_precision": 1.0,
+      "table_recall": 1.0,
+      "table_exact_match": true,
+      "latency_seconds": 33.086,
+      "error": null,
+      "error_category": "none",
+      "is_provider_error": false,
+      "repair_events": []
+    },
+    {
+      "query_id": "q_007",
+      "question": "How many unique customers are located in state SP?",
+      "category": "Customers & Geography",
+      "difficulty": "easy",
+      "expected_tables": [
+        "customers"
+      ],
+      "queried_tables": [
+        "customers"
+      ],
+      "actual_sql": "SELECT COUNT(DISTINCT customer_unique_id) AS unique_customers FROM customers WHERE customer_state = 'SP'",
+      "sql_execution_success": true,
+      "exact_match": false,
+      "equivalent_match": true,
+      "table_precision": 1.0,
+      "table_recall": 1.0,
+      "table_exact_match": true,
+      "latency_seconds": 40.034,
+      "error": null,
+      "error_category": "none",
+      "is_provider_error": false,
+      "repair_events": []
+    },
+    {
+      "query_id": "q_008",
+      "question": "What is the average review score for orders in state SP?",
+      "category": "Reviews & Satisfaction",
+      "difficulty": "medium",
+      "expected_tables": [
+        "orders",
+        "customers",
+        "order_reviews"
+      ],
+      "queried_tables": [
+        "customers",
+        "orders",
+        "order_reviews"
+      ],
+      "actual_sql": "SELECT AVG(orv.review_score) AS avg_review_score FROM orders o JOIN customers c ON o.customer_id = c.customer_id JOIN order_reviews orv ON o.order_id = orv.order_id WHERE c.customer_state = 'SP'",
+      "sql_execution_success": true,
+      "exact_match": true,
+      "equivalent_match": true,
+      "table_precision": 1.0,
+      "table_recall": 1.0,
+      "table_exact_match": true,
+      "latency_seconds": 71.336,
+      "error": null,
+      "error_category": "none",
+      "is_provider_error": false,
+      "repair_events": []
+    },
+    {
+      "query_id": "q_009",
+      "question": "What is the total revenue from customers in state RJ?",
+      "category": "Customers & Geography",
+      "difficulty": "medium",
+      "expected_tables": [
+        "order_items",
+        "orders",
+        "customers"
+      ],
+      "queried_tables": [
+        "customers",
+        "order_items",
+        "orders"
+      ],
+      "actual_sql": "SELECT SUM(order_items.price) AS total_revenue FROM customers JOIN orders ON customers.customer_id = orders.customer_id JOIN order_items ON orders.order_id = order_items.order_id WHERE customers.customer_state = 'RJ'",
+      "sql_execution_success": true,
+      "exact_match": true,
+      "equivalent_match": true,
+      "table_precision": 1.0,
+      "table_recall": 1.0,
+      "table_exact_match": true,
+      "latency_seconds": 50.379,
+      "error": null,
+      "error_category": "none",
+      "is_provider_error": false,
+      "repair_events": []
+    },
+    {
+      "query_id": "q_010",
+      "question": "How many unique customers are located in state RJ?",
+      "category": "Customers & Geography",
+      "difficulty": "easy",
+      "expected_tables": [
+        "customers"
+      ],
+      "queried_tables": [
+        "customers"
+      ],
+      "actual_sql": "SELECT COUNT(DISTINCT customer_unique_id) AS unique_customer_count FROM customers WHERE customer_state = 'RJ'",
+      "sql_execution_success": true,
+      "exact_match": false,
+      "equivalent_match": true,
+      "table_precision": 1.0,
+      "table_recall": 1.0,
+      "table_exact_match": true,
+      "latency_seconds": 100.482,
+      "error": null,
+      "error_category": "none",
+      "is_provider_error": false,
+      "repair_events": []
+    }
+  ]
+}

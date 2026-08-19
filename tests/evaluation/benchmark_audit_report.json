@@ -1,0 +1,991 @@
+{
+  "total_queries": 100,
+  "passed": 96,
+  "failed": 4,
+  "issues_by_severity": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 4
+  },
+  "issues": [
+    {
+      "index": 32,
+      "question": "What is the customer retention rate?",
+      "query_type": "time_series",
+      "difficulty": "hard",
+      "issues": [
+        {
+          "type": "extra_tables_in_sql",
+          "severity": "low",
+          "detail": "Gold SQL uses additional tables ['customers']"
+        }
+      ]
+    },
+    {
+      "index": 44,
+      "question": "What is the geographic distribution of high-value customers?",
+      "query_type": "time_series",
+      "difficulty": "medium",
+      "issues": [
+        {
+          "type": "extra_tables_in_sql",
+          "severity": "low",
+          "detail": "Gold SQL uses additional tables ['customers', 'order_items']"
+        }
+      ]
+    },
+    {
+      "index": 55,
+      "question": "Which products are often bought together? (basic co-occurrence)",
+      "query_type": "ranking",
+      "difficulty": "hard",
+      "issues": [
+        {
+          "type": "extra_tables_in_sql",
+          "severity": "low",
+          "detail": "Gold SQL uses additional tables ['products']"
+        }
+      ]
+    },
+    {
+      "index": 74,
+      "question": "Which sellers have the highest ratings?",
+      "query_type": "ranking",
+      "difficulty": "easy",
+      "issues": [
+        {
+          "type": "extra_tables_in_sql",
+          "severity": "low",
+          "detail": "Gold SQL uses additional tables ['order_reviews']"
+        }
+      ]
+    }
+  ],
+  "full_audit_results": [
+    {
+      "index": 0,
+      "question": "What is the total revenue generated?",
+      "query_type": "single_value",
+      "difficulty": "easy",
+      "domain": "Revenue & Sales",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 1,
+      "question": "What is the monthly revenue trend?",
+      "query_type": "time_series",
+      "difficulty": "medium",
+      "domain": "Revenue & Sales",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 2,
+      "question": "Which month had the highest revenue?",
+      "query_type": "single_value",
+      "difficulty": "easy",
+      "domain": "Revenue & Sales",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 3,
+      "question": "Which month had the lowest revenue?",
+      "query_type": "single_value",
+      "difficulty": "easy",
+      "domain": "Revenue & Sales",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 4,
+      "question": "What is the average order value (AOV)?",
+      "query_type": "single_value",
+      "difficulty": "easy",
+      "domain": "Revenue & Sales",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 5,
+      "question": "How has AOV changed over time?",
+      "query_type": "unknown",
+      "difficulty": "easy",
+      "domain": "Revenue & Sales",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 6,
+      "question": "What percentage of revenue comes from top 10% customers?",
+      "query_type": "aggregation",
+      "difficulty": "medium",
+      "domain": "Revenue & Sales",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 7,
+      "question": "Which days of the week generate the most revenue?",
+      "query_type": "ranking",
+      "difficulty": "easy",
+      "domain": "Revenue & Sales",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 8,
+      "question": "What is the revenue distribution by hour of the day?",
+      "query_type": "time_series",
+      "difficulty": "medium",
+      "domain": "Revenue & Sales",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 9,
+      "question": "What is the revenue growth rate month-over-month?",
+      "query_type": "time_series",
+      "difficulty": "easy",
+      "domain": "Revenue & Sales",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 10,
+      "question": "What is the cumulative revenue over time?",
+      "query_type": "time_series",
+      "difficulty": "easy",
+      "domain": "Revenue & Sales",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 11,
+      "question": "Which payment type contributes most to revenue?",
+      "query_type": "single_value",
+      "difficulty": "easy",
+      "domain": "Revenue & Sales",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 12,
+      "question": "What is the median order value?",
+      "query_type": "single_value",
+      "difficulty": "easy",
+      "domain": "Revenue & Sales",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 13,
+      "question": "What is the revenue per customer?",
+      "query_type": "aggregation",
+      "difficulty": "medium",
+      "domain": "Revenue & Sales",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 14,
+      "question": "What is the revenue per order?",
+      "query_type": "aggregation",
+      "difficulty": "easy",
+      "domain": "Revenue & Sales",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 15,
+      "question": "How many total orders are there?",
+      "query_type": "aggregation",
+      "difficulty": "easy",
+      "domain": "Orders & Transactions",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 16,
+      "question": "How many orders per month?",
+      "query_type": "aggregation",
+      "difficulty": "easy",
+      "domain": "Orders & Transactions",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 17,
+      "question": "What is the average number of items per order?",
+      "query_type": "aggregation",
+      "difficulty": "easy",
+      "domain": "Orders & Transactions",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 18,
+      "question": "What is the distribution of order sizes?",
+      "query_type": "time_series",
+      "difficulty": "medium",
+      "domain": "Orders & Transactions",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 19,
+      "question": "How many orders are completed vs cancelled?",
+      "query_type": "aggregation",
+      "difficulty": "easy",
+      "domain": "Orders & Transactions",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 20,
+      "question": "What is the cancellation rate?",
+      "query_type": "single_value",
+      "difficulty": "easy",
+      "domain": "Orders & Transactions",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 21,
+      "question": "How long does it take to deliver orders on average?",
+      "query_type": "single_value",
+      "difficulty": "easy",
+      "domain": "Orders & Transactions",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 22,
+      "question": "What is the order processing time (purchase -> shipped)?",
+      "query_type": "single_value",
+      "difficulty": "easy",
+      "domain": "Orders & Transactions",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 23,
+      "question": "What percentage of orders are delivered late?",
+      "query_type": "aggregation",
+      "difficulty": "easy",
+      "domain": "Orders & Transactions",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 24,
+      "question": "What is the trend of late deliveries over time?",
+      "query_type": "time_series",
+      "difficulty": "medium",
+      "domain": "Orders & Transactions",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 25,
+      "question": "What is the busiest day for orders?",
+      "query_type": "single_value",
+      "difficulty": "easy",
+      "domain": "Orders & Transactions",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 26,
+      "question": "What is the peak hour for order placement?",
+      "query_type": "single_value",
+      "difficulty": "easy",
+      "domain": "Orders & Transactions",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 27,
+      "question": "What is the average time between orders for a customer?",
+      "query_type": "aggregation",
+      "difficulty": "easy",
+      "domain": "Orders & Transactions",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 28,
+      "question": "What is the repeat order rate?",
+      "query_type": "single_value",
+      "difficulty": "easy",
+      "domain": "Orders & Transactions",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 29,
+      "question": "How many orders contain multiple sellers?",
+      "query_type": "aggregation",
+      "difficulty": "easy",
+      "domain": "Orders & Transactions",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 30,
+      "question": "How many unique customers are there?",
+      "query_type": "aggregation",
+      "difficulty": "easy",
+      "domain": "Customers",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 31,
+      "question": "How many new customers per month?",
+      "query_type": "aggregation",
+      "difficulty": "easy",
+      "domain": "Customers",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 32,
+      "question": "What is the customer retention rate?",
+      "query_type": "time_series",
+      "difficulty": "hard",
+      "domain": "Customers",
+      "issues": [
+        {
+          "type": "extra_tables_in_sql",
+          "severity": "low",
+          "detail": "Gold SQL uses additional tables ['customers']"
+        }
+      ],
+      "status": "ISSUES_FOUND"
+    },
+    {
+      "index": 33,
+      "question": "What is the churn rate?",
+      "query_type": "time_series",
+      "difficulty": "hard",
+      "domain": "Customers",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 34,
+      "question": "What is the average number of orders per customer?",
+      "query_type": "aggregation",
+      "difficulty": "easy",
+      "domain": "Customers",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 35,
+      "question": "What percentage of customers are repeat buyers?",
+      "query_type": "aggregation",
+      "difficulty": "easy",
+      "domain": "Customers",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 36,
+      "question": "Which regions have the most customers?",
+      "query_type": "ranking",
+      "difficulty": "easy",
+      "domain": "Customers",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 37,
+      "question": "What is the distribution of customers by state?",
+      "query_type": "time_series",
+      "difficulty": "medium",
+      "domain": "Customers",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 38,
+      "question": "What is the average revenue per customer (ARPU)?",
+      "query_type": "aggregation",
+      "difficulty": "medium",
+      "domain": "Customers",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 39,
+      "question": "Who are the top 10 customers by revenue?",
+      "query_type": "ranking",
+      "difficulty": "medium",
+      "domain": "Customers",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 40,
+      "question": "What is the lifetime value (LTV) of customers?",
+      "query_type": "aggregation",
+      "difficulty": "medium",
+      "domain": "Customers",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 41,
+      "question": "How long do customers stay active?",
+      "query_type": "aggregation",
+      "difficulty": "easy",
+      "domain": "Customers",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 42,
+      "question": "What is the average time between first and last purchase?",
+      "query_type": "aggregation",
+      "difficulty": "easy",
+      "domain": "Customers",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 43,
+      "question": "What percentage of customers make only one purchase?",
+      "query_type": "aggregation",
+      "difficulty": "easy",
+      "domain": "Customers",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 44,
+      "question": "What is the geographic distribution of high-value customers?",
+      "query_type": "time_series",
+      "difficulty": "medium",
+      "domain": "Customers",
+      "issues": [
+        {
+          "type": "extra_tables_in_sql",
+          "severity": "low",
+          "detail": "Gold SQL uses additional tables ['customers', 'order_items']"
+        }
+      ],
+      "status": "ISSUES_FOUND"
+    },
+    {
+      "index": 45,
+      "question": "Which product categories generate the most revenue?",
+      "query_type": "ranking",
+      "difficulty": "easy",
+      "domain": "Products & Categories",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 46,
+      "question": "Which product categories have the most orders?",
+      "query_type": "ranking",
+      "difficulty": "easy",
+      "domain": "Products & Categories",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 47,
+      "question": "What is the average price per product category?",
+      "query_type": "aggregation",
+      "difficulty": "easy",
+      "domain": "Products & Categories",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 48,
+      "question": "Which products are most frequently purchased?",
+      "query_type": "ranking",
+      "difficulty": "easy",
+      "domain": "Products & Categories",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 49,
+      "question": "Which products generate the most revenue?",
+      "query_type": "ranking",
+      "difficulty": "easy",
+      "domain": "Products & Categories",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 50,
+      "question": "What is the distribution of product prices?",
+      "query_type": "time_series",
+      "difficulty": "medium",
+      "domain": "Products & Categories",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 51,
+      "question": "Which categories have the highest AOV?",
+      "query_type": "ranking",
+      "difficulty": "easy",
+      "domain": "Products & Categories",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 52,
+      "question": "Which categories have declining sales trends?",
+      "query_type": "ranking",
+      "difficulty": "medium",
+      "domain": "Products & Categories",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 53,
+      "question": "Which categories have the fastest growth?",
+      "query_type": "ranking",
+      "difficulty": "medium",
+      "domain": "Products & Categories",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 54,
+      "question": "What is the average number of items sold per product?",
+      "query_type": "aggregation",
+      "difficulty": "easy",
+      "domain": "Products & Categories",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 55,
+      "question": "Which products are often bought together? (basic co-occurrence)",
+      "query_type": "ranking",
+      "difficulty": "hard",
+      "domain": "Products & Categories",
+      "issues": [
+        {
+          "type": "extra_tables_in_sql",
+          "severity": "low",
+          "detail": "Gold SQL uses additional tables ['products']"
+        }
+      ],
+      "status": "ISSUES_FOUND"
+    },
+    {
+      "index": 56,
+      "question": "What is the revenue contribution of top categories?",
+      "query_type": "ranking",
+      "difficulty": "easy",
+      "domain": "Products & Categories",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 57,
+      "question": "Which products have the highest return/cancellation rate?",
+      "query_type": "ranking",
+      "difficulty": "easy",
+      "domain": "Products & Categories",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 58,
+      "question": "What is the price vs sales relationship?",
+      "query_type": "aggregation",
+      "difficulty": "easy",
+      "domain": "Products & Categories",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 59,
+      "question": "Which categories have seasonal demand patterns?",
+      "query_type": "aggregation",
+      "difficulty": "hard",
+      "domain": "Products & Categories",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 60,
+      "question": "What is the average delivery time?",
+      "query_type": "aggregation",
+      "difficulty": "easy",
+      "domain": "Logistics & Delivery",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 61,
+      "question": "What is the average shipping delay?",
+      "query_type": "aggregation",
+      "difficulty": "easy",
+      "domain": "Logistics & Delivery",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 62,
+      "question": "Which states have the longest delivery times?",
+      "query_type": "ranking",
+      "difficulty": "easy",
+      "domain": "Logistics & Delivery",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 63,
+      "question": "Which sellers deliver the fastest?",
+      "query_type": "ranking",
+      "difficulty": "medium",
+      "domain": "Logistics & Delivery",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 64,
+      "question": "What percentage of deliveries are delayed?",
+      "query_type": "aggregation",
+      "difficulty": "easy",
+      "domain": "Logistics & Delivery",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 65,
+      "question": "What is the trend of delivery delays over time?",
+      "query_type": "time_series",
+      "difficulty": "medium",
+      "domain": "Logistics & Delivery",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 66,
+      "question": "How does distance affect delivery time? (approx via location)",
+      "query_type": "aggregation",
+      "difficulty": "medium",
+      "domain": "Logistics & Delivery",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 67,
+      "question": "Which regions have the best delivery performance?",
+      "query_type": "aggregation",
+      "difficulty": "easy",
+      "domain": "Logistics & Delivery",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 68,
+      "question": "What is the distribution of delivery times?",
+      "query_type": "time_series",
+      "difficulty": "medium",
+      "domain": "Logistics & Delivery",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 69,
+      "question": "Are late deliveries increasing or decreasing?",
+      "query_type": "unknown",
+      "difficulty": "easy",
+      "domain": "Logistics & Delivery",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 70,
+      "question": "How many sellers are there?",
+      "query_type": "aggregation",
+      "difficulty": "easy",
+      "domain": "Sellers",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 71,
+      "question": "Which sellers generate the most revenue?",
+      "query_type": "ranking",
+      "difficulty": "easy",
+      "domain": "Sellers",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 72,
+      "question": "Which sellers have the most orders?",
+      "query_type": "ranking",
+      "difficulty": "easy",
+      "domain": "Sellers",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 73,
+      "question": "What is the average revenue per seller?",
+      "query_type": "aggregation",
+      "difficulty": "easy",
+      "domain": "Sellers",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 74,
+      "question": "Which sellers have the highest ratings?",
+      "query_type": "ranking",
+      "difficulty": "easy",
+      "domain": "Sellers",
+      "issues": [
+        {
+          "type": "extra_tables_in_sql",
+          "severity": "low",
+          "detail": "Gold SQL uses additional tables ['order_reviews']"
+        }
+      ],
+      "status": "ISSUES_FOUND"
+    },
+    {
+      "index": 75,
+      "question": "Which sellers have the most delayed deliveries?",
+      "query_type": "ranking",
+      "difficulty": "easy",
+      "domain": "Sellers",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 76,
+      "question": "What is the distribution of sellers by region?",
+      "query_type": "time_series",
+      "difficulty": "medium",
+      "domain": "Sellers",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 77,
+      "question": "Which sellers are growing fastest?",
+      "query_type": "ranking",
+      "difficulty": "easy",
+      "domain": "Sellers",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 78,
+      "question": "What is the average delivery time per seller?",
+      "query_type": "aggregation",
+      "difficulty": "easy",
+      "domain": "Sellers",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 79,
+      "question": "Which sellers have the highest cancellation rate?",
+      "query_type": "ranking",
+      "difficulty": "easy",
+      "domain": "Sellers",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 80,
+      "question": "Which payment method is most used?",
+      "query_type": "single_value",
+      "difficulty": "easy",
+      "domain": "Payments",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 81,
+      "question": "What is the revenue by payment type?",
+      "query_type": "aggregation",
+      "difficulty": "easy",
+      "domain": "Payments",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 82,
+      "question": "What is the average payment value?",
+      "query_type": "aggregation",
+      "difficulty": "easy",
+      "domain": "Payments",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 83,
+      "question": "How many installments are used on average?",
+      "query_type": "aggregation",
+      "difficulty": "easy",
+      "domain": "Payments",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 84,
+      "question": "What is the distribution of installment payments?",
+      "query_type": "time_series",
+      "difficulty": "medium",
+      "domain": "Payments",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 85,
+      "question": "Do installment payments affect order value?",
+      "query_type": "unknown",
+      "difficulty": "easy",
+      "domain": "Payments",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 86,
+      "question": "What is the failure rate of payments?",
+      "query_type": "single_value",
+      "difficulty": "easy",
+      "domain": "Payments",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 87,
+      "question": "Which payment types have highest order value?",
+      "query_type": "ranking",
+      "difficulty": "easy",
+      "domain": "Payments",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 88,
+      "question": "How does payment method vary by region?",
+      "query_type": "aggregation",
+      "difficulty": "medium",
+      "domain": "Payments",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 89,
+      "question": "What is the trend of payment methods over time?",
+      "query_type": "aggregation",
+      "difficulty": "medium",
+      "domain": "Payments",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 90,
+      "question": "What is the average review score?",
+      "query_type": "aggregation",
+      "difficulty": "easy",
+      "domain": "Reviews & Satisfaction",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 91,
+      "question": "What is the distribution of review scores?",
+      "query_type": "time_series",
+      "difficulty": "medium",
+      "domain": "Reviews & Satisfaction",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 92,
+      "question": "Which products have the best reviews?",
+      "query_type": "ranking",
+      "difficulty": "easy",
+      "domain": "Reviews & Satisfaction",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 93,
+      "question": "Which sellers have the worst reviews?",
+      "query_type": "ranking",
+      "difficulty": "easy",
+      "domain": "Reviews & Satisfaction",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 94,
+      "question": "What is the relationship between delivery time and review score?",
+      "query_type": "aggregation",
+      "difficulty": "easy",
+      "domain": "Reviews & Satisfaction",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 95,
+      "question": "Do late deliveries lead to lower ratings?",
+      "query_type": "aggregation",
+      "difficulty": "easy",
+      "domain": "Reviews & Satisfaction",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 96,
+      "question": "What percentage of orders receive reviews?",
+      "query_type": "aggregation",
+      "difficulty": "easy",
+      "domain": "Reviews & Satisfaction",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 97,
+      "question": "What is the trend of review scores over time?",
+      "query_type": "time_series",
+      "difficulty": "medium",
+      "domain": "Reviews & Satisfaction",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 98,
+      "question": "Which categories have the highest satisfaction?",
+      "query_type": "ranking",
+      "difficulty": "medium",
+      "domain": "Reviews & Satisfaction",
+      "issues": [],
+      "status": "PASS"
+    },
+    {
+      "index": 99,
+      "question": "Which categories have the lowest satisfaction?",
+      "query_type": "ranking",
+      "difficulty": "medium",
+      "domain": "Reviews & Satisfaction",
+      "issues": [],
+      "status": "PASS"
+    }
+  ]
+}

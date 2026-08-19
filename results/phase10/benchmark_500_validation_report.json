@@ -1,0 +1,47 @@
+{
+  "dataset_path": "C:\\Users\\mjeni\\OneDrive\\Desktop\\Own Projects\\Data Analyst Agent\\tests\\evaluation\\benchmark_dataset_500.json",
+  "sha256_hash": "0c9807d5867ff9cb6a9252437dab31660b62b2e6c9d09c5e54b1dfc7edc43e04",
+  "total_queries": 500,
+  "valid_structure": true,
+  "error_count": 0,
+  "warning_count": 0,
+  "sql_executable_count": 500,
+  "sql_failed_count": 0,
+  "ground_truth_mismatch_count": 0,
+  "table_hallucination_count": 0,
+  "empty_result_count": 0,
+  "exact_duplicates_count": 0,
+  "domain_distribution": {
+    "Revenue & Sales": 65,
+    "Orders & Transactions": 65,
+    "Customers & Geography": 65,
+    "Products & Categories": 65,
+    "Logistics & Operations": 60,
+    "Sellers & Fulfillment": 60,
+    "Payments & Installments": 60,
+    "Reviews & Satisfaction": 60
+  },
+  "category_distribution": {
+    "Revenue & Sales": 65,
+    "Orders & Transactions": 65,
+    "Customers & Geography": 65,
+    "Products & Categories": 65,
+    "Logistics & Operations": 60,
+    "Sellers & Fulfillment": 60,
+    "Payments & Installments": 60,
+    "Reviews & Satisfaction": 60
+  },
+  "query_type_distribution": {
+    "single_value": 268,
+    "time_series": 49,
+    "aggregated_table": 43,
+    "ranked_list": 140
+  },
+  "difficulty_distribution": {
+    "easy": 114,
+    "medium": 276,
+    "hard": 110
+  },
+  "exact_duplicates": [],
+  "issues": []
+}

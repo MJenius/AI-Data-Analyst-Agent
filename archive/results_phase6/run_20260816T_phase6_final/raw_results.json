@@ -1,0 +1,3998 @@
+[
+  {
+    "index": 1,
+    "question": "What is the total revenue generated?",
+    "domain": "Revenue & Sales",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT SUM(oi.price) AS total_revenue FROM order_items oi",
+    "generated_sql": "SELECT SUM(price) AS total_revenue FROM order_items",
+    "sql_used": "SELECT SUM(price) AS total_revenue FROM order_items",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": true,
+    "result_correctness_reason": "single_value_match",
+    "result_equivalence": true,
+    "result_equivalence_reason": "single_value_match",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 3.14,
+    "token_usage_total": 1225
+  },
+  {
+    "index": 2,
+    "question": "What is the monthly revenue trend?",
+    "domain": "Revenue & Sales",
+    "query_type": "time_series",
+    "difficulty": "medium",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, SUM(oi.price) AS revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id GROUP BY month ORDER BY month",
+    "generated_sql": "SELECT strftime('%Y-%m', orders.order_purchase_timestamp) AS month, SUM(order_items.price) AS revenue FROM order_items JOIN orders ON order_items.order_id = orders.order_id GROUP BY month ORDER BY month",
+    "sql_used": "SELECT strftime('%Y-%m', orders.order_purchase_timestamp) AS month, SUM(order_items.price) AS revenue FROM order_items JOIN orders ON order_items.order_id = orders.order_id GROUP BY month ORDER BY month",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": true,
+    "result_correctness_reason": "timeseries_exact_match",
+    "result_equivalence": true,
+    "result_equivalence_reason": "timeseries_exact_match",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 10.78,
+    "token_usage_total": 2240
+  },
+  {
+    "index": 3,
+    "question": "Which month had the highest revenue?",
+    "domain": "Revenue & Sales",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS peak_month, SUM(oi.price) AS revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id GROUP BY peak_month ORDER BY revenue DESC LIMIT 1",
+    "generated_sql": "SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, SUM(oi.price) AS total_revenue FROM order_items oi JOIN orders o ON oi.order_id = o.order_id GROUP BY month ORDER BY total_revenue DESC LIMIT 1",
+    "sql_used": "SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, SUM(oi.price) AS total_revenue FROM order_items oi JOIN orders o ON oi.order_id = o.order_id GROUP BY month ORDER BY total_revenue DESC LIMIT 1",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "column_mismatch",
+    "result_equivalence": false,
+    "result_equivalence_reason": "column_mismatch",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 8.22,
+    "token_usage_total": 2121
+  },
+  {
+    "index": 4,
+    "question": "Which month had the lowest revenue?",
+    "domain": "Revenue & Sales",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS lowest_month, SUM(oi.price) AS revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id GROUP BY lowest_month ORDER BY revenue ASC LIMIT 1",
+    "generated_sql": "SELECT\n    strftime('%Y-%m', o.order_purchase_timestamp) AS month,\n    SUM(oi.price) AS revenue\nFROM order_items oi\nJOIN orders o ON oi.order_id = o.order_id\nGROUP BY month\nORDER BY revenue ASC\nLIMIT 1",
+    "sql_used": "SELECT\n    strftime('%Y-%m', o.order_purchase_timestamp) AS month,\n    SUM(oi.price) AS revenue\nFROM order_items oi\nJOIN orders o ON oi.order_id = o.order_id\nGROUP BY month\nORDER BY revenue ASC\nLIMIT 1",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "column_mismatch",
+    "result_equivalence": false,
+    "result_equivalence_reason": "column_mismatch",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 9.05,
+    "token_usage_total": 2265
+  },
+  {
+    "index": 5,
+    "question": "What is the average order value (AOV)?",
+    "domain": "Revenue & Sales",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT AVG(order_total) AS average_order_value FROM (SELECT oi.order_id, SUM(oi.price) AS order_total FROM order_items oi GROUP BY oi.order_id)",
+    "generated_sql": "SELECT SUM(price) / COUNT(DISTINCT order_id) AS average_order_value FROM order_items",
+    "sql_used": "SELECT SUM(price) / COUNT(DISTINCT order_id) AS average_order_value FROM order_items",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": true,
+    "result_correctness_reason": "single_value_match",
+    "result_equivalence": true,
+    "result_equivalence_reason": "single_value_match",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 5.29,
+    "token_usage_total": 2356
+  },
+  {
+    "index": 6,
+    "question": "How has AOV changed over time?",
+    "domain": "Revenue & Sales",
+    "query_type": "unknown",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "queried_tables": [],
+    "table_accuracy_pct": 0.0,
+    "table_match": false,
+    "expected_sql": "SELECT month, AVG(monthly_total) AS average_order_value FROM (SELECT o.order_id, strftime('%Y-%m', o.order_purchase_timestamp) AS month, SUM(oi.price) AS monthly_total FROM orders o JOIN order_items oi ON o.order_id = oi.order_id GROUP BY o.order_id, month) GROUP BY month ORDER BY month",
+    "generated_sql": null,
+    "sql_used": null,
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": false,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "not_evaluated",
+    "result_equivalence": false,
+    "result_equivalence_reason": "not_evaluated",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 7.1,
+    "token_usage_total": 1925
+  },
+  {
+    "index": 7,
+    "question": "What percentage of revenue comes from top 10% customers?",
+    "domain": "Revenue & Sales",
+    "query_type": "aggregation",
+    "difficulty": "medium",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "customers"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "WITH customer_revenue AS (SELECT o.customer_id, SUM(oi.price) AS total_spend FROM orders o JOIN order_items oi ON o.order_id = oi.order_id GROUP BY o.customer_id), ranked AS (SELECT total_spend, NTILE(10) OVER (ORDER BY total_spend DESC) AS decile FROM customer_revenue), top10 AS (SELECT SUM(total_spend) AS top_revenue FROM ranked WHERE decile = 1), total AS (SELECT SUM(total_spend) AS total_revenue FROM customer_revenue) SELECT ROUND(100.0 * (SELECT top_revenue FROM top10) / (SELECT total_revenue FROM total), 2) AS customer_revenue_percentage FROM total LIMIT 1",
+    "generated_sql": "WITH cust_rev AS (\n  SELECT\n    c.customer_unique_id,\n    SUM(oi.price) AS revenue\n  FROM customers c\n  JOIN orders o ON o.customer_id = c.customer_id\n  JOIN order_items oi ON oi.order_id = o.order_id\n  GROUP BY c.customer_unique_id\n),\nagg AS (\n  SELECT\n    SUM(revenue) AS total_revenue,\n    COUNT(*) AS total_customers\n  FROM cust_rev\n),\nranked AS (\n  SELECT\n    revenue,\n    total_revenue,\n    total_customers,\n    RANK() OVER (ORDER BY revenue DESC) AS rnk\n  FROM cust_rev\n  CROSS JOIN agg\n)",
+    "sql_used": "WITH cust_rev AS (\n  SELECT\n    c.customer_unique_id,\n    SUM(oi.price) AS revenue\n  FROM customers c\n  JOIN orders o ON o.customer_id = c.customer_id\n  JOIN order_items oi ON oi.order_id = o.order_id\n  GROUP BY c.customer_unique_id\n),\nagg AS (\n  SELECT\n    SUM(revenue) AS total_revenue,\n    COUNT(*) AS total_customers\n  FROM cust_rev\n),\nranked AS (\n  SELECT\n    revenue,\n    total_revenue,\n    total_customers,\n    RANK() OVER (ORDER BY revenue DESC) AS rnk\n  FROM cust_rev\n  CROSS JOIN agg\n)",
+    "repair_attempted": true,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": "prog_repair_returned_none",
+    "sql_execution_success": false,
+    "sql_execution_error": "incomplete input",
+    "result_correctness": false,
+    "result_correctness_reason": "not_evaluated",
+    "result_equivalence": false,
+    "result_equivalence_reason": "not_evaluated",
+    "hallucinated_schema": [
+      "cust_rev",
+      "cust_rev",
+      "agg"
+    ],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": true,
+    "verification_is_valid": false,
+    "verification_issue_categories": {
+      "group_by_mismatch": 1
+    },
+    "verification_issues": [
+      {
+        "category": "group_by_mismatch",
+        "severity": "error",
+        "message": "SQL parse error: Failed to parse any statement following CTE. Line 24, Col: 1.\n     total_customers,\n    RANK() OVER (ORDER BY revenue DESC) AS rnk\n  FROM cust_rev\n  CROSS JOIN agg\n\u001b[4m)\u001b[0m"
+      }
+    ],
+    "run_latency_seconds": 42.79,
+    "token_usage_total": 3915
+  },
+  {
+    "index": 8,
+    "question": "Which days of the week generate the most revenue?",
+    "domain": "Revenue & Sales",
+    "query_type": "ranking",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items"
+    ],
+    "table_accuracy_pct": 50.0,
+    "table_match": false,
+    "expected_sql": "SELECT CAST(strftime('%w', o.order_purchase_timestamp) AS INTEGER) AS day_of_week, SUM(oi.price) AS revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id GROUP BY day_of_week ORDER BY revenue DESC",
+    "generated_sql": "SELECT CASE strftime('%w', shipping_limit_date) WHEN '0' THEN 'Sunday' WHEN '1' THEN 'Monday' WHEN '2' THEN 'Tuesday' WHEN '3' THEN 'Wednesday' WHEN '4' THEN 'Thursday' WHEN '5' THEN 'Friday' WHEN '6' THEN 'Saturday' END AS day_of_week, SUM(price) AS total_revenue FROM order_items GROUP BY day_of_week ORDER BY total_revenue DESC",
+    "sql_used": "SELECT CASE strftime('%w', shipping_limit_date) WHEN '0' THEN 'Sunday' WHEN '1' THEN 'Monday' WHEN '2' THEN 'Tuesday' WHEN '3' THEN 'Wednesday' WHEN '4' THEN 'Thursday' WHEN '5' THEN 'Friday' WHEN '6' THEN 'Saturday' END AS day_of_week, SUM(price) AS total_revenue FROM order_items GROUP BY day_of_week ORDER BY total_revenue DESC",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "ranking_mismatch",
+    "result_equivalence": false,
+    "result_equivalence_reason": "ranking_mismatch",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 7.9,
+    "token_usage_total": 1592
+  },
+  {
+    "index": 9,
+    "question": "What is the revenue distribution by hour of the day?",
+    "domain": "Revenue & Sales",
+    "query_type": "time_series",
+    "difficulty": "medium",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items"
+    ],
+    "table_accuracy_pct": 50.0,
+    "table_match": false,
+    "expected_sql": "SELECT CAST(strftime('%H', o.order_purchase_timestamp) AS INTEGER) AS hour, SUM(oi.price) AS revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id GROUP BY hour ORDER BY hour",
+    "generated_sql": "SELECT strftime('%H', shipping_limit_date) AS hour_of_day, SUM(price) AS revenue FROM order_items GROUP BY hour_of_day ORDER BY hour_of_day",
+    "sql_used": "SELECT strftime('%H', shipping_limit_date) AS hour_of_day, SUM(price) AS revenue FROM order_items GROUP BY hour_of_day ORDER BY hour_of_day",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "time_period_mismatch",
+    "result_equivalence": false,
+    "result_equivalence_reason": "time_period_mismatch",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 6.27,
+    "token_usage_total": 1416
+  },
+  {
+    "index": 10,
+    "question": "What is the revenue growth rate month-over-month?",
+    "domain": "Revenue & Sales",
+    "query_type": "time_series",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "WITH monthly AS (SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, SUM(oi.price) AS revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id GROUP BY month) SELECT month, revenue, ROUND(100.0 * (revenue - LAG(revenue) OVER (ORDER BY month)) / LAG(revenue) OVER (ORDER BY month), 2) AS revenue_growth_rate FROM monthly ORDER BY month",
+    "generated_sql": "WITH monthly_rev AS (\n  SELECT\n    strftime('%Y-%m', o.order_purchase_timestamp) AS month,\n    SUM(oi.price) AS revenue\n  FROM order_items oi\n  JOIN orders o ON oi.order_id = o.order_id\n  GROUP BY month\n)",
+    "sql_used": "WITH monthly_rev AS (\n  SELECT\n    strftime('%Y-%m', o.order_purchase_timestamp) AS month,\n    SUM(oi.price) AS revenue\n  FROM order_items oi\n  JOIN orders o ON oi.order_id = o.order_id\n  GROUP BY month\n)",
+    "repair_attempted": true,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": "prog_repair_returned_none",
+    "sql_execution_success": false,
+    "sql_execution_error": "incomplete input",
+    "result_correctness": false,
+    "result_correctness_reason": "not_evaluated",
+    "result_equivalence": false,
+    "result_equivalence_reason": "not_evaluated",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": true,
+    "verification_is_valid": false,
+    "verification_issue_categories": {
+      "group_by_mismatch": 1
+    },
+    "verification_issues": [
+      {
+        "category": "group_by_mismatch",
+        "severity": "error",
+        "message": "SQL parse error: Failed to parse any statement following CTE. Line 8, Col: 1.\n  rice) AS revenue\n  FROM order_items oi\n  JOIN orders o ON oi.order_id = o.order_id\n  GROUP BY month\n\u001b[4m)\u001b[0m"
+      }
+    ],
+    "run_latency_seconds": 11.42,
+    "token_usage_total": 2524
+  },
+  {
+    "index": 11,
+    "question": "What is the cumulative revenue over time?",
+    "domain": "Revenue & Sales",
+    "query_type": "time_series",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "WITH monthly AS (SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, SUM(oi.price) AS revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id GROUP BY month) SELECT month, revenue, SUM(revenue) OVER (ORDER BY month) AS cumulative_revenue FROM monthly ORDER BY month",
+    "generated_sql": "WITH daily AS (\n  SELECT DATE(o.order_purchase_timestamp) AS order_date,\n         SUM(oi.price) AS daily_revenue\n  FROM order_items oi\n  JOIN orders o ON oi.order_id = o.order_id\n  GROUP BY DATE(o.order_purchase_timestamp)\n)",
+    "sql_used": "WITH daily AS (\n  SELECT DATE(o.order_purchase_timestamp) AS order_date,\n         SUM(oi.price) AS daily_revenue\n  FROM order_items oi\n  JOIN orders o ON oi.order_id = o.order_id\n  GROUP BY DATE(o.order_purchase_timestamp)\n)",
+    "repair_attempted": true,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": "prog_repair_returned_none",
+    "sql_execution_success": false,
+    "sql_execution_error": "incomplete input",
+    "result_correctness": false,
+    "result_correctness_reason": "not_evaluated",
+    "result_equivalence": false,
+    "result_equivalence_reason": "not_evaluated",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": true,
+    "verification_is_valid": false,
+    "verification_issue_categories": {
+      "group_by_mismatch": 1
+    },
+    "verification_issues": [
+      {
+        "category": "group_by_mismatch",
+        "severity": "error",
+        "message": "SQL parse error: Failed to parse any statement following CTE. Line 7, Col: 1.\n  er_items oi\n  JOIN orders o ON oi.order_id = o.order_id\n  GROUP BY DATE(o.order_purchase_timestamp)\n\u001b[4m)\u001b[0m"
+      }
+    ],
+    "run_latency_seconds": 9.94,
+    "token_usage_total": 2464
+  },
+  {
+    "index": 12,
+    "question": "Which payment type contributes most to revenue?",
+    "domain": "Revenue & Sales",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "queried_tables": [
+      "order_items",
+      "order_payments",
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT op.payment_type, SUM(op.payment_value) AS total_revenue FROM order_payments op GROUP BY op.payment_type ORDER BY total_revenue DESC LIMIT 1",
+    "generated_sql": "SELECT op.payment_type, SUM(oi.price) AS revenue\nFROM order_items oi\nJOIN orders o ON oi.order_id = o.order_id\nJOIN order_payments op ON o.order_id = op.order_id\nGROUP BY op.payment_type\nORDER BY revenue DESC\nLIMIT 1",
+    "sql_used": "SELECT op.payment_type, SUM(oi.price) AS revenue\nFROM order_items oi\nJOIN orders o ON oi.order_id = o.order_id\nJOIN order_payments op ON o.order_id = op.order_id\nGROUP BY op.payment_type\nORDER BY revenue DESC\nLIMIT 1",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "column_mismatch",
+    "result_equivalence": false,
+    "result_equivalence_reason": "column_mismatch",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 29.46,
+    "token_usage_total": 3620
+  },
+  {
+    "index": 13,
+    "question": "What is the median order value?",
+    "domain": "Revenue & Sales",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT AVG(order_total) AS median_order_value FROM (SELECT order_total, ROW_NUMBER() OVER (ORDER BY order_total) AS rn, COUNT(*) OVER () AS cnt FROM (SELECT oi.order_id, SUM(oi.price) AS order_total FROM order_items oi GROUP BY oi.order_id)) WHERE rn IN (FLOOR((cnt + 1) / 2), CEIL((cnt + 1) / 2))",
+    "generated_sql": "WITH order_totals AS (\n  SELECT o.order_id, SUM(oi.price) AS total\n  FROM orders o\n  JOIN order_items oi ON o.order_id = oi.order_id\n  GROUP BY o.order_id\n)",
+    "sql_used": "WITH order_totals AS (\n  SELECT o.order_id, SUM(oi.price) AS total\n  FROM orders o\n  JOIN order_items oi ON o.order_id = oi.order_id\n  GROUP BY o.order_id\n)",
+    "repair_attempted": true,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": "prog_repair_returned_none",
+    "sql_execution_success": false,
+    "sql_execution_error": "incomplete input",
+    "result_correctness": false,
+    "result_correctness_reason": "not_evaluated",
+    "result_equivalence": false,
+    "result_equivalence_reason": "not_evaluated",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": true,
+    "verification_is_valid": false,
+    "verification_issue_categories": {
+      "group_by_mismatch": 1
+    },
+    "verification_issues": [
+      {
+        "category": "group_by_mismatch",
+        "severity": "error",
+        "message": "SQL parse error: Failed to parse any statement following CTE. Line 6, Col: 1.\n  e) AS total\n  FROM orders o\n  JOIN order_items oi ON o.order_id = oi.order_id\n  GROUP BY o.order_id\n\u001b[4m)\u001b[0m"
+      }
+    ],
+    "run_latency_seconds": 12.88,
+    "token_usage_total": 2913
+  },
+  {
+    "index": 14,
+    "question": "What is the revenue per customer?",
+    "domain": "Revenue & Sales",
+    "query_type": "aggregation",
+    "difficulty": "medium",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "customers"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT o.customer_id, SUM(oi.price) AS revenue_per_customer FROM orders o JOIN order_items oi ON o.order_id = oi.order_id GROUP BY o.customer_id",
+    "generated_sql": "SELECT c.customer_unique_id, SUM(oi.price) AS revenue_per_customer FROM customers c JOIN orders o ON o.customer_id = c.customer_id JOIN order_items oi ON oi.order_id = o.order_id GROUP BY c.customer_unique_id",
+    "sql_used": "SELECT c.customer_unique_id, SUM(oi.price) AS revenue_per_customer FROM customers c JOIN orders o ON o.customer_id = c.customer_id JOIN order_items oi ON oi.order_id = o.order_id GROUP BY c.customer_unique_id",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "aggregation_mismatch:50",
+    "result_equivalence": false,
+    "result_equivalence_reason": "aggregation_mismatch:50",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 9.6,
+    "token_usage_total": 2721
+  },
+  {
+    "index": 15,
+    "question": "What is the revenue per order?",
+    "domain": "Revenue & Sales",
+    "query_type": "aggregation",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT oi.order_id, SUM(oi.price) AS revenue_per_order FROM order_items oi GROUP BY oi.order_id",
+    "generated_sql": "SELECT SUM(oi.price) / COUNT(DISTINCT o.order_id) AS revenue_per_order FROM order_items oi JOIN orders o ON oi.order_id = o.order_id",
+    "sql_used": "SELECT SUM(oi.price) / COUNT(DISTINCT o.order_id) AS revenue_per_order FROM order_items oi JOIN orders o ON oi.order_id = o.order_id",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "row_count_mismatch: got 1, expected 50",
+    "result_equivalence": false,
+    "result_equivalence_reason": "row_count_mismatch: got 1, expected 50",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": false,
+    "verification_issue_categories": {
+      "duplicate_detection": 1
+    },
+    "verification_issues": [
+      {
+        "category": "duplicate_detection",
+        "severity": "warning",
+        "message": "Result contains only 1 rows but 98666 expected (0.00\u00c3\u2014 too few) \u00e2\u20ac\u201d possible over-filtering or missing JOIN"
+      }
+    ],
+    "run_latency_seconds": 10.16,
+    "token_usage_total": 2496
+  },
+  {
+    "index": 16,
+    "question": "How many total orders are there?",
+    "domain": "Orders & Transactions",
+    "query_type": "aggregation",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders"
+    ],
+    "queried_tables": [
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT COUNT(DISTINCT order_id) AS total_orders FROM orders",
+    "generated_sql": "SELECT COUNT(*) AS total_orders FROM orders",
+    "sql_used": "SELECT COUNT(*) AS total_orders FROM orders",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": true,
+    "result_correctness_reason": "aggregation_exact_match",
+    "result_equivalence": true,
+    "result_equivalence_reason": "aggregation_exact_match",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 7.37,
+    "token_usage_total": 1535
+  },
+  {
+    "index": 17,
+    "question": "How many orders per month?",
+    "domain": "Orders & Transactions",
+    "query_type": "aggregation",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders"
+    ],
+    "queried_tables": [
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT strftime('%Y-%m', order_purchase_timestamp) AS month, COUNT(*) AS order_count FROM orders GROUP BY month ORDER BY month",
+    "generated_sql": "SELECT strftime('%Y-%m', order_purchase_timestamp) AS month, COUNT(*) AS order_count FROM orders GROUP BY month ORDER BY month",
+    "sql_used": "SELECT strftime('%Y-%m', order_purchase_timestamp) AS month, COUNT(*) AS order_count FROM orders GROUP BY month ORDER BY month",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": true,
+    "result_correctness_reason": "aggregation_exact_match",
+    "result_equivalence": true,
+    "result_equivalence_reason": "aggregation_exact_match",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 7.07,
+    "token_usage_total": 1712
+  },
+  {
+    "index": 18,
+    "question": "What is the average number of items per order?",
+    "domain": "Orders & Transactions",
+    "query_type": "aggregation",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT AVG(item_count) AS average_items_per_order FROM (SELECT order_id, COUNT(*) AS item_count FROM order_items GROUP BY order_id)",
+    "generated_sql": "SELECT AVG(item_count) AS avg_items_per_order FROM (SELECT oi.order_id, COUNT(*) AS item_count FROM order_items oi JOIN orders o ON oi.order_id = o.order_id GROUP BY oi.order_id) sub",
+    "sql_used": "SELECT AVG(item_count) AS avg_items_per_order FROM (SELECT oi.order_id, COUNT(*) AS item_count FROM order_items oi JOIN orders o ON oi.order_id = o.order_id GROUP BY oi.order_id) sub",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "aggregation_mismatch:1",
+    "result_equivalence": false,
+    "result_equivalence_reason": "aggregation_mismatch:1",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 10.15,
+    "token_usage_total": 2432
+  },
+  {
+    "index": 19,
+    "question": "What is the distribution of order sizes?",
+    "domain": "Orders & Transactions",
+    "query_type": "time_series",
+    "difficulty": "medium",
+    "expected_tables": [
+      "order_items"
+    ],
+    "queried_tables": [],
+    "table_accuracy_pct": 0.0,
+    "table_match": false,
+    "expected_sql": "SELECT item_count AS items_per_order, COUNT(*) AS order_count FROM (SELECT order_id, COUNT(*) AS item_count FROM order_items GROUP BY order_id) GROUP BY item_count ORDER BY item_count",
+    "generated_sql": null,
+    "sql_used": null,
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": false,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "not_evaluated",
+    "result_equivalence": false,
+    "result_equivalence_reason": "not_evaluated",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 18.43,
+    "token_usage_total": 1861
+  },
+  {
+    "index": 20,
+    "question": "How many orders are completed vs cancelled?",
+    "domain": "Orders & Transactions",
+    "query_type": "aggregation",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders"
+    ],
+    "queried_tables": [
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT order_status, COUNT(*) AS count FROM orders GROUP BY order_status",
+    "generated_sql": "SELECT\n  SUM(CASE WHEN order_status = 'delivered' THEN 1 ELSE 0 END) AS completed_orders,\n  SUM(CASE WHEN order_status = 'canceled' THEN 1 ELSE 0 END) AS cancelled_orders\nFROM orders",
+    "sql_used": "SELECT\n  SUM(CASE WHEN order_status = 'delivered' THEN 1 ELSE 0 END) AS completed_orders,\n  SUM(CASE WHEN order_status = 'canceled' THEN 1 ELSE 0 END) AS cancelled_orders\nFROM orders",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "row_count_mismatch: got 1, expected 8",
+    "result_equivalence": false,
+    "result_equivalence_reason": "row_count_mismatch: got 1, expected 8",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": false,
+    "verification_issue_categories": {
+      "duplicate_detection": 1
+    },
+    "verification_issues": [
+      {
+        "category": "duplicate_detection",
+        "severity": "warning",
+        "message": "Result contains only 1 rows but 8 expected (0.12\u00c3\u2014 too few) \u00e2\u20ac\u201d possible over-filtering or missing JOIN"
+      }
+    ],
+    "run_latency_seconds": 14.03,
+    "token_usage_total": 1804
+  },
+  {
+    "index": 21,
+    "question": "What is the cancellation rate?",
+    "domain": "Orders & Transactions",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders"
+    ],
+    "queried_tables": [
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT ROUND(100.0 * SUM(CASE WHEN order_status = 'canceled' THEN 1 ELSE 0 END) / COUNT(*), 2) AS cancellation_rate FROM orders",
+    "generated_sql": "SELECT (SUM(CASE WHEN order_status='canceled' THEN 1 ELSE 0 END) * 1.0) / COUNT(*) AS cancellation_rate FROM orders",
+    "sql_used": "SELECT (SUM(CASE WHEN order_status='canceled' THEN 1 ELSE 0 END) * 1.0) / COUNT(*) AS cancellation_rate FROM orders",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "numeric_mismatch_cancellation_rate: got 0.0063, expected 0.63",
+    "result_equivalence": false,
+    "result_equivalence_reason": "numeric_mismatch_cancellation_rate: got 0.0063, expected 0.63",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 4.85,
+    "token_usage_total": 2153
+  },
+  {
+    "index": 22,
+    "question": "How long does it take to deliver orders on average?",
+    "domain": "Orders & Transactions",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders"
+    ],
+    "queried_tables": [
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT AVG(JULIANDAY(order_delivered_customer_date) - JULIANDAY(order_purchase_timestamp)) AS average_delivery_time_days FROM orders WHERE order_delivered_customer_date IS NOT NULL",
+    "generated_sql": "SELECT AVG(julianday(o.order_delivered_customer_date) - julianday(o.order_purchase_timestamp)) AS avg_delivery_days FROM orders o WHERE o.order_delivered_customer_date IS NOT NULL AND o.order_status = 'delivered'",
+    "sql_used": "SELECT AVG(julianday(o.order_delivered_customer_date) - julianday(o.order_purchase_timestamp)) AS avg_delivery_days FROM orders o WHERE o.order_delivered_customer_date IS NOT NULL AND o.order_status = 'delivered'",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "column_mismatch",
+    "result_equivalence": false,
+    "result_equivalence_reason": "column_mismatch",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 6.1,
+    "token_usage_total": 1859
+  },
+  {
+    "index": 23,
+    "question": "What is the order processing time (purchase -> shipped)?",
+    "domain": "Orders & Transactions",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders"
+    ],
+    "queried_tables": [],
+    "table_accuracy_pct": 0.0,
+    "table_match": false,
+    "expected_sql": "SELECT AVG(JULIANDAY(order_delivered_carrier_date) - JULIANDAY(order_purchase_timestamp)) * 24 AS average_processing_time_hours FROM orders WHERE order_delivered_carrier_date IS NOT NULL",
+    "generated_sql": null,
+    "sql_used": null,
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": false,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "not_evaluated",
+    "result_equivalence": false,
+    "result_equivalence_reason": "not_evaluated",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 7.4,
+    "token_usage_total": 0
+  },
+  {
+    "index": 24,
+    "question": "What percentage of orders are delivered late?",
+    "domain": "Orders & Transactions",
+    "query_type": "aggregation",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders"
+    ],
+    "queried_tables": [
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT ROUND(100.0 * SUM(CASE WHEN order_delivered_customer_date > order_estimated_delivery_date THEN 1 ELSE 0 END) / COUNT(*), 2) AS percentage_late_deliveries FROM orders WHERE order_delivered_customer_date IS NOT NULL",
+    "generated_sql": "SELECT (SUM(CASE WHEN order_delivered_customer_date > order_estimated_delivery_date THEN 1 ELSE 0 END) * 100.0) / COUNT(*) AS late_delivery_percentage FROM orders WHERE order_delivered_customer_date IS NOT NULL AND order_estimated_delivery_date IS NOT NULL",
+    "sql_used": "SELECT (SUM(CASE WHEN order_delivered_customer_date > order_estimated_delivery_date THEN 1 ELSE 0 END) * 100.0) / COUNT(*) AS late_delivery_percentage FROM orders WHERE order_delivered_customer_date IS NOT NULL AND order_estimated_delivery_date IS NOT NULL",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "aggregation_mismatch:1",
+    "result_equivalence": false,
+    "result_equivalence_reason": "aggregation_mismatch:1",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 13.08,
+    "token_usage_total": 2272
+  },
+  {
+    "index": 25,
+    "question": "What is the trend of late deliveries over time?",
+    "domain": "Orders & Transactions",
+    "query_type": "time_series",
+    "difficulty": "medium",
+    "expected_tables": [
+      "orders"
+    ],
+    "queried_tables": [
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT strftime('%Y-%m', order_purchase_timestamp) AS month, ROUND(100.0 * SUM(CASE WHEN order_delivered_customer_date > order_estimated_delivery_date THEN 1 ELSE 0 END) / COUNT(*), 2) AS percentage_late_deliveries FROM orders WHERE order_delivered_customer_date IS NOT NULL GROUP BY month ORDER BY month",
+    "generated_sql": "SELECT strftime('%Y-%m', order_purchase_timestamp) AS month,\n       COUNT(*) AS total_orders,\n       SUM(CASE WHEN order_delivered_customer_date > order_estimated_delivery_date THEN 1 ELSE 0 END) AS late_deliveries,\n       ROUND(100.0 * SUM(CASE WHEN order_delivered_customer_date > order_estimated_delivery_date THEN 1 ELSE 0 END) / COUNT(*), 2) AS late_delivery_pct\nFROM orders\nWHERE order_delivered_customer_date IS NOT NULL\n  AND order_estimated_delivery_date IS NOT NULL\nGROUP BY month\nORDER BY month",
+    "sql_used": "SELECT strftime('%Y-%m', order_purchase_timestamp) AS month,\n       COUNT(*) AS total_orders,\n       SUM(CASE WHEN order_delivered_customer_date > order_estimated_delivery_date THEN 1 ELSE 0 END) AS late_deliveries,\n       ROUND(100.0 * SUM(CASE WHEN order_delivered_customer_date > order_estimated_delivery_date THEN 1 ELSE 0 END) / COUNT(*), 2) AS late_delivery_pct\nFROM orders\nWHERE order_delivered_customer_date IS NOT NULL\n  AND order_estimated_delivery_date IS NOT NULL\nGROUP BY month\nORDER BY month",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "timeseries_value_mismatch:23",
+    "result_equivalence": false,
+    "result_equivalence_reason": "timeseries_value_mismatch:23",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 16.64,
+    "token_usage_total": 2118
+  },
+  {
+    "index": 26,
+    "question": "What is the busiest day for orders?",
+    "domain": "Orders & Transactions",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders"
+    ],
+    "queried_tables": [
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT CAST(strftime('%w', order_purchase_timestamp) AS INTEGER) AS day_of_week, COUNT(*) AS order_count FROM orders GROUP BY day_of_week ORDER BY order_count DESC LIMIT 1",
+    "generated_sql": "SELECT date(order_purchase_timestamp) AS order_date, COUNT(*) AS order_count FROM orders GROUP BY order_date ORDER BY order_count DESC LIMIT 1",
+    "sql_used": "SELECT date(order_purchase_timestamp) AS order_date, COUNT(*) AS order_count FROM orders GROUP BY order_date ORDER BY order_count DESC LIMIT 1",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "column_mismatch",
+    "result_equivalence": false,
+    "result_equivalence_reason": "column_mismatch",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 9.02,
+    "token_usage_total": 1729
+  },
+  {
+    "index": 27,
+    "question": "What is the peak hour for order placement?",
+    "domain": "Orders & Transactions",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders"
+    ],
+    "queried_tables": [
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT CAST(strftime('%H', order_purchase_timestamp) AS INTEGER) AS hour, COUNT(*) AS order_count FROM orders GROUP BY hour ORDER BY order_count DESC LIMIT 1",
+    "generated_sql": "SELECT strftime('%H', order_purchase_timestamp) AS hour, COUNT(*) AS order_count FROM orders GROUP BY hour ORDER BY order_count DESC LIMIT 1",
+    "sql_used": "SELECT strftime('%H', order_purchase_timestamp) AS hour, COUNT(*) AS order_count FROM orders GROUP BY hour ORDER BY order_count DESC LIMIT 1",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": true,
+    "result_correctness_reason": "single_value_match",
+    "result_equivalence": true,
+    "result_equivalence_reason": "single_value_match",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 9.54,
+    "token_usage_total": 1654
+  },
+  {
+    "index": 28,
+    "question": "What is the average time between orders for a customer?",
+    "domain": "Orders & Transactions",
+    "query_type": "aggregation",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders"
+    ],
+    "queried_tables": [
+      "orders",
+      "customers"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "WITH customer_orders AS (SELECT customer_id, order_purchase_timestamp, LAG(order_purchase_timestamp) OVER (PARTITION BY customer_id ORDER BY order_purchase_timestamp) AS prev_ts FROM orders) SELECT AVG(JULIANDAY(order_purchase_timestamp) - JULIANDAY(prev_ts)) AS average_time_between_orders_days FROM customer_orders WHERE prev_ts IS NOT NULL",
+    "generated_sql": "WITH ordered AS (\n  SELECT\n    c.customer_unique_id,\n    o.order_purchase_timestamp,\n    LAG(o.order_purchase_timestamp) OVER (PARTITION BY c.customer_unique_id ORDER BY o.order_purchase_timestamp) AS prev_ts\n  FROM orders o\n  JOIN customers c ON o.customer_id = c.customer_id\n)",
+    "sql_used": "WITH ordered AS (\n  SELECT\n    c.customer_unique_id,\n    o.order_purchase_timestamp,\n    LAG(o.order_purchase_timestamp) OVER (PARTITION BY c.customer_unique_id ORDER BY o.order_purchase_timestamp) AS prev_ts\n  FROM orders o\n  JOIN customers c ON o.customer_id = c.customer_id\n)",
+    "repair_attempted": true,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": "prog_repair_returned_none",
+    "sql_execution_success": false,
+    "sql_execution_error": "incomplete input",
+    "result_correctness": false,
+    "result_correctness_reason": "not_evaluated",
+    "result_equivalence": false,
+    "result_equivalence_reason": "not_evaluated",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": true,
+    "verification_is_valid": false,
+    "verification_issue_categories": {
+      "group_by_mismatch": 1
+    },
+    "verification_issues": [
+      {
+        "category": "group_by_mismatch",
+        "severity": "error",
+        "message": "SQL parse error: Failed to parse any statement following CTE. Line 8, Col: 1.\n  _purchase_timestamp) AS prev_ts\n  FROM orders o\n  JOIN customers c ON o.customer_id = c.customer_id\n\u001b[4m)\u001b[0m"
+      }
+    ],
+    "run_latency_seconds": 12.55,
+    "token_usage_total": 2705
+  },
+  {
+    "index": 29,
+    "question": "What is the repeat order rate?",
+    "domain": "Orders & Transactions",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders"
+    ],
+    "queried_tables": [
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT ROUND(100.0 * COUNT(CASE WHEN order_count > 1 THEN 1 END) / COUNT(*), 2) AS repeat_order_rate FROM (SELECT customer_id, COUNT(*) AS order_count FROM orders GROUP BY customer_id)",
+    "generated_sql": "SELECT (COUNT(*) - COUNT(DISTINCT customer_id)) * 1.0 / COUNT(*) AS repeat_order_rate FROM orders",
+    "sql_used": "SELECT (COUNT(*) - COUNT(DISTINCT customer_id)) * 1.0 / COUNT(*) AS repeat_order_rate FROM orders",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": true,
+    "result_correctness_reason": "single_value_match",
+    "result_equivalence": true,
+    "result_equivalence_reason": "single_value_match",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 18.97,
+    "token_usage_total": 2406
+  },
+  {
+    "index": 30,
+    "question": "How many orders contain multiple sellers?",
+    "domain": "Orders & Transactions",
+    "query_type": "aggregation",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT COUNT(*) AS multiple_seller_order_count FROM (SELECT order_id FROM order_items GROUP BY order_id HAVING COUNT(DISTINCT seller_id) > 1)",
+    "generated_sql": "SELECT COUNT(*) AS orders_with_multiple_sellers FROM (SELECT order_id FROM order_items GROUP BY order_id HAVING COUNT(DISTINCT seller_id) > 1) AS sub",
+    "sql_used": "SELECT COUNT(*) AS orders_with_multiple_sellers FROM (SELECT order_id FROM order_items GROUP BY order_id HAVING COUNT(DISTINCT seller_id) > 1) AS sub",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "aggregation_mismatch:1",
+    "result_equivalence": false,
+    "result_equivalence_reason": "aggregation_mismatch:1",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 11.9,
+    "token_usage_total": 2965
+  },
+  {
+    "index": 31,
+    "question": "How many unique customers are there?",
+    "domain": "Customers",
+    "query_type": "aggregation",
+    "difficulty": "easy",
+    "expected_tables": [
+      "customers"
+    ],
+    "queried_tables": [
+      "customers"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT COUNT(DISTINCT customer_unique_id) AS unique_customer_count FROM customers",
+    "generated_sql": "SELECT COUNT(DISTINCT customer_unique_id) AS unique_customers FROM customers",
+    "sql_used": "SELECT COUNT(DISTINCT customer_unique_id) AS unique_customers FROM customers",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "aggregation_mismatch:1",
+    "result_equivalence": false,
+    "result_equivalence_reason": "aggregation_mismatch:1",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 3.56,
+    "token_usage_total": 1871
+  },
+  {
+    "index": 32,
+    "question": "How many new customers per month?",
+    "domain": "Customers",
+    "query_type": "aggregation",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders"
+    ],
+    "queried_tables": [
+      "orders",
+      "customers"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "WITH first_orders AS (SELECT customer_id, MIN(strftime('%Y-%m', order_purchase_timestamp)) AS first_month FROM orders GROUP BY customer_id) SELECT first_month AS month, COUNT(*) AS new_customer_count FROM first_orders GROUP BY month ORDER BY month",
+    "generated_sql": "WITH first_orders AS (\n  SELECT\n    c.customer_unique_id,\n    MIN(o.order_purchase_timestamp) AS first_purchase_ts\n  FROM orders o\n  JOIN customers c ON o.customer_id = c.customer_id\n  GROUP BY c.customer_unique_id\n)",
+    "sql_used": "WITH first_orders AS (\n  SELECT\n    c.customer_unique_id,\n    MIN(o.order_purchase_timestamp) AS first_purchase_ts\n  FROM orders o\n  JOIN customers c ON o.customer_id = c.customer_id\n  GROUP BY c.customer_unique_id\n)",
+    "repair_attempted": true,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": "prog_repair_returned_none",
+    "sql_execution_success": false,
+    "sql_execution_error": "incomplete input",
+    "result_correctness": false,
+    "result_correctness_reason": "not_evaluated",
+    "result_equivalence": false,
+    "result_equivalence_reason": "not_evaluated",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": true,
+    "verification_is_valid": false,
+    "verification_issue_categories": {
+      "group_by_mismatch": 1
+    },
+    "verification_issues": [
+      {
+        "category": "group_by_mismatch",
+        "severity": "error",
+        "message": "SQL parse error: Failed to parse any statement following CTE. Line 8, Col: 1.\n    FROM orders o\n  JOIN customers c ON o.customer_id = c.customer_id\n  GROUP BY c.customer_unique_id\n\u001b[4m)\u001b[0m"
+      }
+    ],
+    "run_latency_seconds": 11.65,
+    "token_usage_total": 2529
+  },
+  {
+    "index": 33,
+    "question": "What is the customer retention rate?",
+    "domain": "Customers",
+    "query_type": "time_series",
+    "difficulty": "hard",
+    "expected_tables": [
+      "orders"
+    ],
+    "queried_tables": [
+      "orders",
+      "customers"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "WITH monthly_customers AS (SELECT DISTINCT strftime('%Y-%m', o.order_purchase_timestamp) AS month, o.customer_id FROM orders o), retention AS (SELECT c1.month, c1.customer_id, COUNT(DISTINCT c2.month) AS subsequent_months FROM monthly_customers c1 LEFT JOIN monthly_customers c2 ON c1.customer_id = c2.customer_id AND c2.month > c1.month GROUP BY c1.month, c1.customer_id) SELECT month, ROUND(100.0 * SUM(CASE WHEN subsequent_months > 0 THEN 1 ELSE 0 END) / COUNT(*), 2) AS retention_rate FROM retention GROUP BY month ORDER BY month",
+    "generated_sql": "WITH order_counts AS (\n  SELECT c.customer_unique_id, COUNT(o.order_id) AS order_cnt\n  FROM customers c\n  JOIN orders o ON o.customer_id = c.customer_id\n  GROUP BY c.customer_unique_id\n)",
+    "sql_used": "WITH order_counts AS (\n  SELECT c.customer_unique_id, COUNT(o.order_id) AS order_cnt\n  FROM customers c\n  JOIN orders o ON o.customer_id = c.customer_id\n  GROUP BY c.customer_unique_id\n)",
+    "repair_attempted": true,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": "prog_repair_returned_none",
+    "sql_execution_success": false,
+    "sql_execution_error": "incomplete input",
+    "result_correctness": false,
+    "result_correctness_reason": "not_evaluated",
+    "result_equivalence": false,
+    "result_equivalence_reason": "not_evaluated",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": true,
+    "verification_is_valid": false,
+    "verification_issue_categories": {
+      "group_by_mismatch": 1
+    },
+    "verification_issues": [
+      {
+        "category": "group_by_mismatch",
+        "severity": "error",
+        "message": "SQL parse error: Failed to parse any statement following CTE. Line 6, Col: 1.\n    FROM customers c\n  JOIN orders o ON o.customer_id = c.customer_id\n  GROUP BY c.customer_unique_id\n\u001b[4m)\u001b[0m"
+      }
+    ],
+    "run_latency_seconds": 16.07,
+    "token_usage_total": 2363
+  },
+  {
+    "index": 34,
+    "question": "What is the churn rate?",
+    "domain": "Customers",
+    "query_type": "time_series",
+    "difficulty": "hard",
+    "expected_tables": [
+      "orders"
+    ],
+    "queried_tables": [
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "WITH customer_months AS (SELECT DISTINCT customer_id, strftime('%Y-%m', order_purchase_timestamp) AS month FROM orders), months AS (SELECT DISTINCT month FROM customer_months), churn AS (SELECT c.customer_id, m.month, MAX(c2.month) AS last_month FROM customer_months c CROSS JOIN months m LEFT JOIN customer_months c2 ON c.customer_id = c2.customer_id AND c2.month <= m.month GROUP BY c.customer_id, m.month HAVING m.month > last_month) SELECT month, COUNT(DISTINCT customer_id) AS churn_count FROM churn GROUP BY month ORDER BY month",
+    "generated_sql": "WITH max_dt AS (SELECT MAX(order_purchase_timestamp) AS max_date FROM orders),\ncutoff AS (SELECT date(max_date, '-6 months') AS cutoff_date FROM max_dt),\ncust_last AS (SELECT o.customer_id, MAX(o.order_purchase_timestamp) AS last_order FROM orders o GROUP BY o.customer_id)",
+    "sql_used": "WITH max_dt AS (SELECT MAX(order_purchase_timestamp) AS max_date FROM orders),\ncutoff AS (SELECT date(max_date, '-6 months') AS cutoff_date FROM max_dt),\ncust_last AS (SELECT o.customer_id, MAX(o.order_purchase_timestamp) AS last_order FROM orders o GROUP BY o.customer_id)",
+    "repair_attempted": true,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": "prog_repair_returned_none",
+    "sql_execution_success": false,
+    "sql_execution_error": "incomplete input",
+    "result_correctness": false,
+    "result_correctness_reason": "not_evaluated",
+    "result_equivalence": false,
+    "result_equivalence_reason": "not_evaluated",
+    "hallucinated_schema": [
+      "max_dt"
+    ],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": true,
+    "verification_is_valid": false,
+    "verification_issue_categories": {
+      "group_by_mismatch": 1
+    },
+    "verification_issues": [
+      {
+        "category": "group_by_mismatch",
+        "severity": "error",
+        "message": "SQL parse error: Failed to parse any statement following CTE. Line 3, Col: 119.\n  CT o.customer_id, MAX(o.order_purchase_timestamp) AS last_order FROM orders o GROUP BY o.customer_id\u001b[4m)\u001b[0m"
+      }
+    ],
+    "run_latency_seconds": 27.56,
+    "token_usage_total": 3557
+  },
+  {
+    "index": 35,
+    "question": "What is the average number of orders per customer?",
+    "domain": "Customers",
+    "query_type": "aggregation",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders"
+    ],
+    "queried_tables": [
+      "orders",
+      "customers"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT AVG(order_count) AS average_orders_per_customer FROM (SELECT customer_id, COUNT(*) AS order_count FROM orders GROUP BY customer_id)",
+    "generated_sql": "SELECT AVG(order_cnt) AS avg_orders_per_customer FROM (SELECT c.customer_unique_id, COUNT(o.order_id) AS order_cnt FROM customers c JOIN orders o ON o.customer_id = c.customer_id GROUP BY c.customer_unique_id) sub",
+    "sql_used": "SELECT AVG(order_cnt) AS avg_orders_per_customer FROM (SELECT c.customer_unique_id, COUNT(o.order_id) AS order_cnt FROM customers c JOIN orders o ON o.customer_id = c.customer_id GROUP BY c.customer_unique_id) sub",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "aggregation_mismatch:1",
+    "result_equivalence": false,
+    "result_equivalence_reason": "aggregation_mismatch:1",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 9.73,
+    "token_usage_total": 2287
+  },
+  {
+    "index": 36,
+    "question": "What percentage of customers are repeat buyers?",
+    "domain": "Customers",
+    "query_type": "aggregation",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders"
+    ],
+    "queried_tables": [
+      "orders",
+      "customers"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT ROUND(100.0 * COUNT(CASE WHEN order_count > 1 THEN 1 END) / COUNT(*), 2) AS percentage_repeat_buyers FROM (SELECT customer_id, COUNT(*) AS order_count FROM orders GROUP BY customer_id)",
+    "generated_sql": "WITH cust_orders AS (\n  SELECT c.customer_unique_id, COUNT(o.order_id) AS order_cnt\n  FROM customers c\n  JOIN orders o ON o.customer_id = c.customer_id\n  GROUP BY c.customer_unique_id\n)",
+    "sql_used": "WITH cust_orders AS (\n  SELECT c.customer_unique_id, COUNT(o.order_id) AS order_cnt\n  FROM customers c\n  JOIN orders o ON o.customer_id = c.customer_id\n  GROUP BY c.customer_unique_id\n)",
+    "repair_attempted": true,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": "prog_repair_returned_none",
+    "sql_execution_success": false,
+    "sql_execution_error": "incomplete input",
+    "result_correctness": false,
+    "result_correctness_reason": "not_evaluated",
+    "result_equivalence": false,
+    "result_equivalence_reason": "not_evaluated",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": true,
+    "verification_is_valid": false,
+    "verification_issue_categories": {
+      "group_by_mismatch": 1
+    },
+    "verification_issues": [
+      {
+        "category": "group_by_mismatch",
+        "severity": "error",
+        "message": "SQL parse error: Failed to parse any statement following CTE. Line 6, Col: 1.\n    FROM customers c\n  JOIN orders o ON o.customer_id = c.customer_id\n  GROUP BY c.customer_unique_id\n\u001b[4m)\u001b[0m"
+      }
+    ],
+    "run_latency_seconds": 5.82,
+    "token_usage_total": 2129
+  },
+  {
+    "index": 37,
+    "question": "Which regions have the most customers?",
+    "domain": "Customers",
+    "query_type": "ranking",
+    "difficulty": "easy",
+    "expected_tables": [
+      "customers"
+    ],
+    "queried_tables": [
+      "customers"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT customer_state, COUNT(DISTINCT customer_unique_id) AS customer_count FROM customers GROUP BY customer_state ORDER BY customer_count DESC",
+    "generated_sql": "SELECT customer_state AS region, COUNT(DISTINCT customer_unique_id) AS customer_count FROM customers GROUP BY customer_state ORDER BY customer_count DESC",
+    "sql_used": "SELECT customer_state AS region, COUNT(DISTINCT customer_unique_id) AS customer_count FROM customers GROUP BY customer_state ORDER BY customer_count DESC",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "ranking_mismatch",
+    "result_equivalence": false,
+    "result_equivalence_reason": "ranking_mismatch",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 3.54,
+    "token_usage_total": 2007
+  },
+  {
+    "index": 38,
+    "question": "What is the distribution of customers by state?",
+    "domain": "Customers",
+    "query_type": "time_series",
+    "difficulty": "medium",
+    "expected_tables": [
+      "customers"
+    ],
+    "queried_tables": [
+      "customers"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT customer_state, COUNT(DISTINCT customer_unique_id) AS customer_count FROM customers GROUP BY customer_state ORDER BY customer_count DESC",
+    "generated_sql": "SELECT customers.customer_state, COUNT(DISTINCT customers.customer_unique_id) AS customer_count FROM customers GROUP BY customers.customer_state ORDER BY customer_count DESC",
+    "sql_used": "SELECT customers.customer_state, COUNT(DISTINCT customers.customer_unique_id) AS customer_count FROM customers GROUP BY customers.customer_state ORDER BY customer_count DESC",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": true,
+    "result_correctness_reason": "timeseries_exact_match",
+    "result_equivalence": true,
+    "result_equivalence_reason": "timeseries_exact_match",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 4.45,
+    "token_usage_total": 2093
+  },
+  {
+    "index": 39,
+    "question": "What is the average revenue per customer (ARPU)?",
+    "domain": "Customers",
+    "query_type": "aggregation",
+    "difficulty": "medium",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "customers"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT AVG(customer_spend) AS average_revenue_per_customer FROM (SELECT o.customer_id, SUM(oi.price) AS customer_spend FROM orders o JOIN order_items oi ON o.order_id = oi.order_id GROUP BY o.customer_id)",
+    "generated_sql": "WITH customer_revenue AS (\n  SELECT c.customer_unique_id,\n         SUM(oi.price) AS revenue\n  FROM customers c\n  JOIN orders o ON o.customer_id = c.customer_id\n  JOIN order_items oi ON oi.order_id = o.order_id\n  GROUP BY c.customer_unique_id\n)",
+    "sql_used": "WITH customer_revenue AS (\n  SELECT c.customer_unique_id,\n         SUM(oi.price) AS revenue\n  FROM customers c\n  JOIN orders o ON o.customer_id = c.customer_id\n  JOIN order_items oi ON oi.order_id = o.order_id\n  GROUP BY c.customer_unique_id\n)",
+    "repair_attempted": true,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": "prog_repair_returned_none",
+    "sql_execution_success": false,
+    "sql_execution_error": "incomplete input",
+    "result_correctness": false,
+    "result_correctness_reason": "not_evaluated",
+    "result_equivalence": false,
+    "result_equivalence_reason": "not_evaluated",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": true,
+    "verification_is_valid": false,
+    "verification_issue_categories": {
+      "group_by_mismatch": 1
+    },
+    "verification_issues": [
+      {
+        "category": "group_by_mismatch",
+        "severity": "error",
+        "message": "SQL parse error: Failed to parse any statement following CTE. Line 8, Col: 1.\n  d = c.customer_id\n  JOIN order_items oi ON oi.order_id = o.order_id\n  GROUP BY c.customer_unique_id\n\u001b[4m)\u001b[0m"
+      }
+    ],
+    "run_latency_seconds": 49.49,
+    "token_usage_total": 3029
+  },
+  {
+    "index": 40,
+    "question": "Who are the top 10 customers by revenue?",
+    "domain": "Customers",
+    "query_type": "ranking",
+    "difficulty": "medium",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "customers"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT o.customer_id AS customer_unique_id, SUM(oi.price) AS total_spend FROM orders o JOIN order_items oi ON o.order_id = oi.order_id GROUP BY o.customer_id ORDER BY total_spend DESC LIMIT 10",
+    "generated_sql": "SELECT c.customer_unique_id, SUM(oi.price) AS revenue FROM customers c JOIN orders o ON o.customer_id = c.customer_id JOIN order_items oi ON oi.order_id = o.order_id GROUP BY c.customer_unique_id ORDER BY revenue DESC LIMIT 10",
+    "sql_used": "SELECT c.customer_unique_id, SUM(oi.price) AS revenue FROM customers c JOIN orders o ON o.customer_id = c.customer_id JOIN order_items oi ON oi.order_id = o.order_id GROUP BY c.customer_unique_id ORDER BY revenue DESC LIMIT 10",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "ranking_mismatch",
+    "result_equivalence": false,
+    "result_equivalence_reason": "ranking_mismatch",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 9.9,
+    "token_usage_total": 2824
+  },
+  {
+    "index": 41,
+    "question": "What is the lifetime value (LTV) of customers?",
+    "domain": "Customers",
+    "query_type": "aggregation",
+    "difficulty": "medium",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "queried_tables": [],
+    "table_accuracy_pct": 0.0,
+    "table_match": false,
+    "expected_sql": "SELECT o.customer_id, SUM(oi.price) AS customer_lifetime_value FROM orders o JOIN order_items oi ON o.order_id = oi.order_id GROUP BY o.customer_id",
+    "generated_sql": null,
+    "sql_used": null,
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": false,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "not_evaluated",
+    "result_equivalence": false,
+    "result_equivalence_reason": "not_evaluated",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 9.24,
+    "token_usage_total": 2237
+  },
+  {
+    "index": 42,
+    "question": "How long do customers stay active?",
+    "domain": "Customers",
+    "query_type": "aggregation",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders"
+    ],
+    "queried_tables": [
+      "orders",
+      "customers"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT AVG(JULIANDAY(max_ts) - JULIANDAY(min_ts)) AS active_days_duration FROM (SELECT customer_id, MIN(order_purchase_timestamp) AS min_ts, MAX(order_purchase_timestamp) AS max_ts FROM orders GROUP BY customer_id)",
+    "generated_sql": "WITH cust_spans AS (\n  SELECT\n    c.customer_unique_id,\n    MIN(o.order_purchase_timestamp) AS first_order,\n    MAX(o.order_purchase_timestamp) AS last_order\n  FROM customers c\n  JOIN orders o ON o.customer_id = c.customer_id\n  GROUP BY c.customer_unique_id\n)",
+    "sql_used": "WITH cust_spans AS (\n  SELECT\n    c.customer_unique_id,\n    MIN(o.order_purchase_timestamp) AS first_order,\n    MAX(o.order_purchase_timestamp) AS last_order\n  FROM customers c\n  JOIN orders o ON o.customer_id = c.customer_id\n  GROUP BY c.customer_unique_id\n)",
+    "repair_attempted": true,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": "prog_repair_returned_none",
+    "sql_execution_success": false,
+    "sql_execution_error": "incomplete input",
+    "result_correctness": false,
+    "result_correctness_reason": "not_evaluated",
+    "result_equivalence": false,
+    "result_equivalence_reason": "not_evaluated",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": true,
+    "verification_is_valid": false,
+    "verification_issue_categories": {
+      "group_by_mismatch": 1
+    },
+    "verification_issues": [
+      {
+        "category": "group_by_mismatch",
+        "severity": "error",
+        "message": "SQL parse error: Failed to parse any statement following CTE. Line 9, Col: 1.\n    FROM customers c\n  JOIN orders o ON o.customer_id = c.customer_id\n  GROUP BY c.customer_unique_id\n\u001b[4m)\u001b[0m"
+      }
+    ],
+    "run_latency_seconds": 17.95,
+    "token_usage_total": 2247
+  },
+  {
+    "index": 43,
+    "question": "What is the average time between first and last purchase?",
+    "domain": "Customers",
+    "query_type": "aggregation",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders"
+    ],
+    "queried_tables": [
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT AVG(JULIANDAY(max_ts) - JULIANDAY(min_ts)) AS average_days_between_first_last FROM (SELECT customer_id, MIN(order_purchase_timestamp) AS min_ts, MAX(order_purchase_timestamp) AS max_ts FROM orders GROUP BY customer_id)",
+    "generated_sql": "WITH cust AS (\n  SELECT\n    customer_id,\n    MIN(order_purchase_timestamp) AS first_purchase,\n    MAX(order_purchase_timestamp) AS last_purchase\n  FROM orders\n  GROUP BY customer_id\n)",
+    "sql_used": "WITH cust AS (\n  SELECT\n    customer_id,\n    MIN(order_purchase_timestamp) AS first_purchase,\n    MAX(order_purchase_timestamp) AS last_purchase\n  FROM orders\n  GROUP BY customer_id\n)",
+    "repair_attempted": true,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": "prog_repair_returned_none",
+    "sql_execution_success": false,
+    "sql_execution_error": "incomplete input",
+    "result_correctness": false,
+    "result_correctness_reason": "not_evaluated",
+    "result_equivalence": false,
+    "result_equivalence_reason": "not_evaluated",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": true,
+    "verification_is_valid": false,
+    "verification_issue_categories": {
+      "group_by_mismatch": 1
+    },
+    "verification_issues": [
+      {
+        "category": "group_by_mismatch",
+        "severity": "error",
+        "message": "SQL parse error: Failed to parse any statement following CTE. Line 8, Col: 1.\n  t_purchase,\n    MAX(order_purchase_timestamp) AS last_purchase\n  FROM orders\n  GROUP BY customer_id\n\u001b[4m)\u001b[0m"
+      }
+    ],
+    "run_latency_seconds": 11.2,
+    "token_usage_total": 1889
+  },
+  {
+    "index": 44,
+    "question": "What percentage of customers make only one purchase?",
+    "domain": "Customers",
+    "query_type": "aggregation",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders"
+    ],
+    "queried_tables": [
+      "orders",
+      "customers"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT ROUND(100.0 * SUM(CASE WHEN order_count = 1 THEN 1 ELSE 0 END) / COUNT(*), 2) AS percentage_single_purchase FROM (SELECT customer_id, COUNT(*) AS order_count FROM orders GROUP BY customer_id)",
+    "generated_sql": "WITH cust_orders AS (\n  SELECT c.customer_unique_id, COUNT(o.order_id) AS order_count\n  FROM customers c\n  JOIN orders o ON o.customer_id = c.customer_id\n  GROUP BY c.customer_unique_id\n)",
+    "sql_used": "WITH cust_orders AS (\n  SELECT c.customer_unique_id, COUNT(o.order_id) AS order_count\n  FROM customers c\n  JOIN orders o ON o.customer_id = c.customer_id\n  GROUP BY c.customer_unique_id\n)",
+    "repair_attempted": true,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": "prog_repair_returned_none",
+    "sql_execution_success": false,
+    "sql_execution_error": "incomplete input",
+    "result_correctness": false,
+    "result_correctness_reason": "not_evaluated",
+    "result_equivalence": false,
+    "result_equivalence_reason": "not_evaluated",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": true,
+    "verification_is_valid": false,
+    "verification_issue_categories": {
+      "group_by_mismatch": 1
+    },
+    "verification_issues": [
+      {
+        "category": "group_by_mismatch",
+        "severity": "error",
+        "message": "SQL parse error: Failed to parse any statement following CTE. Line 6, Col: 1.\n    FROM customers c\n  JOIN orders o ON o.customer_id = c.customer_id\n  GROUP BY c.customer_unique_id\n\u001b[4m)\u001b[0m"
+      }
+    ],
+    "run_latency_seconds": 12.16,
+    "token_usage_total": 2200
+  },
+  {
+    "index": 45,
+    "question": "What is the geographic distribution of high-value customers?",
+    "domain": "Customers",
+    "query_type": "time_series",
+    "difficulty": "medium",
+    "expected_tables": [
+      "orders"
+    ],
+    "queried_tables": [
+      "orders",
+      "customers"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "WITH customer_spend AS (SELECT o.customer_id, c.customer_state, SUM(oi.price) AS total_spend FROM orders o JOIN order_items oi ON o.order_id = oi.order_id JOIN customers c ON o.customer_id = c.customer_id GROUP BY o.customer_id, c.customer_state), high_value AS (SELECT *, NTILE(4) OVER (ORDER BY total_spend DESC) AS quartile FROM customer_spend) SELECT customer_state, COUNT(*) AS high_value_customer_count FROM high_value WHERE quartile = 1 GROUP BY customer_state ORDER BY high_value_customer_count DESC",
+    "generated_sql": "WITH customer_order_counts AS (\n  SELECT\n    c.customer_id,\n    c.customer_unique_id,\n    c.customer_state,\n    c.customer_city,\n    c.customer_zip_code_prefix,\n    COUNT(o.order_id) AS order_count\n  FROM customers c\n  JOIN orders o ON o.customer_id = c.customer_id\n  GROUP BY c.customer_id, c.customer_unique_id, c.customer_state, c.customer_city, c.customer_zip_code_prefix\n),\nhigh_value AS (\n  SELECT *\n  FROM customer_order_counts\n  WHERE order_count > 1\n)",
+    "sql_used": "WITH customer_order_counts AS (\n  SELECT\n    c.customer_id,\n    c.customer_unique_id,\n    c.customer_state,\n    c.customer_city,\n    c.customer_zip_code_prefix,\n    COUNT(o.order_id) AS order_count\n  FROM customers c\n  JOIN orders o ON o.customer_id = c.customer_id\n  GROUP BY c.customer_id, c.customer_unique_id, c.customer_state, c.customer_city, c.customer_zip_code_prefix\n),\nhigh_value AS (\n  SELECT *\n  FROM customer_order_counts\n  WHERE order_count > 1\n)",
+    "repair_attempted": true,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": "prog_repair_returned_none",
+    "sql_execution_success": false,
+    "sql_execution_error": "incomplete input",
+    "result_correctness": false,
+    "result_correctness_reason": "not_evaluated",
+    "result_equivalence": false,
+    "result_equivalence_reason": "not_evaluated",
+    "hallucinated_schema": [
+      "customer_order_counts"
+    ],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": true,
+    "verification_is_valid": false,
+    "verification_issue_categories": {
+      "group_by_mismatch": 1
+    },
+    "verification_issues": [
+      {
+        "category": "group_by_mismatch",
+        "severity": "error",
+        "message": "SQL parse error: Failed to parse any statement following CTE. Line 17, Col: 1.\n  _zip_code_prefix\n),\nhigh_value AS (\n  SELECT *\n  FROM customer_order_counts\n  WHERE order_count > 1\n\u001b[4m)\u001b[0m"
+      }
+    ],
+    "run_latency_seconds": 56.34,
+    "token_usage_total": 3170
+  },
+  {
+    "index": 46,
+    "question": "Which product categories generate the most revenue?",
+    "domain": "Products & Categories",
+    "query_type": "ranking",
+    "difficulty": "easy",
+    "expected_tables": [
+      "products",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT p.product_category_name, SUM(oi.price) AS total_revenue FROM order_items oi JOIN products p ON oi.product_id = p.product_id GROUP BY p.product_category_name ORDER BY total_revenue DESC LIMIT 10",
+    "generated_sql": "SELECT p.product_category_name AS product_category, SUM(oi.price) AS total_revenue FROM order_items oi JOIN products p ON oi.product_id = p.product_id GROUP BY p.product_category_name ORDER BY total_revenue DESC",
+    "sql_used": "SELECT p.product_category_name AS product_category, SUM(oi.price) AS total_revenue FROM order_items oi JOIN products p ON oi.product_id = p.product_id GROUP BY p.product_category_name ORDER BY total_revenue DESC",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "ranking_mismatch",
+    "result_equivalence": false,
+    "result_equivalence_reason": "ranking_mismatch",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": false,
+    "verification_issue_categories": {
+      "duplicate_detection": 1
+    },
+    "verification_issues": [
+      {
+        "category": "duplicate_detection",
+        "severity": "warning",
+        "message": "Result contains 74 rows but 10 expected (7.4\u00c3\u2014 too many) \u00e2\u20ac\u201d possible Cartesian product or missing WHERE"
+      }
+    ],
+    "run_latency_seconds": 8.46,
+    "token_usage_total": 2234
+  },
+  {
+    "index": 47,
+    "question": "Which product categories have the most orders?",
+    "domain": "Products & Categories",
+    "query_type": "ranking",
+    "difficulty": "easy",
+    "expected_tables": [
+      "products",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT p.product_category_name, COUNT(DISTINCT oi.order_id) AS order_count FROM order_items oi JOIN products p ON oi.product_id = p.product_id GROUP BY p.product_category_name ORDER BY order_count DESC LIMIT 10",
+    "generated_sql": "SELECT p.product_category_name, COUNT(DISTINCT o.order_id) AS order_count FROM order_items oi JOIN orders o ON oi.order_id = o.order_id JOIN products p ON oi.product_id = p.product_id GROUP BY p.product_category_name ORDER BY order_count DESC",
+    "sql_used": "SELECT p.product_category_name, COUNT(DISTINCT o.order_id) AS order_count FROM order_items oi JOIN orders o ON oi.order_id = o.order_id JOIN products p ON oi.product_id = p.product_id GROUP BY p.product_category_name ORDER BY order_count DESC",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": true,
+    "result_correctness_reason": "ranking_exact_match",
+    "result_equivalence": true,
+    "result_equivalence_reason": "ranking_exact_match",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": false,
+    "verification_issue_categories": {
+      "duplicate_detection": 1
+    },
+    "verification_issues": [
+      {
+        "category": "duplicate_detection",
+        "severity": "warning",
+        "message": "Result contains 74 rows but 10 expected (7.4\u00c3\u2014 too many) \u00e2\u20ac\u201d possible Cartesian product or missing WHERE"
+      }
+    ],
+    "run_latency_seconds": 10.18,
+    "token_usage_total": 3113
+  },
+  {
+    "index": 48,
+    "question": "What is the average price per product category?",
+    "domain": "Products & Categories",
+    "query_type": "aggregation",
+    "difficulty": "easy",
+    "expected_tables": [
+      "products",
+      "order_items"
+    ],
+    "queried_tables": [],
+    "table_accuracy_pct": 0.0,
+    "table_match": false,
+    "expected_sql": "SELECT p.product_category_name, AVG(oi.price) AS average_price FROM order_items oi JOIN products p ON oi.product_id = p.product_id GROUP BY p.product_category_name ORDER BY average_price DESC",
+    "generated_sql": null,
+    "sql_used": null,
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": false,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "not_evaluated",
+    "result_equivalence": false,
+    "result_equivalence_reason": "not_evaluated",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 22.22,
+    "token_usage_total": 1660
+  },
+  {
+    "index": 49,
+    "question": "Which products are most frequently purchased?",
+    "domain": "Products & Categories",
+    "query_type": "ranking",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT product_id, COUNT(*) AS purchase_frequency FROM order_items GROUP BY product_id ORDER BY purchase_frequency DESC LIMIT 10",
+    "generated_sql": "SELECT p.product_id, COUNT(*) AS purchase_count FROM products p JOIN order_items oi ON p.product_id = oi.product_id GROUP BY p.product_id ORDER BY purchase_count DESC",
+    "sql_used": "SELECT p.product_id, COUNT(*) AS purchase_count FROM products p JOIN order_items oi ON p.product_id = oi.product_id GROUP BY p.product_id ORDER BY purchase_count DESC",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "ranking_mismatch",
+    "result_equivalence": false,
+    "result_equivalence_reason": "ranking_mismatch",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": false,
+    "verification_issue_categories": {
+      "duplicate_detection": 1
+    },
+    "verification_issues": [
+      {
+        "category": "duplicate_detection",
+        "severity": "warning",
+        "message": "Result contains 32951 rows but 10 expected (3295.1\u00c3\u2014 too many) \u00e2\u20ac\u201d possible Cartesian product or missing WHERE"
+      }
+    ],
+    "run_latency_seconds": 6.77,
+    "token_usage_total": 1732
+  },
+  {
+    "index": 50,
+    "question": "Which products generate the most revenue?",
+    "domain": "Products & Categories",
+    "query_type": "ranking",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT product_id, SUM(price) AS total_revenue FROM order_items GROUP BY product_id ORDER BY total_revenue DESC LIMIT 10",
+    "generated_sql": "SELECT p.product_id, SUM(oi.price) AS total_revenue FROM order_items oi JOIN products p ON oi.product_id = p.product_id GROUP BY p.product_id ORDER BY total_revenue DESC",
+    "sql_used": "SELECT p.product_id, SUM(oi.price) AS total_revenue FROM order_items oi JOIN products p ON oi.product_id = p.product_id GROUP BY p.product_id ORDER BY total_revenue DESC",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": true,
+    "result_correctness_reason": "ranking_exact_match",
+    "result_equivalence": true,
+    "result_equivalence_reason": "ranking_exact_match",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": false,
+    "verification_issue_categories": {
+      "duplicate_detection": 1
+    },
+    "verification_issues": [
+      {
+        "category": "duplicate_detection",
+        "severity": "warning",
+        "message": "Result contains 32951 rows but 10 expected (3295.1\u00c3\u2014 too many) \u00e2\u20ac\u201d possible Cartesian product or missing WHERE"
+      }
+    ],
+    "run_latency_seconds": 5.77,
+    "token_usage_total": 2140
+  },
+  {
+    "index": 51,
+    "question": "What is the distribution of product prices?",
+    "domain": "Products & Categories",
+    "query_type": "time_series",
+    "difficulty": "medium",
+    "expected_tables": [
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT CASE WHEN price < 50 THEN '0-50' WHEN price < 100 THEN '50-100' WHEN price < 200 THEN '100-200' WHEN price < 500 THEN '200-500' ELSE '500+' END AS price_bucket, COUNT(*) AS product_count FROM order_items GROUP BY price_bucket ORDER BY price_bucket",
+    "generated_sql": "SELECT\n  CASE\n    WHEN price < 10 THEN '0-10'\n    WHEN price < 50 THEN '10-50'\n    WHEN price < 100 THEN '50-100'\n    WHEN price < 500 THEN '100-500'\n    ELSE '500+'\n  END AS price_range,\n  COUNT(*) AS item_count\nFROM order_items\nGROUP BY price_range\nORDER BY MIN(price)",
+    "sql_used": "SELECT\n  CASE\n    WHEN price < 10 THEN '0-10'\n    WHEN price < 50 THEN '10-50'\n    WHEN price < 100 THEN '50-100'\n    WHEN price < 500 THEN '100-500'\n    ELSE '500+'\n  END AS price_range,\n  COUNT(*) AS item_count\nFROM order_items\nGROUP BY price_range\nORDER BY MIN(price)",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "time_period_mismatch",
+    "result_equivalence": false,
+    "result_equivalence_reason": "time_period_mismatch",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 17.14,
+    "token_usage_total": 2539
+  },
+  {
+    "index": 52,
+    "question": "Which categories have the highest AOV?",
+    "domain": "Products & Categories",
+    "query_type": "ranking",
+    "difficulty": "easy",
+    "expected_tables": [
+      "products",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_payments",
+      "orders"
+    ],
+    "table_accuracy_pct": 0.0,
+    "table_match": false,
+    "expected_sql": "SELECT product_category_name, AVG(monthly_total) AS average_order_value FROM (SELECT oi.order_id, p.product_category_name AS product_category_name, SUM(oi.price) AS monthly_total FROM order_items oi JOIN products p ON oi.product_id = p.product_id GROUP BY oi.order_id, product_category_name) GROUP BY product_category_name ORDER BY average_order_value DESC LIMIT 10",
+    "generated_sql": "WITH order_totals AS (\n  SELECT o.order_id, SUM(op.payment_value) AS order_total\n  FROM orders o\n  JOIN order_payments op ON o.order_id = op.order_id\n  GROUP BY o.order_id\n)",
+    "sql_used": "WITH order_totals AS (\n  SELECT o.order_id, SUM(op.payment_value) AS order_total\n  FROM orders o\n  JOIN order_payments op ON o.order_id = op.order_id\n  GROUP BY o.order_id\n)",
+    "repair_attempted": true,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": "prog_repair_returned_none",
+    "sql_execution_success": false,
+    "sql_execution_error": "incomplete input",
+    "result_correctness": false,
+    "result_correctness_reason": "not_evaluated",
+    "result_equivalence": false,
+    "result_equivalence_reason": "not_evaluated",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": true,
+    "verification_is_valid": false,
+    "verification_issue_categories": {
+      "group_by_mismatch": 1
+    },
+    "verification_issues": [
+      {
+        "category": "group_by_mismatch",
+        "severity": "error",
+        "message": "SQL parse error: Failed to parse any statement following CTE. Line 6, Col: 1.\n  er_total\n  FROM orders o\n  JOIN order_payments op ON o.order_id = op.order_id\n  GROUP BY o.order_id\n\u001b[4m)\u001b[0m"
+      }
+    ],
+    "run_latency_seconds": 27.88,
+    "token_usage_total": 4144
+  },
+  {
+    "index": 53,
+    "question": "Which categories have declining sales trends?",
+    "domain": "Products & Categories",
+    "query_type": "ranking",
+    "difficulty": "medium",
+    "expected_tables": [
+      "products",
+      "order_items",
+      "orders"
+    ],
+    "queried_tables": [],
+    "table_accuracy_pct": 0.0,
+    "table_match": false,
+    "expected_sql": "WITH monthly_category AS (SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, p.product_category_name AS product_category_name, SUM(oi.price) AS revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id JOIN products p ON oi.product_id = p.product_id GROUP BY month, product_category_name), trends AS (SELECT product_category_name, month, revenue, LAG(revenue) OVER (PARTITION BY product_category_name ORDER BY month) AS prev_revenue FROM monthly_category) SELECT product_category_name, ROUND(AVG(CASE WHEN prev_revenue IS NOT NULL THEN 100.0 * (revenue - prev_revenue) / prev_revenue END), 2) AS decline_rate FROM trends GROUP BY product_category_name HAVING COUNT(*) > 1 ORDER BY decline_rate ASC LIMIT 10",
+    "generated_sql": null,
+    "sql_used": null,
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": false,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "not_evaluated",
+    "result_equivalence": false,
+    "result_equivalence_reason": "not_evaluated",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 3.45,
+    "token_usage_total": 1442
+  },
+  {
+    "index": 54,
+    "question": "Which categories have the fastest growth?",
+    "domain": "Products & Categories",
+    "query_type": "ranking",
+    "difficulty": "medium",
+    "expected_tables": [
+      "products",
+      "order_items",
+      "orders"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products",
+      "product_category_name_translation"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "WITH monthly_category AS (SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, p.product_category_name AS product_category_name, SUM(oi.price) AS revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id JOIN products p ON oi.product_id = p.product_id GROUP BY month, product_category_name), trends AS (SELECT product_category_name, month, revenue, LAG(revenue) OVER (PARTITION BY product_category_name ORDER BY month) AS prev_revenue FROM monthly_category) SELECT product_category_name, ROUND(AVG(CASE WHEN prev_revenue IS NOT NULL AND prev_revenue > 0 THEN 100.0 * (revenue - prev_revenue) / prev_revenue END), 2) AS growth_rate FROM trends GROUP BY product_category_name HAVING COUNT(*) > 1 ORDER BY growth_rate DESC LIMIT 10",
+    "generated_sql": "WITH monthly AS (\n    SELECT\n        pctn.product_category_name_english AS category,\n        strftime('%Y-%m', REPLACE(o.order_purchase_timestamp, '/', '-')) AS ym,\n        SUM(oi.price) AS revenue\n    FROM order_items oi\n    JOIN orders o ON oi.order_id = o.order_id\n    JOIN products p ON oi.product_id = p.product_id\n    JOIN product_category_name_translation pctn ON p.product_category_name = pctn.product_category_name\n    GROUP BY category, ym\n),\nlatest AS (\n    SELECT MAX(ym) AS latest_ym FROM monthly\n),\nprev AS (\n    SELECT strftime('%Y-%m', date((latest_ym || '-01'), '-1 month')) AS prev_ym\n    FROM latest\n),\nlatest_rev AS (\n    SELECT category, revenue AS latest_rev\n    FROM monthly, latest\n    WHERE monthly.ym = latest.latest_ym\n),\nprev_rev AS (\n    SELECT category, revenue AS prev_rev\n    FROM monthly, prev\n    WHERE monthly.ym = prev.prev_ym\n)",
+    "sql_used": "WITH monthly AS (\n    SELECT\n        pctn.product_category_name_english AS category,\n        strftime('%Y-%m', REPLACE(o.order_purchase_timestamp, '/', '-')) AS ym,\n        SUM(oi.price) AS revenue\n    FROM order_items oi\n    JOIN orders o ON oi.order_id = o.order_id\n    JOIN products p ON oi.product_id = p.product_id\n    JOIN product_category_name_translation pctn ON p.product_category_name = pctn.product_category_name\n    GROUP BY category, ym\n),\nlatest AS (\n    SELECT MAX(ym) AS latest_ym FROM monthly\n),\nprev AS (\n    SELECT strftime('%Y-%m', date((latest_ym || '-01'), '-1 month')) AS prev_ym\n    FROM latest\n),\nlatest_rev AS (\n    SELECT category, revenue AS latest_rev\n    FROM monthly, latest\n    WHERE monthly.ym = latest.latest_ym\n),\nprev_rev AS (\n    SELECT category, revenue AS prev_rev\n    FROM monthly, prev\n    WHERE monthly.ym = prev.prev_ym\n)",
+    "repair_attempted": true,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": "prog_repair_returned_none",
+    "sql_execution_success": false,
+    "sql_execution_error": "incomplete input",
+    "result_correctness": false,
+    "result_correctness_reason": "not_evaluated",
+    "result_equivalence": false,
+    "result_equivalence_reason": "not_evaluated",
+    "hallucinated_schema": [
+      "monthly",
+      "latest",
+      "monthly",
+      "monthly"
+    ],
+    "unsafe_keywords": [
+      "replace"
+    ],
+    "pre_execution_blocked": true,
+    "verification_is_valid": false,
+    "verification_issue_categories": {
+      "group_by_mismatch": 1
+    },
+    "verification_issues": [
+      {
+        "category": "group_by_mismatch",
+        "severity": "error",
+        "message": "SQL parse error: Failed to parse any statement following CTE. Line 28, Col: 1.\n      SELECT category, revenue AS prev_rev\n    FROM monthly, prev\n    WHERE monthly.ym = prev.prev_ym\n\u001b[4m)\u001b[0m"
+      }
+    ],
+    "run_latency_seconds": 24.57,
+    "token_usage_total": 3796
+  },
+  {
+    "index": 55,
+    "question": "What is the average number of items sold per product?",
+    "domain": "Products & Categories",
+    "query_type": "aggregation",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT AVG(item_count) AS average_items_sold FROM (SELECT product_id, SUM(order_item_id) AS item_count FROM order_items GROUP BY product_id)",
+    "generated_sql": "SELECT AVG(items_per_product) AS avg_items_sold_per_product FROM (SELECT COUNT(*) AS items_per_product FROM order_items JOIN products ON order_items.product_id = products.product_id GROUP BY order_items.product_id) sub",
+    "sql_used": "SELECT AVG(items_per_product) AS avg_items_sold_per_product FROM (SELECT COUNT(*) AS items_per_product FROM order_items JOIN products ON order_items.product_id = products.product_id GROUP BY order_items.product_id) sub",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "aggregation_mismatch:1",
+    "result_equivalence": false,
+    "result_equivalence_reason": "aggregation_mismatch:1",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 9.67,
+    "token_usage_total": 2594
+  },
+  {
+    "index": 56,
+    "question": "Which products are often bought together? (basic co-occurrence)",
+    "domain": "Products & Categories",
+    "query_type": "ranking",
+    "difficulty": "hard",
+    "expected_tables": [
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "WITH order_products AS (SELECT DISTINCT order_id, product_id FROM order_items), pairs AS (SELECT o1.product_id AS product_a, o2.product_id AS product_b FROM order_products o1 JOIN order_products o2 ON o1.order_id = o2.order_id AND o1.product_id < o2.product_id) SELECT product_a, product_b, COUNT(*) AS co_occurrence_count FROM pairs GROUP BY product_a, product_b ORDER BY co_occurrence_count DESC LIMIT 10",
+    "generated_sql": "SELECT oi1.product_id AS product_a, oi2.product_id AS product_b, COUNT(*) AS co_occurrence_count\nFROM order_items oi1\nJOIN order_items oi2\n  ON oi1.order_id = oi2.order_id\n AND oi1.product_id < oi2.product_id\nGROUP BY oi1.product_id, oi2.product_id\nORDER BY co_occurrence_count DESC\nLIMIT 20",
+    "sql_used": "SELECT oi1.product_id AS product_a, oi2.product_id AS product_b, COUNT(*) AS co_occurrence_count\nFROM order_items oi1\nJOIN order_items oi2\n  ON oi1.order_id = oi2.order_id\n AND oi1.product_id < oi2.product_id\nGROUP BY oi1.product_id, oi2.product_id\nORDER BY co_occurrence_count DESC\nLIMIT 20",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "ranking_mismatch",
+    "result_equivalence": false,
+    "result_equivalence_reason": "ranking_mismatch",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 18.37,
+    "token_usage_total": 2513
+  },
+  {
+    "index": 57,
+    "question": "What is the revenue contribution of top categories?",
+    "domain": "Products & Categories",
+    "query_type": "ranking",
+    "difficulty": "easy",
+    "expected_tables": [
+      "products",
+      "order_items"
+    ],
+    "queried_tables": [],
+    "table_accuracy_pct": 0.0,
+    "table_match": false,
+    "expected_sql": "WITH category_revenue AS (SELECT p.product_category_name, SUM(oi.price) AS total_revenue FROM order_items oi JOIN products p ON oi.product_id = p.product_id GROUP BY p.product_category_name), total AS (SELECT SUM(total_revenue) AS grand_total FROM category_revenue) SELECT product_category_name, ROUND(100.0 * total_revenue / (SELECT grand_total FROM total), 2) AS revenue_share_percentage FROM category_revenue ORDER BY total_revenue DESC LIMIT 10",
+    "generated_sql": null,
+    "sql_used": null,
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": false,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "not_evaluated",
+    "result_equivalence": false,
+    "result_equivalence_reason": "not_evaluated",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 6.01,
+    "token_usage_total": 1406
+  },
+  {
+    "index": 58,
+    "question": "Which products have the highest return/cancellation rate?",
+    "domain": "Products & Categories",
+    "query_type": "ranking",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "queried_tables": [],
+    "table_accuracy_pct": 0.0,
+    "table_match": false,
+    "expected_sql": "WITH order_status AS (SELECT oi.product_id, o.order_id, o.order_status FROM order_items oi JOIN orders o ON oi.order_id = o.order_id), product_orders AS (SELECT product_id, COUNT(*) AS total_orders, SUM(CASE WHEN order_status IN ('canceled', 'delivered') THEN 1 ELSE 0 END) AS non_returned FROM order_status GROUP BY product_id) SELECT product_id, ROUND(100.0 * (1.0 - 1.0 * non_returned / total_orders), 2) AS cancellation_rate FROM product_orders WHERE total_orders > 10 ORDER BY cancellation_rate DESC LIMIT 10",
+    "generated_sql": null,
+    "sql_used": null,
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": false,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "not_evaluated",
+    "result_equivalence": false,
+    "result_equivalence_reason": "not_evaluated",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 7.12,
+    "token_usage_total": 1571
+  },
+  {
+    "index": 59,
+    "question": "What is the price vs sales relationship?",
+    "domain": "Products & Categories",
+    "query_type": "aggregation",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT CASE WHEN price < 50 THEN '0-50' WHEN price < 100 THEN '50-100' WHEN price < 200 THEN '100-200' WHEN price < 500 THEN '200-500' ELSE '500+' END AS price_range, SUM(order_item_id) AS units_sold FROM order_items GROUP BY price_range ORDER BY price_range",
+    "generated_sql": "SELECT\n  product_id,\n  AVG(price) AS avg_price,\n  COUNT(*) AS total_units_sold,\n  SUM(price) AS total_revenue\nFROM order_items\nGROUP BY product_id\nORDER BY avg_price DESC",
+    "sql_used": "SELECT\n  product_id,\n  AVG(price) AS avg_price,\n  COUNT(*) AS total_units_sold,\n  SUM(price) AS total_revenue\nFROM order_items\nGROUP BY product_id\nORDER BY avg_price DESC",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "row_count_mismatch: got 50, expected 5",
+    "result_equivalence": false,
+    "result_equivalence_reason": "row_count_mismatch: got 50, expected 5",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": false,
+    "verification_issue_categories": {
+      "duplicate_detection": 1
+    },
+    "verification_issues": [
+      {
+        "category": "duplicate_detection",
+        "severity": "warning",
+        "message": "Result contains 32951 rows but 5 expected (6590.2\u00c3\u2014 too many) \u00e2\u20ac\u201d possible Cartesian product or missing WHERE"
+      }
+    ],
+    "run_latency_seconds": 17.96,
+    "token_usage_total": 2743
+  },
+  {
+    "index": 60,
+    "question": "Which categories have seasonal demand patterns?",
+    "domain": "Products & Categories",
+    "query_type": "aggregation",
+    "difficulty": "hard",
+    "expected_tables": [
+      "products",
+      "order_items",
+      "orders"
+    ],
+    "queried_tables": [],
+    "table_accuracy_pct": 0.0,
+    "table_match": false,
+    "expected_sql": "WITH monthly_category AS (SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, p.product_category_name AS product_category_name, SUM(oi.price) AS revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id JOIN products p ON oi.product_id = p.product_id GROUP BY month, product_category_name), monthly_stats AS (SELECT product_category_name, AVG(revenue) AS avg_revenue, MAX(revenue) AS max_revenue, MIN(revenue) AS min_revenue FROM monthly_category GROUP BY product_category_name) SELECT product_category_name, ROUND(max_revenue - min_revenue, 2) AS seasonal_variance FROM monthly_stats ORDER BY seasonal_variance DESC LIMIT 10",
+    "generated_sql": null,
+    "sql_used": null,
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": false,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "not_evaluated",
+    "result_equivalence": false,
+    "result_equivalence_reason": "not_evaluated",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 7.8,
+    "token_usage_total": 2301
+  },
+  {
+    "index": 61,
+    "question": "What is the average delivery time?",
+    "domain": "Logistics & Delivery",
+    "query_type": "aggregation",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders"
+    ],
+    "queried_tables": [
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT AVG(JULIANDAY(order_delivered_customer_date) - JULIANDAY(order_purchase_timestamp)) AS average_delivery_days FROM orders WHERE order_delivered_customer_date IS NOT NULL",
+    "generated_sql": "SELECT AVG(julianday(o.order_delivered_customer_date) - julianday(o.order_purchase_timestamp)) AS average_delivery_time_days FROM orders o WHERE o.order_delivered_customer_date IS NOT NULL AND o.order_purchase_timestamp IS NOT NULL",
+    "sql_used": "SELECT AVG(julianday(o.order_delivered_customer_date) - julianday(o.order_purchase_timestamp)) AS average_delivery_time_days FROM orders o WHERE o.order_delivered_customer_date IS NOT NULL AND o.order_purchase_timestamp IS NOT NULL",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "aggregation_mismatch:1",
+    "result_equivalence": false,
+    "result_equivalence_reason": "aggregation_mismatch:1",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 9.47,
+    "token_usage_total": 1856
+  },
+  {
+    "index": 62,
+    "question": "What is the average shipping delay?",
+    "domain": "Logistics & Delivery",
+    "query_type": "aggregation",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT AVG(JULIANDAY(order_delivered_customer_date) - JULIANDAY(order_estimated_delivery_date)) AS average_delay_days FROM orders WHERE order_delivered_customer_date IS NOT NULL",
+    "generated_sql": "SELECT AVG(julianday(o.order_delivered_carrier_date) - julianday(oi.shipping_limit_date)) AS avg_shipping_delay_days FROM order_items oi JOIN orders o ON oi.order_id = o.order_id WHERE o.order_delivered_carrier_date IS NOT NULL",
+    "sql_used": "SELECT AVG(julianday(o.order_delivered_carrier_date) - julianday(oi.shipping_limit_date)) AS avg_shipping_delay_days FROM order_items oi JOIN orders o ON oi.order_id = o.order_id WHERE o.order_delivered_carrier_date IS NOT NULL",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "aggregation_mismatch:1",
+    "result_equivalence": false,
+    "result_equivalence_reason": "aggregation_mismatch:1",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 22.32,
+    "token_usage_total": 2713
+  },
+  {
+    "index": 63,
+    "question": "Which states have the longest delivery times?",
+    "domain": "Logistics & Delivery",
+    "query_type": "ranking",
+    "difficulty": "easy",
+    "expected_tables": [
+      "customers",
+      "orders"
+    ],
+    "queried_tables": [
+      "orders",
+      "customers"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT c.customer_state, AVG(JULIANDAY(o.order_delivered_customer_date) - JULIANDAY(o.order_purchase_timestamp)) AS average_delivery_days FROM orders o JOIN customers c ON o.customer_id = c.customer_id WHERE o.order_delivered_customer_date IS NOT NULL GROUP BY c.customer_state ORDER BY average_delivery_days DESC LIMIT 10",
+    "generated_sql": "SELECT c.customer_state, AVG(julianday(o.order_delivered_customer_date) - julianday(o.order_purchase_timestamp)) AS avg_delivery_days FROM orders o JOIN customers c ON o.customer_id = c.customer_id WHERE o.order_delivered_customer_date IS NOT NULL GROUP BY c.customer_state ORDER BY avg_delivery_days DESC",
+    "sql_used": "SELECT c.customer_state, AVG(julianday(o.order_delivered_customer_date) - julianday(o.order_purchase_timestamp)) AS avg_delivery_days FROM orders o JOIN customers c ON o.customer_id = c.customer_id WHERE o.order_delivered_customer_date IS NOT NULL GROUP BY c.customer_state ORDER BY avg_delivery_days DESC",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "ranking_mismatch",
+    "result_equivalence": false,
+    "result_equivalence_reason": "ranking_mismatch",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 10.27,
+    "token_usage_total": 2498
+  },
+  {
+    "index": 64,
+    "question": "Which sellers deliver the fastest?",
+    "domain": "Logistics & Delivery",
+    "query_type": "ranking",
+    "difficulty": "medium",
+    "expected_tables": [
+      "order_items",
+      "orders"
+    ],
+    "queried_tables": [],
+    "table_accuracy_pct": 0.0,
+    "table_match": false,
+    "expected_sql": "SELECT oi.seller_id, AVG(JULIANDAY(o.order_delivered_customer_date) - JULIANDAY(o.order_purchase_timestamp)) AS average_delivery_days FROM order_items oi JOIN orders o ON oi.order_id = o.order_id WHERE o.order_delivered_customer_date IS NOT NULL GROUP BY oi.seller_id ORDER BY average_delivery_days ASC LIMIT 10",
+    "generated_sql": null,
+    "sql_used": null,
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": false,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "not_evaluated",
+    "result_equivalence": false,
+    "result_equivalence_reason": "not_evaluated",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 11.56,
+    "token_usage_total": 1555
+  },
+  {
+    "index": 65,
+    "question": "What percentage of deliveries are delayed?",
+    "domain": "Logistics & Delivery",
+    "query_type": "aggregation",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders"
+    ],
+    "queried_tables": [
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT ROUND(100.0 * SUM(CASE WHEN order_delivered_customer_date > order_estimated_delivery_date THEN 1 ELSE 0 END) / COUNT(*), 2) AS delay_percentage FROM orders WHERE order_delivered_customer_date IS NOT NULL",
+    "generated_sql": "SELECT ROUND(100.0 * SUM(CASE WHEN order_delivered_customer_date > order_estimated_delivery_date THEN 1 ELSE 0 END) / COUNT(*), 2) AS delayed_percentage FROM orders WHERE order_status = 'delivered' AND order_delivered_customer_date IS NOT NULL AND order_estimated_delivery_date IS NOT NULL",
+    "sql_used": "SELECT ROUND(100.0 * SUM(CASE WHEN order_delivered_customer_date > order_estimated_delivery_date THEN 1 ELSE 0 END) / COUNT(*), 2) AS delayed_percentage FROM orders WHERE order_status = 'delivered' AND order_delivered_customer_date IS NOT NULL AND order_estimated_delivery_date IS NOT NULL",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "aggregation_mismatch:1",
+    "result_equivalence": false,
+    "result_equivalence_reason": "aggregation_mismatch:1",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 9.66,
+    "token_usage_total": 2519
+  },
+  {
+    "index": 66,
+    "question": "What is the trend of delivery delays over time?",
+    "domain": "Logistics & Delivery",
+    "query_type": "time_series",
+    "difficulty": "medium",
+    "expected_tables": [
+      "orders"
+    ],
+    "queried_tables": [
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT strftime('%Y-%m', order_purchase_timestamp) AS month, ROUND(100.0 * SUM(CASE WHEN order_delivered_customer_date > order_estimated_delivery_date THEN 1 ELSE 0 END) / COUNT(*), 2) AS delay_percentage FROM orders WHERE order_delivered_customer_date IS NOT NULL GROUP BY month ORDER BY month",
+    "generated_sql": "SELECT strftime('%Y-%m', orders.order_purchase_timestamp) AS order_month,\n       AVG(julianday(orders.order_delivered_customer_date) - julianday(orders.order_estimated_delivery_date)) AS avg_delay_days,\n       COUNT(*) AS order_count\nFROM orders\nWHERE orders.order_delivered_customer_date IS NOT NULL\nGROUP BY order_month\nORDER BY order_month",
+    "sql_used": "SELECT strftime('%Y-%m', orders.order_purchase_timestamp) AS order_month,\n       AVG(julianday(orders.order_delivered_customer_date) - julianday(orders.order_estimated_delivery_date)) AS avg_delay_days,\n       COUNT(*) AS order_count\nFROM orders\nWHERE orders.order_delivered_customer_date IS NOT NULL\nGROUP BY order_month\nORDER BY order_month",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "timeseries_value_mismatch:46",
+    "result_equivalence": false,
+    "result_equivalence_reason": "timeseries_value_mismatch:46",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 13.78,
+    "token_usage_total": 2128
+  },
+  {
+    "index": 67,
+    "question": "How does distance affect delivery time? (approx via location)",
+    "domain": "Logistics & Delivery",
+    "query_type": "aggregation",
+    "difficulty": "medium",
+    "expected_tables": [
+      "customers",
+      "sellers",
+      "orders",
+      "order_items"
+    ],
+    "queried_tables": [
+      "geolocation"
+    ],
+    "table_accuracy_pct": 0.0,
+    "table_match": false,
+    "expected_sql": "SELECT ABS(c.customer_zip_code_prefix - s.seller_zip_code_prefix) AS approx_distance, AVG(JULIANDAY(o.order_delivered_customer_date) - JULIANDAY(o.order_purchase_timestamp)) AS delivery_days FROM orders o JOIN order_items oi ON o.order_id = oi.order_id JOIN customers c ON o.customer_id = c.customer_id JOIN sellers s ON oi.seller_id = s.seller_id WHERE o.order_delivered_customer_date IS NOT NULL GROUP BY approx_distance ORDER BY approx_distance",
+    "generated_sql": "WITH geo_agg AS (\n  SELECT\n    geolocation_zip_code_prefix,\n    AVG(geolocation_lat) AS avg_lat,\n    AVG(geolocation_lng) AS avg_lng\n  FROM geolocation\n  GROUP BY geolocation_zip_code_prefix\n)",
+    "sql_used": "WITH geo_agg AS (\n  SELECT\n    geolocation_zip_code_prefix,\n    AVG(geolocation_lat) AS avg_lat,\n    AVG(geolocation_lng) AS avg_lng\n  FROM geolocation\n  GROUP BY geolocation_zip_code_prefix\n)",
+    "repair_attempted": true,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": "prog_repair_returned_none",
+    "sql_execution_success": false,
+    "sql_execution_error": "incomplete input",
+    "result_correctness": false,
+    "result_correctness_reason": "not_evaluated",
+    "result_equivalence": false,
+    "result_equivalence_reason": "not_evaluated",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": true,
+    "verification_is_valid": false,
+    "verification_issue_categories": {
+      "group_by_mismatch": 1
+    },
+    "verification_issues": [
+      {
+        "category": "group_by_mismatch",
+        "severity": "error",
+        "message": "SQL parse error: Failed to parse any statement following CTE. Line 8, Col: 1.\n  _lat,\n    AVG(geolocation_lng) AS avg_lng\n  FROM geolocation\n  GROUP BY geolocation_zip_code_prefix\n\u001b[4m)\u001b[0m"
+      }
+    ],
+    "run_latency_seconds": 52.87,
+    "token_usage_total": 3937
+  },
+  {
+    "index": 68,
+    "question": "Which regions have the best delivery performance?",
+    "domain": "Logistics & Delivery",
+    "query_type": "aggregation",
+    "difficulty": "easy",
+    "expected_tables": [
+      "customers",
+      "orders"
+    ],
+    "queried_tables": [
+      "orders",
+      "customers"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT c.customer_state, ROUND(100.0 * SUM(CASE WHEN o.order_delivered_customer_date <= o.order_estimated_delivery_date THEN 1 ELSE 0 END) / COUNT(*), 2) AS on_time_delivery_percentage FROM orders o JOIN customers c ON o.customer_id = c.customer_id WHERE o.order_delivered_customer_date IS NOT NULL GROUP BY c.customer_state ORDER BY on_time_delivery_percentage DESC LIMIT 10",
+    "generated_sql": "WITH cleaned AS (\n  SELECT\n    c.customer_state,\n    (julianday(o.order_delivered_customer_date) - julianday(o.order_purchase_timestamp)) AS delivery_days,\n    CASE WHEN o.order_delivered_customer_date > o.order_estimated_delivery_date THEN 1 ELSE 0 END AS late_flag\n  FROM orders o\n  JOIN customers c ON o.customer_id = c.customer_id\n  WHERE o.order_delivered_customer_date IS NOT NULL\n    AND o.order_purchase_timestamp IS NOT NULL\n    AND o.order_estimated_delivery_date IS NOT NULL\n)",
+    "sql_used": "WITH cleaned AS (\n  SELECT\n    c.customer_state,\n    (julianday(o.order_delivered_customer_date) - julianday(o.order_purchase_timestamp)) AS delivery_days,\n    CASE WHEN o.order_delivered_customer_date > o.order_estimated_delivery_date THEN 1 ELSE 0 END AS late_flag\n  FROM orders o\n  JOIN customers c ON o.customer_id = c.customer_id\n  WHERE o.order_delivered_customer_date IS NOT NULL\n    AND o.order_purchase_timestamp IS NOT NULL\n    AND o.order_estimated_delivery_date IS NOT NULL\n)",
+    "repair_attempted": true,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": "prog_repair_returned_none",
+    "sql_execution_success": false,
+    "sql_execution_error": "incomplete input",
+    "result_correctness": false,
+    "result_correctness_reason": "not_evaluated",
+    "result_equivalence": false,
+    "result_equivalence_reason": "not_evaluated",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": true,
+    "verification_is_valid": false,
+    "verification_issue_categories": {
+      "group_by_mismatch": 1
+    },
+    "verification_issues": [
+      {
+        "category": "group_by_mismatch",
+        "severity": "error",
+        "message": "SQL parse error: Failed to parse any statement following CTE. Line 11, Col: 1.\n  \n    AND o.order_purchase_timestamp IS NOT NULL\n    AND o.order_estimated_delivery_date IS NOT NULL\n\u001b[4m)\u001b[0m"
+      }
+    ],
+    "run_latency_seconds": 14.38,
+    "token_usage_total": 3004
+  },
+  {
+    "index": 69,
+    "question": "What is the distribution of delivery times?",
+    "domain": "Logistics & Delivery",
+    "query_type": "time_series",
+    "difficulty": "medium",
+    "expected_tables": [
+      "orders"
+    ],
+    "queried_tables": [
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT CASE WHEN delivery_days < 5 THEN '0-5' WHEN delivery_days < 10 THEN '5-10' WHEN delivery_days < 15 THEN '10-15' WHEN delivery_days < 20 THEN '15-20' ELSE '20+' END AS delivery_days_bucket, COUNT(*) AS order_count FROM (SELECT JULIANDAY(order_delivered_customer_date) - JULIANDAY(order_purchase_timestamp) AS delivery_days FROM orders WHERE order_delivered_customer_date IS NOT NULL) GROUP BY delivery_days_bucket ORDER BY delivery_days_bucket",
+    "generated_sql": "SELECT CAST((julianday(order_delivered_customer_date) - julianday(order_purchase_timestamp)) AS INTEGER) AS delivery_days, COUNT(*) AS order_count FROM orders WHERE order_delivered_customer_date IS NOT NULL AND order_purchase_timestamp IS NOT NULL GROUP BY delivery_days ORDER BY delivery_days",
+    "sql_used": "SELECT CAST((julianday(order_delivered_customer_date) - julianday(order_purchase_timestamp)) AS INTEGER) AS delivery_days, COUNT(*) AS order_count FROM orders WHERE order_delivered_customer_date IS NOT NULL AND order_purchase_timestamp IS NOT NULL GROUP BY delivery_days ORDER BY delivery_days",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "row_count_mismatch: got 50, expected 5",
+    "result_equivalence": false,
+    "result_equivalence_reason": "row_count_mismatch: got 50, expected 5",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": false,
+    "verification_issue_categories": {
+      "duplicate_detection": 1
+    },
+    "verification_issues": [
+      {
+        "category": "duplicate_detection",
+        "severity": "warning",
+        "message": "Result contains 146 rows but 5 expected (29.2\u00c3\u2014 too many) \u00e2\u20ac\u201d possible Cartesian product or missing WHERE"
+      }
+    ],
+    "run_latency_seconds": 6.43,
+    "token_usage_total": 2106
+  },
+  {
+    "index": 70,
+    "question": "Are late deliveries increasing or decreasing?",
+    "domain": "Logistics & Delivery",
+    "query_type": "unknown",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders"
+    ],
+    "queried_tables": [
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT strftime('%Y-%m', order_purchase_timestamp) AS month, SUM(CASE WHEN order_delivered_customer_date > order_estimated_delivery_date THEN 1 ELSE 0 END) AS late_order_count FROM orders WHERE order_delivered_customer_date IS NOT NULL GROUP BY month ORDER BY month",
+    "generated_sql": "SELECT\n    strftime('%Y-%m', order_purchase_timestamp) AS month,\n    SUM(CASE WHEN order_delivered_customer_date > order_estimated_delivery_date THEN 1 ELSE 0 END) AS late_count,\n    COUNT(*) AS total_orders,\n    (SUM(CASE WHEN order_delivered_customer_date > order_estimated_delivery_date THEN 1 ELSE 0 END) * 1.0) / COUNT(*) AS late_rate\nFROM orders\nWHERE order_delivered_customer_date IS NOT NULL\nGROUP BY month\nORDER BY month",
+    "sql_used": "SELECT\n    strftime('%Y-%m', order_purchase_timestamp) AS month,\n    SUM(CASE WHEN order_delivered_customer_date > order_estimated_delivery_date THEN 1 ELSE 0 END) AS late_count,\n    COUNT(*) AS total_orders,\n    (SUM(CASE WHEN order_delivered_customer_date > order_estimated_delivery_date THEN 1 ELSE 0 END) * 1.0) / COUNT(*) AS late_rate\nFROM orders\nWHERE order_delivered_customer_date IS NOT NULL\nGROUP BY month\nORDER BY month",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "aggregation_mismatch:23",
+    "result_equivalence": false,
+    "result_equivalence_reason": "aggregation_mismatch:23",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 9.97,
+    "token_usage_total": 2210
+  },
+  {
+    "index": 71,
+    "question": "How many sellers are there?",
+    "domain": "Sellers",
+    "query_type": "aggregation",
+    "difficulty": "easy",
+    "expected_tables": [
+      "sellers"
+    ],
+    "queried_tables": [
+      "sellers"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT COUNT(*) AS total_sellers FROM sellers",
+    "generated_sql": "SELECT COUNT(*) AS seller_count FROM sellers",
+    "sql_used": "SELECT COUNT(*) AS seller_count FROM sellers",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "aggregation_mismatch:1",
+    "result_equivalence": false,
+    "result_equivalence_reason": "aggregation_mismatch:1",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 3.95,
+    "token_usage_total": 1154
+  },
+  {
+    "index": 72,
+    "question": "Which sellers generate the most revenue?",
+    "domain": "Sellers",
+    "query_type": "ranking",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "sellers"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT seller_id, SUM(price) AS total_revenue FROM order_items GROUP BY seller_id ORDER BY total_revenue DESC LIMIT 10",
+    "generated_sql": "SELECT s.seller_id, SUM(oi.price) AS revenue FROM order_items oi JOIN sellers s ON oi.seller_id = s.seller_id GROUP BY s.seller_id ORDER BY revenue DESC",
+    "sql_used": "SELECT s.seller_id, SUM(oi.price) AS revenue FROM order_items oi JOIN sellers s ON oi.seller_id = s.seller_id GROUP BY s.seller_id ORDER BY revenue DESC",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "ranking_mismatch",
+    "result_equivalence": false,
+    "result_equivalence_reason": "ranking_mismatch",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": false,
+    "verification_issue_categories": {
+      "duplicate_detection": 1
+    },
+    "verification_issues": [
+      {
+        "category": "duplicate_detection",
+        "severity": "warning",
+        "message": "Result contains 3095 rows but 10 expected (309.5\u00c3\u2014 too many) \u00e2\u20ac\u201d possible Cartesian product or missing WHERE"
+      }
+    ],
+    "run_latency_seconds": 8.72,
+    "token_usage_total": 1948
+  },
+  {
+    "index": 73,
+    "question": "Which sellers have the most orders?",
+    "domain": "Sellers",
+    "query_type": "ranking",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "sellers",
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT seller_id, COUNT(DISTINCT order_id) AS order_count FROM order_items GROUP BY seller_id ORDER BY order_count DESC LIMIT 10",
+    "generated_sql": "SELECT s.seller_id, COUNT(DISTINCT oi.order_id) AS order_count FROM order_items oi JOIN orders o ON oi.order_id = o.order_id JOIN sellers s ON oi.seller_id = s.seller_id GROUP BY s.seller_id ORDER BY order_count DESC",
+    "sql_used": "SELECT s.seller_id, COUNT(DISTINCT oi.order_id) AS order_count FROM order_items oi JOIN orders o ON oi.order_id = o.order_id JOIN sellers s ON oi.seller_id = s.seller_id GROUP BY s.seller_id ORDER BY order_count DESC",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": true,
+    "result_correctness_reason": "ranking_exact_match",
+    "result_equivalence": true,
+    "result_equivalence_reason": "ranking_exact_match",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": false,
+    "verification_issue_categories": {
+      "duplicate_detection": 1
+    },
+    "verification_issues": [
+      {
+        "category": "duplicate_detection",
+        "severity": "warning",
+        "message": "Result contains 3095 rows but 10 expected (309.5\u00c3\u2014 too many) \u00e2\u20ac\u201d possible Cartesian product or missing WHERE"
+      }
+    ],
+    "run_latency_seconds": 10.19,
+    "token_usage_total": 2992
+  },
+  {
+    "index": 74,
+    "question": "What is the average revenue per seller?",
+    "domain": "Sellers",
+    "query_type": "aggregation",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "sellers"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT AVG(seller_revenue) AS average_revenue_per_seller FROM (SELECT seller_id, SUM(price) AS seller_revenue FROM order_items GROUP BY seller_id)",
+    "generated_sql": "SELECT AVG(total_revenue) AS average_revenue_per_seller FROM (SELECT SUM(oi.price) AS total_revenue FROM order_items oi JOIN sellers s ON oi.seller_id = s.seller_id GROUP BY s.seller_id) sub",
+    "sql_used": "SELECT AVG(total_revenue) AS average_revenue_per_seller FROM (SELECT SUM(oi.price) AS total_revenue FROM order_items oi JOIN sellers s ON oi.seller_id = s.seller_id GROUP BY s.seller_id) sub",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": true,
+    "result_correctness_reason": "aggregation_exact_match",
+    "result_equivalence": true,
+    "result_equivalence_reason": "aggregation_exact_match",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 7.91,
+    "token_usage_total": 1920
+  },
+  {
+    "index": 75,
+    "question": "Which sellers have the highest ratings?",
+    "domain": "Sellers",
+    "query_type": "ranking",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "order_reviews"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT oi.seller_id, AVG(or2.review_score) AS average_rating FROM order_items oi JOIN order_reviews or2 ON oi.order_id = or2.order_id GROUP BY oi.seller_id ORDER BY average_rating DESC LIMIT 10",
+    "generated_sql": "WITH distinct_seller_review AS (\n  SELECT DISTINCT oi.seller_id, r.review_score\n  FROM order_items oi\n  JOIN orders o ON o.order_id = oi.order_id\n  JOIN order_reviews r ON r.order_id = o.order_id\n)",
+    "sql_used": "WITH distinct_seller_review AS (\n  SELECT DISTINCT oi.seller_id, r.review_score\n  FROM order_items oi\n  JOIN orders o ON o.order_id = oi.order_id\n  JOIN order_reviews r ON r.order_id = o.order_id\n)",
+    "repair_attempted": true,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": "prog_repair_returned_none",
+    "sql_execution_success": false,
+    "sql_execution_error": "incomplete input",
+    "result_correctness": false,
+    "result_correctness_reason": "not_evaluated",
+    "result_equivalence": false,
+    "result_equivalence_reason": "not_evaluated",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": true,
+    "verification_is_valid": false,
+    "verification_issue_categories": {
+      "group_by_mismatch": 1
+    },
+    "verification_issues": [
+      {
+        "category": "group_by_mismatch",
+        "severity": "error",
+        "message": "SQL parse error: Failed to parse any statement following CTE. Line 6, Col: 1.\n  ms oi\n  JOIN orders o ON o.order_id = oi.order_id\n  JOIN order_reviews r ON r.order_id = o.order_id\n\u001b[4m)\u001b[0m"
+      }
+    ],
+    "run_latency_seconds": 17.72,
+    "token_usage_total": 3985
+  },
+  {
+    "index": 76,
+    "question": "Which sellers have the most delayed deliveries?",
+    "domain": "Sellers",
+    "query_type": "ranking",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "queried_tables": [],
+    "table_accuracy_pct": 0.0,
+    "table_match": false,
+    "expected_sql": "SELECT oi.seller_id, COUNT(*) AS delay_count FROM order_items oi JOIN orders o ON oi.order_id = o.order_id WHERE o.order_delivered_customer_date > o.order_estimated_delivery_date GROUP BY oi.seller_id ORDER BY delay_count DESC LIMIT 10",
+    "generated_sql": null,
+    "sql_used": null,
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": false,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "not_evaluated",
+    "result_equivalence": false,
+    "result_equivalence_reason": "not_evaluated",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 9.29,
+    "token_usage_total": 1347
+  },
+  {
+    "index": 77,
+    "question": "What is the distribution of sellers by region?",
+    "domain": "Sellers",
+    "query_type": "time_series",
+    "difficulty": "medium",
+    "expected_tables": [
+      "sellers"
+    ],
+    "queried_tables": [
+      "sellers"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT seller_state, COUNT(*) AS seller_count FROM sellers GROUP BY seller_state ORDER BY seller_count DESC",
+    "generated_sql": "SELECT sellers.seller_state, COUNT(sellers.seller_id) AS seller_count FROM sellers GROUP BY sellers.seller_state ORDER BY sellers.seller_state",
+    "sql_used": "SELECT sellers.seller_state, COUNT(sellers.seller_id) AS seller_count FROM sellers GROUP BY sellers.seller_state ORDER BY sellers.seller_state",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "time_period_mismatch",
+    "result_equivalence": false,
+    "result_equivalence_reason": "time_period_mismatch",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 11.16,
+    "token_usage_total": 1372
+  },
+  {
+    "index": 78,
+    "question": "Which sellers are growing fastest?",
+    "domain": "Sellers",
+    "query_type": "ranking",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_items",
+      "orders"
+    ],
+    "queried_tables": [],
+    "table_accuracy_pct": 0.0,
+    "table_match": false,
+    "expected_sql": "WITH monthly_sales AS (SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, oi.seller_id, SUM(oi.price) AS revenue FROM order_items oi JOIN orders o ON oi.order_id = o.order_id GROUP BY month, oi.seller_id), growth AS (SELECT seller_id, month, revenue, LAG(revenue) OVER (PARTITION BY seller_id ORDER BY month) AS prev_revenue FROM monthly_sales) SELECT seller_id, ROUND(AVG(CASE WHEN prev_revenue IS NOT NULL AND prev_revenue > 0 THEN 100.0 * (revenue - prev_revenue) / prev_revenue END), 2) AS sales_growth_rate FROM growth GROUP BY seller_id ORDER BY sales_growth_rate DESC LIMIT 10",
+    "generated_sql": null,
+    "sql_used": null,
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": false,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "not_evaluated",
+    "result_equivalence": false,
+    "result_equivalence_reason": "not_evaluated",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 7.59,
+    "token_usage_total": 1417
+  },
+  {
+    "index": 79,
+    "question": "What is the average delivery time per seller?",
+    "domain": "Sellers",
+    "query_type": "aggregation",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "queried_tables": [
+      "orders"
+    ],
+    "table_accuracy_pct": 50.0,
+    "table_match": false,
+    "expected_sql": "SELECT oi.seller_id, AVG(JULIANDAY(o.order_delivered_customer_date) - JULIANDAY(o.order_purchase_timestamp)) AS average_delivery_days FROM order_items oi JOIN orders o ON oi.order_id = o.order_id WHERE o.order_delivered_customer_date IS NOT NULL GROUP BY oi.seller_id ORDER BY average_delivery_days ASC LIMIT 10",
+    "generated_sql": "WITH order_delivery AS (\n  SELECT\n    o.order_id,\n    (julianday(o.order_delivered_customer_date) - julianday(o.order_purchase_timestamp)) AS delivery_days\n  FROM orders o\n  WHERE o.order_delivered_customer_date IS NOT NULL\n)",
+    "sql_used": "WITH order_delivery AS (\n  SELECT\n    o.order_id,\n    (julianday(o.order_delivered_customer_date) - julianday(o.order_purchase_timestamp)) AS delivery_days\n  FROM orders o\n  WHERE o.order_delivered_customer_date IS NOT NULL\n)",
+    "repair_attempted": true,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": "prog_repair_returned_none",
+    "sql_execution_success": false,
+    "sql_execution_error": "incomplete input",
+    "result_correctness": false,
+    "result_correctness_reason": "not_evaluated",
+    "result_equivalence": false,
+    "result_equivalence_reason": "not_evaluated",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": true,
+    "verification_is_valid": false,
+    "verification_issue_categories": {
+      "group_by_mismatch": 1
+    },
+    "verification_issues": [
+      {
+        "category": "group_by_mismatch",
+        "severity": "error",
+        "message": "SQL parse error: Failed to parse any statement following CTE. Line 7, Col: 1.\n  se_timestamp)) AS delivery_days\n  FROM orders o\n  WHERE o.order_delivered_customer_date IS NOT NULL\n\u001b[4m)\u001b[0m"
+      }
+    ],
+    "run_latency_seconds": 13.82,
+    "token_usage_total": 3526
+  },
+  {
+    "index": 80,
+    "question": "Which sellers have the highest cancellation rate?",
+    "domain": "Sellers",
+    "query_type": "ranking",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "queried_tables": [],
+    "table_accuracy_pct": 0.0,
+    "table_match": false,
+    "expected_sql": "SELECT oi.seller_id, ROUND(100.0 * SUM(CASE WHEN o.order_status = 'canceled' THEN 1 ELSE 0 END) / COUNT(*), 2) AS cancellation_rate FROM order_items oi JOIN orders o ON oi.order_id = o.order_id GROUP BY oi.seller_id ORDER BY cancellation_rate DESC LIMIT 10",
+    "generated_sql": null,
+    "sql_used": null,
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": false,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "not_evaluated",
+    "result_equivalence": false,
+    "result_equivalence_reason": "not_evaluated",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 7.73,
+    "token_usage_total": 1303
+  },
+  {
+    "index": 81,
+    "question": "Which payment method is most used?",
+    "domain": "Payments",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "queried_tables": [
+      "order_payments"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT payment_type, COUNT(*) AS payment_count FROM order_payments GROUP BY payment_type ORDER BY payment_count DESC LIMIT 1",
+    "generated_sql": "SELECT payment_type, COUNT(*) AS usage_count FROM order_payments GROUP BY payment_type ORDER BY usage_count DESC LIMIT 1",
+    "sql_used": "SELECT payment_type, COUNT(*) AS usage_count FROM order_payments GROUP BY payment_type ORDER BY usage_count DESC LIMIT 1",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "column_mismatch",
+    "result_equivalence": false,
+    "result_equivalence_reason": "column_mismatch",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 6.4,
+    "token_usage_total": 2273
+  },
+  {
+    "index": 82,
+    "question": "What is the revenue by payment type?",
+    "domain": "Payments",
+    "query_type": "aggregation",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "queried_tables": [
+      "order_payments"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT payment_type, SUM(payment_value) AS total_payments_value FROM order_payments GROUP BY payment_type ORDER BY total_payments_value DESC",
+    "generated_sql": "WITH payment_agg AS (\n  SELECT\n    op.order_id,\n    op.payment_type,\n    SUM(op.payment_value) AS total_payment\n  FROM order_payments op\n  GROUP BY op.order_id, op.payment_type\n)",
+    "sql_used": "WITH payment_agg AS (\n  SELECT\n    op.order_id,\n    op.payment_type,\n    SUM(op.payment_value) AS total_payment\n  FROM order_payments op\n  GROUP BY op.order_id, op.payment_type\n)",
+    "repair_attempted": true,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": "prog_repair_returned_none",
+    "sql_execution_success": false,
+    "sql_execution_error": "incomplete input",
+    "result_correctness": false,
+    "result_correctness_reason": "not_evaluated",
+    "result_equivalence": false,
+    "result_equivalence_reason": "not_evaluated",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": true,
+    "verification_is_valid": false,
+    "verification_issue_categories": {
+      "group_by_mismatch": 1
+    },
+    "verification_issues": [
+      {
+        "category": "group_by_mismatch",
+        "severity": "error",
+        "message": "SQL parse error: Failed to parse any statement following CTE. Line 8, Col: 1.\n  op.payment_value) AS total_payment\n  FROM order_payments op\n  GROUP BY op.order_id, op.payment_type\n\u001b[4m)\u001b[0m"
+      }
+    ],
+    "run_latency_seconds": 34.14,
+    "token_usage_total": 3696
+  },
+  {
+    "index": 83,
+    "question": "What is the average payment value?",
+    "domain": "Payments",
+    "query_type": "aggregation",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "queried_tables": [
+      "order_payments"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT AVG(payment_value) AS average_payment_value FROM order_payments",
+    "generated_sql": "SELECT AVG(payment_value) AS average_payment_value FROM order_payments",
+    "sql_used": "SELECT AVG(payment_value) AS average_payment_value FROM order_payments",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": true,
+    "result_correctness_reason": "aggregation_exact_match",
+    "result_equivalence": true,
+    "result_equivalence_reason": "aggregation_exact_match",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 6.99,
+    "token_usage_total": 2251
+  },
+  {
+    "index": 84,
+    "question": "How many installments are used on average?",
+    "domain": "Payments",
+    "query_type": "aggregation",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "queried_tables": [
+      "order_payments"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT AVG(payment_installments) AS average_installments FROM order_payments",
+    "generated_sql": "SELECT AVG(payment_installments) AS average_installments FROM order_payments",
+    "sql_used": "SELECT AVG(payment_installments) AS average_installments FROM order_payments",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": true,
+    "result_correctness_reason": "aggregation_exact_match",
+    "result_equivalence": true,
+    "result_equivalence_reason": "aggregation_exact_match",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 7.47,
+    "token_usage_total": 2246
+  },
+  {
+    "index": 85,
+    "question": "What is the distribution of installment payments?",
+    "domain": "Payments",
+    "query_type": "time_series",
+    "difficulty": "medium",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "queried_tables": [
+      "order_payments"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT payment_installments, COUNT(*) AS order_count FROM order_payments GROUP BY payment_installments ORDER BY payment_installments",
+    "generated_sql": "SELECT op.payment_installments, COUNT(*) AS payment_count FROM order_payments AS op GROUP BY op.payment_installments ORDER BY op.payment_installments",
+    "sql_used": "SELECT op.payment_installments, COUNT(*) AS payment_count FROM order_payments AS op GROUP BY op.payment_installments ORDER BY op.payment_installments",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "timeseries_value_mismatch:24",
+    "result_equivalence": false,
+    "result_equivalence_reason": "timeseries_value_mismatch:24",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 8.59,
+    "token_usage_total": 2440
+  },
+  {
+    "index": 86,
+    "question": "Do installment payments affect order value?",
+    "domain": "Payments",
+    "query_type": "unknown",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "queried_tables": [
+      "order_items",
+      "order_payments"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT payment_installments, AVG(payment_value) AS average_payment_value FROM order_payments GROUP BY payment_installments ORDER BY payment_installments",
+    "generated_sql": "WITH payments_agg AS (\n  SELECT\n    order_id,\n    AVG(payment_installments) AS avg_installments,\n    SUM(payment_value) AS total_payment\n  FROM order_payments\n  GROUP BY order_id\n),\norder_value AS (\n  SELECT\n    order_id,\n    SUM(price) AS order_value\n  FROM order_items\n  GROUP BY order_id\n)",
+    "sql_used": "WITH payments_agg AS (\n  SELECT\n    order_id,\n    AVG(payment_installments) AS avg_installments,\n    SUM(payment_value) AS total_payment\n  FROM order_payments\n  GROUP BY order_id\n),\norder_value AS (\n  SELECT\n    order_id,\n    SUM(price) AS order_value\n  FROM order_items\n  GROUP BY order_id\n)",
+    "repair_attempted": true,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": "prog_repair_returned_none",
+    "sql_execution_success": false,
+    "sql_execution_error": "incomplete input",
+    "result_correctness": false,
+    "result_correctness_reason": "not_evaluated",
+    "result_equivalence": false,
+    "result_equivalence_reason": "not_evaluated",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": true,
+    "verification_is_valid": false,
+    "verification_issue_categories": {
+      "group_by_mismatch": 1
+    },
+    "verification_issues": [
+      {
+        "category": "group_by_mismatch",
+        "severity": "error",
+        "message": "SQL parse error: Failed to parse any statement following CTE. Line 15, Col: 1.\n  ue AS (\n  SELECT\n    order_id,\n    SUM(price) AS order_value\n  FROM order_items\n  GROUP BY order_id\n\u001b[4m)\u001b[0m"
+      }
+    ],
+    "run_latency_seconds": 35.54,
+    "token_usage_total": 4799
+  },
+  {
+    "index": 87,
+    "question": "What is the failure rate of payments?",
+    "domain": "Payments",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "queried_tables": [],
+    "table_accuracy_pct": 0.0,
+    "table_match": false,
+    "expected_sql": "SELECT ROUND(100.0 * SUM(CASE WHEN payment_value <= 0 THEN 1 ELSE 0 END) / COUNT(*), 2) AS payment_failure_rate FROM order_payments",
+    "generated_sql": null,
+    "sql_used": null,
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": false,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "not_evaluated",
+    "result_equivalence": false,
+    "result_equivalence_reason": "not_evaluated",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 9.05,
+    "token_usage_total": 2317
+  },
+  {
+    "index": 88,
+    "question": "Which payment types have highest order value?",
+    "domain": "Payments",
+    "query_type": "ranking",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "queried_tables": [
+      "order_items",
+      "order_payments",
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT payment_type, AVG(payment_value) AS average_payment_value FROM order_payments GROUP BY payment_type ORDER BY average_payment_value DESC LIMIT 5",
+    "generated_sql": "SELECT op.payment_type, SUM(oi.price) AS total_order_value FROM order_payments op JOIN orders o ON op.order_id = o.order_id JOIN order_items oi ON o.order_id = oi.order_id GROUP BY op.payment_type ORDER BY total_order_value DESC",
+    "sql_used": "SELECT op.payment_type, SUM(oi.price) AS total_order_value FROM order_payments op JOIN orders o ON op.order_id = o.order_id JOIN order_items oi ON o.order_id = oi.order_id GROUP BY op.payment_type ORDER BY total_order_value DESC",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "ranking_mismatch",
+    "result_equivalence": false,
+    "result_equivalence_reason": "ranking_mismatch",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 38.23,
+    "token_usage_total": 4572
+  },
+  {
+    "index": 89,
+    "question": "How does payment method vary by region?",
+    "domain": "Payments",
+    "query_type": "aggregation",
+    "difficulty": "medium",
+    "expected_tables": [
+      "customers",
+      "orders",
+      "order_payments"
+    ],
+    "queried_tables": [
+      "order_payments",
+      "orders",
+      "customers"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT c.customer_state, op.payment_type, COUNT(*) AS count FROM order_payments op JOIN orders o ON op.order_id = o.order_id JOIN customers c ON o.customer_id = c.customer_id GROUP BY c.customer_state, op.payment_type ORDER BY c.customer_state, count DESC",
+    "generated_sql": "SELECT c.customer_state AS region,\n       op.payment_type AS payment_method,\n       COUNT(*) AS payment_count,\n       SUM(op.payment_value) AS total_payment_value\nFROM order_payments op\nJOIN orders o ON op.order_id = o.order_id\nJOIN customers c ON o.customer_id = c.customer_id\nGROUP BY c.customer_state, op.payment_type\nORDER BY c.customer_state, payment_count DESC",
+    "sql_used": "SELECT c.customer_state AS region,\n       op.payment_type AS payment_method,\n       COUNT(*) AS payment_count,\n       SUM(op.payment_value) AS total_payment_value\nFROM order_payments op\nJOIN orders o ON op.order_id = o.order_id\nJOIN customers c ON o.customer_id = c.customer_id\nGROUP BY c.customer_state, op.payment_type\nORDER BY c.customer_state, payment_count DESC",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "aggregation_mismatch:50",
+    "result_equivalence": false,
+    "result_equivalence_reason": "aggregation_mismatch:50",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 19.7,
+    "token_usage_total": 3341
+  },
+  {
+    "index": 90,
+    "question": "What is the trend of payment methods over time?",
+    "domain": "Payments",
+    "query_type": "aggregation",
+    "difficulty": "medium",
+    "expected_tables": [
+      "orders",
+      "order_payments"
+    ],
+    "queried_tables": [
+      "order_payments",
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, op.payment_type, COUNT(*) AS count FROM order_payments op JOIN orders o ON op.order_id = o.order_id GROUP BY month, op.payment_type ORDER BY month, count DESC",
+    "generated_sql": "SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, op.payment_type, COUNT(*) AS payment_count FROM order_payments op JOIN orders o ON op.order_id = o.order_id GROUP BY month, op.payment_type ORDER BY month, op.payment_type",
+    "sql_used": "SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, op.payment_type, COUNT(*) AS payment_count FROM order_payments op JOIN orders o ON op.order_id = o.order_id GROUP BY month, op.payment_type ORDER BY month, op.payment_type",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "aggregation_mismatch:50",
+    "result_equivalence": false,
+    "result_equivalence_reason": "aggregation_mismatch:50",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 9.7,
+    "token_usage_total": 2723
+  },
+  {
+    "index": 91,
+    "question": "What is the average review score?",
+    "domain": "Reviews & Satisfaction",
+    "query_type": "aggregation",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_reviews"
+    ],
+    "queried_tables": [
+      "order_reviews"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT AVG(review_score) AS average_review_score FROM order_reviews",
+    "generated_sql": "SELECT AVG(review_score) AS average_review_score FROM order_reviews",
+    "sql_used": "SELECT AVG(review_score) AS average_review_score FROM order_reviews",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": true,
+    "result_correctness_reason": "aggregation_exact_match",
+    "result_equivalence": true,
+    "result_equivalence_reason": "aggregation_exact_match",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 17.97,
+    "token_usage_total": 2214
+  },
+  {
+    "index": 92,
+    "question": "What is the distribution of review scores?",
+    "domain": "Reviews & Satisfaction",
+    "query_type": "time_series",
+    "difficulty": "medium",
+    "expected_tables": [
+      "order_reviews"
+    ],
+    "queried_tables": [
+      "order_reviews"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT review_score, COUNT(*) AS count FROM order_reviews GROUP BY review_score ORDER BY review_score",
+    "generated_sql": "SELECT review_score, COUNT(*) AS count FROM order_reviews GROUP BY review_score ORDER BY review_score",
+    "sql_used": "SELECT review_score, COUNT(*) AS count FROM order_reviews GROUP BY review_score ORDER BY review_score",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": true,
+    "result_correctness_reason": "timeseries_exact_match",
+    "result_equivalence": true,
+    "result_equivalence_reason": "timeseries_exact_match",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 9.0,
+    "token_usage_total": 2010
+  },
+  {
+    "index": 93,
+    "question": "Which products have the best reviews?",
+    "domain": "Reviews & Satisfaction",
+    "query_type": "ranking",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_reviews",
+      "order_items"
+    ],
+    "queried_tables": [
+      "orders",
+      "order_reviews"
+    ],
+    "table_accuracy_pct": 50.0,
+    "table_match": false,
+    "expected_sql": "SELECT oi.product_id, AVG(or2.review_score) AS average_review_score FROM order_items oi JOIN order_reviews or2 ON oi.order_id = or2.order_id GROUP BY oi.product_id ORDER BY average_review_score DESC LIMIT 10",
+    "generated_sql": "WITH order_review_agg AS (\n  SELECT o.order_id, AVG(r.review_score) AS avg_review_score\n  FROM orders o\n  JOIN order_reviews r ON r.order_id = o.order_id\n  GROUP BY o.order_id\n)",
+    "sql_used": "WITH order_review_agg AS (\n  SELECT o.order_id, AVG(r.review_score) AS avg_review_score\n  FROM orders o\n  JOIN order_reviews r ON r.order_id = o.order_id\n  GROUP BY o.order_id\n)",
+    "repair_attempted": true,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": "prog_repair_returned_none",
+    "sql_execution_success": false,
+    "sql_execution_error": "incomplete input",
+    "result_correctness": false,
+    "result_correctness_reason": "not_evaluated",
+    "result_equivalence": false,
+    "result_equivalence_reason": "not_evaluated",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": true,
+    "verification_is_valid": false,
+    "verification_issue_categories": {
+      "group_by_mismatch": 1
+    },
+    "verification_issues": [
+      {
+        "category": "group_by_mismatch",
+        "severity": "error",
+        "message": "SQL parse error: Failed to parse any statement following CTE. Line 6, Col: 1.\n  eview_score\n  FROM orders o\n  JOIN order_reviews r ON r.order_id = o.order_id\n  GROUP BY o.order_id\n\u001b[4m)\u001b[0m"
+      }
+    ],
+    "run_latency_seconds": 26.29,
+    "token_usage_total": 4588
+  },
+  {
+    "index": 94,
+    "question": "Which sellers have the worst reviews?",
+    "domain": "Reviews & Satisfaction",
+    "query_type": "ranking",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_reviews",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "sellers",
+      "orders",
+      "order_reviews"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT oi.seller_id, AVG(or2.review_score) AS average_review_score FROM order_items oi JOIN order_reviews or2 ON oi.order_id = or2.order_id GROUP BY oi.seller_id ORDER BY average_review_score ASC LIMIT 10",
+    "generated_sql": "WITH seller_reviews AS (\n  SELECT DISTINCT\n    oi.seller_id,\n    r.review_id,\n    r.review_score\n  FROM order_reviews r\n  JOIN orders o ON r.order_id = o.order_id\n  JOIN order_items oi ON o.order_id = oi.order_id\n  JOIN sellers s ON oi.seller_id = s.seller_id\n)",
+    "sql_used": "WITH seller_reviews AS (\n  SELECT DISTINCT\n    oi.seller_id,\n    r.review_id,\n    r.review_score\n  FROM order_reviews r\n  JOIN orders o ON r.order_id = o.order_id\n  JOIN order_items oi ON o.order_id = oi.order_id\n  JOIN sellers s ON oi.seller_id = s.seller_id\n)",
+    "repair_attempted": true,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": "prog_repair_returned_none",
+    "sql_execution_success": false,
+    "sql_execution_error": "incomplete input",
+    "result_correctness": false,
+    "result_correctness_reason": "not_evaluated",
+    "result_equivalence": false,
+    "result_equivalence_reason": "not_evaluated",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": true,
+    "verification_is_valid": false,
+    "verification_issue_categories": {
+      "group_by_mismatch": 1
+    },
+    "verification_issues": [
+      {
+        "category": "group_by_mismatch",
+        "severity": "error",
+        "message": "SQL parse error: Failed to parse any statement following CTE. Line 10, Col: 1.\n  id\n  JOIN order_items oi ON o.order_id = oi.order_id\n  JOIN sellers s ON oi.seller_id = s.seller_id\n\u001b[4m)\u001b[0m"
+      }
+    ],
+    "run_latency_seconds": 27.36,
+    "token_usage_total": 4202
+  },
+  {
+    "index": 95,
+    "question": "What is the relationship between delivery time and review score?",
+    "domain": "Reviews & Satisfaction",
+    "query_type": "aggregation",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders",
+      "order_reviews"
+    ],
+    "queried_tables": [
+      "orders",
+      "order_reviews"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT CAST(JULIANDAY(order_delivered_customer_date) - JULIANDAY(order_purchase_timestamp) AS INTEGER) AS delivery_days, AVG(or2.review_score) AS average_review_score FROM orders o JOIN order_reviews or2 ON o.order_id = or2.order_id WHERE o.order_delivered_customer_date IS NOT NULL GROUP BY delivery_days ORDER BY delivery_days",
+    "generated_sql": "SELECT r.review_score,\n       AVG(julianday(o.order_delivered_customer_date) - julianday(o.order_purchase_timestamp)) AS avg_delivery_days,\n       COUNT(*) AS review_count\nFROM orders o\nJOIN order_reviews r ON o.order_id = r.order_id\nWHERE o.order_delivered_customer_date IS NOT NULL\n  AND o.order_purchase_timestamp IS NOT NULL\nGROUP BY r.review_score\nORDER BY r.review_score",
+    "sql_used": "SELECT r.review_score,\n       AVG(julianday(o.order_delivered_customer_date) - julianday(o.order_purchase_timestamp)) AS avg_delivery_days,\n       COUNT(*) AS review_count\nFROM orders o\nJOIN order_reviews r ON o.order_id = r.order_id\nWHERE o.order_delivered_customer_date IS NOT NULL\n  AND o.order_purchase_timestamp IS NOT NULL\nGROUP BY r.review_score\nORDER BY r.review_score",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "row_count_mismatch: got 5, expected 50",
+    "result_equivalence": false,
+    "result_equivalence_reason": "row_count_mismatch: got 5, expected 50",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": false,
+    "verification_issue_categories": {
+      "duplicate_detection": 1
+    },
+    "verification_issues": [
+      {
+        "category": "duplicate_detection",
+        "severity": "warning",
+        "message": "Result contains only 5 rows but 143 expected (0.03\u00c3\u2014 too few) \u00e2\u20ac\u201d possible over-filtering or missing JOIN"
+      }
+    ],
+    "run_latency_seconds": 14.6,
+    "token_usage_total": 2945
+  },
+  {
+    "index": 96,
+    "question": "Do late deliveries lead to lower ratings?",
+    "domain": "Reviews & Satisfaction",
+    "query_type": "aggregation",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders",
+      "order_reviews"
+    ],
+    "queried_tables": [
+      "orders",
+      "order_reviews"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT CASE WHEN order_delivered_customer_date > order_estimated_delivery_date THEN 1 ELSE 0 END AS is_late, AVG(or2.review_score) AS average_review_score FROM orders o JOIN order_reviews or2 ON o.order_id = or2.order_id WHERE o.order_delivered_customer_date IS NOT NULL GROUP BY is_late",
+    "generated_sql": "SELECT\n  CASE WHEN o.order_delivered_customer_date > o.order_estimated_delivery_date THEN 1 ELSE 0 END AS is_late,\n  AVG(r.review_score) AS avg_review_score,\n  COUNT(*) AS review_count\nFROM order_reviews r\nJOIN orders o ON r.order_id = o.order_id\nWHERE o.order_delivered_customer_date IS NOT NULL\n  AND o.order_estimated_delivery_date IS NOT NULL\nGROUP BY is_late\nORDER BY is_late",
+    "sql_used": "SELECT\n  CASE WHEN o.order_delivered_customer_date > o.order_estimated_delivery_date THEN 1 ELSE 0 END AS is_late,\n  AVG(r.review_score) AS avg_review_score,\n  COUNT(*) AS review_count\nFROM order_reviews r\nJOIN orders o ON r.order_id = o.order_id\nWHERE o.order_delivered_customer_date IS NOT NULL\n  AND o.order_estimated_delivery_date IS NOT NULL\nGROUP BY is_late\nORDER BY is_late",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "aggregation_mismatch:2",
+    "result_equivalence": false,
+    "result_equivalence_reason": "aggregation_mismatch:2",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 9.01,
+    "token_usage_total": 2632
+  },
+  {
+    "index": 97,
+    "question": "What percentage of orders receive reviews?",
+    "domain": "Reviews & Satisfaction",
+    "query_type": "aggregation",
+    "difficulty": "easy",
+    "expected_tables": [
+      "orders",
+      "order_reviews"
+    ],
+    "queried_tables": [
+      "orders",
+      "order_reviews"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT ROUND(100.0 * COUNT(DISTINCT or2.order_id) / COUNT(*), 2) AS review_response_rate FROM orders o LEFT JOIN order_reviews or2 ON o.order_id = or2.order_id",
+    "generated_sql": "SELECT (COUNT(DISTINCT rev.order_id) * 100.0) / COUNT(DISTINCT ord.order_id) AS percent_orders_with_reviews FROM orders ord LEFT JOIN order_reviews rev ON ord.order_id = rev.order_id",
+    "sql_used": "SELECT (COUNT(DISTINCT rev.order_id) * 100.0) / COUNT(DISTINCT ord.order_id) AS percent_orders_with_reviews FROM orders ord LEFT JOIN order_reviews rev ON ord.order_id = rev.order_id",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "aggregation_mismatch:1",
+    "result_equivalence": false,
+    "result_equivalence_reason": "aggregation_mismatch:1",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 8.01,
+    "token_usage_total": 2667
+  },
+  {
+    "index": 98,
+    "question": "What is the trend of review scores over time?",
+    "domain": "Reviews & Satisfaction",
+    "query_type": "time_series",
+    "difficulty": "medium",
+    "expected_tables": [
+      "order_reviews"
+    ],
+    "queried_tables": [
+      "order_reviews"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT strftime('%Y-%m', review_creation_date) AS month, AVG(review_score) AS average_review_score FROM order_reviews GROUP BY month ORDER BY month",
+    "generated_sql": "SELECT strftime('%Y-%m', r.review_creation_date) AS month, AVG(r.review_score) AS avg_review_score FROM order_reviews AS r GROUP BY month ORDER BY month",
+    "sql_used": "SELECT strftime('%Y-%m', r.review_creation_date) AS month, AVG(r.review_score) AS avg_review_score FROM order_reviews AS r GROUP BY month ORDER BY month",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "timeseries_value_mismatch:23",
+    "result_equivalence": false,
+    "result_equivalence_reason": "timeseries_value_mismatch:23",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": true,
+    "verification_issue_categories": {},
+    "verification_issues": [],
+    "run_latency_seconds": 15.65,
+    "token_usage_total": 2864
+  },
+  {
+    "index": 99,
+    "question": "Which categories have the highest satisfaction?",
+    "domain": "Reviews & Satisfaction",
+    "query_type": "ranking",
+    "difficulty": "medium",
+    "expected_tables": [
+      "products",
+      "order_reviews",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products",
+      "product_category_name_translation",
+      "order_reviews"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT p.product_category_name, AVG(or2.review_score) AS average_review_score FROM order_reviews or2 JOIN order_items oi ON or2.order_id = oi.order_id JOIN products p ON oi.product_id = p.product_id GROUP BY p.product_category_name ORDER BY average_review_score DESC LIMIT 10",
+    "generated_sql": "SELECT pcnt.product_category_name_english AS category,\n       AVG(orv.review_score) AS avg_satisfaction,\n       COUNT(*) AS review_count\nFROM order_reviews orv\nJOIN orders o ON orv.order_id = o.order_id\nJOIN order_items oi ON o.order_id = oi.order_id\nJOIN products p ON oi.product_id = p.product_id\nJOIN product_category_name_translation pcnt ON p.product_category_name = pcnt.product_category_name\nGROUP BY pcnt.product_category_name_english\nORDER BY avg_satisfaction DESC",
+    "sql_used": "SELECT pcnt.product_category_name_english AS category,\n       AVG(orv.review_score) AS avg_satisfaction,\n       COUNT(*) AS review_count\nFROM order_reviews orv\nJOIN orders o ON orv.order_id = o.order_id\nJOIN order_items oi ON o.order_id = oi.order_id\nJOIN products p ON oi.product_id = p.product_id\nJOIN product_category_name_translation pcnt ON p.product_category_name = pcnt.product_category_name\nGROUP BY pcnt.product_category_name_english\nORDER BY avg_satisfaction DESC",
+    "repair_attempted": false,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": null,
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": false,
+    "result_correctness_reason": "ranking_mismatch",
+    "result_equivalence": false,
+    "result_equivalence_reason": "ranking_mismatch",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": false,
+    "verification_is_valid": false,
+    "verification_issue_categories": {
+      "duplicate_detection": 1
+    },
+    "verification_issues": [
+      {
+        "category": "duplicate_detection",
+        "severity": "warning",
+        "message": "Result contains 71 rows but 10 expected (7.1\u00c3\u2014 too many) \u00e2\u20ac\u201d possible Cartesian product or missing WHERE"
+      }
+    ],
+    "run_latency_seconds": 20.4,
+    "token_usage_total": 3817
+  },
+  {
+    "index": 100,
+    "question": "Which categories have the lowest satisfaction?",
+    "domain": "Reviews & Satisfaction",
+    "query_type": "ranking",
+    "difficulty": "medium",
+    "expected_tables": [
+      "products",
+      "order_reviews",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products",
+      "product_category_name_translation",
+      "order_reviews"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_match": true,
+    "expected_sql": "SELECT p.product_category_name, AVG(or2.review_score) AS average_review_score FROM order_reviews or2 JOIN order_items oi ON or2.order_id = oi.order_id JOIN products p ON oi.product_id = p.product_id GROUP BY p.product_category_name ORDER BY average_review_score ASC LIMIT 10",
+    "generated_sql": "WITH review_order_category AS (\n  SELECT DISTINCT\n    r.order_id,\n    r.review_score,\n    t.product_category_name_english\n  FROM order_reviews r\n  JOIN orders o ON r.order_id = o.order_id\n  JOIN order_items i ON o.order_id = i.order_id\n  JOIN products p ON i.product_id = p.product_id\n  JOIN product_category_name_translation t ON p.product_category_name = t.product_category_name\n)",
+    "sql_used": "WITH review_order_category AS (\n  SELECT DISTINCT\n    r.order_id,\n    r.review_score,\n    t.product_category_name_english\n  FROM order_reviews r\n  JOIN orders o ON r.order_id = o.order_id\n  JOIN order_items i ON o.order_id = i.order_id\n  JOIN products p ON i.product_id = p.product_id\n  JOIN product_category_name_translation t ON p.product_category_name = t.product_category_name\n)",
+    "repair_attempted": true,
+    "programmatic_repaired": false,
+    "llm_repair_needed": false,
+    "repair_detail": "prog_repair_returned_none",
+    "sql_execution_success": false,
+    "sql_execution_error": "incomplete input",
+    "result_correctness": false,
+    "result_correctness_reason": "not_evaluated",
+    "result_equivalence": false,
+    "result_equivalence_reason": "not_evaluated",
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "pre_execution_blocked": true,
+    "verification_is_valid": false,
+    "verification_issue_categories": {
+      "group_by_mismatch": 1
+    },
+    "verification_issues": [
+      {
+        "category": "group_by_mismatch",
+        "severity": "error",
+        "message": "SQL parse error: Failed to parse any statement following CTE. Line 11, Col: 1.\n  _id\n  JOIN product_category_name_translation t ON p.product_category_name = t.product_category_name\n\u001b[4m)\u001b[0m"
+      }
+    ],
+    "run_latency_seconds": 23.92,
+    "token_usage_total": 4448
+  }
+]

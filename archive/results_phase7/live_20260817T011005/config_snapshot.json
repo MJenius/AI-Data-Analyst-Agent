@@ -1,0 +1,17 @@
+{
+  "timestamp": "2026-08-17T01:40:11.296854",
+  "benchmark_path": "C:\\Users\\mjeni\\OneDrive\\Desktop\\Own Projects\\Data Analyst Agent\\tests\\evaluation\\benchmark_dataset_v2.json",
+  "benchmark_hash": "3b55106604bb4ce7",
+  "database_path": "C:\\Users\\mjeni\\OneDrive\\Desktop\\Own Projects\\Data Analyst Agent\\data\\analytics.db",
+  "llm_provider": "nvidia",
+  "nvidia_model": "nvidia/llama-3.3-nemotron-super-49b-v1.5",
+  "phase": "phase7_live",
+  "features": [
+    "improved_rag",
+    "column_grounding",
+    "truncation_detection",
+    "sqlglot_validation",
+    "semantic_verification",
+    "targeted_repair"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "total_queries": 1,
+  "result_correctness": 0.0,
+  "exact_match_rate": 0.0,
+  "equivalent_match_rate": 0.0,
+  "sql_execution_success_rate": 0.0,
+  "table_precision": 0.0,
+  "table_recall": 0.0,
+  "repair_attempted_rate": 0.0,
+  "repair_success_rate": 0.0,
+  "mean_latency_seconds": 0.6226,
+  "p50_latency_seconds": 0.6226,
+  "p95_latency_seconds": 0.6226,
+  "total_elapsed_seconds": 0.62
+}

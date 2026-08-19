@@ -1,0 +1,49 @@
+[
+  {
+    "config": "config1_current_system",
+    "index": 1,
+    "question": "What is the total revenue generated?",
+    "domain": "Revenue & Sales",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "expected_tables": [
+      "order_items"
+    ],
+    "expected_sql": "SELECT SUM(oi.price) AS total_revenue FROM order_items oi",
+    "generated_sql": "SELECT SUM(price) AS total_revenue FROM order_items",
+    "run_latency_seconds": 3.17,
+    "failure_category": "correct",
+    "sql_execution_success": true,
+    "sql_execution_error": null,
+    "result_correctness": true,
+    "result_correctness_reason": "single_value_match",
+    "result_equivalence": true,
+    "result_equivalence_reason": "single_value_match",
+    "queried_tables": [
+      "order_items"
+    ],
+    "table_accuracy_pct": 100.0,
+    "table_precision_pct": 100.0,
+    "table_match": true,
+    "invalid_sql": false,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "validation_errors": [],
+    "pre_execution_blocked": false,
+    "gold_exec_success": true,
+    "token_usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "all_sql": [
+      "SELECT SUM(price) AS total_revenue FROM order_items",
+      "SELECT SUM(price) AS total_revenue FROM order_items",
+      "SELECT SUM(price) AS total_revenue FROM order_items"
+    ],
+    "latency_seconds": 3.17,
+    "status": "completed",
+    "verdict": "accurate",
+    "confidence": 1.0
+  }
+]

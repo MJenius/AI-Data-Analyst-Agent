@@ -1,0 +1,26 @@
+Total entries: 456
+[1/456] took 0.026s: SELECT SUM(oi.price) AS total_revenue FROM order_items oi
+[2/456] took 0.025s: SELECT SUM(oi.freight_value) AS total_freight FROM order_ite
+[3/456] took 0.662s: SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS mont
+[4/456] took 0.704s: SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS mont
+[5/456] took 0.979s: SELECT CAST(SUM(oi.price) AS REAL) / COUNT(DISTINCT o.order_
+[6/456] took 1.454s: SELECT SUM(oi.price) AS total_revenue FROM customers c JOIN 
+[7/456] took 0.057s: SELECT COUNT(DISTINCT customer_unique_id) AS customer_count 
+[8/456] took 1.749s: SELECT AVG(r.review_score) AS avg_review_score FROM customer
+[9/456] took 1.104s: SELECT SUM(oi.price) AS total_revenue FROM customers c JOIN 
+[10/456] took 0.032s: SELECT COUNT(DISTINCT customer_unique_id) AS customer_count 
+[11/456] took 1.517s: SELECT AVG(r.review_score) AS avg_review_score FROM customer
+[12/456] took 1.212s: SELECT SUM(oi.price) AS total_revenue FROM customers c JOIN 
+[13/456] took 0.025s: SELECT COUNT(DISTINCT customer_unique_id) AS customer_count 
+[14/456] took 1.458s: SELECT AVG(r.review_score) AS avg_review_score FROM customer
+[15/456] took 1.055s: SELECT SUM(oi.price) AS total_revenue FROM customers c JOIN 
+[16/456] took 0.025s: SELECT COUNT(DISTINCT customer_unique_id) AS customer_count 
+[17/456] took 1.400s: SELECT AVG(r.review_score) AS avg_review_score FROM customer
+[18/456] took 1.031s: SELECT SUM(oi.price) AS total_revenue FROM customers c JOIN 
+[19/456] took 0.028s: SELECT COUNT(DISTINCT customer_unique_id) AS customer_count 
+[20/456] took 1.550s: SELECT AVG(r.review_score) AS avg_review_score FROM customer
+[21/456] took 0.994s: SELECT SUM(oi.price) AS total_revenue FROM customers c JOIN 
+[22/456] took 0.024s: SELECT COUNT(DISTINCT customer_unique_id) AS customer_count 
+[23/456] took 1.469s: SELECT AVG(r.review_score) AS avg_review_score FROM customer
+[24/456] took 1.078s: SELECT SUM(oi.price) AS total_revenue FROM customers c JOIN 
+[25/456] took 0.017s: SELECT COUNT(DISTINCT customer_unique_id) AS customer_count 

@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use this software, benchmark, or findings in your research, please cite it as below."
+authors:
+  - family-names: "Jose"
+    given-names: "Mevin"
+title: "Engineering Reliable LLM-Based Data Analysis: An Empirical Study of Schema Grounding, Planning, Verification, and SQL Repair"
+version: 1.0.0
+date-released: 2026-08-19
+url: "https://github.com/MJenius/AI-Data-Analyst-Agent"
+repository-code: "https://github.com/MJenius/AI-Data-Analyst-Agent"
+keywords:
+  - "Text-to-SQL"
+  - "AI Agents"
+  - "RAG"
+  - "Structural Verification"
+  - "Data Analytics"
+  - "SQL Repair"
+  - "Relational Databases"
+license: "MIT"

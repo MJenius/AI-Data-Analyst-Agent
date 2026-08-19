@@ -1,0 +1,466 @@
+{
+  "summaries": {
+    "phase4_full_schema": {
+      "config": "phase4_full_schema",
+      "total_queries": 100,
+      "run_status": "completed",
+      "planned_queries": 100,
+      "provider_error_count": 3,
+      "result_correctness_pct": 14.0,
+      "result_equivalence_pct": 14.0,
+      "table_accuracy_pct": 93.0,
+      "table_match_pct": 58.0,
+      "sql_execution_success_pct": 60.0,
+      "invalid_sql_rate_pct": 40.0,
+      "hallucinated_schema_rate_pct": 0.0,
+      "unsafe_sql_rate_pct": 0.0,
+      "avg_latency_seconds": 15.48,
+      "min_latency_seconds": 3.03,
+      "max_latency_seconds": 60.9,
+      "token_usage": {
+        "prompt_tokens": 470211,
+        "completion_tokens": 77264,
+        "total_tokens": 547475
+      },
+      "failure_breakdown": {
+        "correct": 14,
+        "provider_error": 3,
+        "sql_execution_error": 37,
+        "sql_semantic_error": 32,
+        "table_selection_error": 14
+      },
+      "by_query_type": {
+        "single_value": {
+          "total": 14,
+          "correct": 3,
+          "correct_pct": 21.43,
+          "exec": 10
+        },
+        "aggregation": {
+          "total": 40,
+          "correct": 6,
+          "correct_pct": 15.0,
+          "exec": 25
+        },
+        "ranking": {
+          "total": 26,
+          "correct": 3,
+          "correct_pct": 11.54,
+          "exec": 15
+        },
+        "time_series": {
+          "total": 17,
+          "correct": 2,
+          "correct_pct": 11.76,
+          "exec": 9
+        },
+        "unknown": {
+          "total": 3,
+          "correct": 0,
+          "correct_pct": 0.0,
+          "exec": 1
+        }
+      },
+      "by_difficulty": {
+        "easy": {
+          "total": 70,
+          "correct": 12,
+          "correct_pct": 17.14,
+          "exec": 43
+        },
+        "medium": {
+          "total": 26,
+          "correct": 2,
+          "correct_pct": 7.69,
+          "exec": 16
+        },
+        "hard": {
+          "total": 4,
+          "correct": 0,
+          "correct_pct": 0.0,
+          "exec": 1
+        }
+      },
+      "table_precision_pct": 77.47,
+      "pre_execution_blocked_pct": 7.0,
+      "retrieval_table_recall_pct": 100.0,
+      "retrieval_table_precision_pct": 16.33,
+      "retrieval_unnecessary_table_rate_pct": 100.0,
+      "validation_failure_breakdown": {
+        "malformed_sql": 7
+      },
+      "provider_adjusted": {
+        "scored_queries": 97,
+        "result_correctness_pct": 14.43,
+        "result_equivalence_pct": 14.43,
+        "table_accuracy_pct": 95.88,
+        "sql_execution_success_pct": 61.86,
+        "invalid_sql_rate_pct": 38.14,
+        "avg_latency_seconds": 15.73
+      }
+    },
+    "phase4_current_top5": {
+      "config": "phase4_current_top5",
+      "total_queries": 100,
+      "run_status": "completed",
+      "planned_queries": 100,
+      "provider_error_count": 8,
+      "result_correctness_pct": 12.0,
+      "result_equivalence_pct": 12.0,
+      "table_accuracy_pct": 73.5,
+      "table_match_pct": 56.0,
+      "sql_execution_success_pct": 50.0,
+      "invalid_sql_rate_pct": 50.0,
+      "hallucinated_schema_rate_pct": 2.0,
+      "unsafe_sql_rate_pct": 0.0,
+      "avg_latency_seconds": 13.23,
+      "min_latency_seconds": 1.36,
+      "max_latency_seconds": 60.02,
+      "token_usage": {
+        "prompt_tokens": 89457,
+        "completion_tokens": 62977,
+        "total_tokens": 152434
+      },
+      "failure_breakdown": {
+        "correct": 12,
+        "provider_error": 8,
+        "sql_execution_error": 40,
+        "sql_gen_hallucination": 2,
+        "sql_semantic_error": 31,
+        "table_selection_error": 7
+      },
+      "by_query_type": {
+        "single_value": {
+          "total": 14,
+          "correct": 3,
+          "correct_pct": 21.43,
+          "exec": 8
+        },
+        "aggregation": {
+          "total": 40,
+          "correct": 5,
+          "correct_pct": 12.5,
+          "exec": 22
+        },
+        "ranking": {
+          "total": 26,
+          "correct": 2,
+          "correct_pct": 7.69,
+          "exec": 9
+        },
+        "time_series": {
+          "total": 17,
+          "correct": 2,
+          "correct_pct": 11.76,
+          "exec": 10
+        },
+        "unknown": {
+          "total": 3,
+          "correct": 0,
+          "correct_pct": 0.0,
+          "exec": 1
+        }
+      },
+      "by_difficulty": {
+        "easy": {
+          "total": 70,
+          "correct": 10,
+          "correct_pct": 14.29,
+          "exec": 36
+        },
+        "medium": {
+          "total": 26,
+          "correct": 2,
+          "correct_pct": 7.69,
+          "exec": 14
+        },
+        "hard": {
+          "total": 4,
+          "correct": 0,
+          "correct_pct": 0.0,
+          "exec": 0
+        }
+      },
+      "table_precision_pct": 68.08,
+      "pre_execution_blocked_pct": 32.0,
+      "retrieval_table_recall_pct": 94.58,
+      "retrieval_table_precision_pct": 62.25,
+      "retrieval_unnecessary_table_rate_pct": 74.0,
+      "validation_failure_breakdown": {
+        "malformed_sql": 26,
+        "nonexistent_column": 2,
+        "table_not_in_context": 5
+      },
+      "provider_adjusted": {
+        "scored_queries": 92,
+        "result_correctness_pct": 13.04,
+        "result_equivalence_pct": 13.04,
+        "table_accuracy_pct": 79.89,
+        "sql_execution_success_pct": 54.35,
+        "invalid_sql_rate_pct": 45.65,
+        "avg_latency_seconds": 13.23
+      }
+    },
+    "phase4_improved_rag": {
+      "config": "phase4_improved_rag",
+      "total_queries": 100,
+      "run_status": "completed",
+      "planned_queries": 100,
+      "provider_error_count": 1,
+      "result_correctness_pct": 16.0,
+      "result_equivalence_pct": 16.0,
+      "table_accuracy_pct": 82.0,
+      "table_match_pct": 49.0,
+      "sql_execution_success_pct": 60.0,
+      "invalid_sql_rate_pct": 40.0,
+      "hallucinated_schema_rate_pct": 1.0,
+      "unsafe_sql_rate_pct": 1.0,
+      "avg_latency_seconds": 14.0,
+      "min_latency_seconds": 3.14,
+      "max_latency_seconds": 56.34,
+      "token_usage": {
+        "prompt_tokens": 171975,
+        "completion_tokens": 73918,
+        "total_tokens": 245893
+      },
+      "failure_breakdown": {
+        "correct": 16,
+        "provider_error": 1,
+        "sql_execution_error": 37,
+        "sql_gen_hallucination": 1,
+        "sql_safety_blocked": 1,
+        "sql_semantic_error": 31,
+        "table_selection_error": 13
+      },
+      "by_query_type": {
+        "single_value": {
+          "total": 14,
+          "correct": 4,
+          "correct_pct": 28.57,
+          "exec": 11
+        },
+        "aggregation": {
+          "total": 40,
+          "correct": 6,
+          "correct_pct": 15.0,
+          "exec": 25
+        },
+        "ranking": {
+          "total": 26,
+          "correct": 3,
+          "correct_pct": 11.54,
+          "exec": 12
+        },
+        "time_series": {
+          "total": 17,
+          "correct": 3,
+          "correct_pct": 17.65,
+          "exec": 11
+        },
+        "unknown": {
+          "total": 3,
+          "correct": 0,
+          "correct_pct": 0.0,
+          "exec": 1
+        }
+      },
+      "by_difficulty": {
+        "easy": {
+          "total": 70,
+          "correct": 13,
+          "correct_pct": 18.57,
+          "exec": 43
+        },
+        "medium": {
+          "total": 26,
+          "correct": 3,
+          "correct_pct": 11.54,
+          "exec": 16
+        },
+        "hard": {
+          "total": 4,
+          "correct": 0,
+          "correct_pct": 0.0,
+          "exec": 1
+        }
+      },
+      "table_precision_pct": 68.62,
+      "pre_execution_blocked_pct": 16.0,
+      "retrieval_table_recall_pct": 88.75,
+      "retrieval_table_precision_pct": 63.85,
+      "retrieval_unnecessary_table_rate_pct": 64.0,
+      "validation_failure_breakdown": {
+        "malformed_sql": 14,
+        "nonexistent_column": 1,
+        "table_not_in_context": 1
+      },
+      "provider_adjusted": {
+        "scored_queries": 99,
+        "result_correctness_pct": 16.16,
+        "result_equivalence_pct": 16.16,
+        "table_accuracy_pct": 82.83,
+        "sql_execution_success_pct": 60.61,
+        "invalid_sql_rate_pct": 39.39,
+        "avg_latency_seconds": 14.07
+      }
+    },
+    "phase4_plan_improved_rag": {
+      "config": "phase4_plan_improved_rag",
+      "total_queries": 100,
+      "run_status": "completed",
+      "planned_queries": 100,
+      "provider_error_count": 21,
+      "result_correctness_pct": 11.0,
+      "result_equivalence_pct": 11.0,
+      "table_accuracy_pct": 67.17,
+      "table_match_pct": 45.0,
+      "sql_execution_success_pct": 54.0,
+      "invalid_sql_rate_pct": 46.0,
+      "hallucinated_schema_rate_pct": 1.0,
+      "unsafe_sql_rate_pct": 0.0,
+      "avg_latency_seconds": 25.34,
+      "min_latency_seconds": 0.25,
+      "max_latency_seconds": 66.76,
+      "token_usage": {
+        "prompt_tokens": 281772,
+        "completion_tokens": 114175,
+        "total_tokens": 395947
+      },
+      "failure_breakdown": {
+        "correct": 11,
+        "planning_error": 15,
+        "provider_error": 21,
+        "sql_execution_error": 24,
+        "sql_gen_hallucination": 1,
+        "sql_semantic_error": 14,
+        "table_selection_error": 14
+      },
+      "by_query_type": {
+        "single_value": {
+          "total": 14,
+          "correct": 3,
+          "correct_pct": 21.43,
+          "exec": 10
+        },
+        "aggregation": {
+          "total": 40,
+          "correct": 7,
+          "correct_pct": 17.5,
+          "exec": 20
+        },
+        "ranking": {
+          "total": 26,
+          "correct": 1,
+          "correct_pct": 3.85,
+          "exec": 13
+        },
+        "time_series": {
+          "total": 17,
+          "correct": 0,
+          "correct_pct": 0.0,
+          "exec": 10
+        },
+        "unknown": {
+          "total": 3,
+          "correct": 0,
+          "correct_pct": 0.0,
+          "exec": 1
+        }
+      },
+      "by_difficulty": {
+        "easy": {
+          "total": 70,
+          "correct": 11,
+          "correct_pct": 15.71,
+          "exec": 38
+        },
+        "medium": {
+          "total": 26,
+          "correct": 0,
+          "correct_pct": 0.0,
+          "exec": 14
+        },
+        "hard": {
+          "total": 4,
+          "correct": 0,
+          "correct_pct": 0.0,
+          "exec": 2
+        }
+      },
+      "table_precision_pct": 59.78,
+      "pre_execution_blocked_pct": 31.0,
+      "retrieval_table_recall_pct": 88.75,
+      "retrieval_table_precision_pct": 63.85,
+      "retrieval_unnecessary_table_rate_pct": 64.0,
+      "validation_failure_breakdown": {
+        "malformed_sql": 29,
+        "nonexistent_column": 1,
+        "table_not_in_context": 1
+      },
+      "provider_adjusted": {
+        "scored_queries": 79,
+        "result_correctness_pct": 13.92,
+        "result_equivalence_pct": 13.92,
+        "table_accuracy_pct": 85.02,
+        "sql_execution_success_pct": 68.35,
+        "invalid_sql_rate_pct": 31.65,
+        "avg_latency_seconds": 27.78
+      }
+    }
+  },
+  "plan_summaries": {
+    "phase4_plan_improved_rag": {
+      "total_with_plan": 87,
+      "plan_core_ok_pct": 42.53,
+      "plan_full_ok_pct": 14.94,
+      "intent_ok_pct": 72.41,
+      "metric_ok_pct": 64.37,
+      "aggregation_ok_pct": 66.67,
+      "group_by_ok_pct": 83.91,
+      "ordering_ok_pct": 83.91,
+      "limit_ok_pct": 75.86,
+      "filters_ok_pct": 88.51,
+      "tables_ok_pct": 86.21,
+      "plan_ok_sql_wrong": 29,
+      "plan_wrong_sql_wrong": 47,
+      "plan_ok_sql_correct": 8,
+      "by_query_type": {
+        "single_value": {
+          "total": 12,
+          "plan_core_ok": 8,
+          "metric_ok": 11,
+          "tables_ok": 12,
+          "aggregation_ok": 9
+        },
+        "aggregation": {
+          "total": 33,
+          "plan_core_ok": 11,
+          "metric_ok": 17,
+          "tables_ok": 31,
+          "aggregation_ok": 22
+        },
+        "ranking": {
+          "total": 23,
+          "plan_core_ok": 10,
+          "metric_ok": 17,
+          "tables_ok": 15,
+          "aggregation_ok": 15
+        },
+        "time_series": {
+          "total": 16,
+          "plan_core_ok": 8,
+          "metric_ok": 10,
+          "tables_ok": 15,
+          "aggregation_ok": 11
+        },
+        "unknown": {
+          "total": 3,
+          "plan_core_ok": 0,
+          "metric_ok": 1,
+          "tables_ok": 2,
+          "aggregation_ok": 1
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "status": "completed",
+  "timestamp": "2026-08-18T19:06:33.906735",
+  "dataset_path": "tests\\evaluation\\benchmark_dataset_500.json",
+  "dataset_sha256": "0c9807d5867ff9cb6a9252437dab31660b62b2e6c9d09c5e54b1dfc7edc43e04",
+  "total_queries": 1,
+  "workers": 1,
+  "dry_run": false,
+  "llm_provider": "nvidia",
+  "model_name": "nvidia/nemotron-3-super-120b-a12b",
+  "total_elapsed_seconds": 75.15,
+  "queries_per_minute": 0.8,
+  "equivalent_match_rate": 0.0,
+  "exact_match_rate": 0.0,
+  "sql_execution_success_rate": 1.0,
+  "table_accuracy": 0.0,
+  "table_precision": 0.5,
+  "table_recall": 1.0,
+  "mean_latency_seconds": 73.87,
+  "p50_latency_seconds": 73.87,
+  "p95_latency_seconds": 73.87,
+  "provider_errors_count": 0,
+  "rate_limited_count": 0,
+  "timeout_count": 0,
+  "results": [
+    {
+      "query_id": "q_001",
+      "question": "What is the total revenue generated across all completed order items?",
+      "category": "Revenue & Sales",
+      "difficulty": "easy",
+      "expected_tables": [
+        "order_items"
+      ],
+      "queried_tables": [
+        "orders",
+        "order_items"
+      ],
+      "actual_sql": "SELECT SUM(oi.price) AS total_revenue FROM order_items oi JOIN orders o ON oi.order_id = o.order_id WHERE o.order_status = 'delivered'",
+      "sql_execution_success": true,
+      "exact_match": false,
+      "equivalent_match": false,
+      "table_precision": 0.5,
+      "table_recall": 1.0,
+      "table_exact_match": false,
+      "latency_seconds": 73.873,
+      "error": null,
+      "error_category": "none",
+      "is_provider_error": false,
+      "repair_events": []
+    }
+  ]
+}

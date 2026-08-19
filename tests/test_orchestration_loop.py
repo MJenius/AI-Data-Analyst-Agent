@@ -5,13 +5,21 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
+from agent_platform.experiments.query_plan import QueryPlan
 from agent_platform.orchestration.loop import ExecutionLoop
 from agent_platform.orchestration.state import ExecutionState, StepStatus
 
 
 class FakePlanner:
     async def plan(self, task):
-        return ["retrieve logs", "summarize failure"]
+        return QueryPlan(
+            intent=task,
+            metric="count",
+            entity="log_entry",
+            aggregation="COUNT",
+            required_tables=["logs"],
+            reasoning=f"Question asks to analyze {task}.",
+        )
 
 
 class FakeRag:
@@ -67,22 +75,28 @@ class ExecutionLoopTests(unittest.TestCase):
         state = asyncio.run(loop.run("Analyze why API latency increased"))
 
         self.assertIsInstance(state, ExecutionState)
-        self.assertEqual(state.plan, ["retrieve logs", "summarize failure"])
-        self.assertEqual(state.current_step_index, 2)
+        self.assertEqual(len(state.plan), 3)
+        self.assertEqual(state.plan[0], "Inspect schema for logs to understand Analyze why API latency increased")
+        self.assertEqual(state.plan[1], "count by log_entry")
+        self.assertEqual(state.plan[2], "Summarize findings for Analyze why API latency increased with supporting metrics")
+        self.assertEqual(state.current_step_index, 3)
         self.assertEqual(state.status, StepStatus.COMPLETED)
         self.assertEqual(
             state.intermediate_outputs,
             {
-                "retrieve logs": "completed retrieve logs",
-                "summarize failure": "completed summarize failure",
+                state.plan[0]: f"completed {state.plan[0]}",
+                state.plan[1]: f"completed {state.plan[1]}",
+                state.plan[2]: f"completed {state.plan[2]}",
             },
         )
-        self.assertEqual(len(state.tool_results), 2)
+        self.assertEqual(len(state.tool_results), 3)
         self.assertEqual(state.evaluation["score"], 0.91)
         self.assertEqual(
             [event[0] for event in observer.events],
             [
                 "run_start",
+                "step_start",
+                "step_end",
                 "step_start",
                 "step_end",
                 "step_start",
@@ -108,7 +122,7 @@ class ExecutionLoopTests(unittest.TestCase):
 
         self.assertEqual(state.status, StepStatus.FAILED)
         self.assertEqual(len(state.errors), 1)
-        self.assertEqual(state.errors[0].step, "retrieve logs")
+        self.assertEqual(state.errors[0].step, "Inspect schema for logs to understand Debug task")
         self.assertIn("tool failed", state.errors[0].message)
         self.assertEqual(state.current_step_index, 0)
 

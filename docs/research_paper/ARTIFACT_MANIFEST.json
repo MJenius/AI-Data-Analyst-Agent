@@ -1,0 +1,356 @@
+{
+  "title": "Frozen Publication Artifact Manifest",
+  "paper_title": "Engineering Reliable LLM-Based Data Analysis: An Empirical Study of Schema Grounding, Planning, Verification, and SQL Repair",
+  "version": "1.0.0",
+  "timestamp_utc": "2026-08-19T10:00:00Z",
+  "status": "FROZEN_FOR_PUBLICATION",
+  "author": "Mevin Jose",
+  "verified_metrics": {
+    "total_queries": 500,
+    "equivalent_matches": 367,
+    "result_equivalence_rate": "73.40%",
+    "exact_matches": 155,
+    "exact_accuracy": "31.00%",
+    "sql_execution_success": "100.00%"
+  },
+  "tracked_repository_artifacts": {
+    "data/schema.sql": {
+      "sha256": "6cdfed56ece9a1093e3998a6e0ef9cc3e9e2298cde66adf2b18769d28e149833",
+      "size_bytes": 2974,
+      "is_external": false
+    },
+    "data/build_database.py": {
+      "sha256": "76d5dbf09f66323051902bb57c04be1f9ddd5c864b898a93e699d9081fa4f217",
+      "size_bytes": 5775,
+      "is_external": false
+    },
+    "tests/evaluation/benchmark_dataset_500.json": {
+      "sha256": "0c9807d5867ff9cb6a9252437dab31660b62b2e6c9d09c5e54b1dfc7edc43e04",
+      "size_bytes": 723001,
+      "is_external": false
+    },
+    "tests/evaluation/run_benchmark_phase10.py": {
+      "sha256": "6968b79821122bd49d94076082e635b6e8503c80167732e6f02e41b1f63c0fee",
+      "size_bytes": 16182,
+      "is_external": false
+    },
+    "tests/evaluation/run_ablation_study.py": {
+      "sha256": "468425aba455bc36536e15f71f297699f517f683ab9a947bc4bf6cff5cf7fa33",
+      "size_bytes": 16661,
+      "is_external": false
+    },
+    "tests/evaluation/rescore_500_benchmark.py": {
+      "sha256": "b09db5d57e0fc815cb5fd7750d9e105db5e8c2c1832518d159f54954ecfcbfa6",
+      "size_bytes": 5142,
+      "is_external": false
+    },
+    "tests/evaluation/validate_500_dataset.py": {
+      "sha256": "c963caaf09df1002fc355d0276fdfbc514ed1591b1530fa5828b9ba9b883c3cd",
+      "size_bytes": 10890,
+      "is_external": false
+    },
+    "tests/evaluation/audit_sample_evaluator.py": {
+      "sha256": "0ad0e93e5f3dfae30b332b2dad2051321d0137820e3781b289614b9ae2b5089c",
+      "size_bytes": 7075,
+      "is_external": false
+    },
+    "tests/evaluation/run_final_research_validation.py": {
+      "sha256": "994f83d3975a4c5f95605e36591809bebe0fc2242744b9c99a4f61acc6290d4f",
+      "size_bytes": 30197,
+      "is_external": false
+    },
+    "tests/unit/test_compare_results.py": {
+      "sha256": "203dd2932cdde3f3d144b403ec24d01a39d3db23d4b2d80a960c6eac75fda2c5",
+      "size_bytes": 7301,
+      "is_external": false
+    },
+    "tests/unit/test_statistics.py": {
+      "sha256": "2f17fe34c583e505d14526feaaf27968b8239e1e16f92965c51ebbc7935277c6",
+      "size_bytes": 5708,
+      "is_external": false
+    },
+    "tests/unit/test_paper_generator.py": {
+      "sha256": "7ab10ee3a5a3f8ddbb7908af2861a8b6ab69900ac29f78c229252ed6ee268ce5",
+      "size_bytes": 2771,
+      "is_external": false
+    },
+    "tests/unit/test_failure_taxonomy.py": {
+      "sha256": "f76fd92f438f7ee890ec4740a372a97a5a954fe058c3f7a48a6898c97bc86b76",
+      "size_bytes": 3138,
+      "is_external": false
+    },
+    "tests/unit/test_robustness.py": {
+      "sha256": "80094418bf2e44e7ef80d2372d98e7d72ba7f9cfe5e287ab5f2702ed09fa7450",
+      "size_bytes": 2738,
+      "is_external": false
+    },
+    "tests/unit/test_cost_latency.py": {
+      "sha256": "334023e8105692da131378a0c588a29540d9ab9725589317a1bb476e7cd95f68",
+      "size_bytes": 3285,
+      "is_external": false
+    },
+    "tests/unit/test_ranking_semantics.py": {
+      "sha256": "599a34d52f01f29785dde2915a9e417dd4e227e6e0544ed60545b08f876d6eec",
+      "size_bytes": 13002,
+      "is_external": false
+    },
+    "tests/unit/test_sql_truncation.py": {
+      "sha256": "a963d351bcbdfc14742233816f9aa51b36ef9d95913cc8ff52ea48d2e1aa5c3d",
+      "size_bytes": 7857,
+      "is_external": false
+    },
+    "tests/unit/test_reproducibility.py": {
+      "sha256": "b959045d5961e0826f9adca854e8808d14c75f71afe350d7a1ac48399184b516",
+      "size_bytes": 2528,
+      "is_external": false
+    },
+    "results/phase10/live_500_benchmark_run/summary.json": {
+      "sha256": "d3631f16a2e6888fa968f47d95c7fab52d4b9fcd404f2f5d9aed5452f4406e12",
+      "size_bytes": 785870,
+      "is_external": false
+    },
+    "results/phase10/final_research_validation_report.json": {
+      "sha256": "51e1897e475fb3cd21bb96c5c5bfa04c2ad0e4eb7bfefc71d2f092cb424efb7c",
+      "size_bytes": 43752,
+      "is_external": false
+    },
+    "results/phase10/benchmark_500_validation_report.json": {
+      "sha256": "3bd124af6cc259d6dc0b00defcc12f405570dd5ffe95e946e4e40cd8f3dab6de",
+      "size_bytes": 1401,
+      "is_external": false
+    },
+    "results/phase10/repair_audit_cache.json": {
+      "sha256": "2a75f5669ceb676f8e0fc9b789bb7d2491a6d930d285c890ee69fa6b6f578b8f",
+      "size_bytes": 16169,
+      "is_external": false
+    },
+    "results/phase10/ablation/rag_only/checkpoint.json": {
+      "sha256": "ab01a9a705114e50cf680e675051764d10ec8ea221c550dfd6c1d4b8a0cac89a",
+      "size_bytes": 71460,
+      "is_external": false
+    },
+    "results/phase10/ablation/rag_planner/checkpoint.json": {
+      "sha256": "5dc34ea637c0dc3263b9394fced34b125c904db2af4f97027d2f2d9c890c15f0",
+      "size_bytes": 50923,
+      "is_external": false
+    },
+    "results/phase10/ablation/rag_planner_verifier/checkpoint.json": {
+      "sha256": "8e471de9c74c06e9932a6c08d660554b3020ac8e6eb99e1465383092c6517ed9",
+      "size_bytes": 58542,
+      "is_external": false
+    },
+    "results/phase10/ablation/full_system/checkpoint.json": {
+      "sha256": "a31fdda5c3a7806f88e000a51fccbf9c2a88497b6365d0f9088391a735ff6e56",
+      "size_bytes": 54138,
+      "is_external": false
+    },
+    "docs/research_paper/latex/main.tex": {
+      "sha256": "7fd8fbd4640a14054c961ce8e4aa04bbb2f46236c9af59003c3e916ca7fc0d74",
+      "size_bytes": 26090,
+      "is_external": false
+    },
+    "docs/research_paper/latex/references.bib": {
+      "sha256": "4407fde55d0be9af830aee5d4d5a11e4ea562e4401a63dc4cac26cea70d310e0",
+      "size_bytes": 3475,
+      "is_external": false
+    },
+    "docs/research_paper/latex/macros.tex": {
+      "sha256": "0d6c64a965f2b04e8c923c96ee8a3a45f0072d94ad6b895db4701138ab9992bc",
+      "size_bytes": 1091,
+      "is_external": false
+    },
+    "docs/research_paper/macros.tex": {
+      "sha256": "0d6c64a965f2b04e8c923c96ee8a3a45f0072d94ad6b895db4701138ab9992bc",
+      "size_bytes": 1091,
+      "is_external": false
+    },
+    "docs/research_paper/PAPER_DRAFT.md": {
+      "sha256": "c92057ab0da2ad8eb1cb91d7a4febb1337554cce8dd44b69472841c22a292a83",
+      "size_bytes": 24405,
+      "is_external": false
+    },
+    "docs/research_paper/PAPER_READINESS_AUDIT.md": {
+      "sha256": "a78aa44045bb115c0caa738f9cf7041f470da99baf05951847c17ada082d0bdc",
+      "size_bytes": 10389,
+      "is_external": false
+    },
+    "docs/research_paper/SEMANTIC_AUDIT.md": {
+      "sha256": "e65ef89aec1d233703db1741b2482f7f2762e0a499d437937e2806e678dbe744",
+      "size_bytes": 4666,
+      "is_external": false
+    },
+    "docs/research_paper/figures/fig1_pipeline_architecture.pdf": {
+      "sha256": "00685f644676d45a60d8a1fb7088e5e8c2d49c0145023446574dbdd71d125ad5",
+      "size_bytes": 33246,
+      "is_external": false
+    },
+    "docs/research_paper/figures/fig1_pipeline_architecture.png": {
+      "sha256": "bce4ddab1a410acefdc938af3a45955c0b88e06db51fb13ff8fb0a14247055d0",
+      "size_bytes": 158607,
+      "is_external": false
+    },
+    "docs/research_paper/figures/fig1_pipeline_architecture.svg": {
+      "sha256": "68b9d1df79f274956d27224ce17c2a37c9d0f2a060f849fe838b77d77a00d734",
+      "size_bytes": 73639,
+      "is_external": false
+    },
+    "docs/research_paper/figures/fig2_phase_accuracy_progression.pdf": {
+      "sha256": "89ffb7b9cbb979a27241740d77c1e062480f3829360c731cff0fc125c355983e",
+      "size_bytes": 26693,
+      "is_external": false
+    },
+    "docs/research_paper/figures/fig2_phase_accuracy_progression.png": {
+      "sha256": "472be357170d92941960883597fc204ec3abcbf5cda6328473dc3578e9ffebf4",
+      "size_bytes": 180406,
+      "is_external": false
+    },
+    "docs/research_paper/figures/fig2_phase_accuracy_progression.svg": {
+      "sha256": "a3d714bf316b49c3ab64277f5d8764a0c511aab0c30ad66816958744557d0aa0",
+      "size_bytes": 67304,
+      "is_external": false
+    },
+    "docs/research_paper/figures/fig3_pareto_frontier.pdf": {
+      "sha256": "b38d17e4a8ef05646ea0baf969f856fc9a38c89aec2f4d2c074544e99abfc917",
+      "size_bytes": 39983,
+      "is_external": false
+    },
+    "docs/research_paper/figures/fig3_pareto_frontier.png": {
+      "sha256": "6501557aca947e9914a3191bd4557bd97028cc8437517eb1643e0e5d8094c009",
+      "size_bytes": 239800,
+      "is_external": false
+    },
+    "docs/research_paper/figures/fig3_pareto_frontier.svg": {
+      "sha256": "8ec7b6d96cb5a4d8cdd985d1f0553bc245fa9114fe623e30d9ab2ae0228823a0",
+      "size_bytes": 97030,
+      "is_external": false
+    },
+    "docs/research_paper/figures/fig4_repair_dynamics.pdf": {
+      "sha256": "491e1a6e9067747b8c1aae60da5beb5b015657746143bdd4a10c899e864d2a3d",
+      "size_bytes": 26864,
+      "is_external": false
+    },
+    "docs/research_paper/figures/fig4_repair_dynamics.png": {
+      "sha256": "3894420fe3bb4f9d864fe7c48e3fa8d7ed0ee44abe6d2a5a1a6aad811393b073",
+      "size_bytes": 205564,
+      "is_external": false
+    },
+    "docs/research_paper/figures/fig4_repair_dynamics.svg": {
+      "sha256": "65692874e864ba717af74fd41828d2c505172e9c3bfe729d33ac47ef7177a6f7",
+      "size_bytes": 81290,
+      "is_external": false
+    },
+    "docs/research_paper/figures/fig5_domain_difficulty_heatmap.pdf": {
+      "sha256": "6330ae7410a93b727b00bf8d3d9cd7bebff5cb8e388f3d87ffb084f44c8b042a",
+      "size_bytes": 27287,
+      "is_external": false
+    },
+    "docs/research_paper/figures/fig5_domain_difficulty_heatmap.png": {
+      "sha256": "88d5d45d83cb83b39e8782b1e6a6f72ae8868a78c4f867c6dad85f0824444f8c",
+      "size_bytes": 273906,
+      "is_external": false
+    },
+    "docs/research_paper/figures/fig5_domain_difficulty_heatmap.svg": {
+      "sha256": "3829b81579551aef236e3645361c11ee218db2783cb569151a411c00f3aa1514",
+      "size_bytes": 86207,
+      "is_external": false
+    },
+    "docs/research_paper/figures/fig6_robustness_degradation.pdf": {
+      "sha256": "a247c132288cdfbe0da0b8ca4b5fbaf3fc2902f58d09f2e28c7802ab2b98d848",
+      "size_bytes": 19000,
+      "is_external": false
+    },
+    "docs/research_paper/figures/fig6_robustness_degradation.png": {
+      "sha256": "b224bfe29818ec6a1f30da88de72eedbbe76f4fc2a3f61ce7cf9ae4986513f0a",
+      "size_bytes": 119446,
+      "is_external": false
+    },
+    "docs/research_paper/figures/fig6_robustness_degradation.svg": {
+      "sha256": "fdfcf3cd4668ac263f7574bb09454a1a8fbeea675ff6f31d68403a453254620f",
+      "size_bytes": 52306,
+      "is_external": false
+    },
+    "docs/research_paper/figures/fig7_failure_taxonomy.pdf": {
+      "sha256": "cdf697344367a10604931fa7abb4a47f89dea71659ef612af1f135ce66dae32c",
+      "size_bytes": 26808,
+      "is_external": false
+    },
+    "docs/research_paper/figures/fig7_failure_taxonomy.png": {
+      "sha256": "89273df114958740f9d48652db2eb6f110010f33fcdb235915e44f06b6ec4033",
+      "size_bytes": 156803,
+      "is_external": false
+    },
+    "docs/research_paper/figures/fig7_failure_taxonomy.svg": {
+      "sha256": "3f0407cadb1c13713ea0b4631ffc1a9f0f7fc0a867fdb78d1c2bc4daeb891acf",
+      "size_bytes": 71390,
+      "is_external": false
+    },
+    "docs/research_paper/tables/tab_domain_breakdown.tex": {
+      "sha256": "e1b92dda34274e4f74481b5a7e3f0cea33d9a46f2cc67538c54cb457ce0d12e4",
+      "size_bytes": 1146,
+      "is_external": false
+    },
+    "docs/research_paper/tables/tab_headline_500.tex": {
+      "sha256": "8ca170de52b4e0f974f6c69ac69bd73bcdc6330a15252dfb31de03319491731b",
+      "size_bytes": 570,
+      "is_external": false
+    },
+    "docs/research_paper/tables/tab_phase_progression.tex": {
+      "sha256": "adcab671d8c0196b27c116aac8631b21ef95d84f65dc9134e5291a077eaec4b8",
+      "size_bytes": 905,
+      "is_external": false
+    },
+    "docs/research_paper/tables/tab_repair_audit.tex": {
+      "sha256": "e95964b3a22700ee765735a980674355d268f226b8d42a193b87c921dcb3d2cb",
+      "size_bytes": 804,
+      "is_external": false
+    },
+    "docs/research_paper/tables/tab_robustness.tex": {
+      "sha256": "56717bb3acab3f16874de9ce4c746725b3af306c002fa9a7ebc79100e57bfa1e",
+      "size_bytes": 644,
+      "is_external": false
+    },
+    "REPRODUCIBILITY.md": {
+      "sha256": "dab8ba307abed886b14247b46a1708d48e781645bd2b7fa93b132b3b1ee3cbd4",
+      "size_bytes": 3480,
+      "is_external": false
+    },
+    "LICENSE": {
+      "sha256": "ab390bfff7f81710b3aa6f8819cd44e03bf47b61f425d6000b72021e7206f460",
+      "size_bytes": 1429,
+      "is_external": false
+    },
+    "CITATION.cff": {
+      "sha256": "9951ab91131945566ca6ca81f3351328f9278b753d6c83c09dc33948a318a465",
+      "size_bytes": 644,
+      "is_external": false
+    },
+    "CONTRIBUTING.md": {
+      "sha256": "c5b84cf1699be169247c8add6fea200f948241975967d16336c0fa3aa7b46b9d",
+      "size_bytes": 1431,
+      "is_external": false
+    },
+    "README.md": {
+      "sha256": "73777eebb4d77e3d52cfc99c51aab1dd76576b2327480d14547c512c4d21a07d",
+      "size_bytes": 8493,
+      "is_external": false
+    },
+    "pyproject.toml": {
+      "sha256": "c11ac5d3d801b8670bb2f261788417cd25e332d2d8d52c82f7ba000e3afd4764",
+      "size_bytes": 830,
+      "is_external": false
+    }
+  },
+  "external_data_artifacts": {
+    "data/analytics.db": {
+      "sha256": "8550c4cc6d670aa0441bc898e47a57a40001858fc3f13dc5cb16fb90ca11c130",
+      "size_bytes": 160145408,
+      "is_external": true,
+      "description": "Normalized SQLite relational data warehouse constructed from Olist Brazilian E-Commerce dataset (9 tables, 100k+ orders).",
+      "license": "CC BY-NC-SA 4.0",
+      "source_url": "https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce",
+      "build_command": "python data/build_database.py",
+      "build_script": "data/build_database.py",
+      "schema_file": "data/schema.sql"
+    }
+  }
+}

@@ -1,0 +1,2334 @@
+[
+  {
+    "question": "What is the total revenue generated?",
+    "category": "Revenue & Sales",
+    "expected_tables": [
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 14.08,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.6,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the monthly revenue trend?",
+    "category": "Revenue & Sales",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT\n                substr(o.order_purchase_timestamp, 1, 7) AS month,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY month\n            ORDER BY month\nSELECT\n                substr(o.order_purchase_timestamp, 1, 7) AS month,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY month\n            ORDER BY month\nSELECT\n                substr(o.order_purchase_timestamp, 1, 7) AS month,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY month\n            ORDER BY month",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 7.81,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "Which month had the highest revenue?",
+    "category": "Revenue & Sales",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 10.86,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "Which month had the lowest revenue?",
+    "category": "Revenue & Sales",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT\n                substr(o.order_purchase_timestamp, 1, 7) AS month,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY month\n            ORDER BY month\nSELECT\n                substr(o.order_purchase_timestamp, 1, 7) AS month,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY month\n            ORDER BY month\nSELECT\n                substr(o.order_purchase_timestamp, 1, 7) AS month,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY month\n            ORDER BY month\nSELECT\n                substr(o.order_purchase_timestamp, 1, 7) AS month,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY month\n            ORDER BY month",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 7.97,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the average order value (AOV)?",
+    "category": "Revenue & Sales",
+    "expected_tables": [
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT ROUND(SUM(price) / COUNT(DISTINCT order_id), 2) AS average_order_value\n            FROM order_items\nSELECT ROUND(SUM(price) / COUNT(DISTINCT order_id), 2) AS average_order_value\n            FROM order_items",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 1.68,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "How has AOV changed over time?",
+    "category": "Revenue & Sales",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT\n                substr(o.order_purchase_timestamp, 1, 7) AS month,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY month\n            ORDER BY month\nSELECT\n                substr(o.order_purchase_timestamp, 1, 7) AS month,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY month\n            ORDER BY month\nSELECT\n                substr(o.order_purchase_timestamp, 1, 7) AS month,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY month\n            ORDER BY month",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 6.47,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What percentage of revenue comes from top 10% customers?",
+    "category": "Revenue & Sales",
+    "expected_tables": [
+      "customers",
+      "orders",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 66.67,
+    "generated_sql": "SELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 12.34,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "Which days of the week generate the most revenue?",
+    "category": "Revenue & Sales",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 9.65,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the revenue distribution by hour of the day?",
+    "category": "Revenue & Sales",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 8.03,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the revenue growth rate month-over-month?",
+    "category": "Revenue & Sales",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 8.9,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the cumulative revenue over time?",
+    "category": "Revenue & Sales",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT\n                substr(o.order_purchase_timestamp, 1, 7) AS month,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY month\n            ORDER BY month\nSELECT\n                substr(o.order_purchase_timestamp, 1, 7) AS month,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY month\n            ORDER BY month",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 4.35,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "Which payment type contributes most to revenue?",
+    "category": "Revenue & Sales",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products",
+      "order_payments"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT name, type FROM sqlite_master WHERE type='table' ORDER BY name\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                payment_type,\n                COUNT(DISTINCT order_id) AS order_count,\n                ROUND(SUM(payment_value), 2) AS total_payment_value\n            FROM order_payments\n            GROUP BY payment_type\n            ORDER BY order_count DESC\nSELECT\n                payment_type,\n                COUNT(DISTINCT order_id) AS order_count,\n                ROUND(SUM(payment_value), 2) AS total_payment_value\n            FROM order_payments\n            GROUP BY payment_type\n            ORDER BY order_count DESC",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 7.54,
+    "hallucinated_schema": [
+      "sqlite_master"
+    ],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the median order value?",
+    "category": "Revenue & Sales",
+    "expected_tables": [
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 4.71,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the revenue per customer?",
+    "category": "Revenue & Sales",
+    "expected_tables": [
+      "customers",
+      "orders",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 66.67,
+    "generated_sql": "SELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 7.9,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the revenue per order?",
+    "category": "Revenue & Sales",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT name, type FROM sqlite_master WHERE type='table' ORDER BY name\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 8.0,
+    "hallucinated_schema": [
+      "sqlite_master"
+    ],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "How many total orders are there?",
+    "category": "Orders & Transactions",
+    "expected_tables": [
+      "orders"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 5.23,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "How many orders per month?",
+    "category": "Orders & Transactions",
+    "expected_tables": [
+      "orders"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT\n                substr(o.order_purchase_timestamp, 1, 7) AS month,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY month\n            ORDER BY month\nSELECT\n                substr(o.order_purchase_timestamp, 1, 7) AS month,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY month\n            ORDER BY month",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 3.83,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the average number of items per order?",
+    "category": "Orders & Transactions",
+    "expected_tables": [
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 7.21,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the distribution of order sizes?",
+    "category": "Orders & Transactions",
+    "expected_tables": [
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 8.98,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "How many orders are completed vs cancelled?",
+    "category": "Orders & Transactions",
+    "expected_tables": [
+      "orders"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT\n                o.order_status,\n                COUNT(DISTINCT o.order_id) AS order_count,\n                ROUND(SUM(oi.price), 2) AS total_price\n            FROM orders o\n            LEFT JOIN order_items oi ON o.order_id = oi.order_id\n            WHERE o.order_status = 'canceled'\n            GROUP BY o.order_status\nSELECT\n                o.order_status,\n                COUNT(DISTINCT o.order_id) AS order_count,\n                ROUND(SUM(oi.price), 2) AS total_price\n            FROM orders o\n            LEFT JOIN order_items oi ON o.order_id = oi.order_id\n            WHERE o.order_status = 'canceled'\n            GROUP BY o.order_status\nSELECT\n                o.order_status,\n                COUNT(DISTINCT o.order_id) AS order_count,\n                ROUND(SUM(oi.price), 2) AS total_price\n            FROM orders o\n            LEFT JOIN order_items oi ON o.order_id = oi.order_id\n            WHERE o.order_status = 'canceled'\n            GROUP BY o.order_status",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 3.71,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the cancellation rate?",
+    "category": "Orders & Transactions",
+    "expected_tables": [
+      "orders"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT COUNT(DISTINCT order_id) AS total_orders FROM order_items\nSELECT\n                o.order_status,\n                COUNT(DISTINCT o.order_id) AS order_count,\n                ROUND(SUM(oi.price), 2) AS total_price\n            FROM orders o\n            LEFT JOIN order_items oi ON o.order_id = oi.order_id\n            WHERE o.order_status = 'canceled'\n            GROUP BY o.order_status\nSELECT\n                o.order_status,\n                COUNT(DISTINCT o.order_id) AS order_count,\n                ROUND(SUM(oi.price), 2) AS total_price\n            FROM orders o\n            LEFT JOIN order_items oi ON o.order_id = oi.order_id\n            WHERE o.order_status = 'canceled'\n            GROUP BY o.order_status",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 2.71,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "How long does it take to deliver orders on average?",
+    "category": "Orders & Transactions",
+    "expected_tables": [
+      "orders"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 7.28,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the order processing time (purchase -> shipped)?",
+    "category": "Orders & Transactions",
+    "expected_tables": [
+      "orders"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT ROUND(SUM(price) / COUNT(DISTINCT order_id), 2) AS average_order_value\n            FROM order_items",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 5.59,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What percentage of orders are delivered late?",
+    "category": "Orders & Transactions",
+    "expected_tables": [
+      "orders"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT name, type FROM sqlite_master WHERE type='table' ORDER BY name\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 7.67,
+    "hallucinated_schema": [
+      "sqlite_master"
+    ],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the trend of late deliveries over time?",
+    "category": "Orders & Transactions",
+    "expected_tables": [
+      "orders"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT\n                substr(o.order_purchase_timestamp, 1, 7) AS month,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY month\n            ORDER BY month\nSELECT\n                substr(o.order_purchase_timestamp, 1, 7) AS month,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY month\n            ORDER BY month\nSELECT\n                substr(o.order_purchase_timestamp, 1, 7) AS month,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY month\n            ORDER BY month",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 6.87,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the busiest day for orders?",
+    "category": "Orders & Transactions",
+    "expected_tables": [
+      "orders"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 4.5,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the peak hour for order placement?",
+    "category": "Orders & Transactions",
+    "expected_tables": [
+      "orders"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 6.25,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the average time between orders for a customer?",
+    "category": "Orders & Transactions",
+    "expected_tables": [
+      "customers",
+      "orders"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 50.0,
+    "generated_sql": "SELECT DISTINCT customer_id FROM orders\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 12.09,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the repeat order rate?",
+    "category": "Orders & Transactions",
+    "expected_tables": [
+      "customers",
+      "orders"
+    ],
+    "queried_tables": [
+      "orders",
+      "customers"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT DISTINCT customer_id FROM orders\nSELECT\n                c.customer_unique_id,\n                COUNT(o.order_id) AS order_count\n            FROM orders o\n            JOIN customers c ON c.customer_id = o.customer_id\n            GROUP BY c.customer_unique_id\n            HAVING order_count > 1\n            ORDER BY order_count DESC\n            LIMIT 10\nSELECT COUNT(DISTINCT customer_id) AS total_customers, COUNT(customer_id) AS repeat_customers FROM orders\nSELECT\n                c.customer_unique_id,\n                COUNT(o.order_id) AS order_count\n            FROM orders o\n            JOIN customers c ON c.customer_id = o.customer_id\n            GROUP BY c.customer_unique_id\n            HAVING order_count > 1\n            ORDER BY order_count DESC\n            LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 12.36,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "How many orders contain multiple sellers?",
+    "category": "Orders & Transactions",
+    "expected_tables": [
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT\n                oi.seller_id,\n                COUNT(DISTINCT oi.order_id) AS total_orders,\n                ROUND(SUM(oi.price), 2) AS total_sales\n            FROM order_items oi\n            GROUP BY oi.seller_id\n            ORDER BY total_sales DESC\n            LIMIT 10\nSELECT\n                oi.seller_id,\n                COUNT(DISTINCT oi.order_id) AS total_orders,\n                ROUND(SUM(oi.price), 2) AS total_sales\n            FROM order_items oi\n            GROUP BY oi.seller_id\n            ORDER BY total_sales DESC\n            LIMIT 10\nSELECT COUNT(*) FROM (SELECT order_id FROM order_items GROUP BY order_id HAVING COUNT(DISTINCT product_id) > 1) AS orders_with_multiple_sellers",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 3.9,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "How many unique customers are there?",
+    "category": "Customers",
+    "expected_tables": [
+      "customers"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 0.0,
+    "generated_sql": "SELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT COUNT(DISTINCT customer_id) FROM orders",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 3.89,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "How many new customers per month?",
+    "category": "Customers",
+    "expected_tables": [
+      "customers",
+      "orders"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders"
+    ],
+    "table_accuracy_pct": 50.0,
+    "generated_sql": "SELECT\n                substr(o.order_purchase_timestamp, 1, 7) AS month,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY month\n            ORDER BY month\nSELECT\n                substr(o.order_purchase_timestamp, 1, 7) AS month,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY month\n            ORDER BY month",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 5.33,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the customer retention rate?",
+    "category": "Customers",
+    "expected_tables": [
+      "customers",
+      "orders"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "customers",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n                c.customer_unique_id,\n                COUNT(o.order_id) AS order_count\n            FROM orders o\n            JOIN customers c ON c.customer_id = o.customer_id\n            GROUP BY c.customer_unique_id\n            HAVING order_count > 1\n            ORDER BY order_count DESC\n            LIMIT 10\nSELECT\n                c.customer_unique_id,\n                COUNT(o.order_id) AS order_count\n            FROM orders o\n            JOIN customers c ON c.customer_id = o.customer_id\n            GROUP BY c.customer_unique_id\n            HAVING order_count > 1\n            ORDER BY order_count DESC\n            LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 7.83,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the churn rate?",
+    "category": "Customers",
+    "expected_tables": [
+      "customers",
+      "orders"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "customers",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n                c.customer_unique_id,\n                COUNT(o.order_id) AS order_count\n            FROM orders o\n            JOIN customers c ON c.customer_id = o.customer_id\n            GROUP BY c.customer_unique_id\n            HAVING order_count > 1\n            ORDER BY order_count DESC\n            LIMIT 10\nSELECT\n                c.customer_unique_id,\n                COUNT(o.order_id) AS order_count\n            FROM orders o\n            JOIN customers c ON c.customer_id = o.customer_id\n            GROUP BY c.customer_unique_id\n            HAVING order_count > 1\n            ORDER BY order_count DESC\n            LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 9.81,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the average number of orders per customer?",
+    "category": "Customers",
+    "expected_tables": [
+      "customers",
+      "orders"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 50.0,
+    "generated_sql": "SELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 5.95,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What percentage of customers are repeat buyers?",
+    "category": "Customers",
+    "expected_tables": [
+      "customers",
+      "orders"
+    ],
+    "queried_tables": [
+      "orders",
+      "customers"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT\n                c.customer_unique_id,\n                COUNT(o.order_id) AS order_count\n            FROM orders o\n            JOIN customers c ON c.customer_id = o.customer_id\n            GROUP BY c.customer_unique_id\n            HAVING order_count > 1\n            ORDER BY order_count DESC\n            LIMIT 10\nSELECT\n                c.customer_unique_id,\n                COUNT(o.order_id) AS order_count\n            FROM orders o\n            JOIN customers c ON c.customer_id = o.customer_id\n            GROUP BY c.customer_unique_id\n            HAVING order_count > 1\n            ORDER BY order_count DESC\n            LIMIT 10\nSELECT\n                c.customer_unique_id,\n                COUNT(o.order_id) AS order_count\n            FROM orders o\n            JOIN customers c ON c.customer_id = o.customer_id\n            GROUP BY c.customer_unique_id\n            HAVING order_count > 1\n            ORDER BY order_count DESC\n            LIMIT 10\nSELECT\n                c.customer_unique_id,\n                COUNT(o.order_id) AS order_count\n            FROM orders o\n            JOIN customers c ON c.customer_id = o.customer_id\n            GROUP BY c.customer_unique_id\n            HAVING order_count > 1\n            ORDER BY order_count DESC\n            LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 13.82,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "Which regions have the most customers?",
+    "category": "Customers",
+    "expected_tables": [
+      "customers"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 0.0,
+    "generated_sql": "SELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 7.99,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the distribution of customers by state?",
+    "category": "Customers",
+    "expected_tables": [
+      "customers"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "customers"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT name, type FROM sqlite_master WHERE type='table' ORDER BY name\nSELECT\n                c.customer_state AS state,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN customers c ON c.customer_id = o.customer_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY state\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                c.customer_state AS state,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN customers c ON c.customer_id = o.customer_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY state\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                c.customer_state AS state,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN customers c ON c.customer_id = o.customer_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY state\n            ORDER BY revenue DESC\n            LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 11.94,
+    "hallucinated_schema": [
+      "sqlite_master"
+    ],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the average revenue per customer (ARPU)?",
+    "category": "Customers",
+    "expected_tables": [
+      "customers",
+      "order_items",
+      "orders"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 66.67,
+    "generated_sql": "SELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 11.2,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "Who are the top 10 customers by revenue?",
+    "category": "Customers",
+    "expected_tables": [
+      "customers",
+      "orders",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 66.67,
+    "generated_sql": "SELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 8.39,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the lifetime value (LTV) of customers?",
+    "category": "Customers",
+    "expected_tables": [
+      "customers",
+      "orders",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 66.67,
+    "generated_sql": "SELECT ROUND(SUM(price) / COUNT(DISTINCT order_id), 2) AS average_order_value\n            FROM order_items\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT ROUND(SUM(price) / COUNT(DISTINCT order_id), 2) AS average_order_value\n            FROM order_items",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 7.53,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "How long do customers stay active?",
+    "category": "Customers",
+    "expected_tables": [
+      "customers",
+      "orders"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 50.0,
+    "generated_sql": "SELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n                substr(o.order_purchase_timestamp, 1, 7) AS month,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY month\n            ORDER BY month",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 7.84,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the average time between first and last purchase?",
+    "category": "Customers",
+    "expected_tables": [
+      "customers",
+      "orders"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 50.0,
+    "generated_sql": "SELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 7.8,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What percentage of customers make only one purchase?",
+    "category": "Customers",
+    "expected_tables": [
+      "customers",
+      "orders"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 50.0,
+    "generated_sql": "SELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 7.92,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the geographic distribution of high-value customers?",
+    "category": "Customers",
+    "expected_tables": [
+      "customers",
+      "orders",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 66.67,
+    "generated_sql": "SELECT\n                substr(o.order_purchase_timestamp, 1, 7) AS month,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY month\n            ORDER BY month\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 7.61,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "Which product categories generate the most revenue?",
+    "category": "Products & Categories",
+    "expected_tables": [
+      "products",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 12.18,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "Which product categories have the most orders?",
+    "category": "Products & Categories",
+    "expected_tables": [
+      "products",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 9.38,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the average price per product category?",
+    "category": "Products & Categories",
+    "expected_tables": [
+      "products",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 9.35,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "Which products are most frequently purchased?",
+    "category": "Products & Categories",
+    "expected_tables": [
+      "products",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 8.18,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "Which products generate the most revenue?",
+    "category": "Products & Categories",
+    "expected_tables": [
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 7.91,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the distribution of product prices?",
+    "category": "Products & Categories",
+    "expected_tables": [
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 5.88,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "Which categories have the highest AOV?",
+    "category": "Products & Categories",
+    "expected_tables": [
+      "products",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT ROUND(SUM(price) / COUNT(DISTINCT order_id), 2) AS average_order_value\n            FROM order_items\nSELECT ROUND(SUM(price) / COUNT(DISTINCT order_id), 2) AS average_order_value\n            FROM order_items\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT ROUND(SUM(price) / COUNT(DISTINCT order_id), 2) AS average_order_value\n            FROM order_items",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 5.76,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "Which categories have declining sales trends?",
+    "category": "Products & Categories",
+    "expected_tables": [
+      "products",
+      "order_items",
+      "orders"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT\n                substr(o.order_purchase_timestamp, 1, 7) AS month,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY month\n            ORDER BY month\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                substr(o.order_purchase_timestamp, 1, 7) AS month,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY month\n            ORDER BY month",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 11.86,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "Which categories have the fastest growth?",
+    "category": "Products & Categories",
+    "expected_tables": [
+      "products",
+      "order_items",
+      "orders"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 13.02,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the average number of items sold per product?",
+    "category": "Products & Categories",
+    "expected_tables": [
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT name, type FROM sqlite_master WHERE type='table' ORDER BY name\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 9.15,
+    "hallucinated_schema": [
+      "sqlite_master"
+    ],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "Which products are often bought together? (basic co-occurrence)",
+    "category": "Products & Categories",
+    "expected_tables": [
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 7.24,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the revenue contribution of top categories?",
+    "category": "Products & Categories",
+    "expected_tables": [
+      "products",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 7.63,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "Which products have the highest return/cancellation rate?",
+    "category": "Products & Categories",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT\n                o.order_status,\n                COUNT(DISTINCT o.order_id) AS order_count,\n                ROUND(SUM(oi.price), 2) AS total_price\n            FROM orders o\n            LEFT JOIN order_items oi ON o.order_id = oi.order_id\n            WHERE o.order_status = 'canceled'\n            GROUP BY o.order_status\nSELECT\n                o.order_status,\n                COUNT(DISTINCT o.order_id) AS order_count,\n                ROUND(SUM(oi.price), 2) AS total_price\n            FROM orders o\n            LEFT JOIN order_items oi ON o.order_id = oi.order_id\n            WHERE o.order_status = 'canceled'\n            GROUP BY o.order_status",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 3.33,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the price vs sales relationship?",
+    "category": "Products & Categories",
+    "expected_tables": [
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT name, type FROM sqlite_master WHERE type='table' ORDER BY name\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 8.19,
+    "hallucinated_schema": [
+      "sqlite_master"
+    ],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "Which categories have seasonal demand patterns?",
+    "category": "Products & Categories",
+    "expected_tables": [
+      "products",
+      "order_items",
+      "orders"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                substr(o.order_purchase_timestamp, 1, 7) AS month,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY month\n            ORDER BY month",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 7.67,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the average delivery time?",
+    "category": "Logistics & Delivery",
+    "expected_tables": [
+      "orders"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT name, type FROM sqlite_master WHERE type='table' ORDER BY name\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 8.26,
+    "hallucinated_schema": [
+      "sqlite_master"
+    ],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the average shipping delay?",
+    "category": "Logistics & Delivery",
+    "expected_tables": [
+      "orders"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT name, type FROM sqlite_master WHERE type='table' ORDER BY name\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 8.26,
+    "hallucinated_schema": [
+      "sqlite_master"
+    ],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "Which states have the longest delivery times?",
+    "category": "Logistics & Delivery",
+    "expected_tables": [
+      "customers",
+      "orders"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "customers"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT name, type FROM sqlite_master WHERE type='table' ORDER BY name\nSELECT\n                c.customer_state AS state,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN customers c ON c.customer_id = o.customer_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY state\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                c.customer_state AS state,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN customers c ON c.customer_id = o.customer_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY state\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                c.customer_state AS state,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN customers c ON c.customer_id = o.customer_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY state\n            ORDER BY revenue DESC\n            LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 12.71,
+    "hallucinated_schema": [
+      "sqlite_master"
+    ],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "Which sellers deliver the fastest?",
+    "category": "Logistics & Delivery",
+    "expected_tables": [
+      "sellers",
+      "orders",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 66.67,
+    "generated_sql": "SELECT name, type FROM sqlite_master WHERE type='table' ORDER BY name\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                oi.seller_id,\n                COUNT(DISTINCT oi.order_id) AS total_orders,\n                ROUND(SUM(oi.price), 2) AS total_sales\n            FROM order_items oi\n            GROUP BY oi.seller_id\n            ORDER BY total_sales DESC\n            LIMIT 10\nSELECT\n                oi.seller_id,\n                COUNT(DISTINCT oi.order_id) AS total_orders,\n                ROUND(SUM(oi.price), 2) AS total_sales\n            FROM order_items oi\n            GROUP BY oi.seller_id\n            ORDER BY total_sales DESC\n            LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 5.45,
+    "hallucinated_schema": [
+      "sqlite_master"
+    ],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What percentage of deliveries are delayed?",
+    "category": "Logistics & Delivery",
+    "expected_tables": [
+      "orders"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT name, type FROM sqlite_master WHERE type='table' ORDER BY name\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 8.24,
+    "hallucinated_schema": [
+      "sqlite_master"
+    ],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the trend of delivery delays over time?",
+    "category": "Logistics & Delivery",
+    "expected_tables": [
+      "orders"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT name, type FROM sqlite_master WHERE type='table' ORDER BY name\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                substr(o.order_purchase_timestamp, 1, 7) AS month,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY month\n            ORDER BY month\nSELECT\n                substr(o.order_purchase_timestamp, 1, 7) AS month,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY month\n            ORDER BY month",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 8.66,
+    "hallucinated_schema": [
+      "sqlite_master"
+    ],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "How does distance affect delivery time? (approx via location)",
+    "category": "Logistics & Delivery",
+    "expected_tables": [
+      "customers",
+      "sellers",
+      "orders",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 50.0,
+    "generated_sql": "SELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 5.93,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "Which regions have the best delivery performance?",
+    "category": "Logistics & Delivery",
+    "expected_tables": [
+      "customers",
+      "orders"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 50.0,
+    "generated_sql": "SELECT name, type FROM sqlite_master WHERE type='table' ORDER BY name\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 7.35,
+    "hallucinated_schema": [
+      "sqlite_master"
+    ],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the distribution of delivery times?",
+    "category": "Logistics & Delivery",
+    "expected_tables": [
+      "orders"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 4.28,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "Are late deliveries increasing or decreasing?",
+    "category": "Logistics & Delivery",
+    "expected_tables": [
+      "orders"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT\n                substr(o.order_purchase_timestamp, 1, 7) AS month,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY month\n            ORDER BY month\nSELECT\n                substr(o.order_purchase_timestamp, 1, 7) AS month,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY month\n            ORDER BY month\nSELECT\n                substr(o.order_purchase_timestamp, 1, 7) AS month,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY month\n            ORDER BY month",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 5.82,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "How many sellers are there?",
+    "category": "Sellers",
+    "expected_tables": [
+      "sellers"
+    ],
+    "queried_tables": [
+      "order_items"
+    ],
+    "table_accuracy_pct": 0.0,
+    "generated_sql": "SELECT\n                oi.seller_id,\n                COUNT(DISTINCT oi.order_id) AS total_orders,\n                ROUND(SUM(oi.price), 2) AS total_sales\n            FROM order_items oi\n            GROUP BY oi.seller_id\n            ORDER BY total_sales DESC\n            LIMIT 10\nSELECT\n                oi.seller_id,\n                COUNT(DISTINCT oi.order_id) AS total_orders,\n                ROUND(SUM(oi.price), 2) AS total_sales\n            FROM order_items oi\n            GROUP BY oi.seller_id\n            ORDER BY total_sales DESC\n            LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 2.89,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "Which sellers generate the most revenue?",
+    "category": "Sellers",
+    "expected_tables": [
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT name, type FROM sqlite_master WHERE type='table' ORDER BY name\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                oi.seller_id,\n                COUNT(DISTINCT oi.order_id) AS total_orders,\n                ROUND(SUM(oi.price), 2) AS total_sales\n            FROM order_items oi\n            GROUP BY oi.seller_id\n            ORDER BY total_sales DESC\n            LIMIT 10\nSELECT\n                oi.seller_id,\n                COUNT(DISTINCT oi.order_id) AS total_orders,\n                ROUND(SUM(oi.price), 2) AS total_sales\n            FROM order_items oi\n            GROUP BY oi.seller_id\n            ORDER BY total_sales DESC\n            LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 4.9,
+    "hallucinated_schema": [
+      "sqlite_master"
+    ],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "Which sellers have the most orders?",
+    "category": "Sellers",
+    "expected_tables": [
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT name, type FROM sqlite_master WHERE type='table' ORDER BY name\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                oi.seller_id,\n                COUNT(DISTINCT oi.order_id) AS total_orders,\n                ROUND(SUM(oi.price), 2) AS total_sales\n            FROM order_items oi\n            GROUP BY oi.seller_id\n            ORDER BY total_sales DESC\n            LIMIT 10\nSELECT\n                oi.seller_id,\n                COUNT(DISTINCT oi.order_id) AS total_orders,\n                ROUND(SUM(oi.price), 2) AS total_sales\n            FROM order_items oi\n            GROUP BY oi.seller_id\n            ORDER BY total_sales DESC\n            LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 4.56,
+    "hallucinated_schema": [
+      "sqlite_master"
+    ],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the average revenue per seller?",
+    "category": "Sellers",
+    "expected_tables": [
+      "order_items",
+      "sellers"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 50.0,
+    "generated_sql": "SELECT name, type FROM sqlite_master WHERE type='table' ORDER BY name\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                oi.seller_id,\n                COUNT(DISTINCT oi.order_id) AS total_orders,\n                ROUND(SUM(oi.price), 2) AS total_sales\n            FROM order_items oi\n            GROUP BY oi.seller_id\n            ORDER BY total_sales DESC\n            LIMIT 10\nSELECT\n                oi.seller_id,\n                COUNT(DISTINCT oi.order_id) AS total_orders,\n                ROUND(SUM(oi.price), 2) AS total_sales\n            FROM order_items oi\n            GROUP BY oi.seller_id\n            ORDER BY total_sales DESC\n            LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 3.98,
+    "hallucinated_schema": [
+      "sqlite_master"
+    ],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "Which sellers have the highest ratings?",
+    "category": "Sellers",
+    "expected_tables": [
+      "order_reviews",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items"
+    ],
+    "table_accuracy_pct": 50.0,
+    "generated_sql": "SELECT\n                oi.seller_id,\n                COUNT(DISTINCT oi.order_id) AS total_orders,\n                ROUND(SUM(oi.price), 2) AS total_sales\n            FROM order_items oi\n            GROUP BY oi.seller_id\n            ORDER BY total_sales DESC\n            LIMIT 10\nSELECT\n                oi.seller_id,\n                COUNT(DISTINCT oi.order_id) AS total_orders,\n                ROUND(SUM(oi.price), 2) AS total_sales\n            FROM order_items oi\n            GROUP BY oi.seller_id\n            ORDER BY total_sales DESC\n            LIMIT 10\nSELECT\n                oi.seller_id,\n                COUNT(DISTINCT oi.order_id) AS total_orders,\n                ROUND(SUM(oi.price), 2) AS total_sales\n            FROM order_items oi\n            GROUP BY oi.seller_id\n            ORDER BY total_sales DESC\n            LIMIT 10\nSELECT\n                oi.seller_id,\n                COUNT(DISTINCT oi.order_id) AS total_orders,\n                ROUND(SUM(oi.price), 2) AS total_sales\n            FROM order_items oi\n            GROUP BY oi.seller_id\n            ORDER BY total_sales DESC\n            LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 3.02,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "Which sellers have the most delayed deliveries?",
+    "category": "Sellers",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT name, type FROM sqlite_master WHERE type='table' ORDER BY name\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                oi.seller_id,\n                COUNT(DISTINCT oi.order_id) AS total_orders,\n                ROUND(SUM(oi.price), 2) AS total_sales\n            FROM order_items oi\n            GROUP BY oi.seller_id\n            ORDER BY total_sales DESC\n            LIMIT 10\nSELECT\n                oi.seller_id,\n                COUNT(DISTINCT oi.order_id) AS total_orders,\n                ROUND(SUM(oi.price), 2) AS total_sales\n            FROM order_items oi\n            GROUP BY oi.seller_id\n            ORDER BY total_sales DESC\n            LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 5.07,
+    "hallucinated_schema": [
+      "sqlite_master"
+    ],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the distribution of sellers by region?",
+    "category": "Sellers",
+    "expected_tables": [
+      "sellers"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 0.0,
+    "generated_sql": "SELECT name, type FROM sqlite_master WHERE type='table' ORDER BY name\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                oi.seller_id,\n                COUNT(DISTINCT oi.order_id) AS total_orders,\n                ROUND(SUM(oi.price), 2) AS total_sales\n            FROM order_items oi\n            GROUP BY oi.seller_id\n            ORDER BY total_sales DESC\n            LIMIT 10\nSELECT\n                oi.seller_id,\n                COUNT(DISTINCT oi.order_id) AS total_orders,\n                ROUND(SUM(oi.price), 2) AS total_sales\n            FROM order_items oi\n            GROUP BY oi.seller_id\n            ORDER BY total_sales DESC\n            LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 4.18,
+    "hallucinated_schema": [
+      "sqlite_master"
+    ],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "Which sellers are growing fastest?",
+    "category": "Sellers",
+    "expected_tables": [
+      "order_items",
+      "orders"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT\n                substr(o.order_purchase_timestamp, 1, 7) AS month,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY month\n            ORDER BY month\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 5.83,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the average delivery time per seller?",
+    "category": "Sellers",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items"
+    ],
+    "table_accuracy_pct": 50.0,
+    "generated_sql": "SELECT\n                oi.seller_id,\n                COUNT(DISTINCT oi.order_id) AS total_orders,\n                ROUND(SUM(oi.price), 2) AS total_sales\n            FROM order_items oi\n            GROUP BY oi.seller_id\n            ORDER BY total_sales DESC\n            LIMIT 10\nSELECT\n                oi.seller_id,\n                COUNT(DISTINCT oi.order_id) AS total_orders,\n                ROUND(SUM(oi.price), 2) AS total_sales\n            FROM order_items oi\n            GROUP BY oi.seller_id\n            ORDER BY total_sales DESC\n            LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 1.88,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "Which sellers have the highest cancellation rate?",
+    "category": "Sellers",
+    "expected_tables": [
+      "orders",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT name, type FROM sqlite_master WHERE type='table' ORDER BY name\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                oi.seller_id,\n                COUNT(DISTINCT oi.order_id) AS total_orders,\n                ROUND(SUM(oi.price), 2) AS total_sales\n            FROM order_items oi\n            GROUP BY oi.seller_id\n            ORDER BY total_sales DESC\n            LIMIT 10\nSELECT\n                oi.seller_id,\n                COUNT(DISTINCT oi.order_id) AS total_orders,\n                ROUND(SUM(oi.price), 2) AS total_sales\n            FROM order_items oi\n            GROUP BY oi.seller_id\n            ORDER BY total_sales DESC\n            LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 5.18,
+    "hallucinated_schema": [
+      "sqlite_master"
+    ],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "Which payment method is most used?",
+    "category": "Payments",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products",
+      "order_payments"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT name, type FROM sqlite_master WHERE type='table' ORDER BY name\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                payment_type,\n                COUNT(DISTINCT order_id) AS order_count,\n                ROUND(SUM(payment_value), 2) AS total_payment_value\n            FROM order_payments\n            GROUP BY payment_type\n            ORDER BY order_count DESC\nSELECT\n                payment_type,\n                COUNT(DISTINCT order_id) AS order_count,\n                ROUND(SUM(payment_value), 2) AS total_payment_value\n            FROM order_payments\n            GROUP BY payment_type\n            ORDER BY order_count DESC",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 6.04,
+    "hallucinated_schema": [
+      "sqlite_master"
+    ],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the revenue by payment type?",
+    "category": "Payments",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "queried_tables": [
+      "order_payments"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT\n                payment_type,\n                COUNT(DISTINCT order_id) AS order_count,\n                ROUND(SUM(payment_value), 2) AS total_payment_value\n            FROM order_payments\n            GROUP BY payment_type\n            ORDER BY order_count DESC\nSELECT\n                payment_type,\n                COUNT(DISTINCT order_id) AS order_count,\n                ROUND(SUM(payment_value), 2) AS total_payment_value\n            FROM order_payments\n            GROUP BY payment_type\n            ORDER BY order_count DESC",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 4.2,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the average payment value?",
+    "category": "Payments",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products",
+      "order_payments"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT name, type FROM sqlite_master WHERE type='table' ORDER BY name\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                payment_type,\n                COUNT(DISTINCT order_id) AS order_count,\n                ROUND(SUM(payment_value), 2) AS total_payment_value\n            FROM order_payments\n            GROUP BY payment_type\n            ORDER BY order_count DESC\nSELECT\n                payment_type,\n                COUNT(DISTINCT order_id) AS order_count,\n                ROUND(SUM(payment_value), 2) AS total_payment_value\n            FROM order_payments\n            GROUP BY payment_type\n            ORDER BY order_count DESC",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 5.96,
+    "hallucinated_schema": [
+      "sqlite_master"
+    ],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "How many installments are used on average?",
+    "category": "Payments",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 0.0,
+    "generated_sql": "SELECT name, type FROM sqlite_master WHERE type='table' ORDER BY name\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 6.32,
+    "hallucinated_schema": [
+      "sqlite_master"
+    ],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the distribution of installment payments?",
+    "category": "Payments",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products",
+      "order_payments"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT name, type FROM sqlite_master WHERE type='table' ORDER BY name\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                payment_type,\n                COUNT(DISTINCT order_id) AS order_count,\n                ROUND(SUM(payment_value), 2) AS total_payment_value\n            FROM order_payments\n            GROUP BY payment_type\n            ORDER BY order_count DESC\nSELECT\n                payment_type,\n                COUNT(DISTINCT order_id) AS order_count,\n                ROUND(SUM(payment_value), 2) AS total_payment_value\n            FROM order_payments\n            GROUP BY payment_type\n            ORDER BY order_count DESC",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 5.95,
+    "hallucinated_schema": [
+      "sqlite_master"
+    ],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "Do installment payments affect order value?",
+    "category": "Payments",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products",
+      "order_payments"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT name, type FROM sqlite_master WHERE type='table' ORDER BY name\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                payment_type,\n                COUNT(DISTINCT order_id) AS order_count,\n                ROUND(SUM(payment_value), 2) AS total_payment_value\n            FROM order_payments\n            GROUP BY payment_type\n            ORDER BY order_count DESC\nSELECT\n                payment_type,\n                COUNT(DISTINCT order_id) AS order_count,\n                ROUND(SUM(payment_value), 2) AS total_payment_value\n            FROM order_payments\n            GROUP BY payment_type\n            ORDER BY order_count DESC",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 6.38,
+    "hallucinated_schema": [
+      "sqlite_master"
+    ],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the failure rate of payments?",
+    "category": "Payments",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products",
+      "order_payments"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT name, type FROM sqlite_master WHERE type='table' ORDER BY name\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                payment_type,\n                COUNT(DISTINCT order_id) AS order_count,\n                ROUND(SUM(payment_value), 2) AS total_payment_value\n            FROM order_payments\n            GROUP BY payment_type\n            ORDER BY order_count DESC\nSELECT\n                payment_type,\n                COUNT(DISTINCT order_id) AS order_count,\n                ROUND(SUM(payment_value), 2) AS total_payment_value\n            FROM order_payments\n            GROUP BY payment_type\n            ORDER BY order_count DESC",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 6.77,
+    "hallucinated_schema": [
+      "sqlite_master"
+    ],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "Which payment types have highest order value?",
+    "category": "Payments",
+    "expected_tables": [
+      "order_payments"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products",
+      "order_payments"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT name, type FROM sqlite_master WHERE type='table' ORDER BY name\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                payment_type,\n                COUNT(DISTINCT order_id) AS order_count,\n                ROUND(SUM(payment_value), 2) AS total_payment_value\n            FROM order_payments\n            GROUP BY payment_type\n            ORDER BY order_count DESC\nSELECT\n                payment_type,\n                COUNT(DISTINCT order_id) AS order_count,\n                ROUND(SUM(payment_value), 2) AS total_payment_value\n            FROM order_payments\n            GROUP BY payment_type\n            ORDER BY order_count DESC",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 6.61,
+    "hallucinated_schema": [
+      "sqlite_master"
+    ],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "How does payment method vary by region?",
+    "category": "Payments",
+    "expected_tables": [
+      "customers",
+      "orders",
+      "order_payments"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products",
+      "order_payments"
+    ],
+    "table_accuracy_pct": 66.67,
+    "generated_sql": "SELECT name, type FROM sqlite_master WHERE type='table' ORDER BY name\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                payment_type,\n                COUNT(DISTINCT order_id) AS order_count,\n                ROUND(SUM(payment_value), 2) AS total_payment_value\n            FROM order_payments\n            GROUP BY payment_type\n            ORDER BY order_count DESC\nSELECT\n                payment_type,\n                COUNT(DISTINCT order_id) AS order_count,\n                ROUND(SUM(payment_value), 2) AS total_payment_value\n            FROM order_payments\n            GROUP BY payment_type\n            ORDER BY order_count DESC",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 6.51,
+    "hallucinated_schema": [
+      "sqlite_master"
+    ],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the trend of payment methods over time?",
+    "category": "Payments",
+    "expected_tables": [
+      "orders",
+      "order_payments"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 50.0,
+    "generated_sql": "SELECT name, type FROM sqlite_master WHERE type='table' ORDER BY name\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                substr(o.order_purchase_timestamp, 1, 7) AS month,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY month\n            ORDER BY month\nSELECT\n                substr(o.order_purchase_timestamp, 1, 7) AS month,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY month\n            ORDER BY month",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 8.22,
+    "hallucinated_schema": [
+      "sqlite_master"
+    ],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the average review score?",
+    "category": "Reviews & Satisfaction",
+    "expected_tables": [
+      "order_reviews"
+    ],
+    "queried_tables": [
+      "order_items",
+      "order_reviews",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT name, type FROM sqlite_master WHERE type='table' ORDER BY name\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                review_score,\n                COUNT(*) AS count,\n                ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM order_reviews), 2) AS percentage\n            FROM order_reviews\n            GROUP BY review_score\n            ORDER BY review_score DESC\nSELECT\n                review_score,\n                COUNT(*) AS count,\n                ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM order_reviews), 2) AS percentage\n            FROM order_reviews\n            GROUP BY review_score\n            ORDER BY review_score DESC",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 6.21,
+    "hallucinated_schema": [
+      "sqlite_master"
+    ],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the distribution of review scores?",
+    "category": "Reviews & Satisfaction",
+    "expected_tables": [
+      "order_reviews"
+    ],
+    "queried_tables": [
+      "order_items",
+      "order_reviews",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT name, type FROM sqlite_master WHERE type='table' ORDER BY name\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                review_score,\n                COUNT(*) AS count,\n                ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM order_reviews), 2) AS percentage\n            FROM order_reviews\n            GROUP BY review_score\n            ORDER BY review_score DESC\nSELECT\n                review_score,\n                COUNT(*) AS count,\n                ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM order_reviews), 2) AS percentage\n            FROM order_reviews\n            GROUP BY review_score\n            ORDER BY review_score DESC",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 6.52,
+    "hallucinated_schema": [
+      "sqlite_master"
+    ],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "Which products have the best reviews?",
+    "category": "Reviews & Satisfaction",
+    "expected_tables": [
+      "order_reviews",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "order_reviews",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT name, type FROM sqlite_master WHERE type='table' ORDER BY name\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                review_score,\n                COUNT(*) AS count,\n                ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM order_reviews), 2) AS percentage\n            FROM order_reviews\n            GROUP BY review_score\n            ORDER BY review_score DESC\nSELECT\n                review_score,\n                COUNT(*) AS count,\n                ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM order_reviews), 2) AS percentage\n            FROM order_reviews\n            GROUP BY review_score\n            ORDER BY review_score DESC",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 7.2,
+    "hallucinated_schema": [
+      "sqlite_master"
+    ],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "Which sellers have the worst reviews?",
+    "category": "Reviews & Satisfaction",
+    "expected_tables": [
+      "order_reviews",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items"
+    ],
+    "table_accuracy_pct": 50.0,
+    "generated_sql": "SELECT\n                oi.seller_id,\n                COUNT(DISTINCT oi.order_id) AS total_orders,\n                ROUND(SUM(oi.price), 2) AS total_sales\n            FROM order_items oi\n            GROUP BY oi.seller_id\n            ORDER BY total_sales DESC\n            LIMIT 10\nSELECT\n                oi.seller_id,\n                COUNT(DISTINCT oi.order_id) AS total_orders,\n                ROUND(SUM(oi.price), 2) AS total_sales\n            FROM order_items oi\n            GROUP BY oi.seller_id\n            ORDER BY total_sales DESC\n            LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 2.37,
+    "hallucinated_schema": [],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the relationship between delivery time and review score?",
+    "category": "Reviews & Satisfaction",
+    "expected_tables": [
+      "orders",
+      "order_reviews"
+    ],
+    "queried_tables": [
+      "order_items",
+      "order_reviews",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT name, type FROM sqlite_master WHERE type='table' ORDER BY name\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                review_score,\n                COUNT(*) AS count,\n                ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM order_reviews), 2) AS percentage\n            FROM order_reviews\n            GROUP BY review_score\n            ORDER BY review_score DESC\nSELECT\n                review_score,\n                COUNT(*) AS count,\n                ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM order_reviews), 2) AS percentage\n            FROM order_reviews\n            GROUP BY review_score\n            ORDER BY review_score DESC",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 6.23,
+    "hallucinated_schema": [
+      "sqlite_master"
+    ],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "Do late deliveries lead to lower ratings?",
+    "category": "Reviews & Satisfaction",
+    "expected_tables": [
+      "orders",
+      "order_reviews"
+    ],
+    "queried_tables": [
+      "order_items",
+      "order_reviews",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT name, type FROM sqlite_master WHERE type='table' ORDER BY name\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                review_score,\n                COUNT(*) AS count,\n                ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM order_reviews), 2) AS percentage\n            FROM order_reviews\n            GROUP BY review_score\n            ORDER BY review_score DESC\nSELECT\n                review_score,\n                COUNT(*) AS count,\n                ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM order_reviews), 2) AS percentage\n            FROM order_reviews\n            GROUP BY review_score\n            ORDER BY review_score DESC",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 5.37,
+    "hallucinated_schema": [
+      "sqlite_master"
+    ],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What percentage of orders receive reviews?",
+    "category": "Reviews & Satisfaction",
+    "expected_tables": [
+      "orders",
+      "order_reviews"
+    ],
+    "queried_tables": [
+      "order_items",
+      "order_reviews",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 100.0,
+    "generated_sql": "SELECT name, type FROM sqlite_master WHERE type='table' ORDER BY name\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                review_score,\n                COUNT(*) AS count,\n                ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM order_reviews), 2) AS percentage\n            FROM order_reviews\n            GROUP BY review_score\n            ORDER BY review_score DESC\nSELECT\n                review_score,\n                COUNT(*) AS count,\n                ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM order_reviews), 2) AS percentage\n            FROM order_reviews\n            GROUP BY review_score\n            ORDER BY review_score DESC",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 5.47,
+    "hallucinated_schema": [
+      "sqlite_master"
+    ],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "What is the trend of review scores over time?",
+    "category": "Reviews & Satisfaction",
+    "expected_tables": [
+      "order_reviews"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 0.0,
+    "generated_sql": "SELECT name, type FROM sqlite_master WHERE type='table' ORDER BY name\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n                substr(o.order_purchase_timestamp, 1, 7) AS month,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY month\n            ORDER BY month\nSELECT\n                substr(o.order_purchase_timestamp, 1, 7) AS month,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY month\n            ORDER BY month",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 6.07,
+    "hallucinated_schema": [
+      "sqlite_master"
+    ],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "Which categories have the highest satisfaction?",
+    "category": "Reviews & Satisfaction",
+    "expected_tables": [
+      "products",
+      "order_reviews",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 66.67,
+    "generated_sql": "SELECT name, type FROM sqlite_master WHERE type='table' ORDER BY name\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 6.91,
+    "hallucinated_schema": [
+      "sqlite_master"
+    ],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  },
+  {
+    "question": "Which categories have the lowest satisfaction?",
+    "category": "Reviews & Satisfaction",
+    "expected_tables": [
+      "products",
+      "order_reviews",
+      "order_items"
+    ],
+    "queried_tables": [
+      "order_items",
+      "orders",
+      "products"
+    ],
+    "table_accuracy_pct": 66.67,
+    "generated_sql": "SELECT name, type FROM sqlite_master WHERE type='table' ORDER BY name\nSELECT\n                p.product_category_name,\n                ROUND(SUM(oi.price), 2) AS revenue\n            FROM order_items oi\n            JOIN orders o ON o.order_id = oi.order_id\n            JOIN products p ON p.product_id = oi.product_id\n            WHERE o.order_status IN ('delivered', 'shipped', 'invoiced')\n            GROUP BY p.product_category_name\n            ORDER BY revenue DESC\n            LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10\nSELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
+    "success": true,
+    "sql_error": null,
+    "latency_seconds": 6.92,
+    "hallucinated_schema": [
+      "sqlite_master"
+    ],
+    "unsafe_keywords": [],
+    "confidence": 0.92,
+    "verdict": "uncertain",
+    "hallucinated_schema_corrected": []
+  }
+]

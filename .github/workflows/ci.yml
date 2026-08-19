@@ -1,0 +1,89 @@
+name: Research CI & Verification
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test-and-validate:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[research,dev]"
+
+      - name: Run unit & regression test suite (110 tests)
+        run: |
+          pytest tests/unit/ -v
+
+      - name: Validate 500-query benchmark dataset integrity
+        run: |
+          python tests/evaluation/validate_500_dataset.py
+
+      - name: Strict Cryptographic Artifact Manifest Verification Gate
+        run: |
+          python -c "
+          import json, hashlib, pathlib, sys
+
+          manifest_path = pathlib.Path('docs/research_paper/ARTIFACT_MANIFEST.json')
+          if not manifest_path.exists():
+              print('ERROR: ARTIFACT_MANIFEST.json not found!')
+              sys.exit(1)
+
+          manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+          tracked = manifest.get('tracked_repository_artifacts', {})
+          external = manifest.get('external_data_artifacts', {})
+
+          print(f'Checking {len(tracked)} tracked repository artifacts...')
+          missing, mismatches = [], []
+          for rel_path, meta in tracked.items():
+              p = pathlib.Path(rel_path)
+              if not p.exists():
+                  missing.append(rel_path)
+              else:
+                  h = hashlib.sha256(p.read_bytes()).hexdigest()
+                  if h != meta['sha256']:
+                      mismatches.append((rel_path, h, meta['sha256']))
+
+          if missing:
+              print(f'ERROR: Genuinely missing required tracked artifacts ({len(missing)}):')
+              for m in missing:
+                  print(f'  - {m}')
+              sys.exit(1)
+
+          if mismatches:
+              print(f'ERROR: SHA-256 hash mismatches ({len(mismatches)}):')
+              for path_str, actual_h, exp_h in mismatches:
+                  print(f'  - {path_str}: actual={actual_h} != expected={exp_h}')
+              sys.exit(1)
+
+          print(f'PASSED: All {len(tracked)} tracked repository artifacts verified bitwise.')
+
+          # Verify external artifact descriptors
+          print(f'Verifying {len(external)} external data artifact descriptor(s)...')
+          for rel_path, meta in external.items():
+              build_script = pathlib.Path(meta.get('build_script', 'data/build_database.py'))
+              schema_file = pathlib.Path(meta.get('schema_file', 'data/schema.sql'))
+              if not build_script.exists() or not schema_file.exists():
+                  print(f'ERROR: External artifact build dependencies missing: script={build_script.exists()}, schema={schema_file.exists()}')
+                  sys.exit(1)
+              print(f'  - {rel_path}: Verified external descriptor (build script: {build_script}, schema: {schema_file})')
+
+          print('ALL ARTIFACT GATES PASSED!')
+          "

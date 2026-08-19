@@ -1,0 +1,79 @@
+{
+  "timestamp": "2026-08-17T23:15:33.390296",
+  "provider": "NvidiaClient",
+  "total_queries": 100,
+  "error_count": 0,
+  "elapsed_seconds": 1404.35,
+  "all_core_alignment_rate": 0.52,
+  "table_exact_rate": 0.5,
+  "table_mean_precision": 0.777,
+  "table_mean_recall": 0.9383,
+  "metric_alignment_rate": 0.59,
+  "aggregation_alignment_rate": 1.0,
+  "limit_alignment_rate": 0.94,
+  "ranking_direction_alignment_rate": 1.0,
+  "time_grain_alignment_rate": 0.98,
+  "join_path_alignment_rate": 1.0,
+  "result_shape_alignment_rate": 1.0,
+  "composite_alignment_rate": 0.9,
+  "entity_alignment_rate": 1.0,
+  "filter_alignment_rate": 1.0,
+  "category_breakdown": {
+    "Customers": {
+      "count": 15,
+      "all_core_rate": 0.6,
+      "table_exact_rate": 0.2667,
+      "limit_rate": 1.0,
+      "metric_rate": 0.6
+    },
+    "Logistics & Delivery": {
+      "count": 10,
+      "all_core_rate": 0.1,
+      "table_exact_rate": 0.7,
+      "limit_rate": 0.9,
+      "metric_rate": 0.1
+    },
+    "Orders & Transactions": {
+      "count": 15,
+      "all_core_rate": 0.4667,
+      "table_exact_rate": 0.6667,
+      "limit_rate": 0.8667,
+      "metric_rate": 0.6667
+    },
+    "Payments": {
+      "count": 10,
+      "all_core_rate": 0.6,
+      "table_exact_rate": 0.8,
+      "limit_rate": 1.0,
+      "metric_rate": 0.6
+    },
+    "Products & Categories": {
+      "count": 15,
+      "all_core_rate": 0.4667,
+      "table_exact_rate": 0.3333,
+      "limit_rate": 0.8,
+      "metric_rate": 0.5333
+    },
+    "Revenue & Sales": {
+      "count": 15,
+      "all_core_rate": 0.6,
+      "table_exact_rate": 0.6,
+      "limit_rate": 1.0,
+      "metric_rate": 0.7333
+    },
+    "Reviews & Satisfaction": {
+      "count": 10,
+      "all_core_rate": 0.9,
+      "table_exact_rate": 0.5,
+      "limit_rate": 1.0,
+      "metric_rate": 0.9
+    },
+    "Sellers": {
+      "count": 10,
+      "all_core_rate": 0.4,
+      "table_exact_rate": 0.2,
+      "limit_rate": 1.0,
+      "metric_rate": 0.5
+    }
+  }
+}

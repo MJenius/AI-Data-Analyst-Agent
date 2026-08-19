@@ -6,6 +6,8 @@ from enum import Enum
 from typing import Any
 from uuid import uuid4
 
+from agent_platform.experiments.query_plan import QueryPlan
+
 
 class StepStatus(str, Enum):
     """Lifecycle status for a task execution run."""
@@ -44,10 +46,12 @@ class ExecutionState:
 
     task: str
     run_id: str = field(default_factory=lambda: str(uuid4()))
+    query_plan: QueryPlan | None = field(default=None)
     plan: list[str] = field(default_factory=list)
     current_step_index: int = 0
     intermediate_outputs: dict[str, Any] = field(default_factory=dict)
     tool_results: list[dict[str, Any]] = field(default_factory=list)
+    repair_events: list[dict[str, Any]] = field(default_factory=list)
     errors: list[ExecutionError] = field(default_factory=list)
     retrieved_context: dict[str, list[Any]] = field(default_factory=dict)
     evaluation: dict[str, Any] | None = None
@@ -64,6 +68,11 @@ class ExecutionState:
 
     def set_plan(self, plan: list[str]) -> None:
         self.plan = plan
+        self.current_step_index = 0
+
+    def set_query_plan(self, query_plan: QueryPlan) -> None:
+        self.query_plan = query_plan
+        self.plan = query_plan.to_steps()
         self.current_step_index = 0
 
     def mark_running(self) -> None:

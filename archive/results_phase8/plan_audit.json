@@ -1,0 +1,3020 @@
+{
+  "total": 100,
+  "audited": 100,
+  "limit_alignment": 0.67,
+  "aggregation_alignment": 0.66,
+  "tables_alignment": 0.29,
+  "filter_evidence_ok": 0.96,
+  "all_core_aligned": 0.16,
+  "rows": [
+    {
+      "query_id": "q000",
+      "question": "What is the total revenue generated?",
+      "plan": {
+        "intent": "Answer the question: What is the total revenue generated?",
+        "metric": "total revenue",
+        "entity": "order items",
+        "aggregation": "SUM",
+        "filters": [],
+        "group_by": null,
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "order_items"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the total revenue generated?"
+      },
+      "expected_sql": "SELECT SUM(oi.price) AS total_revenue FROM order_items oi",
+      "expected_tables": [
+        "order_items"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": true,
+      "filter_evidence": true,
+      "elapsed": 0.02
+    },
+    {
+      "query_id": "q001",
+      "question": "What is the monthly revenue trend?",
+      "plan": {
+        "intent": "Answer the question: What is the monthly revenue trend?",
+        "metric": "total revenue",
+        "entity": "month",
+        "aggregation": "SUM",
+        "filters": [
+          "group by month using substr(order_purchase_timestamp, 1, 7)"
+        ],
+        "group_by": [
+          "month"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "orders",
+          "order_items"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the monthly revenue trend?"
+      },
+      "expected_sql": "SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, SUM(oi.price) AS revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id GROUP BY month ORDER BY month",
+      "expected_tables": [
+        "order_items",
+        "orders"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": true,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q002",
+      "question": "Which month had the highest revenue?",
+      "plan": {
+        "intent": "Answer the question: Which month had the highest revenue?",
+        "metric": "total revenue",
+        "entity": "month",
+        "aggregation": "SUM",
+        "filters": [
+          "group by month using substr(order_purchase_timestamp, 1, 7)"
+        ],
+        "group_by": [
+          "month"
+        ],
+        "ordering": "metric DESC",
+        "limit": null,
+        "required_tables": [
+          "orders",
+          "order_items"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: Which month had the highest revenue?"
+      },
+      "expected_sql": "SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS peak_month, SUM(oi.price) AS revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id GROUP BY peak_month ORDER BY revenue DESC LIMIT 1",
+      "expected_tables": [
+        "order_items",
+        "orders"
+      ],
+      "plan_limit_ok": false,
+      "plan_agg_ok": true,
+      "plan_tables_ok": true,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q003",
+      "question": "Which month had the lowest revenue?",
+      "plan": {
+        "intent": "Answer the question: Which month had the lowest revenue?",
+        "metric": "total revenue",
+        "entity": "month",
+        "aggregation": "SUM",
+        "filters": [
+          "group by month using substr(order_purchase_timestamp, 1, 7)"
+        ],
+        "group_by": [
+          "month"
+        ],
+        "ordering": "metric ASC",
+        "limit": null,
+        "required_tables": [
+          "orders",
+          "order_items"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: Which month had the lowest revenue?"
+      },
+      "expected_sql": "SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS lowest_month, SUM(oi.price) AS revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id GROUP BY lowest_month ORDER BY revenue ASC LIMIT 1",
+      "expected_tables": [
+        "order_items",
+        "orders"
+      ],
+      "plan_limit_ok": false,
+      "plan_agg_ok": true,
+      "plan_tables_ok": true,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q004",
+      "question": "What is the average order value (AOV)?",
+      "plan": {
+        "intent": "Answer the question: What is the average order value (AOV)?",
+        "metric": "average order value",
+        "entity": "customers",
+        "aggregation": "AVG",
+        "filters": [],
+        "group_by": null,
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "customers",
+          "orders",
+          "order_items"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the average order value (AOV)?"
+      },
+      "expected_sql": "SELECT AVG(order_total) AS average_order_value FROM (SELECT oi.order_id, SUM(oi.price) AS order_total FROM order_items oi GROUP BY oi.order_id)",
+      "expected_tables": [
+        "order_items"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q005",
+      "question": "How has AOV changed over time?",
+      "plan": {
+        "intent": "Answer the question: How has AOV changed over time?",
+        "metric": "average order value",
+        "entity": "month",
+        "aggregation": "AVG",
+        "filters": [],
+        "group_by": [
+          "month"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "customers",
+          "orders",
+          "order_items"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: How has AOV changed over time?"
+      },
+      "expected_sql": "SELECT month, AVG(monthly_total) AS average_order_value FROM (SELECT o.order_id, strftime('%Y-%m', o.order_purchase_timestamp) AS month, SUM(oi.price) AS monthly_total FROM orders o JOIN order_items oi ON o.order_id = oi.order_id GROUP BY o.order_id, month) GROUP BY month ORDER BY month",
+      "expected_tables": [
+        "order_items",
+        "orders"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q006",
+      "question": "What percentage of revenue comes from top 10% customers?",
+      "plan": {
+        "intent": "Answer the question: What percentage of revenue comes from top 10% customers?",
+        "metric": "total revenue",
+        "entity": "customer_state",
+        "aggregation": "SUM",
+        "filters": [],
+        "group_by": [
+          "customer_state"
+        ],
+        "ordering": "metric DESC",
+        "limit": 10,
+        "required_tables": [
+          "customers",
+          "order_items"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What percentage of revenue comes from top 10% customers?"
+      },
+      "expected_sql": "WITH customer_revenue AS (SELECT o.customer_id, SUM(oi.price) AS total_spend FROM orders o JOIN order_items oi ON o.order_id = oi.order_id GROUP BY o.customer_id), ranked AS (SELECT total_spend, NTILE(10) OVER (ORDER BY total_spend DESC) AS decile FROM customer_revenue), top10 AS (SELECT SUM(total_spend) AS top_revenue FROM ranked WHERE decile = 1), total AS (SELECT SUM(total_spend) AS total_revenue FROM customer_revenue) SELECT ROUND(100.0 * (SELECT top_revenue FROM top10) / (SELECT total_revenue FROM total), 2) AS customer_revenue_percentage FROM total LIMIT 1",
+      "expected_tables": [
+        "order_items",
+        "orders"
+      ],
+      "plan_limit_ok": false,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q007",
+      "question": "Which days of the week generate the most revenue?",
+      "plan": {
+        "intent": "Answer the question: Which days of the week generate the most revenue?",
+        "metric": "total revenue",
+        "entity": "order items",
+        "aggregation": "SUM",
+        "filters": [],
+        "group_by": null,
+        "ordering": "metric DESC",
+        "limit": null,
+        "required_tables": [
+          "order_items"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: Which days of the week generate the most revenue?"
+      },
+      "expected_sql": "SELECT CAST(strftime('%w', o.order_purchase_timestamp) AS INTEGER) AS day_of_week, SUM(oi.price) AS revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id GROUP BY day_of_week ORDER BY revenue DESC",
+      "expected_tables": [
+        "order_items",
+        "orders"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q008",
+      "question": "What is the revenue distribution by hour of the day?",
+      "plan": {
+        "intent": "Answer the question: What is the revenue distribution by hour of the day?",
+        "metric": "total revenue",
+        "entity": "order items",
+        "aggregation": "SUM",
+        "filters": [],
+        "group_by": null,
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "order_items"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the revenue distribution by hour of the day?"
+      },
+      "expected_sql": "SELECT CAST(strftime('%H', o.order_purchase_timestamp) AS INTEGER) AS hour, SUM(oi.price) AS revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id GROUP BY hour ORDER BY hour",
+      "expected_tables": [
+        "order_items",
+        "orders"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q009",
+      "question": "What is the revenue growth rate month-over-month?",
+      "plan": {
+        "intent": "Answer the question: What is the revenue growth rate month-over-month?",
+        "metric": "total revenue",
+        "entity": "month",
+        "aggregation": "SUM",
+        "filters": [
+          "group by month using substr(order_purchase_timestamp, 1, 7)"
+        ],
+        "group_by": [
+          "month"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "orders",
+          "order_items"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the revenue growth rate month-over-month?"
+      },
+      "expected_sql": "WITH monthly AS (SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, SUM(oi.price) AS revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id GROUP BY month) SELECT month, revenue, ROUND(100.0 * (revenue - LAG(revenue) OVER (ORDER BY month)) / LAG(revenue) OVER (ORDER BY month), 2) AS revenue_growth_rate FROM monthly ORDER BY month",
+      "expected_tables": [
+        "order_items",
+        "orders"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": true,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q010",
+      "question": "What is the cumulative revenue over time?",
+      "plan": {
+        "intent": "Answer the question: What is the cumulative revenue over time?",
+        "metric": "total revenue",
+        "entity": "month",
+        "aggregation": "SUM",
+        "filters": [],
+        "group_by": [
+          "month"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "orders",
+          "order_items",
+          "geolocation"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the cumulative revenue over time?"
+      },
+      "expected_sql": "WITH monthly AS (SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, SUM(oi.price) AS revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id GROUP BY month) SELECT month, revenue, SUM(revenue) OVER (ORDER BY month) AS cumulative_revenue FROM monthly ORDER BY month",
+      "expected_tables": [
+        "order_items",
+        "orders"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q011",
+      "question": "Which payment type contributes most to revenue?",
+      "plan": {
+        "intent": "Answer the question: Which payment type contributes most to revenue?",
+        "metric": "total revenue",
+        "entity": "payment_type",
+        "aggregation": "SUM",
+        "filters": [],
+        "group_by": [
+          "payment_type"
+        ],
+        "ordering": "metric DESC",
+        "limit": null,
+        "required_tables": [
+          "order_items",
+          "order_payments"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: Which payment type contributes most to revenue?"
+      },
+      "expected_sql": "SELECT op.payment_type, SUM(op.payment_value) AS total_revenue FROM order_payments op GROUP BY op.payment_type ORDER BY total_revenue DESC LIMIT 1",
+      "expected_tables": [
+        "order_payments"
+      ],
+      "plan_limit_ok": false,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q012",
+      "question": "What is the median order value?",
+      "plan": {
+        "intent": "Answer the question: What is the median order value?",
+        "metric": "count",
+        "entity": "orders",
+        "aggregation": "COUNT",
+        "filters": [],
+        "group_by": null,
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "orders"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the median order value?"
+      },
+      "expected_sql": "SELECT AVG(order_total) AS median_order_value FROM (SELECT order_total, ROW_NUMBER() OVER (ORDER BY order_total) AS rn, COUNT(*) OVER () AS cnt FROM (SELECT oi.order_id, SUM(oi.price) AS order_total FROM order_items oi GROUP BY oi.order_id)) WHERE rn IN (FLOOR((cnt + 1) / 2), CEIL((cnt + 1) / 2))",
+      "expected_tables": [
+        "order_items"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": false,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q013",
+      "question": "What is the revenue per customer?",
+      "plan": {
+        "intent": "Answer the question: What is the revenue per customer?",
+        "metric": "total revenue",
+        "entity": "customer_state",
+        "aggregation": "SUM",
+        "filters": [],
+        "group_by": [
+          "customer_state"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "customers",
+          "order_items"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the revenue per customer?"
+      },
+      "expected_sql": "SELECT o.customer_id, SUM(oi.price) AS revenue_per_customer FROM orders o JOIN order_items oi ON o.order_id = oi.order_id GROUP BY o.customer_id",
+      "expected_tables": [
+        "order_items",
+        "orders"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q014",
+      "question": "What is the revenue per order?",
+      "plan": {
+        "intent": "Answer the question: What is the revenue per order?",
+        "metric": "total revenue",
+        "entity": "orders",
+        "aggregation": "SUM",
+        "filters": [],
+        "group_by": null,
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "orders",
+          "order_items"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the revenue per order?"
+      },
+      "expected_sql": "SELECT oi.order_id, SUM(oi.price) AS revenue_per_order FROM order_items oi GROUP BY oi.order_id",
+      "expected_tables": [
+        "order_items"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.03
+    },
+    {
+      "query_id": "q015",
+      "question": "How many total orders are there?",
+      "plan": {
+        "intent": "Answer the question: How many total orders are there?",
+        "metric": "count",
+        "entity": "orders",
+        "aggregation": "COUNT",
+        "filters": [],
+        "group_by": null,
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "orders"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: How many total orders are there?"
+      },
+      "expected_sql": "SELECT COUNT(DISTINCT order_id) AS total_orders FROM orders",
+      "expected_tables": [
+        "orders"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": true,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q016",
+      "question": "How many orders per month?",
+      "plan": {
+        "intent": "Answer the question: How many orders per month?",
+        "metric": "count",
+        "entity": "month",
+        "aggregation": "COUNT",
+        "filters": [
+          "group by month using substr(order_purchase_timestamp, 1, 7)"
+        ],
+        "group_by": [
+          "month"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "orders"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: How many orders per month?"
+      },
+      "expected_sql": "SELECT strftime('%Y-%m', order_purchase_timestamp) AS month, COUNT(*) AS order_count FROM orders GROUP BY month ORDER BY month",
+      "expected_tables": [
+        "orders"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": true,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q017",
+      "question": "What is the average number of items per order?",
+      "plan": {
+        "intent": "Answer the question: What is the average number of items per order?",
+        "metric": "average value",
+        "entity": "orders",
+        "aggregation": "AVG",
+        "filters": [],
+        "group_by": null,
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "orders",
+          "order_items"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the average number of items per order?"
+      },
+      "expected_sql": "SELECT AVG(item_count) AS average_items_per_order FROM (SELECT order_id, COUNT(*) AS item_count FROM order_items GROUP BY order_id)",
+      "expected_tables": [
+        "order_items"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q018",
+      "question": "What is the distribution of order sizes?",
+      "plan": {
+        "intent": "Answer the question: What is the distribution of order sizes?",
+        "metric": "count",
+        "entity": "orders",
+        "aggregation": "COUNT",
+        "filters": [],
+        "group_by": null,
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "orders"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the distribution of order sizes?"
+      },
+      "expected_sql": "SELECT item_count AS items_per_order, COUNT(*) AS order_count FROM (SELECT order_id, COUNT(*) AS item_count FROM order_items GROUP BY order_id) GROUP BY item_count ORDER BY item_count",
+      "expected_tables": [
+        "order_items"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q019",
+      "question": "How many orders are completed vs cancelled?",
+      "plan": {
+        "intent": "Answer the question: How many orders are completed vs cancelled?",
+        "metric": "count",
+        "entity": "orders",
+        "aggregation": "COUNT",
+        "filters": [
+          "order_status = 'canceled'"
+        ],
+        "group_by": null,
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "orders"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: How many orders are completed vs cancelled?"
+      },
+      "expected_sql": "SELECT order_status, COUNT(*) AS count FROM orders GROUP BY order_status",
+      "expected_tables": [
+        "orders"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": true,
+      "filter_evidence": false,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q020",
+      "question": "What is the cancellation rate?",
+      "plan": {
+        "intent": "Answer the question: What is the cancellation rate?",
+        "metric": "count",
+        "entity": "orders",
+        "aggregation": "COUNT",
+        "filters": [
+          "order_status = 'canceled'"
+        ],
+        "group_by": null,
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "orders",
+          "geolocation"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the cancellation rate?"
+      },
+      "expected_sql": "SELECT ROUND(100.0 * SUM(CASE WHEN order_status = 'canceled' THEN 1 ELSE 0 END) / COUNT(*), 2) AS cancellation_rate FROM orders",
+      "expected_tables": [
+        "orders"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": false,
+      "plan_tables_ok": false,
+      "filter_evidence": false,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q021",
+      "question": "How long does it take to deliver orders on average?",
+      "plan": {
+        "intent": "Answer the question: How long does it take to deliver orders on average?",
+        "metric": "average value",
+        "entity": "orders",
+        "aggregation": "AVG",
+        "filters": [],
+        "group_by": null,
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "orders"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: How long does it take to deliver orders on average?"
+      },
+      "expected_sql": "SELECT AVG(JULIANDAY(order_delivered_customer_date) - JULIANDAY(order_purchase_timestamp)) AS average_delivery_time_days FROM orders WHERE order_delivered_customer_date IS NOT NULL",
+      "expected_tables": [
+        "orders"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": true,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q022",
+      "question": "What is the order processing time (purchase -> shipped)?",
+      "plan": {
+        "intent": "Answer the question: What is the order processing time (purchase -> shipped)?",
+        "metric": "count",
+        "entity": "orders",
+        "aggregation": "COUNT",
+        "filters": [
+          "order_status IN ('delivered', 'shipped', 'invoiced')"
+        ],
+        "group_by": null,
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "orders"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the order processing time (purchase -> shipped)?"
+      },
+      "expected_sql": "SELECT AVG(JULIANDAY(order_delivered_carrier_date) - JULIANDAY(order_purchase_timestamp)) * 24 AS average_processing_time_hours FROM orders WHERE order_delivered_carrier_date IS NOT NULL",
+      "expected_tables": [
+        "orders"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": false,
+      "plan_tables_ok": true,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q023",
+      "question": "What percentage of orders are delivered late?",
+      "plan": {
+        "intent": "Answer the question: What percentage of orders are delivered late?",
+        "metric": "count",
+        "entity": "orders",
+        "aggregation": "COUNT",
+        "filters": [
+          "order_status IN ('delivered', 'shipped', 'invoiced')"
+        ],
+        "group_by": null,
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "orders",
+          "geolocation"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What percentage of orders are delivered late?"
+      },
+      "expected_sql": "SELECT ROUND(100.0 * SUM(CASE WHEN order_delivered_customer_date > order_estimated_delivery_date THEN 1 ELSE 0 END) / COUNT(*), 2) AS percentage_late_deliveries FROM orders WHERE order_delivered_customer_date IS NOT NULL",
+      "expected_tables": [
+        "orders"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": false,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q024",
+      "question": "What is the trend of late deliveries over time?",
+      "plan": {
+        "intent": "Answer the question: What is the trend of late deliveries over time?",
+        "metric": "count",
+        "entity": "month",
+        "aggregation": "COUNT",
+        "filters": [],
+        "group_by": [
+          "month"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "orders",
+          "geolocation"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the trend of late deliveries over time?"
+      },
+      "expected_sql": "SELECT strftime('%Y-%m', order_purchase_timestamp) AS month, ROUND(100.0 * SUM(CASE WHEN order_delivered_customer_date > order_estimated_delivery_date THEN 1 ELSE 0 END) / COUNT(*), 2) AS percentage_late_deliveries FROM orders WHERE order_delivered_customer_date IS NOT NULL GROUP BY month ORDER BY month",
+      "expected_tables": [
+        "orders"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": false,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q025",
+      "question": "What is the busiest day for orders?",
+      "plan": {
+        "intent": "Answer the question: What is the busiest day for orders?",
+        "metric": "count",
+        "entity": "orders",
+        "aggregation": "COUNT",
+        "filters": [],
+        "group_by": null,
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "orders"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the busiest day for orders?"
+      },
+      "expected_sql": "SELECT CAST(strftime('%w', order_purchase_timestamp) AS INTEGER) AS day_of_week, COUNT(*) AS order_count FROM orders GROUP BY day_of_week ORDER BY order_count DESC LIMIT 1",
+      "expected_tables": [
+        "orders"
+      ],
+      "plan_limit_ok": false,
+      "plan_agg_ok": true,
+      "plan_tables_ok": true,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q026",
+      "question": "What is the peak hour for order placement?",
+      "plan": {
+        "intent": "Answer the question: What is the peak hour for order placement?",
+        "metric": "count",
+        "entity": "orders",
+        "aggregation": "COUNT",
+        "filters": [],
+        "group_by": null,
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "orders"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the peak hour for order placement?"
+      },
+      "expected_sql": "SELECT CAST(strftime('%H', order_purchase_timestamp) AS INTEGER) AS hour, COUNT(*) AS order_count FROM orders GROUP BY hour ORDER BY order_count DESC LIMIT 1",
+      "expected_tables": [
+        "orders"
+      ],
+      "plan_limit_ok": false,
+      "plan_agg_ok": true,
+      "plan_tables_ok": true,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q027",
+      "question": "What is the average time between orders for a customer?",
+      "plan": {
+        "intent": "Answer the question: What is the average time between orders for a customer?",
+        "metric": "average value",
+        "entity": "customer_state",
+        "aggregation": "AVG",
+        "filters": [],
+        "group_by": [
+          "customer_state"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "customers",
+          "orders"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the average time between orders for a customer?"
+      },
+      "expected_sql": "WITH customer_orders AS (SELECT customer_id, order_purchase_timestamp, LAG(order_purchase_timestamp) OVER (PARTITION BY customer_id ORDER BY order_purchase_timestamp) AS prev_ts FROM orders) SELECT AVG(JULIANDAY(order_purchase_timestamp) - JULIANDAY(prev_ts)) AS average_time_between_orders_days FROM customer_orders WHERE prev_ts IS NOT NULL",
+      "expected_tables": [
+        "orders"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q028",
+      "question": "What is the repeat order rate?",
+      "plan": {
+        "intent": "Answer the question: What is the repeat order rate?",
+        "metric": "count",
+        "entity": "customers",
+        "aggregation": "COUNT",
+        "filters": [],
+        "group_by": null,
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "customers",
+          "orders"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the repeat order rate?"
+      },
+      "expected_sql": "SELECT ROUND(100.0 * COUNT(CASE WHEN order_count > 1 THEN 1 END) / COUNT(*), 2) AS repeat_order_rate FROM (SELECT customer_id, COUNT(*) AS order_count FROM orders GROUP BY customer_id)",
+      "expected_tables": [
+        "orders"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q029",
+      "question": "How many orders contain multiple sellers?",
+      "plan": {
+        "intent": "Answer the question: How many orders contain multiple sellers?",
+        "metric": "count",
+        "entity": "seller_id",
+        "aggregation": "COUNT",
+        "filters": [],
+        "group_by": [
+          "seller_id"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "orders",
+          "order_items",
+          "sellers"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: How many orders contain multiple sellers?"
+      },
+      "expected_sql": "SELECT COUNT(*) AS multiple_seller_order_count FROM (SELECT order_id FROM order_items GROUP BY order_id HAVING COUNT(DISTINCT seller_id) > 1)",
+      "expected_tables": [
+        "order_items"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q030",
+      "question": "How many unique customers are there?",
+      "plan": {
+        "intent": "Answer the question: How many unique customers are there?",
+        "metric": "count",
+        "entity": "customer_state",
+        "aggregation": "COUNT",
+        "filters": [],
+        "group_by": [
+          "customer_state"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "customers"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: How many unique customers are there?"
+      },
+      "expected_sql": "SELECT COUNT(DISTINCT customer_unique_id) AS unique_customer_count FROM customers",
+      "expected_tables": [
+        "customers"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": true,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q031",
+      "question": "How many new customers per month?",
+      "plan": {
+        "intent": "Answer the question: How many new customers per month?",
+        "metric": "count",
+        "entity": "month",
+        "aggregation": "COUNT",
+        "filters": [
+          "group by month using substr(order_purchase_timestamp, 1, 7)"
+        ],
+        "group_by": [
+          "month"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "customers",
+          "orders"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: How many new customers per month?"
+      },
+      "expected_sql": "WITH first_orders AS (SELECT customer_id, MIN(strftime('%Y-%m', order_purchase_timestamp)) AS first_month FROM orders GROUP BY customer_id) SELECT first_month AS month, COUNT(*) AS new_customer_count FROM first_orders GROUP BY month ORDER BY month",
+      "expected_tables": [
+        "orders"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": false,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q032",
+      "question": "What is the customer retention rate?",
+      "plan": {
+        "intent": "Answer the question: What is the customer retention rate?",
+        "metric": "count",
+        "entity": "customer_state",
+        "aggregation": "COUNT",
+        "filters": [],
+        "group_by": [
+          "customer_state"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "customers"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the customer retention rate?"
+      },
+      "expected_sql": "WITH monthly_customers AS (SELECT DISTINCT strftime('%Y-%m', o.order_purchase_timestamp) AS month, o.customer_id FROM orders o), retention AS (SELECT c1.month, c1.customer_id, COUNT(DISTINCT c2.month) AS subsequent_months FROM monthly_customers c1 LEFT JOIN monthly_customers c2 ON c1.customer_id = c2.customer_id AND c2.month > c1.month GROUP BY c1.month, c1.customer_id) SELECT month, ROUND(100.0 * SUM(CASE WHEN subsequent_months > 0 THEN 1 ELSE 0 END) / COUNT(*), 2) AS retention_rate FROM retention GROUP BY month ORDER BY month",
+      "expected_tables": [
+        "orders"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q033",
+      "question": "What is the churn rate?",
+      "plan": {
+        "intent": "Answer the question: What is the churn rate?",
+        "metric": "count",
+        "entity": "order items",
+        "aggregation": "COUNT",
+        "filters": [],
+        "group_by": null,
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "order_items",
+          "orders",
+          "products"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the churn rate?"
+      },
+      "expected_sql": "WITH customer_months AS (SELECT DISTINCT customer_id, strftime('%Y-%m', order_purchase_timestamp) AS month FROM orders), months AS (SELECT DISTINCT month FROM customer_months), churn AS (SELECT c.customer_id, m.month, MAX(c2.month) AS last_month FROM customer_months c CROSS JOIN months m LEFT JOIN customer_months c2 ON c.customer_id = c2.customer_id AND c2.month <= m.month GROUP BY c.customer_id, m.month HAVING m.month > last_month) SELECT month, COUNT(DISTINCT customer_id) AS churn_count FROM churn GROUP BY month ORDER BY month",
+      "expected_tables": [
+        "orders"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": false,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q034",
+      "question": "What is the average number of orders per customer?",
+      "plan": {
+        "intent": "Answer the question: What is the average number of orders per customer?",
+        "metric": "average value",
+        "entity": "customer_state",
+        "aggregation": "AVG",
+        "filters": [],
+        "group_by": [
+          "customer_state"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "customers",
+          "orders"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the average number of orders per customer?"
+      },
+      "expected_sql": "SELECT AVG(order_count) AS average_orders_per_customer FROM (SELECT customer_id, COUNT(*) AS order_count FROM orders GROUP BY customer_id)",
+      "expected_tables": [
+        "orders"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q035",
+      "question": "What percentage of customers are repeat buyers?",
+      "plan": {
+        "intent": "Answer the question: What percentage of customers are repeat buyers?",
+        "metric": "count",
+        "entity": "customer_state",
+        "aggregation": "COUNT",
+        "filters": [],
+        "group_by": [
+          "customer_state"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "customers"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What percentage of customers are repeat buyers?"
+      },
+      "expected_sql": "SELECT ROUND(100.0 * COUNT(CASE WHEN order_count > 1 THEN 1 END) / COUNT(*), 2) AS percentage_repeat_buyers FROM (SELECT customer_id, COUNT(*) AS order_count FROM orders GROUP BY customer_id)",
+      "expected_tables": [
+        "orders"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q036",
+      "question": "Which regions have the most customers?",
+      "plan": {
+        "intent": "Answer the question: Which regions have the most customers?",
+        "metric": "count",
+        "entity": "state",
+        "aggregation": "COUNT",
+        "filters": [],
+        "group_by": [
+          "state"
+        ],
+        "ordering": "metric DESC",
+        "limit": null,
+        "required_tables": [
+          "customers"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: Which regions have the most customers?"
+      },
+      "expected_sql": "SELECT customer_state, COUNT(DISTINCT customer_unique_id) AS customer_count FROM customers GROUP BY customer_state ORDER BY customer_count DESC",
+      "expected_tables": [
+        "customers"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": true,
+      "filter_evidence": true,
+      "elapsed": 0.02
+    },
+    {
+      "query_id": "q037",
+      "question": "What is the distribution of customers by state?",
+      "plan": {
+        "intent": "Answer the question: What is the distribution of customers by state?",
+        "metric": "count",
+        "entity": "state",
+        "aggregation": "COUNT",
+        "filters": [],
+        "group_by": [
+          "state"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "customers",
+          "sellers"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the distribution of customers by state?"
+      },
+      "expected_sql": "SELECT customer_state, COUNT(DISTINCT customer_unique_id) AS customer_count FROM customers GROUP BY customer_state ORDER BY customer_count DESC",
+      "expected_tables": [
+        "customers"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q038",
+      "question": "What is the average revenue per customer (ARPU)?",
+      "plan": {
+        "intent": "Answer the question: What is the average revenue per customer (ARPU)?",
+        "metric": "total revenue",
+        "entity": "customer_state",
+        "aggregation": "SUM",
+        "filters": [],
+        "group_by": [
+          "customer_state"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "customers",
+          "order_items"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the average revenue per customer (ARPU)?"
+      },
+      "expected_sql": "SELECT AVG(customer_spend) AS average_revenue_per_customer FROM (SELECT o.customer_id, SUM(oi.price) AS customer_spend FROM orders o JOIN order_items oi ON o.order_id = oi.order_id GROUP BY o.customer_id)",
+      "expected_tables": [
+        "order_items",
+        "orders"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": false,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q039",
+      "question": "Who are the top 10 customers by revenue?",
+      "plan": {
+        "intent": "Answer the question: Who are the top 10 customers by revenue?",
+        "metric": "total revenue",
+        "entity": "customer_state",
+        "aggregation": "SUM",
+        "filters": [],
+        "group_by": [
+          "customer_state"
+        ],
+        "ordering": "metric DESC",
+        "limit": 10,
+        "required_tables": [
+          "customers",
+          "order_items"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: Who are the top 10 customers by revenue?"
+      },
+      "expected_sql": "SELECT o.customer_id AS customer_unique_id, SUM(oi.price) AS total_spend FROM orders o JOIN order_items oi ON o.order_id = oi.order_id GROUP BY o.customer_id ORDER BY total_spend DESC LIMIT 10",
+      "expected_tables": [
+        "order_items",
+        "orders"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q040",
+      "question": "What is the lifetime value (LTV) of customers?",
+      "plan": {
+        "intent": "Answer the question: What is the lifetime value (LTV) of customers?",
+        "metric": "count",
+        "entity": "customer_state",
+        "aggregation": "COUNT",
+        "filters": [],
+        "group_by": [
+          "customer_state"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "customers",
+          "orders"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the lifetime value (LTV) of customers?"
+      },
+      "expected_sql": "SELECT o.customer_id, SUM(oi.price) AS customer_lifetime_value FROM orders o JOIN order_items oi ON o.order_id = oi.order_id GROUP BY o.customer_id",
+      "expected_tables": [
+        "order_items",
+        "orders"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": false,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q041",
+      "question": "How long do customers stay active?",
+      "plan": {
+        "intent": "Answer the question: How long do customers stay active?",
+        "metric": "count",
+        "entity": "customer_state",
+        "aggregation": "COUNT",
+        "filters": [],
+        "group_by": [
+          "customer_state"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "customers"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: How long do customers stay active?"
+      },
+      "expected_sql": "SELECT AVG(JULIANDAY(max_ts) - JULIANDAY(min_ts)) AS active_days_duration FROM (SELECT customer_id, MIN(order_purchase_timestamp) AS min_ts, MAX(order_purchase_timestamp) AS max_ts FROM orders GROUP BY customer_id)",
+      "expected_tables": [
+        "orders"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": false,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q042",
+      "question": "What is the average time between first and last purchase?",
+      "plan": {
+        "intent": "Answer the question: What is the average time between first and last purchase?",
+        "metric": "average value",
+        "entity": "orders",
+        "aggregation": "AVG",
+        "filters": [],
+        "group_by": null,
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "orders"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the average time between first and last purchase?"
+      },
+      "expected_sql": "SELECT AVG(JULIANDAY(max_ts) - JULIANDAY(min_ts)) AS average_days_between_first_last FROM (SELECT customer_id, MIN(order_purchase_timestamp) AS min_ts, MAX(order_purchase_timestamp) AS max_ts FROM orders GROUP BY customer_id)",
+      "expected_tables": [
+        "orders"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": true,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q043",
+      "question": "What percentage of customers make only one purchase?",
+      "plan": {
+        "intent": "Answer the question: What percentage of customers make only one purchase?",
+        "metric": "count",
+        "entity": "customer_state",
+        "aggregation": "COUNT",
+        "filters": [],
+        "group_by": [
+          "customer_state"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "customers"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What percentage of customers make only one purchase?"
+      },
+      "expected_sql": "SELECT ROUND(100.0 * SUM(CASE WHEN order_count = 1 THEN 1 ELSE 0 END) / COUNT(*), 2) AS percentage_single_purchase FROM (SELECT customer_id, COUNT(*) AS order_count FROM orders GROUP BY customer_id)",
+      "expected_tables": [
+        "orders"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": false,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q044",
+      "question": "What is the geographic distribution of high-value customers?",
+      "plan": {
+        "intent": "Answer the question: What is the geographic distribution of high-value customers?",
+        "metric": "count",
+        "entity": "customer_state",
+        "aggregation": "COUNT",
+        "filters": [],
+        "group_by": [
+          "customer_state"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "customers"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the geographic distribution of high-value customers?"
+      },
+      "expected_sql": "WITH customer_spend AS (SELECT o.customer_id, c.customer_state, SUM(oi.price) AS total_spend FROM orders o JOIN order_items oi ON o.order_id = oi.order_id JOIN customers c ON o.customer_id = c.customer_id GROUP BY o.customer_id, c.customer_state), high_value AS (SELECT *, NTILE(4) OVER (ORDER BY total_spend DESC) AS quartile FROM customer_spend) SELECT customer_state, COUNT(*) AS high_value_customer_count FROM high_value WHERE quartile = 1 GROUP BY customer_state ORDER BY high_value_customer_count DESC",
+      "expected_tables": [
+        "orders"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": false,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q045",
+      "question": "Which product categories generate the most revenue?",
+      "plan": {
+        "intent": "Answer the question: Which product categories generate the most revenue?",
+        "metric": "total revenue",
+        "entity": "product_category_name",
+        "aggregation": "SUM",
+        "filters": [],
+        "group_by": [
+          "product_category_name"
+        ],
+        "ordering": "metric DESC",
+        "limit": null,
+        "required_tables": [
+          "order_items",
+          "products"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: Which product categories generate the most revenue?"
+      },
+      "expected_sql": "SELECT p.product_category_name, SUM(oi.price) AS total_revenue FROM order_items oi JOIN products p ON oi.product_id = p.product_id GROUP BY p.product_category_name ORDER BY total_revenue DESC LIMIT 10",
+      "expected_tables": [
+        "order_items",
+        "products"
+      ],
+      "plan_limit_ok": false,
+      "plan_agg_ok": true,
+      "plan_tables_ok": true,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q046",
+      "question": "Which product categories have the most orders?",
+      "plan": {
+        "intent": "Answer the question: Which product categories have the most orders?",
+        "metric": "count",
+        "entity": "product_category_name",
+        "aggregation": "COUNT",
+        "filters": [],
+        "group_by": [
+          "product_category_name"
+        ],
+        "ordering": "metric DESC",
+        "limit": null,
+        "required_tables": [
+          "orders",
+          "order_items",
+          "products"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: Which product categories have the most orders?"
+      },
+      "expected_sql": "SELECT p.product_category_name, COUNT(DISTINCT oi.order_id) AS order_count FROM order_items oi JOIN products p ON oi.product_id = p.product_id GROUP BY p.product_category_name ORDER BY order_count DESC LIMIT 10",
+      "expected_tables": [
+        "order_items",
+        "products"
+      ],
+      "plan_limit_ok": false,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q047",
+      "question": "What is the average price per product category?",
+      "plan": {
+        "intent": "Answer the question: What is the average price per product category?",
+        "metric": "average value",
+        "entity": "product_category_name",
+        "aggregation": "AVG",
+        "filters": [],
+        "group_by": [
+          "product_category_name"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "order_items",
+          "products"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the average price per product category?"
+      },
+      "expected_sql": "SELECT p.product_category_name, AVG(oi.price) AS average_price FROM order_items oi JOIN products p ON oi.product_id = p.product_id GROUP BY p.product_category_name ORDER BY average_price DESC",
+      "expected_tables": [
+        "order_items",
+        "products"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": true,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q048",
+      "question": "Which products are most frequently purchased?",
+      "plan": {
+        "intent": "Answer the question: Which products are most frequently purchased?",
+        "metric": "count",
+        "entity": "order items",
+        "aggregation": "COUNT",
+        "filters": [],
+        "group_by": null,
+        "ordering": "metric DESC",
+        "limit": null,
+        "required_tables": [
+          "order_items",
+          "products"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: Which products are most frequently purchased?"
+      },
+      "expected_sql": "SELECT product_id, COUNT(*) AS purchase_frequency FROM order_items GROUP BY product_id ORDER BY purchase_frequency DESC LIMIT 10",
+      "expected_tables": [
+        "order_items"
+      ],
+      "plan_limit_ok": false,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q049",
+      "question": "Which products generate the most revenue?",
+      "plan": {
+        "intent": "Answer the question: Which products generate the most revenue?",
+        "metric": "total revenue",
+        "entity": "order items",
+        "aggregation": "SUM",
+        "filters": [],
+        "group_by": null,
+        "ordering": "metric DESC",
+        "limit": null,
+        "required_tables": [
+          "order_items",
+          "products"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: Which products generate the most revenue?"
+      },
+      "expected_sql": "SELECT product_id, SUM(price) AS total_revenue FROM order_items GROUP BY product_id ORDER BY total_revenue DESC LIMIT 10",
+      "expected_tables": [
+        "order_items"
+      ],
+      "plan_limit_ok": false,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q050",
+      "question": "What is the distribution of product prices?",
+      "plan": {
+        "intent": "Answer the question: What is the distribution of product prices?",
+        "metric": "count",
+        "entity": "order items",
+        "aggregation": "COUNT",
+        "filters": [],
+        "group_by": null,
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "order_items",
+          "products"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the distribution of product prices?"
+      },
+      "expected_sql": "SELECT CASE WHEN price < 50 THEN '0-50' WHEN price < 100 THEN '50-100' WHEN price < 200 THEN '100-200' WHEN price < 500 THEN '200-500' ELSE '500+' END AS price_bucket, COUNT(*) AS product_count FROM order_items GROUP BY price_bucket ORDER BY price_bucket",
+      "expected_tables": [
+        "order_items"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q051",
+      "question": "Which categories have the highest AOV?",
+      "plan": {
+        "intent": "Answer the question: Which categories have the highest AOV?",
+        "metric": "average order value",
+        "entity": "product_category_name",
+        "aggregation": "AVG",
+        "filters": [],
+        "group_by": [
+          "product_category_name"
+        ],
+        "ordering": "metric DESC",
+        "limit": null,
+        "required_tables": [
+          "customers",
+          "order_items"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: Which categories have the highest AOV?"
+      },
+      "expected_sql": "SELECT product_category_name, AVG(monthly_total) AS average_order_value FROM (SELECT oi.order_id, p.product_category_name AS product_category_name, SUM(oi.price) AS monthly_total FROM order_items oi JOIN products p ON oi.product_id = p.product_id GROUP BY oi.order_id, product_category_name) GROUP BY product_category_name ORDER BY average_order_value DESC LIMIT 10",
+      "expected_tables": [
+        "order_items",
+        "products"
+      ],
+      "plan_limit_ok": false,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q052",
+      "question": "Which categories have declining sales trends?",
+      "plan": {
+        "intent": "Answer the question: Which categories have declining sales trends?",
+        "metric": "total revenue",
+        "entity": "product_category_name",
+        "aggregation": "SUM",
+        "filters": [],
+        "group_by": [
+          "product_category_name"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "orders",
+          "order_items"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: Which categories have declining sales trends?"
+      },
+      "expected_sql": "WITH monthly_category AS (SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, p.product_category_name AS product_category_name, SUM(oi.price) AS revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id JOIN products p ON oi.product_id = p.product_id GROUP BY month, product_category_name), trends AS (SELECT product_category_name, month, revenue, LAG(revenue) OVER (PARTITION BY product_category_name ORDER BY month) AS prev_revenue FROM monthly_category) SELECT product_category_name, ROUND(AVG(CASE WHEN prev_revenue IS NOT NULL THEN 100.0 * (revenue - prev_revenue) / prev_revenue END), 2) AS decline_rate FROM trends GROUP BY product_category_name HAVING COUNT(*) > 1 ORDER BY decline_rate ASC LIMIT 10",
+      "expected_tables": [
+        "order_items",
+        "orders",
+        "products"
+      ],
+      "plan_limit_ok": false,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q053",
+      "question": "Which categories have the fastest growth?",
+      "plan": {
+        "intent": "Answer the question: Which categories have the fastest growth?",
+        "metric": "count",
+        "entity": "product_category_name",
+        "aggregation": "COUNT",
+        "filters": [],
+        "group_by": [
+          "product_category_name"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "order_items",
+          "orders",
+          "products"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: Which categories have the fastest growth?"
+      },
+      "expected_sql": "WITH monthly_category AS (SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, p.product_category_name AS product_category_name, SUM(oi.price) AS revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id JOIN products p ON oi.product_id = p.product_id GROUP BY month, product_category_name), trends AS (SELECT product_category_name, month, revenue, LAG(revenue) OVER (PARTITION BY product_category_name ORDER BY month) AS prev_revenue FROM monthly_category) SELECT product_category_name, ROUND(AVG(CASE WHEN prev_revenue IS NOT NULL AND prev_revenue > 0 THEN 100.0 * (revenue - prev_revenue) / prev_revenue END), 2) AS growth_rate FROM trends GROUP BY product_category_name HAVING COUNT(*) > 1 ORDER BY growth_rate DESC LIMIT 10",
+      "expected_tables": [
+        "order_items",
+        "orders",
+        "products"
+      ],
+      "plan_limit_ok": false,
+      "plan_agg_ok": false,
+      "plan_tables_ok": true,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q054",
+      "question": "What is the average number of items sold per product?",
+      "plan": {
+        "intent": "Answer the question: What is the average number of items sold per product?",
+        "metric": "average value",
+        "entity": "order items",
+        "aggregation": "AVG",
+        "filters": [],
+        "group_by": null,
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "order_items",
+          "products"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the average number of items sold per product?"
+      },
+      "expected_sql": "SELECT AVG(item_count) AS average_items_sold FROM (SELECT product_id, SUM(order_item_id) AS item_count FROM order_items GROUP BY product_id)",
+      "expected_tables": [
+        "order_items"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q055",
+      "question": "Which products are often bought together? (basic co-occurrence)",
+      "plan": {
+        "intent": "Answer the question: Which products are often bought together? (basic co-occurrence)",
+        "metric": "count",
+        "entity": "order items",
+        "aggregation": "COUNT",
+        "filters": [],
+        "group_by": null,
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "order_items",
+          "products"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: Which products are often bought together? (basic co-occurrence)"
+      },
+      "expected_sql": "WITH order_products AS (SELECT DISTINCT order_id, product_id FROM order_items), pairs AS (SELECT o1.product_id AS product_a, o2.product_id AS product_b FROM order_products o1 JOIN order_products o2 ON o1.order_id = o2.order_id AND o1.product_id < o2.product_id) SELECT product_a, product_b, COUNT(*) AS co_occurrence_count FROM pairs GROUP BY product_a, product_b ORDER BY co_occurrence_count DESC LIMIT 10",
+      "expected_tables": [
+        "order_items"
+      ],
+      "plan_limit_ok": false,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q056",
+      "question": "What is the revenue contribution of top categories?",
+      "plan": {
+        "intent": "Answer the question: What is the revenue contribution of top categories?",
+        "metric": "total revenue",
+        "entity": "product_category_name",
+        "aggregation": "SUM",
+        "filters": [],
+        "group_by": [
+          "product_category_name"
+        ],
+        "ordering": "metric DESC",
+        "limit": null,
+        "required_tables": [
+          "order_items"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the revenue contribution of top categories?"
+      },
+      "expected_sql": "WITH category_revenue AS (SELECT p.product_category_name, SUM(oi.price) AS total_revenue FROM order_items oi JOIN products p ON oi.product_id = p.product_id GROUP BY p.product_category_name), total AS (SELECT SUM(total_revenue) AS grand_total FROM category_revenue) SELECT product_category_name, ROUND(100.0 * total_revenue / (SELECT grand_total FROM total), 2) AS revenue_share_percentage FROM category_revenue ORDER BY total_revenue DESC LIMIT 10",
+      "expected_tables": [
+        "order_items",
+        "products"
+      ],
+      "plan_limit_ok": false,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q057",
+      "question": "Which products have the highest return/cancellation rate?",
+      "plan": {
+        "intent": "Answer the question: Which products have the highest return/cancellation rate?",
+        "metric": "count",
+        "entity": "orders",
+        "aggregation": "COUNT",
+        "filters": [
+          "order_status = 'canceled'"
+        ],
+        "group_by": null,
+        "ordering": "metric DESC",
+        "limit": null,
+        "required_tables": [
+          "orders",
+          "order_items",
+          "products",
+          "geolocation"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: Which products have the highest return/cancellation rate?"
+      },
+      "expected_sql": "WITH order_status AS (SELECT oi.product_id, o.order_id, o.order_status FROM order_items oi JOIN orders o ON oi.order_id = o.order_id), product_orders AS (SELECT product_id, COUNT(*) AS total_orders, SUM(CASE WHEN order_status IN ('canceled', 'delivered') THEN 1 ELSE 0 END) AS non_returned FROM order_status GROUP BY product_id) SELECT product_id, ROUND(100.0 * (1.0 - 1.0 * non_returned / total_orders), 2) AS cancellation_rate FROM product_orders WHERE total_orders > 10 ORDER BY cancellation_rate DESC LIMIT 10",
+      "expected_tables": [
+        "order_items",
+        "orders"
+      ],
+      "plan_limit_ok": false,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": false,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q058",
+      "question": "What is the price vs sales relationship?",
+      "plan": {
+        "intent": "Answer the question: What is the price vs sales relationship?",
+        "metric": "total revenue",
+        "entity": "order items",
+        "aggregation": "SUM",
+        "filters": [],
+        "group_by": null,
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "order_items",
+          "geolocation"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the price vs sales relationship?"
+      },
+      "expected_sql": "SELECT CASE WHEN price < 50 THEN '0-50' WHEN price < 100 THEN '50-100' WHEN price < 200 THEN '100-200' WHEN price < 500 THEN '200-500' ELSE '500+' END AS price_range, SUM(order_item_id) AS units_sold FROM order_items GROUP BY price_range ORDER BY price_range",
+      "expected_tables": [
+        "order_items"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q059",
+      "question": "Which categories have seasonal demand patterns?",
+      "plan": {
+        "intent": "Answer the question: Which categories have seasonal demand patterns?",
+        "metric": "count",
+        "entity": "product_category_name",
+        "aggregation": "COUNT",
+        "filters": [],
+        "group_by": [
+          "product_category_name"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "order_items",
+          "orders",
+          "products"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: Which categories have seasonal demand patterns?"
+      },
+      "expected_sql": "WITH monthly_category AS (SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, p.product_category_name AS product_category_name, SUM(oi.price) AS revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id JOIN products p ON oi.product_id = p.product_id GROUP BY month, product_category_name), monthly_stats AS (SELECT product_category_name, AVG(revenue) AS avg_revenue, MAX(revenue) AS max_revenue, MIN(revenue) AS min_revenue FROM monthly_category GROUP BY product_category_name) SELECT product_category_name, ROUND(max_revenue - min_revenue, 2) AS seasonal_variance FROM monthly_stats ORDER BY seasonal_variance DESC LIMIT 10",
+      "expected_tables": [
+        "order_items",
+        "orders",
+        "products"
+      ],
+      "plan_limit_ok": false,
+      "plan_agg_ok": false,
+      "plan_tables_ok": true,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q060",
+      "question": "What is the average delivery time?",
+      "plan": {
+        "intent": "Answer the question: What is the average delivery time?",
+        "metric": "average value",
+        "entity": "orders",
+        "aggregation": "AVG",
+        "filters": [],
+        "group_by": null,
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "orders"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the average delivery time?"
+      },
+      "expected_sql": "SELECT AVG(JULIANDAY(order_delivered_customer_date) - JULIANDAY(order_purchase_timestamp)) AS average_delivery_days FROM orders WHERE order_delivered_customer_date IS NOT NULL",
+      "expected_tables": [
+        "orders"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": true,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q061",
+      "question": "What is the average shipping delay?",
+      "plan": {
+        "intent": "Answer the question: What is the average shipping delay?",
+        "metric": "average value",
+        "entity": "order items",
+        "aggregation": "AVG",
+        "filters": [],
+        "group_by": null,
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "order_items",
+          "orders",
+          "products"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the average shipping delay?"
+      },
+      "expected_sql": "SELECT AVG(JULIANDAY(order_delivered_customer_date) - JULIANDAY(order_estimated_delivery_date)) AS average_delay_days FROM orders WHERE order_delivered_customer_date IS NOT NULL",
+      "expected_tables": [
+        "orders"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q062",
+      "question": "Which states have the longest delivery times?",
+      "plan": {
+        "intent": "Answer the question: Which states have the longest delivery times?",
+        "metric": "count",
+        "entity": "state",
+        "aggregation": "COUNT",
+        "filters": [],
+        "group_by": [
+          "state"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "customers",
+          "orders",
+          "sellers"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: Which states have the longest delivery times?"
+      },
+      "expected_sql": "SELECT c.customer_state, AVG(JULIANDAY(o.order_delivered_customer_date) - JULIANDAY(o.order_purchase_timestamp)) AS average_delivery_days FROM orders o JOIN customers c ON o.customer_id = c.customer_id WHERE o.order_delivered_customer_date IS NOT NULL GROUP BY c.customer_state ORDER BY average_delivery_days DESC LIMIT 10",
+      "expected_tables": [
+        "customers",
+        "orders"
+      ],
+      "plan_limit_ok": false,
+      "plan_agg_ok": false,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q063",
+      "question": "Which sellers deliver the fastest?",
+      "plan": {
+        "intent": "Answer the question: Which sellers deliver the fastest?",
+        "metric": "count",
+        "entity": "seller_id",
+        "aggregation": "COUNT",
+        "filters": [],
+        "group_by": [
+          "seller_id"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "orders",
+          "order_items",
+          "sellers"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: Which sellers deliver the fastest?"
+      },
+      "expected_sql": "SELECT oi.seller_id, AVG(JULIANDAY(o.order_delivered_customer_date) - JULIANDAY(o.order_purchase_timestamp)) AS average_delivery_days FROM order_items oi JOIN orders o ON oi.order_id = o.order_id WHERE o.order_delivered_customer_date IS NOT NULL GROUP BY oi.seller_id ORDER BY average_delivery_days ASC LIMIT 10",
+      "expected_tables": [
+        "order_items",
+        "orders"
+      ],
+      "plan_limit_ok": false,
+      "plan_agg_ok": false,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q064",
+      "question": "What percentage of deliveries are delayed?",
+      "plan": {
+        "intent": "Answer the question: What percentage of deliveries are delayed?",
+        "metric": "count",
+        "entity": "order items",
+        "aggregation": "COUNT",
+        "filters": [],
+        "group_by": null,
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "order_items",
+          "orders",
+          "products"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What percentage of deliveries are delayed?"
+      },
+      "expected_sql": "SELECT ROUND(100.0 * SUM(CASE WHEN order_delivered_customer_date > order_estimated_delivery_date THEN 1 ELSE 0 END) / COUNT(*), 2) AS delay_percentage FROM orders WHERE order_delivered_customer_date IS NOT NULL",
+      "expected_tables": [
+        "orders"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": false,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q065",
+      "question": "What is the trend of delivery delays over time?",
+      "plan": {
+        "intent": "Answer the question: What is the trend of delivery delays over time?",
+        "metric": "count",
+        "entity": "month",
+        "aggregation": "COUNT",
+        "filters": [],
+        "group_by": [
+          "month"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "orders"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the trend of delivery delays over time?"
+      },
+      "expected_sql": "SELECT strftime('%Y-%m', order_purchase_timestamp) AS month, ROUND(100.0 * SUM(CASE WHEN order_delivered_customer_date > order_estimated_delivery_date THEN 1 ELSE 0 END) / COUNT(*), 2) AS delay_percentage FROM orders WHERE order_delivered_customer_date IS NOT NULL GROUP BY month ORDER BY month",
+      "expected_tables": [
+        "orders"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": false,
+      "plan_tables_ok": true,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q066",
+      "question": "How does distance affect delivery time? (approx via location)",
+      "plan": {
+        "intent": "Answer the question: How does distance affect delivery time? (approx via location)",
+        "metric": "count",
+        "entity": "state",
+        "aggregation": "COUNT",
+        "filters": [],
+        "group_by": [
+          "state"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "orders"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: How does distance affect delivery time? (approx via location)"
+      },
+      "expected_sql": "SELECT ABS(c.customer_zip_code_prefix - s.seller_zip_code_prefix) AS approx_distance, AVG(JULIANDAY(o.order_delivered_customer_date) - JULIANDAY(o.order_purchase_timestamp)) AS delivery_days FROM orders o JOIN order_items oi ON o.order_id = oi.order_id JOIN customers c ON o.customer_id = c.customer_id JOIN sellers s ON oi.seller_id = s.seller_id WHERE o.order_delivered_customer_date IS NOT NULL GROUP BY approx_distance ORDER BY approx_distance",
+      "expected_tables": [
+        "customers",
+        "order_items",
+        "orders",
+        "sellers"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": false,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q067",
+      "question": "Which regions have the best delivery performance?",
+      "plan": {
+        "intent": "Answer the question: Which regions have the best delivery performance?",
+        "metric": "count",
+        "entity": "state",
+        "aggregation": "COUNT",
+        "filters": [],
+        "group_by": [
+          "state"
+        ],
+        "ordering": "metric DESC",
+        "limit": null,
+        "required_tables": [
+          "customers"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: Which regions have the best delivery performance?"
+      },
+      "expected_sql": "SELECT c.customer_state, ROUND(100.0 * SUM(CASE WHEN o.order_delivered_customer_date <= o.order_estimated_delivery_date THEN 1 ELSE 0 END) / COUNT(*), 2) AS on_time_delivery_percentage FROM orders o JOIN customers c ON o.customer_id = c.customer_id WHERE o.order_delivered_customer_date IS NOT NULL GROUP BY c.customer_state ORDER BY on_time_delivery_percentage DESC LIMIT 10",
+      "expected_tables": [
+        "customers",
+        "orders"
+      ],
+      "plan_limit_ok": false,
+      "plan_agg_ok": false,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q068",
+      "question": "What is the distribution of delivery times?",
+      "plan": {
+        "intent": "Answer the question: What is the distribution of delivery times?",
+        "metric": "count",
+        "entity": "orders",
+        "aggregation": "COUNT",
+        "filters": [],
+        "group_by": null,
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "orders"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the distribution of delivery times?"
+      },
+      "expected_sql": "SELECT CASE WHEN delivery_days < 5 THEN '0-5' WHEN delivery_days < 10 THEN '5-10' WHEN delivery_days < 15 THEN '10-15' WHEN delivery_days < 20 THEN '15-20' ELSE '20+' END AS delivery_days_bucket, COUNT(*) AS order_count FROM (SELECT JULIANDAY(order_delivered_customer_date) - JULIANDAY(order_purchase_timestamp) AS delivery_days FROM orders WHERE order_delivered_customer_date IS NOT NULL) GROUP BY delivery_days_bucket ORDER BY delivery_days_bucket",
+      "expected_tables": [
+        "orders"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": true,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q069",
+      "question": "Are late deliveries increasing or decreasing?",
+      "plan": {
+        "intent": "Answer the question: Are late deliveries increasing or decreasing?",
+        "metric": "count",
+        "entity": "geolocation",
+        "aggregation": "COUNT",
+        "filters": [],
+        "group_by": null,
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "geolocation"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: Are late deliveries increasing or decreasing?"
+      },
+      "expected_sql": "SELECT strftime('%Y-%m', order_purchase_timestamp) AS month, SUM(CASE WHEN order_delivered_customer_date > order_estimated_delivery_date THEN 1 ELSE 0 END) AS late_order_count FROM orders WHERE order_delivered_customer_date IS NOT NULL GROUP BY month ORDER BY month",
+      "expected_tables": [
+        "orders"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": false,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q070",
+      "question": "How many sellers are there?",
+      "plan": {
+        "intent": "Answer the question: How many sellers are there?",
+        "metric": "count",
+        "entity": "seller_id",
+        "aggregation": "COUNT",
+        "filters": [],
+        "group_by": [
+          "seller_id"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "orders",
+          "order_items",
+          "sellers"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: How many sellers are there?"
+      },
+      "expected_sql": "SELECT COUNT(*) AS total_sellers FROM sellers",
+      "expected_tables": [
+        "sellers"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q071",
+      "question": "Which sellers generate the most revenue?",
+      "plan": {
+        "intent": "Answer the question: Which sellers generate the most revenue?",
+        "metric": "total revenue",
+        "entity": "seller_id",
+        "aggregation": "SUM",
+        "filters": [],
+        "group_by": [
+          "seller_id"
+        ],
+        "ordering": "metric DESC",
+        "limit": null,
+        "required_tables": [
+          "orders",
+          "order_items",
+          "sellers"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: Which sellers generate the most revenue?"
+      },
+      "expected_sql": "SELECT seller_id, SUM(price) AS total_revenue FROM order_items GROUP BY seller_id ORDER BY total_revenue DESC LIMIT 10",
+      "expected_tables": [
+        "order_items"
+      ],
+      "plan_limit_ok": false,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q072",
+      "question": "Which sellers have the most orders?",
+      "plan": {
+        "intent": "Answer the question: Which sellers have the most orders?",
+        "metric": "count",
+        "entity": "seller_id",
+        "aggregation": "COUNT",
+        "filters": [],
+        "group_by": [
+          "seller_id"
+        ],
+        "ordering": "metric DESC",
+        "limit": null,
+        "required_tables": [
+          "orders",
+          "order_items",
+          "sellers"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: Which sellers have the most orders?"
+      },
+      "expected_sql": "SELECT seller_id, COUNT(DISTINCT order_id) AS order_count FROM order_items GROUP BY seller_id ORDER BY order_count DESC LIMIT 10",
+      "expected_tables": [
+        "order_items"
+      ],
+      "plan_limit_ok": false,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q073",
+      "question": "What is the average revenue per seller?",
+      "plan": {
+        "intent": "Answer the question: What is the average revenue per seller?",
+        "metric": "total revenue",
+        "entity": "seller_id",
+        "aggregation": "SUM",
+        "filters": [],
+        "group_by": [
+          "seller_id"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "orders",
+          "order_items",
+          "sellers"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the average revenue per seller?"
+      },
+      "expected_sql": "SELECT AVG(seller_revenue) AS average_revenue_per_seller FROM (SELECT seller_id, SUM(price) AS seller_revenue FROM order_items GROUP BY seller_id)",
+      "expected_tables": [
+        "order_items"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": false,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q074",
+      "question": "Which sellers have the highest ratings?",
+      "plan": {
+        "intent": "Answer the question: Which sellers have the highest ratings?",
+        "metric": "average review score",
+        "entity": "seller_id",
+        "aggregation": "AVG",
+        "filters": [],
+        "group_by": [
+          "seller_id"
+        ],
+        "ordering": "metric DESC",
+        "limit": null,
+        "required_tables": [
+          "orders",
+          "order_items",
+          "order_reviews",
+          "sellers"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: Which sellers have the highest ratings?"
+      },
+      "expected_sql": "SELECT oi.seller_id, AVG(or2.review_score) AS average_rating FROM order_items oi JOIN order_reviews or2 ON oi.order_id = or2.order_id GROUP BY oi.seller_id ORDER BY average_rating DESC LIMIT 10",
+      "expected_tables": [
+        "order_items"
+      ],
+      "plan_limit_ok": false,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q075",
+      "question": "Which sellers have the most delayed deliveries?",
+      "plan": {
+        "intent": "Answer the question: Which sellers have the most delayed deliveries?",
+        "metric": "count",
+        "entity": "seller_id",
+        "aggregation": "COUNT",
+        "filters": [],
+        "group_by": [
+          "seller_id"
+        ],
+        "ordering": "metric DESC",
+        "limit": null,
+        "required_tables": [
+          "orders",
+          "order_items",
+          "sellers"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: Which sellers have the most delayed deliveries?"
+      },
+      "expected_sql": "SELECT oi.seller_id, COUNT(*) AS delay_count FROM order_items oi JOIN orders o ON oi.order_id = o.order_id WHERE o.order_delivered_customer_date > o.order_estimated_delivery_date GROUP BY oi.seller_id ORDER BY delay_count DESC LIMIT 10",
+      "expected_tables": [
+        "order_items",
+        "orders"
+      ],
+      "plan_limit_ok": false,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q076",
+      "question": "What is the distribution of sellers by region?",
+      "plan": {
+        "intent": "Answer the question: What is the distribution of sellers by region?",
+        "metric": "count",
+        "entity": "state",
+        "aggregation": "COUNT",
+        "filters": [],
+        "group_by": [
+          "state"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "customers",
+          "orders",
+          "order_items",
+          "sellers"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the distribution of sellers by region?"
+      },
+      "expected_sql": "SELECT seller_state, COUNT(*) AS seller_count FROM sellers GROUP BY seller_state ORDER BY seller_count DESC",
+      "expected_tables": [
+        "sellers"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q077",
+      "question": "Which sellers are growing fastest?",
+      "plan": {
+        "intent": "Answer the question: Which sellers are growing fastest?",
+        "metric": "count",
+        "entity": "seller_id",
+        "aggregation": "COUNT",
+        "filters": [],
+        "group_by": [
+          "seller_id"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "orders",
+          "order_items",
+          "sellers"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: Which sellers are growing fastest?"
+      },
+      "expected_sql": "WITH monthly_sales AS (SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, oi.seller_id, SUM(oi.price) AS revenue FROM order_items oi JOIN orders o ON oi.order_id = o.order_id GROUP BY month, oi.seller_id), growth AS (SELECT seller_id, month, revenue, LAG(revenue) OVER (PARTITION BY seller_id ORDER BY month) AS prev_revenue FROM monthly_sales) SELECT seller_id, ROUND(AVG(CASE WHEN prev_revenue IS NOT NULL AND prev_revenue > 0 THEN 100.0 * (revenue - prev_revenue) / prev_revenue END), 2) AS sales_growth_rate FROM growth GROUP BY seller_id ORDER BY sales_growth_rate DESC LIMIT 10",
+      "expected_tables": [
+        "order_items",
+        "orders"
+      ],
+      "plan_limit_ok": false,
+      "plan_agg_ok": false,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q078",
+      "question": "What is the average delivery time per seller?",
+      "plan": {
+        "intent": "Answer the question: What is the average delivery time per seller?",
+        "metric": "average value",
+        "entity": "seller_id",
+        "aggregation": "AVG",
+        "filters": [],
+        "group_by": [
+          "seller_id"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "orders",
+          "order_items",
+          "sellers"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the average delivery time per seller?"
+      },
+      "expected_sql": "SELECT oi.seller_id, AVG(JULIANDAY(o.order_delivered_customer_date) - JULIANDAY(o.order_purchase_timestamp)) AS average_delivery_days FROM order_items oi JOIN orders o ON oi.order_id = o.order_id WHERE o.order_delivered_customer_date IS NOT NULL GROUP BY oi.seller_id ORDER BY average_delivery_days ASC LIMIT 10",
+      "expected_tables": [
+        "order_items",
+        "orders"
+      ],
+      "plan_limit_ok": false,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q079",
+      "question": "Which sellers have the highest cancellation rate?",
+      "plan": {
+        "intent": "Answer the question: Which sellers have the highest cancellation rate?",
+        "metric": "count",
+        "entity": "seller_id",
+        "aggregation": "COUNT",
+        "filters": [
+          "order_status = 'canceled'"
+        ],
+        "group_by": [
+          "seller_id"
+        ],
+        "ordering": "metric DESC",
+        "limit": null,
+        "required_tables": [
+          "orders",
+          "order_items",
+          "sellers",
+          "geolocation"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: Which sellers have the highest cancellation rate?"
+      },
+      "expected_sql": "SELECT oi.seller_id, ROUND(100.0 * SUM(CASE WHEN o.order_status = 'canceled' THEN 1 ELSE 0 END) / COUNT(*), 2) AS cancellation_rate FROM order_items oi JOIN orders o ON oi.order_id = o.order_id GROUP BY oi.seller_id ORDER BY cancellation_rate DESC LIMIT 10",
+      "expected_tables": [
+        "order_items",
+        "orders"
+      ],
+      "plan_limit_ok": false,
+      "plan_agg_ok": false,
+      "plan_tables_ok": false,
+      "filter_evidence": false,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q080",
+      "question": "Which payment method is most used?",
+      "plan": {
+        "intent": "Answer the question: Which payment method is most used?",
+        "metric": "total payment value",
+        "entity": "payment_type",
+        "aggregation": "SUM",
+        "filters": [],
+        "group_by": [
+          "payment_type"
+        ],
+        "ordering": "metric DESC",
+        "limit": null,
+        "required_tables": [
+          "order_payments"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: Which payment method is most used?"
+      },
+      "expected_sql": "SELECT payment_type, COUNT(*) AS payment_count FROM order_payments GROUP BY payment_type ORDER BY payment_count DESC LIMIT 1",
+      "expected_tables": [
+        "order_payments"
+      ],
+      "plan_limit_ok": false,
+      "plan_agg_ok": false,
+      "plan_tables_ok": true,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q081",
+      "question": "What is the revenue by payment type?",
+      "plan": {
+        "intent": "Answer the question: What is the revenue by payment type?",
+        "metric": "total revenue",
+        "entity": "payment_type",
+        "aggregation": "SUM",
+        "filters": [],
+        "group_by": [
+          "payment_type"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "order_items",
+          "order_payments"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the revenue by payment type?"
+      },
+      "expected_sql": "SELECT payment_type, SUM(payment_value) AS total_payments_value FROM order_payments GROUP BY payment_type ORDER BY total_payments_value DESC",
+      "expected_tables": [
+        "order_payments"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q082",
+      "question": "What is the average payment value?",
+      "plan": {
+        "intent": "Answer the question: What is the average payment value?",
+        "metric": "average value",
+        "entity": "payment_type",
+        "aggregation": "AVG",
+        "filters": [],
+        "group_by": [
+          "payment_type"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "order_payments"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the average payment value?"
+      },
+      "expected_sql": "SELECT AVG(payment_value) AS average_payment_value FROM order_payments",
+      "expected_tables": [
+        "order_payments"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": true,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q083",
+      "question": "How many installments are used on average?",
+      "plan": {
+        "intent": "Answer the question: How many installments are used on average?",
+        "metric": "average value",
+        "entity": "order payments",
+        "aggregation": "AVG",
+        "filters": [],
+        "group_by": null,
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "order_payments"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: How many installments are used on average?"
+      },
+      "expected_sql": "SELECT AVG(payment_installments) AS average_installments FROM order_payments",
+      "expected_tables": [
+        "order_payments"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": true,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q084",
+      "question": "What is the distribution of installment payments?",
+      "plan": {
+        "intent": "Answer the question: What is the distribution of installment payments?",
+        "metric": "total payment value",
+        "entity": "payment_type",
+        "aggregation": "SUM",
+        "filters": [],
+        "group_by": [
+          "payment_type"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "order_payments"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the distribution of installment payments?"
+      },
+      "expected_sql": "SELECT payment_installments, COUNT(*) AS order_count FROM order_payments GROUP BY payment_installments ORDER BY payment_installments",
+      "expected_tables": [
+        "order_payments"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": false,
+      "plan_tables_ok": true,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q085",
+      "question": "Do installment payments affect order value?",
+      "plan": {
+        "intent": "Answer the question: Do installment payments affect order value?",
+        "metric": "total payment value",
+        "entity": "payment_type",
+        "aggregation": "SUM",
+        "filters": [],
+        "group_by": [
+          "payment_type"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "orders",
+          "order_payments"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: Do installment payments affect order value?"
+      },
+      "expected_sql": "SELECT payment_installments, AVG(payment_value) AS average_payment_value FROM order_payments GROUP BY payment_installments ORDER BY payment_installments",
+      "expected_tables": [
+        "order_payments"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": false,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q086",
+      "question": "What is the failure rate of payments?",
+      "plan": {
+        "intent": "Answer the question: What is the failure rate of payments?",
+        "metric": "total payment value",
+        "entity": "payment_type",
+        "aggregation": "SUM",
+        "filters": [],
+        "group_by": [
+          "payment_type"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "order_payments"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the failure rate of payments?"
+      },
+      "expected_sql": "SELECT ROUND(100.0 * SUM(CASE WHEN payment_value <= 0 THEN 1 ELSE 0 END) / COUNT(*), 2) AS payment_failure_rate FROM order_payments",
+      "expected_tables": [
+        "order_payments"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": true,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q087",
+      "question": "Which payment types have highest order value?",
+      "plan": {
+        "intent": "Answer the question: Which payment types have highest order value?",
+        "metric": "total payment value",
+        "entity": "payment_type",
+        "aggregation": "SUM",
+        "filters": [],
+        "group_by": [
+          "payment_type"
+        ],
+        "ordering": "metric DESC",
+        "limit": null,
+        "required_tables": [
+          "orders",
+          "order_payments"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: Which payment types have highest order value?"
+      },
+      "expected_sql": "SELECT payment_type, AVG(payment_value) AS average_payment_value FROM order_payments GROUP BY payment_type ORDER BY average_payment_value DESC LIMIT 5",
+      "expected_tables": [
+        "order_payments"
+      ],
+      "plan_limit_ok": false,
+      "plan_agg_ok": false,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q088",
+      "question": "How does payment method vary by region?",
+      "plan": {
+        "intent": "Answer the question: How does payment method vary by region?",
+        "metric": "total payment value",
+        "entity": "state",
+        "aggregation": "SUM",
+        "filters": [],
+        "group_by": [
+          "state"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "customers",
+          "order_payments"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: How does payment method vary by region?"
+      },
+      "expected_sql": "SELECT c.customer_state, op.payment_type, COUNT(*) AS count FROM order_payments op JOIN orders o ON op.order_id = o.order_id JOIN customers c ON o.customer_id = c.customer_id GROUP BY c.customer_state, op.payment_type ORDER BY c.customer_state, count DESC",
+      "expected_tables": [
+        "customers",
+        "order_payments",
+        "orders"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": false,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q089",
+      "question": "What is the trend of payment methods over time?",
+      "plan": {
+        "intent": "Answer the question: What is the trend of payment methods over time?",
+        "metric": "total payment value",
+        "entity": "month",
+        "aggregation": "SUM",
+        "filters": [],
+        "group_by": [
+          "month"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "orders",
+          "order_payments"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the trend of payment methods over time?"
+      },
+      "expected_sql": "SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, op.payment_type, COUNT(*) AS count FROM order_payments op JOIN orders o ON op.order_id = o.order_id GROUP BY month, op.payment_type ORDER BY month, count DESC",
+      "expected_tables": [
+        "order_payments",
+        "orders"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": false,
+      "plan_tables_ok": true,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q090",
+      "question": "What is the average review score?",
+      "plan": {
+        "intent": "Answer the question: What is the average review score?",
+        "metric": "average value",
+        "entity": "review_score",
+        "aggregation": "AVG",
+        "filters": [],
+        "group_by": [
+          "review_score"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "orders",
+          "order_reviews"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the average review score?"
+      },
+      "expected_sql": "SELECT AVG(review_score) AS average_review_score FROM order_reviews",
+      "expected_tables": [
+        "order_reviews"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q091",
+      "question": "What is the distribution of review scores?",
+      "plan": {
+        "intent": "Answer the question: What is the distribution of review scores?",
+        "metric": "average review score",
+        "entity": "review_score",
+        "aggregation": "AVG",
+        "filters": [],
+        "group_by": [
+          "review_score"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "orders",
+          "order_reviews"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the distribution of review scores?"
+      },
+      "expected_sql": "SELECT review_score, COUNT(*) AS count FROM order_reviews GROUP BY review_score ORDER BY review_score",
+      "expected_tables": [
+        "order_reviews"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": false,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q092",
+      "question": "Which products have the best reviews?",
+      "plan": {
+        "intent": "Answer the question: Which products have the best reviews?",
+        "metric": "average review score",
+        "entity": "review_score",
+        "aggregation": "AVG",
+        "filters": [],
+        "group_by": [
+          "review_score"
+        ],
+        "ordering": "metric DESC",
+        "limit": null,
+        "required_tables": [
+          "orders",
+          "order_items",
+          "products",
+          "order_reviews"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: Which products have the best reviews?"
+      },
+      "expected_sql": "SELECT oi.product_id, AVG(or2.review_score) AS average_review_score FROM order_items oi JOIN order_reviews or2 ON oi.order_id = or2.order_id GROUP BY oi.product_id ORDER BY average_review_score DESC LIMIT 10",
+      "expected_tables": [
+        "order_items",
+        "order_reviews"
+      ],
+      "plan_limit_ok": false,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q093",
+      "question": "Which sellers have the worst reviews?",
+      "plan": {
+        "intent": "Answer the question: Which sellers have the worst reviews?",
+        "metric": "average review score",
+        "entity": "seller_id",
+        "aggregation": "AVG",
+        "filters": [],
+        "group_by": [
+          "seller_id"
+        ],
+        "ordering": "metric ASC",
+        "limit": null,
+        "required_tables": [
+          "orders",
+          "order_items",
+          "order_reviews",
+          "sellers"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: Which sellers have the worst reviews?"
+      },
+      "expected_sql": "SELECT oi.seller_id, AVG(or2.review_score) AS average_review_score FROM order_items oi JOIN order_reviews or2 ON oi.order_id = or2.order_id GROUP BY oi.seller_id ORDER BY average_review_score ASC LIMIT 10",
+      "expected_tables": [
+        "order_items",
+        "order_reviews"
+      ],
+      "plan_limit_ok": false,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q094",
+      "question": "What is the relationship between delivery time and review score?",
+      "plan": {
+        "intent": "Answer the question: What is the relationship between delivery time and review score?",
+        "metric": "average review score",
+        "entity": "review_score",
+        "aggregation": "AVG",
+        "filters": [],
+        "group_by": [
+          "review_score"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "orders",
+          "order_reviews",
+          "geolocation"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the relationship between delivery time and review score?"
+      },
+      "expected_sql": "SELECT CAST(JULIANDAY(order_delivered_customer_date) - JULIANDAY(order_purchase_timestamp) AS INTEGER) AS delivery_days, AVG(or2.review_score) AS average_review_score FROM orders o JOIN order_reviews or2 ON o.order_id = or2.order_id WHERE o.order_delivered_customer_date IS NOT NULL GROUP BY delivery_days ORDER BY delivery_days",
+      "expected_tables": [
+        "order_reviews",
+        "orders"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q095",
+      "question": "Do late deliveries lead to lower ratings?",
+      "plan": {
+        "intent": "Answer the question: Do late deliveries lead to lower ratings?",
+        "metric": "average review score",
+        "entity": "review_score",
+        "aggregation": "AVG",
+        "filters": [],
+        "group_by": [
+          "review_score"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "order_reviews",
+          "geolocation"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: Do late deliveries lead to lower ratings?"
+      },
+      "expected_sql": "SELECT CASE WHEN order_delivered_customer_date > order_estimated_delivery_date THEN 1 ELSE 0 END AS is_late, AVG(or2.review_score) AS average_review_score FROM orders o JOIN order_reviews or2 ON o.order_id = or2.order_id WHERE o.order_delivered_customer_date IS NOT NULL GROUP BY is_late",
+      "expected_tables": [
+        "order_reviews",
+        "orders"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.01
+    },
+    {
+      "query_id": "q096",
+      "question": "What percentage of orders receive reviews?",
+      "plan": {
+        "intent": "Answer the question: What percentage of orders receive reviews?",
+        "metric": "average review score",
+        "entity": "review_score",
+        "aggregation": "AVG",
+        "filters": [],
+        "group_by": [
+          "review_score"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "orders",
+          "order_reviews"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What percentage of orders receive reviews?"
+      },
+      "expected_sql": "SELECT ROUND(100.0 * COUNT(DISTINCT or2.order_id) / COUNT(*), 2) AS review_response_rate FROM orders o LEFT JOIN order_reviews or2 ON o.order_id = or2.order_id",
+      "expected_tables": [
+        "order_reviews",
+        "orders"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": false,
+      "plan_tables_ok": true,
+      "filter_evidence": true,
+      "elapsed": 0.0
+    },
+    {
+      "query_id": "q097",
+      "question": "What is the trend of review scores over time?",
+      "plan": {
+        "intent": "Answer the question: What is the trend of review scores over time?",
+        "metric": "average review score",
+        "entity": "month",
+        "aggregation": "AVG",
+        "filters": [],
+        "group_by": [
+          "month"
+        ],
+        "ordering": null,
+        "limit": null,
+        "required_tables": [
+          "orders",
+          "order_reviews"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: What is the trend of review scores over time?"
+      },
+      "expected_sql": "SELECT strftime('%Y-%m', review_creation_date) AS month, AVG(review_score) AS average_review_score FROM order_reviews GROUP BY month ORDER BY month",
+      "expected_tables": [
+        "order_reviews"
+      ],
+      "plan_limit_ok": true,
+      "plan_agg_ok": true,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.0
+    },
+    {
+      "query_id": "q098",
+      "question": "Which categories have the highest satisfaction?",
+      "plan": {
+        "intent": "Answer the question: Which categories have the highest satisfaction?",
+        "metric": "count",
+        "entity": "product_category_name",
+        "aggregation": "COUNT",
+        "filters": [],
+        "group_by": [
+          "product_category_name"
+        ],
+        "ordering": "metric DESC",
+        "limit": null,
+        "required_tables": [
+          "order_items",
+          "orders",
+          "products"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: Which categories have the highest satisfaction?"
+      },
+      "expected_sql": "SELECT p.product_category_name, AVG(or2.review_score) AS average_review_score FROM order_reviews or2 JOIN order_items oi ON or2.order_id = oi.order_id JOIN products p ON oi.product_id = p.product_id GROUP BY p.product_category_name ORDER BY average_review_score DESC LIMIT 10",
+      "expected_tables": [
+        "order_items",
+        "order_reviews",
+        "products"
+      ],
+      "plan_limit_ok": false,
+      "plan_agg_ok": false,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.0
+    },
+    {
+      "query_id": "q099",
+      "question": "Which categories have the lowest satisfaction?",
+      "plan": {
+        "intent": "Answer the question: Which categories have the lowest satisfaction?",
+        "metric": "count",
+        "entity": "product_category_name",
+        "aggregation": "COUNT",
+        "filters": [],
+        "group_by": [
+          "product_category_name"
+        ],
+        "ordering": "metric ASC",
+        "limit": null,
+        "required_tables": [
+          "order_items",
+          "orders",
+          "products"
+        ],
+        "reasoning": "Deterministic fallback derived from question keywords for: Which categories have the lowest satisfaction?"
+      },
+      "expected_sql": "SELECT p.product_category_name, AVG(or2.review_score) AS average_review_score FROM order_reviews or2 JOIN order_items oi ON or2.order_id = oi.order_id JOIN products p ON oi.product_id = p.product_id GROUP BY p.product_category_name ORDER BY average_review_score ASC LIMIT 10",
+      "expected_tables": [
+        "order_items",
+        "order_reviews",
+        "products"
+      ],
+      "plan_limit_ok": false,
+      "plan_agg_ok": false,
+      "plan_tables_ok": false,
+      "filter_evidence": true,
+      "elapsed": 0.0
+    }
+  ]
+}

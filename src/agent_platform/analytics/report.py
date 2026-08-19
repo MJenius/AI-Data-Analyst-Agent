@@ -68,13 +68,15 @@ class AnalyticsReportBuilder:
                 for row in rows:
                     findings.append(f"Average delivery time in state {row['state']} is {row['avg_delivery_time_days']:.2f} days.")
 
-            # Single row attribution
-            elif len(rows) == 1:
-                first = rows[0]
-                label = first.get("product_name") or first.get("category") or first.get("region") or "Top segment"
-                val = first.get("revenue") or first.get("revenue_growth")
-                if val:
-                    findings.append(f"{label} contributed {val:.1f} to the current results.")
+            # General multi-row or ranked results
+            elif len(rows) >= 1:
+                for row in rows[:3]:
+                    label = row.get("product_category_name") or row.get("category") or row.get("product_name") or row.get("state") or row.get("month") or row.get("seller_id") or "Item"
+                    val = row.get("revenue") or row.get("total_revenue") or row.get("price") or row.get("count") or row.get("total_orders")
+                    if val is not None:
+                        findings.append(f"{label}: {val}")
+                    else:
+                        findings.append(f"Result entry: {row}")
         
         return findings[:5]  # Limit to top 5 findings
 

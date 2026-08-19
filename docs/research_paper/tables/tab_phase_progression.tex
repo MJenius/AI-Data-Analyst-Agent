@@ -1,0 +1,19 @@
+\begin{table*}[t]
+\centering
+\small
+\caption{Longitudinal Comparison Across Development Phases}
+\label{tab:phase_progression}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Phase / System Variant} & \textbf{N} & \textbf{Result Equivalence (95\% CI)} & \textbf{Exact Match} & \textbf{SQL Exec} & \textbf{Table Rec} & \textbf{Latency (s)} \\
+\midrule
+Ablation A: RAG Only & 100 & 19.0\% [12.1, 28.3] & 7.0\% & 99.0\% & 0.0\% & 153.0 (p95: 309.1) \\
+Ablation B: RAG+Planner & 100 & 15.0\% [8.9, 23.9] & 7.0\% & 34.0\% & 0.0\% & 85.8 (p95: 93.1) \\
+Ablation C: RAG+Plan+Verify & 100 & 26.0\% [18.0, 35.9] & 13.0\% & 65.0\% & 0.0\% & 209.4 (p95: 240.0) \\
+Ablation D: Full System & 100 & 14.0\% [8.1, 22.7] & 10.0\% & 45.0\% & 0.0\% & 232.6 (p95: 271.3) \\
+Phase 10: 500-Query Live & 500 & 73.4\% [69.3, 77.2] & 31.0\% & 100.0\% & 95.3\% & 64.0 (p95: 121.9) \\
+\bottomrule
+\end{tabular}%
+}
+\end{table*}

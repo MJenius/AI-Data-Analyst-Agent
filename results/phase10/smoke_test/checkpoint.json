@@ -1,0 +1,36 @@
+{
+  "status": "in_progress",
+  "timestamp": "2026-08-18T19:06:33.903015",
+  "dataset_path": "tests\\evaluation\\benchmark_dataset_500.json",
+  "dataset_sha256": "0c9807d5867ff9cb6a9252437dab31660b62b2e6c9d09c5e54b1dfc7edc43e04",
+  "total_queries": 1,
+  "completed_count": 1,
+  "workers": 1,
+  "entries": {
+    "q_001": {
+      "query_id": "q_001",
+      "question": "What is the total revenue generated across all completed order items?",
+      "category": "Revenue & Sales",
+      "difficulty": "easy",
+      "expected_tables": [
+        "order_items"
+      ],
+      "queried_tables": [
+        "orders",
+        "order_items"
+      ],
+      "actual_sql": "SELECT SUM(oi.price) AS total_revenue FROM order_items oi JOIN orders o ON oi.order_id = o.order_id WHERE o.order_status = 'delivered'",
+      "sql_execution_success": true,
+      "exact_match": false,
+      "equivalent_match": false,
+      "table_precision": 0.5,
+      "table_recall": 1.0,
+      "table_exact_match": false,
+      "latency_seconds": 73.873,
+      "error": null,
+      "error_category": "none",
+      "is_provider_error": false,
+      "repair_events": []
+    }
+  }
+}

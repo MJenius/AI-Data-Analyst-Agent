@@ -1,0 +1,390 @@
+[
+  {
+    "query_id": "q000",
+    "question": "What is the total revenue generated?",
+    "domain": "Revenue & Sales",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "actual_sql": "SELECT SUM(price) AS total_revenue FROM order_items",
+    "expected_sql": "SELECT SUM(oi.price) AS total_revenue FROM order_items oi",
+    "expected_tables": [
+      "order_items"
+    ],
+    "actual_tables": [
+      "order_items"
+    ],
+    "table_precision": 1.0,
+    "table_recall": 1.0,
+    "table_match": true,
+    "result_correct": true,
+    "result_exact_match": true,
+    "result_equivalent_match": true,
+    "result_shape_match": true,
+    "row_count_match": true,
+    "expected_row_count": 1,
+    "actual_row_count": 1,
+    "sql_execution_success": true,
+    "plan_available": true,
+    "query_plan": {
+      "intent": "Calculate the total revenue generated from all order items.",
+      "entities": [
+        "revenue"
+      ],
+      "entity": "revenue",
+      "required_tables": [
+        "order_items"
+      ],
+      "join_path": [],
+      "metric": "total_revenue",
+      "composite_metric": null,
+      "aggregation": "SUM",
+      "filters": [],
+      "time_column": null,
+      "time_range": null,
+      "time_grain": null,
+      "group_by": [],
+      "ranking_dimension": null,
+      "ranking_metric": null,
+      "ranking_direction": null,
+      "ordering": null,
+      "limit": null,
+      "result_shape": "single_value",
+      "reasoning": "The question asks for total revenue, which is defined as the sum of order_items.price. No filters, grouping, or ranking are needed, so only the order_items table is required with a simple SUM aggregation."
+    },
+    "verifier_issues": [],
+    "detected_plan_mismatch": false,
+    "repair_attempted": false,
+    "repair_applied": false,
+    "repair_events": [],
+    "repair_methods": [],
+    "repair_categories": [],
+    "hallucinated_tables": [],
+    "elapsed_seconds": 56.778,
+    "error": null,
+    "failure_cause": "SQL generation"
+  },
+  {
+    "query_id": "q001",
+    "question": "What is the monthly revenue trend?",
+    "domain": "Revenue & Sales",
+    "query_type": "time_series",
+    "difficulty": "medium",
+    "actual_sql": "SELECT strftime('%Y-%m', orders.order_purchase_timestamp) AS month, SUM(order_items.price) AS total_revenue FROM order_items JOIN orders ON order_items.order_id = orders.order_id GROUP BY strftime('%Y-%m', orders.order_purchase_timestamp), month ORDER BY month ASC",
+    "expected_sql": "SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, SUM(oi.price) AS revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id GROUP BY month ORDER BY month",
+    "expected_tables": [
+      "order_items",
+      "orders"
+    ],
+    "actual_tables": [
+      "order_items",
+      "orders"
+    ],
+    "table_precision": 1.0,
+    "table_recall": 1.0,
+    "table_match": true,
+    "result_correct": true,
+    "result_exact_match": false,
+    "result_equivalent_match": true,
+    "result_shape_match": true,
+    "row_count_match": true,
+    "expected_row_count": 24,
+    "actual_row_count": 24,
+    "sql_execution_success": true,
+    "plan_available": true,
+    "query_plan": {
+      "intent": "Calculate the monthly trend of total revenue over time.",
+      "entities": [
+        "month"
+      ],
+      "entity": "month",
+      "required_tables": [
+        "order_items",
+        "orders"
+      ],
+      "join_path": [
+        "order_items.order_id = orders.order_id"
+      ],
+      "metric": "total_revenue",
+      "composite_metric": null,
+      "aggregation": "SUM",
+      "filters": [],
+      "time_column": "orders.order_purchase_timestamp",
+      "time_range": null,
+      "time_grain": "month",
+      "group_by": [
+        "month",
+        "strftime('%Y-%m', orders.order_purchase_timestamp)"
+      ],
+      "ranking_dimension": null,
+      "ranking_metric": null,
+      "ranking_direction": "ASC",
+      "ordering": "strftime('%Y-%m', orders.order_purchase_timestamp) ASC",
+      "limit": null,
+      "result_shape": "time_series",
+      "reasoning": "The question asks for monthly revenue trend, requiring revenue (SUM of order_items.price) grouped by month derived from orders.order_purchase_timestamp. Both tables are needed to join items to their order timestamps. No filters, ranking, or limits are specified."
+    },
+    "verifier_issues": [],
+    "detected_plan_mismatch": false,
+    "repair_attempted": true,
+    "repair_applied": true,
+    "repair_events": [
+      {
+        "step": "SUM(total_revenue) by month at month grain grouped by month, strftime('%Y-%m', orders.order_purchase_timestamp) ordered by strftime('%Y-%m', orders.order_purchase_timestamp) ASC",
+        "attempted": true,
+        "applied": true,
+        "method": "programmatic",
+        "categories": [
+          "group_by_grain_mismatch"
+        ],
+        "pre_repair_sql": "SELECT strftime('%Y-%m', orders.order_purchase_timestamp) AS month, SUM(order_items.price) AS total_revenue FROM order_items JOIN orders ON order_items.order_id = orders.order_id GROUP BY strftime('%Y-%m', orders.order_purchase_timestamp) ORDER BY month ASC;",
+        "re_validated": true,
+        "executed": true,
+        "category": "group_by_grain_mismatch",
+        "post_repair_sql": "SELECT strftime('%Y-%m', orders.order_purchase_timestamp) AS month, SUM(order_items.price) AS total_revenue FROM order_items JOIN orders ON order_items.order_id = orders.order_id GROUP BY strftime('%Y-%m', orders.order_purchase_timestamp), month ORDER BY month ASC;",
+        "final_sql": "SELECT strftime('%Y-%m', orders.order_purchase_timestamp) AS month, SUM(order_items.price) AS total_revenue FROM order_items JOIN orders ON order_items.order_id = orders.order_id GROUP BY strftime('%Y-%m', orders.order_purchase_timestamp), month ORDER BY month ASC;"
+      },
+      {
+        "step": "Summarize findings for Calculate the monthly trend of total revenue over time. with supporting metrics",
+        "attempted": true,
+        "applied": true,
+        "method": "programmatic",
+        "categories": [
+          "group_by_grain_mismatch"
+        ],
+        "pre_repair_sql": "SELECT strftime('%Y-%m', orders.order_purchase_timestamp) AS month, SUM(order_items.price) AS total_revenue FROM order_items JOIN orders ON order_items.order_id = orders.order_id GROUP BY strftime('%Y-%m', orders.order_purchase_timestamp) ORDER BY month ASC;",
+        "re_validated": true,
+        "executed": true,
+        "category": "group_by_grain_mismatch",
+        "post_repair_sql": "SELECT strftime('%Y-%m', orders.order_purchase_timestamp) AS month, SUM(order_items.price) AS total_revenue FROM order_items JOIN orders ON order_items.order_id = orders.order_id GROUP BY strftime('%Y-%m', orders.order_purchase_timestamp), month ORDER BY month ASC;",
+        "final_sql": "SELECT strftime('%Y-%m', orders.order_purchase_timestamp) AS month, SUM(order_items.price) AS total_revenue FROM order_items JOIN orders ON order_items.order_id = orders.order_id GROUP BY strftime('%Y-%m', orders.order_purchase_timestamp), month ORDER BY month ASC;"
+      }
+    ],
+    "repair_methods": [
+      "programmatic",
+      "programmatic"
+    ],
+    "repair_categories": [
+      "group_by_grain_mismatch",
+      "group_by_grain_mismatch"
+    ],
+    "hallucinated_tables": [],
+    "elapsed_seconds": 124.379,
+    "error": null,
+    "failure_cause": "SQL generation"
+  },
+  {
+    "query_id": "q002",
+    "question": "Which month had the highest revenue?",
+    "domain": "Revenue & Sales",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "actual_sql": "SELECT strftime('%Y-%m', orders.order_purchase_timestamp) AS month, SUM(order_items.price) AS total_revenue FROM order_items JOIN orders ON order_items.order_id = orders.order_id GROUP BY month ORDER BY total_revenue DESC LIMIT 1",
+    "expected_sql": "SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS peak_month, SUM(oi.price) AS revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id GROUP BY peak_month ORDER BY revenue DESC LIMIT 1",
+    "expected_tables": [
+      "order_items",
+      "orders"
+    ],
+    "actual_tables": [
+      "order_items",
+      "orders"
+    ],
+    "table_precision": 1.0,
+    "table_recall": 1.0,
+    "table_match": true,
+    "result_correct": true,
+    "result_exact_match": false,
+    "result_equivalent_match": true,
+    "result_shape_match": true,
+    "row_count_match": true,
+    "expected_row_count": 1,
+    "actual_row_count": 1,
+    "sql_execution_success": true,
+    "plan_available": true,
+    "query_plan": {
+      "intent": "Determine the month with the highest total revenue.",
+      "entities": [
+        "month"
+      ],
+      "entity": "strftime('%Y-%m', orders.order_purchase_timestamp)",
+      "required_tables": [
+        "order_items",
+        "orders"
+      ],
+      "join_path": [
+        "order_items.order_id = orders.order_id"
+      ],
+      "metric": "total_revenue",
+      "composite_metric": null,
+      "aggregation": "SUM",
+      "filters": [],
+      "time_column": "orders.order_purchase_timestamp",
+      "time_range": null,
+      "time_grain": "month",
+      "group_by": [
+        "strftime('%Y-%m', orders.order_purchase_timestamp)"
+      ],
+      "ranking_dimension": "strftime('%Y-%m', orders.order_purchase_timestamp)",
+      "ranking_metric": "total_revenue",
+      "ranking_direction": "DESC",
+      "ordering": "total_revenue DESC",
+      "limit": 1,
+      "result_shape": "time_series",
+      "reasoning": "To find the month with highest revenue, we sum order_items.price per month derived from orders.order_purchase_timestamp, order by the summed revenue descending, and limit to the top month."
+    },
+    "verifier_issues": [],
+    "detected_plan_mismatch": false,
+    "repair_attempted": false,
+    "repair_applied": false,
+    "repair_events": [],
+    "repair_methods": [],
+    "repair_categories": [],
+    "hallucinated_tables": [],
+    "elapsed_seconds": 123.539,
+    "error": null,
+    "failure_cause": "SQL generation"
+  },
+  {
+    "query_id": "q003",
+    "question": "Which month had the lowest revenue?",
+    "domain": "Revenue & Sales",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "actual_sql": "SELECT strftime('%Y-%m', orders.order_purchase_timestamp) AS month, SUM(order_items.price) AS total_revenue FROM order_items JOIN orders ON order_items.order_id = orders.order_id GROUP BY month ORDER BY total_revenue ASC LIMIT 1",
+    "expected_sql": "SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS lowest_month, SUM(oi.price) AS revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id GROUP BY lowest_month ORDER BY revenue ASC LIMIT 1",
+    "expected_tables": [
+      "order_items",
+      "orders"
+    ],
+    "actual_tables": [
+      "order_items",
+      "orders"
+    ],
+    "table_precision": 1.0,
+    "table_recall": 1.0,
+    "table_match": true,
+    "result_correct": true,
+    "result_exact_match": false,
+    "result_equivalent_match": true,
+    "result_shape_match": true,
+    "row_count_match": true,
+    "expected_row_count": 1,
+    "actual_row_count": 1,
+    "sql_execution_success": true,
+    "plan_available": true,
+    "query_plan": {
+      "intent": "Determine the month with the lowest total revenue.",
+      "entities": [
+        "month"
+      ],
+      "entity": "month",
+      "required_tables": [
+        "order_items",
+        "orders"
+      ],
+      "join_path": [
+        "order_items.order_id = orders.order_id"
+      ],
+      "metric": "total_revenue",
+      "composite_metric": null,
+      "aggregation": "SUM",
+      "filters": [],
+      "time_column": "orders.order_purchase_timestamp",
+      "time_range": null,
+      "time_grain": "month",
+      "group_by": [
+        "strftime('%Y-%m', orders.order_purchase_timestamp)"
+      ],
+      "ranking_dimension": "month",
+      "ranking_metric": "total_revenue",
+      "ranking_direction": "ASC",
+      "ordering": "total_revenue ASC",
+      "limit": 1,
+      "result_shape": "time_series",
+      "reasoning": "To find the month with lowest revenue, we sum order_items.price per month derived from orders.order_purchase_timestamp, order by the summed revenue ascending, and limit to the first row, which gives the month with the minimum revenue."
+    },
+    "verifier_issues": [],
+    "detected_plan_mismatch": false,
+    "repair_attempted": false,
+    "repair_applied": false,
+    "repair_events": [],
+    "repair_methods": [],
+    "repair_categories": [],
+    "hallucinated_tables": [],
+    "elapsed_seconds": 74.519,
+    "error": null,
+    "failure_cause": "SQL generation"
+  },
+  {
+    "query_id": "q004",
+    "question": "What is the average order value (AOV)?",
+    "domain": "Revenue & Sales",
+    "query_type": "single_value",
+    "difficulty": "easy",
+    "actual_sql": "SELECT SUM(oi.price) / COUNT(DISTINCT oi.order_id) AS aov FROM order_items oi",
+    "expected_sql": "SELECT AVG(order_total) AS average_order_value FROM (SELECT oi.order_id, SUM(oi.price) AS order_total FROM order_items oi GROUP BY oi.order_id)",
+    "expected_tables": [
+      "order_items"
+    ],
+    "actual_tables": [
+      "order_items"
+    ],
+    "table_precision": 1.0,
+    "table_recall": 1.0,
+    "table_match": true,
+    "result_correct": true,
+    "result_exact_match": false,
+    "result_equivalent_match": true,
+    "result_shape_match": true,
+    "row_count_match": true,
+    "expected_row_count": 1,
+    "actual_row_count": 1,
+    "sql_execution_success": true,
+    "plan_available": true,
+    "query_plan": {
+      "intent": "Calculate the average order value (AOV) defined as total item revenue divided by the number of distinct orders.",
+      "entities": [
+        "order"
+      ],
+      "entity": "order_id",
+      "required_tables": [
+        "order_items"
+      ],
+      "join_path": [],
+      "metric": "aov",
+      "composite_metric": {
+        "metric_type": "average",
+        "name": "aov",
+        "numerator": "SUM(oi.price)",
+        "denominator": "COUNT(DISTINCT o.order_id)",
+        "aggregation": "AVG",
+        "grouping_grain": [],
+        "filter_scope": [],
+        "formula_template": "SUM(oi.price) / COUNT(DISTINCT o.order_id)"
+      },
+      "aggregation": null,
+      "filters": [],
+      "time_column": null,
+      "time_range": null,
+      "time_grain": null,
+      "group_by": [],
+      "ranking_dimension": null,
+      "ranking_metric": null,
+      "ranking_direction": null,
+      "ordering": null,
+      "limit": null,
+      "result_shape": "single_value",
+      "reasoning": "The question asks for AOV, which requires summing item prices and counting distinct orders. The order_items table contains both price and order_id, so no additional tables or joins are needed. No time, filters, or ranking are requested, resulting in a single scalar value."
+    },
+    "verifier_issues": [],
+    "detected_plan_mismatch": false,
+    "repair_attempted": false,
+    "repair_applied": false,
+    "repair_events": [],
+    "repair_methods": [],
+    "repair_categories": [],
+    "hallucinated_tables": [],
+    "elapsed_seconds": 59.627,
+    "error": null,
+    "failure_cause": "SQL generation"
+  }
+]

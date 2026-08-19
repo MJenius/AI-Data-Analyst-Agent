@@ -1,0 +1,139 @@
+{
+  "phase": 5,
+  "run_id": "run_20260816T172631Z",
+  "total_queries": 100,
+  "phase4_baseline": {
+    "config": "phase4_improved_rag",
+    "result_correctness_pct": 16.0,
+    "sql_execution_success_pct": 60.0,
+    "failure_breakdown": {
+      "correct": 16,
+      "provider_error": 1,
+      "sql_execution_error": 37,
+      "sql_gen_hallucination": 1,
+      "sql_safety_blocked": 1,
+      "sql_semantic_error": 31,
+      "table_selection_error": 13
+    }
+  },
+  "result_correctness_pct": 16.0,
+  "result_equivalence_pct": 16.0,
+  "sql_execution_success_pct": 61.0,
+  "table_accuracy_pct": 80.0,
+  "hallucinated_schema_rate_pct": 4.0,
+  "unsafe_sql_rate_pct": 1.0,
+  "pre_execution_blocked_pct": 25.0,
+  "avg_latency_seconds": 14.0,
+  "total_tokens": 245893,
+  "failure_breakdown": {
+    "correct": 16,
+    "sql_semantic_error": 45,
+    "sql_execution_error": 39
+  },
+  "semantic_verification_stats": {
+    "queries_with_issues": 52,
+    "group_by_mismatch": 41,
+    "aggregation_grain": 0,
+    "join_fan_out": 0,
+    "duplicate_detection": 12,
+    "expected_row_count": 0,
+    "metric_inconsistency": 0,
+    "pre_execution_blocks": 25,
+    "semantic_issues_on_wrong_queries": 46,
+    "semantic_issues_on_correct_queries": 6
+  },
+  "domain_breakdown": {
+    "Revenue & Sales": {
+      "total": 15,
+      "correct": 3,
+      "exec": 10
+    },
+    "Orders & Transactions": {
+      "total": 15,
+      "correct": 4,
+      "exec": 12
+    },
+    "Customers": {
+      "total": 15,
+      "correct": 1,
+      "exec": 5
+    },
+    "Products & Categories": {
+      "total": 15,
+      "correct": 2,
+      "exec": 8
+    },
+    "Logistics & Delivery": {
+      "total": 10,
+      "correct": 0,
+      "exec": 7
+    },
+    "Sellers": {
+      "total": 10,
+      "correct": 2,
+      "exec": 5
+    },
+    "Payments": {
+      "total": 10,
+      "correct": 2,
+      "exec": 7
+    },
+    "Reviews & Satisfaction": {
+      "total": 10,
+      "correct": 2,
+      "exec": 7
+    }
+  },
+  "query_type_breakdown": {
+    "single_value": {
+      "total": 14,
+      "correct": 4,
+      "exec": 11
+    },
+    "time_series": {
+      "total": 17,
+      "correct": 3,
+      "exec": 11
+    },
+    "unknown": {
+      "total": 3,
+      "correct": 0,
+      "exec": 1
+    },
+    "aggregation": {
+      "total": 40,
+      "correct": 6,
+      "exec": 25
+    },
+    "ranking": {
+      "total": 26,
+      "correct": 3,
+      "exec": 13
+    }
+  },
+  "difficulty_breakdown": {
+    "easy": {
+      "total": 70,
+      "correct": 13,
+      "exec": 44
+    },
+    "medium": {
+      "total": 26,
+      "correct": 3,
+      "exec": 16
+    },
+    "hard": {
+      "total": 4,
+      "correct": 0,
+      "exec": 1
+    }
+  },
+  "wall_time_seconds": 53.59,
+  "config_snapshot": {
+    "llm_provider": "none (frozen Phase 4 SQL)",
+    "verifier_enabled": true,
+    "verifier_level": "balanced",
+    "phase4_baseline_path": "C:\\Users\\mjeni\\OneDrive\\Desktop\\Own Projects\\Data Analyst Agent\\results\\phase4\\run_20260816T_phase4_nvidia_nemotron_120b_v2\\phase4_improved_rag\\raw_results.json",
+    "benchmark_path": "C:\\Users\\mjeni\\OneDrive\\Desktop\\Own Projects\\Data Analyst Agent\\tests\\evaluation\\benchmark_dataset_v2.json"
+  }
+}

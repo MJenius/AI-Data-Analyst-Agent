@@ -131,8 +131,8 @@ class ExecutionLoop:
         self._observer.on_run_start(state)
 
         try:
-            plan = await self._planner.execute(state)
-            state.set_plan(plan)
+            query_plan = await self._planner.execute(state)
+            state.set_query_plan(query_plan)
 
             # Each step is isolated so retries/fallback policies can wrap this block later.
             while state.current_step is not None:
