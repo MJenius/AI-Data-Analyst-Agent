@@ -132,7 +132,12 @@ pytest tests/unit/ -v
 python tests/evaluation/validate_500_dataset.py
 ```
 
-### 4. Compile Publication Manuscript
+### 4. Run Spider Cross-Database Transfer Evaluation
+```bash
+python tests/evaluation/run_spider_eval.py --sample-size 50 --concurrency 3
+```
+
+### 5. Compile Publication Manuscript
 ```bash
 cd docs/research_paper/latex
 pdflatex main.tex
@@ -141,7 +146,8 @@ pdflatex main.tex
 pdflatex main.tex
 ```
 
-For complete instructions on acquiring the Olist dataset and running live evaluations, see **[REPRODUCIBILITY.md](REPRODUCIBILITY.md)**.
+For complete instructions on acquiring the raw datasets, running the live 500-query benchmark, and reproducing all empirical figures, see **[REPRODUCIBILITY.md](REPRODUCIBILITY.md)**.
+
 
 ---
 

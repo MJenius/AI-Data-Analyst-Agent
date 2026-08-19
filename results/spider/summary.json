@@ -1,0 +1,116 @@
+{
+  "benchmark": "Spider (Yale Text-to-SQL)",
+  "split": "validation_stratified_subset",
+  "sample_size": 50,
+  "unique_databases": 20,
+  "equivalent_matches": 9,
+  "equivalent_rate": 0.18,
+  "exact_matches": 3,
+  "exact_rate": 0.06,
+  "execution_successes": 50,
+  "execution_success_rate": 1.0,
+  "mean_latency_seconds": 72.66,
+  "per_database_breakdown": {
+    "concert_singer": {
+      "total": 3,
+      "equiv": 1,
+      "exec": 3
+    },
+    "battle_death": {
+      "total": 3,
+      "equiv": 0,
+      "exec": 3
+    },
+    "car_1": {
+      "total": 3,
+      "equiv": 1,
+      "exec": 3
+    },
+    "course_teach": {
+      "total": 3,
+      "equiv": 1,
+      "exec": 3
+    },
+    "cre_Doc_Template_Mgt": {
+      "total": 3,
+      "equiv": 0,
+      "exec": 3
+    },
+    "dog_kennels": {
+      "total": 3,
+      "equiv": 0,
+      "exec": 3
+    },
+    "employee_hire_evaluation": {
+      "total": 3,
+      "equiv": 1,
+      "exec": 3
+    },
+    "museum_visit": {
+      "total": 3,
+      "equiv": 0,
+      "exec": 3
+    },
+    "flight_2": {
+      "total": 3,
+      "equiv": 2,
+      "exec": 3
+    },
+    "network_1": {
+      "total": 3,
+      "equiv": 0,
+      "exec": 3
+    },
+    "orchestra": {
+      "total": 2,
+      "equiv": 1,
+      "exec": 2
+    },
+    "pets_1": {
+      "total": 2,
+      "equiv": 0,
+      "exec": 2
+    },
+    "poker_player": {
+      "total": 2,
+      "equiv": 1,
+      "exec": 2
+    },
+    "student_transcripts_tracking": {
+      "total": 2,
+      "equiv": 0,
+      "exec": 2
+    },
+    "real_estate_properties": {
+      "total": 2,
+      "equiv": 0,
+      "exec": 2
+    },
+    "singer": {
+      "total": 2,
+      "equiv": 1,
+      "exec": 2
+    },
+    "tvshow": {
+      "total": 2,
+      "equiv": 0,
+      "exec": 2
+    },
+    "world_1": {
+      "total": 2,
+      "equiv": 0,
+      "exec": 2
+    },
+    "voter_1": {
+      "total": 2,
+      "equiv": 0,
+      "exec": 2
+    },
+    "wta_1": {
+      "total": 2,
+      "equiv": 0,
+      "exec": 2
+    }
+  },
+  "timestamp_utc": "2026-08-19T21:14:22.622675+00:00"
+}

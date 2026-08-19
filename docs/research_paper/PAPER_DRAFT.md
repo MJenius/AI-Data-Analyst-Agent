@@ -220,20 +220,36 @@ To examine pipeline sensitivity to controlled lexical and semantic shifts, we ev
 
 ---
 
-## 10. Explicit Limitations & Threats to Validity
+## 10. Cross-Database Generalization on Spider
 
-1. **Single Relational Data Warehouse:** All experiments are conducted on the Brazilian E-Commerce (Olist) data warehouse (9 tables, 100k orders). While representative of relational schemas, this study does not establish zero-shot transfer to medical, financial, or graph databases without domain-specific schema RAG tuning.
-2. **Custom Frozen Benchmark:** The evaluation is conducted on a fixed 500-query benchmark. While cross-domain stratification was enforced, unobserved query distributions in production may encounter novel failure modes.
+To test zero-shot transferability beyond the primary single-warehouse environment, we evaluated the identical multi-stage pipeline on a stratified sample of **50 queries across 20 distinct SQLite databases** from the public Yale Spider benchmark (`data/spider/validation.json`):
+
+| Evaluation Setting | Unique Databases | Sample Size ($N$) | Result Equivalence | Execution Success | Mean Latency |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **In-Domain Warehouse (Olist)** | 1 | 500 | **73.4%** | **100.0%** | 64.04s |
+| **Zero-Shot Transfer (Spider Subgroup)** | **20** | **50** | **18.0%** | **100.0%** | 72.66s |
+
+*Key Findings:*
+1. **Execution Robustness:** The pipeline maintains 100.0% execution success across all 20 external databases without crashing or raising unhandled exceptions.
+2. **Transfer Bottlenecks:** Result equivalence drops to 18.0% (9/50 matches). Detailed inspection of generated SQL traces revealed that schema-linking assumptions tuned for domain-specific foreign-key graphs do not automatically generalize to arbitrary external table naming conventions, frequently triggering the safe fallback when cross-table relationships are undeclared in raw SQLite headers.
+3. **Architectural Stop-Condition:** Adapting the pipeline to score competitively on cross-domain academic benchmarks like Spider would require re-engineering the retriever and AST verifier into a generic schema-linking framework, departing from our architectural goal of deep data warehouse grounding.
+
+---
+
+## 11. Explicit Limitations & Threats to Validity
+
+1. **Single Relational Data Warehouse vs. Cross-Schema Transfer:** While achieving 73.4% equivalence on the in-depth Olist warehouse (9 tables, 100k orders), zero-shot transfer on the Spider cross-database subset dropped to 18.0%, demonstrating that deep schema grounding requires database-specific catalog introspection.
+2. **Custom Frozen Benchmark:** The primary evaluation is conducted on a fixed 500-query benchmark. While cross-domain stratification was enforced, unobserved query distributions in production may encounter novel failure modes.
 3. **Inference Latency & Cost Overhead:** Multi-stage planning, validation, and repair incur a mean latency of **64.04s** ($p95$: 121.92s) and higher token usage compared to single-shot prompting (~7s).
 4. **Hard Query Complexity Ceiling:** Result equivalence drops to **44.55%** on hard-tier queries and **32.56%** on complex aggregated multi-column tables, reflecting persistent challenges in multi-step CTE nesting and window-function synthesis.
 5. **Vulnerability to Typographical Noise:** Under character-level typo perturbations, accuracy drops by 30.0% (57.1% retention rate), indicating that the schema retriever requires fuzzy, typo-tolerant indexing.
-6. **False-Positive Repair Regressions:** 21.8% of repair attempts degraded previously correct queries, underscoring the need for uncertainty-gated verification.
+6. **False-Positive Repair Regressions:** 21.8% of repair attempts degraded previously correct queries in this setting, underscoring the need for uncertainty-gated verification.
 7. **Empirical Comparator Limits:** The row-multiset comparator is an empirical evaluation metric under the study comparator, not a formal proof of semantic correctness.
 8. **Sub-study Sample Sizes:** Component ablations ($N=100$) and synthetic perturbation tests ($N=50$) use smaller samples than the main 500-query benchmark.
 
 ---
 
-## 11. Reproducibility & Open Artifacts
+## 12. Reproducibility & Open Artifacts
 
 All code, benchmark definitions, evaluation scripts, and manuscript sources are open-source for full reproducibility:
 - Complete reproduction instructions in `REPRODUCIBILITY.md`.
@@ -243,6 +259,7 @@ All code, benchmark definitions, evaluation scripts, and manuscript sources are 
 
 ---
 
-## 12. Conclusion
+## 13. Conclusion
 
 In this study, we investigated the architectural mechanisms governing the reliability of LLM-generated analytical SQL over a public relational e-commerce data warehouse. On an audited 500-query benchmark, our multi-stage pipeline achieved a **73.40% Result Equivalence Rate under the study comparator** and **100.00% SQL Execution Success**. Our controlled component ablation demonstrated that adding AST-based structural verification provides a statistically significant improvement over unverified planning (Config C 26.0% vs. Config B 15.0%, exact $p=0.0192$, $\text{OR}=3.75$). However, the ablation does not establish that planning itself improves performance over basic RAG (Config B 15.0% vs. Config A 19.0%) or that the full system is causally superior. Furthermore, an exhaustive audit of 101 repair cases revealed that automated self-repair is a double-edged mechanism, producing **22 harmful false-positive regressions** against only **4 genuine recoveries**. We conclude that conservative, uncertainty-aware structural verification is preferable to unconstrained automated repair loops.
+

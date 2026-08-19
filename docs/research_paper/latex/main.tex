@@ -227,18 +227,26 @@ To examine sensitivity to controlled lexical and semantic shifts, we evaluated a
 \paragraph{Robustness Observations.}
 The pipeline demonstrates high retention under query paraphrasing (80.0\% retention), ranking phrasing variants (100.0\% retention), and synonym substitution (100.0\% retention). Temporal boundary shifts exhibit moderate degradation (85.7\% retention). However, character-level typographical noise causes severe degradation (57.1\% retention, 30.0\% absolute drop), exposing the vulnerability of exact token-matching in the schema retriever.
 
+\section{Cross-Database Generalization on Spider}
+To examine zero-shot transferability beyond the single-warehouse setting, we evaluated the identical multi-stage pipeline directly on a stratified sample of \SpiderSampleQueries{} queries across \SpiderUniqueDatabases{} distinct SQLite databases from the public Spider benchmark \cite{yu2018spider} (Table~\ref{tab:spider_evaluation}).
+
+\IfFileExists{tables/tab_spider_evaluation.tex}{\input{tables/tab_spider_evaluation.tex}}{\input{../tables/tab_spider_evaluation.tex}}
+
+While the pipeline maintains \SpiderExecutionSuccess{} SQL Execution Success across all 20 external databases, Result Equivalence drops to \SpiderEquivalentAccuracy{} (9/50 queries). Analysis reveals the key transfer bottlenecks: (1) schema-linking assumptions tuned for domain-specific foreign-key graphs do not automatically generalize to arbitrary external table naming conventions without schema adaptation; (2) query plans frequently hit the safe fallback when cross-table foreign-key relationships are undeclared in raw SQLite headers; and (3) complex subqueries and multi-way nested joins in Spider exceed the grain-mapping templates. This finding confirms the stop-condition boundary: adapting the pipeline to achieve high Spider scores would require altering the core warehouse-grounding architecture.
+
 \section{Limitations and Threats to Validity}
 We explicitly document the scientific and operational limitations of this study:
 \begin{enumerate}\sloppy
-    \item \textbf{Single Data Warehouse Schema:} All evaluations were conducted on the Olist e-commerce relational schema (9 tables, 100k orders). While architecturally representative of relational star/snowflake schemas, our results do not claim zero-shot transfer to financial, healthcare, or graph database schemas without domain-specific schema RAG tuning.
-    \item \textbf{Custom Frozen Benchmark:} The 500-query benchmark is a custom frozen corpus. Although stratified across domains and difficulty tiers, evaluations on external public benchmarks (e.g., Spider, BIRD) remain necessary for cross-benchmark comparison.
+    \item \textbf{Single Data Warehouse Focus vs.\ Cross-Schema Transfer:} While achieving 73.4\% equivalence on the in-depth Olist warehouse (9 tables, 100k orders), zero-shot transfer on the Spider cross-database subset dropped to 18.0\%, demonstrating that deep schema grounding requires database-specific catalog introspection.
+    \item \textbf{Custom Frozen Benchmark:} The primary 500-query benchmark is a custom frozen corpus. All records and cryptographic hashes are permanently archived for full auditability.
     \item \textbf{Inference Latency Overhead:} Multi-stage retrieval, planning, validation, and verification incur a mean latency of \HeadlineMeanLatency{} ($p95$: \HeadlinePNinetyFiveLatency{}), making this architecture suited for asynchronous analytics rather than sub-second interactive search.
     \item \textbf{Hard Query Degradation:} Result equivalence drops to 44.55\% on hard queries and 32.56\% on aggregated table queries, reflecting persistent limitations in multi-step CTE nesting and window functions.
     \item \textbf{Typographical Sensitivity:} The schema retriever degrades significantly under typographical noise (57.1\% retention), indicating the necessity of fuzzy edit-distance indexing.
-    \item \textbf{False-Positive Repair Regressions:} Heuristic repair rules induced regressions in 22 out of 101 triggered cases, underscoring the need for uncertainty-aware gating before applying automated repairs.
+    \item \textbf{False-Positive Repair Regressions:} Heuristic repair rules induced regressions in 22 out of 101 triggered cases in this evaluation setting, underscoring the need for uncertainty-aware gating before applying automated repairs.
     \item \textbf{Empirical Comparator Scope:} The row-multiset comparator is an empirical evaluation metric with numerical tolerance under the defined comparator, not a formal mathematical proof of semantic correctness.
     \item \textbf{Ablation Sample Sizes:} Component ablations ($N=100$) and synthetic perturbation tests ($N=50$) use smaller sample sizes than the main 500-query benchmark.
 \end{enumerate}
+
 
 \section{Reproducibility and Open Artifacts}
 All code, benchmark definitions, evaluation scripts, and manuscript sources are open-source:

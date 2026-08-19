@@ -110,7 +110,7 @@
       "is_external": false
     },
     "results/phase10/final_research_validation_report.json": {
-      "sha256": "79d7269b7d89914a6a3ff01a980e1b3c01d3f7fac54caea2dadf3a6c0f65f04c",
+      "sha256": "51e1897e475fb3cd21bb96c5c5bfa04c2ad0e4eb7bfefc71d2f092cb424efb7c",
       "size_bytes": 43752,
       "is_external": false
     },
@@ -145,28 +145,28 @@
       "is_external": false
     },
     "docs/research_paper/latex/main.tex": {
-      "sha256": "20d2b444c61886aff617dd1b5683643da5ce7f147cba600f197e38673bbab847",
-      "size_bytes": 26814,
+      "sha256": "ea8095f064583c7b3189b3e8605bce24c414ac84746d4ee47ac129ea78fa17b4",
+      "size_bytes": 28080,
       "is_external": false
     },
     "docs/research_paper/latex/references.bib": {
-      "sha256": "45ffa9a8ae7158b02c5ca7f3a945c9a17c98a9d536106e09a1569eca33b9f8c5",
-      "size_bytes": 3560,
+      "sha256": "eecae96d1d2f135a4d4d07c965ec1c376b732b198b922c1131009f92a2223e4f",
+      "size_bytes": 4364,
       "is_external": false
     },
     "docs/research_paper/latex/macros.tex": {
-      "sha256": "0d6c64a965f2b04e8c923c96ee8a3a45f0072d94ad6b895db4701138ab9992bc",
-      "size_bytes": 1091,
+      "sha256": "8b3496855ba86b174f614231090221a7506fdba4feea261494eca473dc690e14",
+      "size_bytes": 1356,
       "is_external": false
     },
     "docs/research_paper/macros.tex": {
-      "sha256": "0d6c64a965f2b04e8c923c96ee8a3a45f0072d94ad6b895db4701138ab9992bc",
-      "size_bytes": 1091,
+      "sha256": "8b3496855ba86b174f614231090221a7506fdba4feea261494eca473dc690e14",
+      "size_bytes": 1356,
       "is_external": false
     },
     "docs/research_paper/PAPER_DRAFT.md": {
-      "sha256": "034d8b0796c46bda242ad064c504c9ad734328dc230cdc532f545d6bfcea6469",
-      "size_bytes": 25214,
+      "sha256": "79cc4071f680e5c2da6633025e741986bdbf9f6fdd2dbc0e50f874fa5886cb68",
+      "size_bytes": 26809,
       "is_external": false
     },
     "docs/research_paper/PAPER_READINESS_AUDIT.md": {
@@ -330,13 +330,18 @@
       "is_external": false
     },
     "README.md": {
-      "sha256": "58150ed6b4ff027fdbb0436f14ec0d660b7eaceac88d93c1e634d940cdd4645d",
-      "size_bytes": 8674,
+      "sha256": "8ad2d9b0df40aeea2f51d6258006ce9dd894f1e824dffe65ab20f34cd459aea6",
+      "size_bytes": 8870,
       "is_external": false
     },
     "pyproject.toml": {
       "sha256": "89109a21c31652d0a62796a56fb4ad174ee5363445d4a6b61dcf382e639acb42",
       "size_bytes": 903,
+      "is_external": false
+    },
+    "results/spider/summary.json": {
+      "sha256": "698db227266ff0d288cf3905b38a2e60eccb14194e95d41ce903019dd3a4e358",
+      "size_bytes": 2148,
       "is_external": false
     }
   },
