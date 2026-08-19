@@ -29,38 +29,52 @@
 \maketitle
 
 \begin{abstract}
-While Large Language Models (LLMs) demonstrate notable code-generation capabilities, translating natural language questions into reliable analytical SQL over relational databases (Text-to-SQL) remains brittle in practice. Queries frequently fail due to schema hallucinations, invalid join topologies, aggregation grain mismatch, and SQL dialect incompatibilities. In this paper, we present an empirical reliability study investigating which architectural mechanisms improve the reliability of LLM-generated analytical SQL, and what failure modes persist across grounding, planning, structural verification, and automated repair. We evaluate a multi-stage reliability pipeline on a frozen 500-query benchmark across 8 business domains over a public relational e-commerce data warehouse (the Olist dataset, 9 tables, 100,000+ orders). Our system achieves a \textbf{\HeadlineEquivalentAccuracy{} Result Equivalence Rate under the study comparator} (367/500 queries, 95\% Wilson Score CI: [\HeadlineEquivalentCILower{}, \HeadlineEquivalentCIUpper{}]), \textbf{\HeadlineExactMatchAccuracy{} Exact Match}, and \textbf{\HeadlineSQLExecutionSuccess{} SQL Execution Success} with a mean latency of \HeadlineMeanLatency{} ($p50$: \HeadlinePFiftyLatency{}, $p95$: \HeadlinePNinetyFiveLatency{}). In a controlled 4-way 100-query ablation, activating AST-based structural verification significantly improves result equivalence over unverified planners (Config~C 26.0\% vs.\ Config~B 15.0\%, McNemar exact $p=0.0192$, $\text{OR}=3.75$). An exhaustive audit of all \TotalRepairTriggered{} repair events reveals that automated self-repair is a double-edged mechanism: while 97 of 101 post-repair queries (96.0\%) were syntactically valid and preserved \RepairMaintainedCount{} already-correct queries, repair yielded only \RepairTrulyRecoveredCount{} genuine recoveries while inducing \RepairHarmedFalsePositiveCount{} false-positive regressions. In a controlled 50-query synthetic perturbation robustness study across 5 vectors, the pipeline remains resilient to paraphrasing, synonyms, and ranking variants, but degrades under typographical noise (57.1\% retention). We conclude that conservative, uncertainty-aware structural verification is preferable to unrestricted automated repair, and document the persistent structural failure modes across complex analytical queries.
+While Large Language Models (LLMs) demonstrate notable code-generation capabilities, translating natural language questions into reliable analytical SQL over relational databases (Text-to-SQL) remains brittle in practice. In this paper, we investigate the empirical mechanisms governing Text-to-SQL reliability: \textbf{structural verification improves query reliability, whereas aggressive automated repair can introduce substantial semantic regressions}. We evaluate a multi-stage reliability pipeline on a frozen 500-query benchmark across 8 business domains over a public relational e-commerce data warehouse (the Olist dataset, 9 tables, 100,000+ orders). Our system achieves a \textbf{\HeadlineEquivalentAccuracy{} Result Equivalence Rate under the study comparator} (367/500 queries, 95\% Wilson Score CI: [\HeadlineEquivalentCILower{}, \HeadlineEquivalentCIUpper{}]), \textbf{\HeadlineExactMatchAccuracy{} Exact Match}, and \textbf{\HeadlineSQLExecutionSuccess{} SQL Execution Success} with a mean latency of \HeadlineMeanLatency{} ($p50$: \HeadlinePFiftyLatency{}, $p95$: \HeadlinePNinetyFiveLatency{}). In a controlled 4-way 100-query ablation, activating deterministic Abstract Syntax Tree (AST) structural verification significantly improves result equivalence over unverified planning (Config~C 26.0\% vs.\ Config~B 15.0\%, McNemar exact $p=0.0192$, $\text{Odds Ratio}=3.75$). However, an exhaustive audit of all \TotalRepairTriggered{} repair events reveals that automated self-repair is a double-edged mechanism: while 97 of 101 post-repair queries (96.0\%) were syntactically valid and preserved \RepairMaintainedCount{} already-correct queries, repair yielded only \RepairTrulyRecoveredCount{} genuine recoveries while inducing \RepairHarmedFalsePositiveCount{} harmful false-positive regressions. Furthermore, a cross-schema transfer probe across \SpiderUniqueDatabases{} external databases from the Spider benchmark demonstrates that while execution stability is preserved (100.0\%), result equivalence drops to \SpiderEquivalentAccuracy{} (9/50), highlighting the gap between in-domain grounding and zero-shot schema transfer. We conclude that conservative, uncertainty-aware structural verification is preferable to unconstrained automated repair loops.
 \end{abstract}
 
-\section{Introduction and Research Questions}
+\section{Introduction and Central Thesis}
 Natural language interfaces to relational databases (Text-to-SQL) have received widespread attention for democratizing analytical access \cite{yu2018spider,li2023bird}. However, translating ambiguous business questions into sound SQL over normalized multi-table schemas reveals a fundamental operational reality:
 \begin{center}
 \textit{Executable SQL is not necessarily reliable analytical SQL.}
 \end{center}
-A query may compile cleanly and execute without database runtime exceptions, yet return subtly corrupted figures due to several systemic failure modes:
-\begin{enumerate}\sloppy
-    \item \textbf{Schema Grounding Hallucinations:} LLMs frequently invent nonexistent columns (e.g., querying \texttt{order\_amount} instead of \texttt{price}), guess unindexed foreign keys, or join tables across disconnected topologies.
-    \item \textbf{Join-Path \& Topology Errors:} In multi-table relational schemas, joining distant entities without necessary intermediate bridging tables creates invalid query semantics or cartesian fan-out.
-    \item \textbf{Aggregation Grain Inconsistencies:} Computing metrics across mismatched dimensional grains (e.g., joining order items before aggregating customer attributes) produces inflated totals due to join fan-out multiplication.
-    \item \textbf{Filtering \& Ranking Errors:} Queries often omit critical domain predicates (e.g., \texttt{order\_status = 'delivered'}) or invert ordering directions in ranking clauses.
-    \item \textbf{Dialect \& Runtime Failures:} Syntactic incompatibilities across SQL engines (e.g., SQLite's \texttt{strftime} vs.\ PostgreSQL's \texttt{DATE\_TRUNC}) cause execution failures when models mix dialect idioms.
+A query may compile cleanly and execute without database runtime exceptions, yet return corrupted figures due to systemic structural failure modes: schema hallucinations, join-path omissions, aggregation grain mismatches, and filter inconsistencies.
+
+\paragraph{Central Thesis.}
+Rather than presenting Text-to-SQL as an unconstrained agentic pipeline, this empirical study establishes that:
+\begin{center}
+\textbf{Deterministic structural verification improves Text-to-SQL reliability, while aggressive automated repair can introduce semantic regressions.}
+\end{center}
+Our evidence directly supports this thesis:
+\begin{enumerate}
+    \item \textbf{Verification Benefit:} In a controlled ablation, activating AST-based structural verification improves result equivalence from 15.0\% to 26.0\% over unverified planning (McNemar exact $p=0.0192$, $\text{OR}=3.75$).
+    \item \textbf{Repair Hazard:} An audit of all 101 repair events reveals that compiler execution validity masks semantic degradation, producing \textbf{22 harmful false-positive regressions} against only \textbf{4 genuine recoveries}.
 \end{enumerate}
 
-To evaluate how these failure modes can be mitigated, we study a multi-stage architecture that decomposes query synthesis into explicit schema grounding, structured query planning, deterministic plan validation, AST-based structural verification, and closed-loop repair. Rather than treating Text-to-SQL as end-to-end string generation, this study investigates the marginal contribution and empirical limitations of each stage.
-
-We formulate the central research question:
-\begin{quote}
-\textit{Which architectural mechanisms improve the reliability of LLM-generated analytical SQL, and what failure modes remain after grounding, planning, verification, and repair?}
-\end{quote}
-
-Specifically, we address five explicit research questions:
+\section{Research Questions and Summary of Findings}
+To evaluate these mechanisms systematically, we address five explicit research questions:
 \begin{itemize}
-    \item \textbf{RQ1 (Overall Reliability):} Does the multi-stage reliability pipeline improve result equivalence on complex relational queries?
-    \item \textbf{RQ2 (Marginal Verification Effect):} What is the marginal impact of deterministic AST structural verification over unverified query planning?
-    \item \textbf{RQ3 (Automated Repair Dynamics):} Does automated repair genuinely recover incorrect queries without degrading already-correct ones?
-    \item \textbf{RQ4 (Failure Taxonomy):} What structural failure modes dominate the remaining non-equivalent queries?
-    \item \textbf{RQ5 (Controlled Perturbation Robustness):} How sensitive is the system to controlled lexical, temporal, and typographical perturbations?
+    \item \textbf{RQ1: Overall Reliability --- Does the multi-stage pipeline achieve high result equivalence on a complex data warehouse?} \\
+    $\rightarrow$ \textbf{Answer:} On the 500-query benchmark across 8 domains, the system achieves \textbf{\HeadlineEquivalentAccuracy{} Result Equivalence} under the study comparator (95\% Wilson CI: [\HeadlineEquivalentCILower{}, \HeadlineEquivalentCIUpper{}]) and \textbf{\HeadlineSQLExecutionSuccess{} SQL Execution Success}.
+    \item \textbf{RQ2: Verification Impact --- What is the marginal effect of deterministic AST structural verification?} \\
+    $\rightarrow$ \textbf{Answer:} Adding AST structural verification significantly increases execution reliability from 34.0\% to 65.0\% and result equivalence from 15.0\% to 26.0\% (McNemar exact $p=0.0192$, $\text{OR}=3.75$).
+    \item \textbf{RQ3: Repair Dynamics --- Does automated self-repair reliably fix broken queries without harming valid ones?} \\
+    $\rightarrow$ \textbf{Answer:} No. While 96.0\% of post-repair queries execute cleanly and 49 correct queries are maintained, repair produced only \textbf{4 genuine recoveries} while causing \textbf{22 false-positive regressions}.
+    \item \textbf{RQ4: Failure Taxonomy --- What structural failure modes dominate remaining non-equivalent queries?} \\
+    $\rightarrow$ \textbf{Answer:} Among the 133 non-equivalent queries, failure is dominated by missing join paths (27.8\%), filter omissions/errors (24.8\%), and aggregation mismatches (24.1\%).
+    \item \textbf{RQ5: Cross-Schema Transfer --- Does warehouse-grounded reliability transfer to unseen external schemas?} \\
+    $\rightarrow$ \textbf{Answer:} Execution stability is fully preserved (100.0\%), but result equivalence drops to \textbf{18.0\%} (9/50) on a 20-database Spider transfer probe, exposing the gap between deep schema grounding and zero-shot transfer.
 \end{itemize}
+
+\section{Summary of Contributions}
+We summarize our core contributions as follows:
+\begin{enumerate}
+    \item \textbf{Controlled Empirical Decomposition:} We evaluate the marginal effect of deterministic AST verification over unverified planning, demonstrating a statistically significant reliability gain ($p=0.0192$).
+    \item \textbf{Repair-Risk Characterization:} We present an exhaustive 4-way semantic audit of 101 repair events, showing that execution-valid repair can induce substantial false-positive regressions (22 harmed vs.\ 4 recovered).
+    \item \textbf{Systematic Failure Taxonomy:} We categorize all 133 non-equivalent queries using AST diffing across six core structural failure classes.
+    \item \textbf{Cross-Schema Transfer Probe:} We report zero-shot transfer evaluation across 20 unseen SQLite databases from the Spider benchmark, demonstrating execution robustness alongside a marked semantic generalization drop.
+    \item \textbf{Audited Open Science Package:} We release all source code, frozen benchmark definitions, evaluation scripts, LaTeX manuscripts, and a cryptographic SHA-256 artifact manifest.
+\end{enumerate}
+
 
 \begin{figure*}[t]
 \centering
@@ -227,25 +241,27 @@ To examine sensitivity to controlled lexical and semantic shifts, we evaluated a
 \paragraph{Robustness Observations.}
 The pipeline demonstrates high retention under query paraphrasing (80.0\% retention), ranking phrasing variants (100.0\% retention), and synonym substitution (100.0\% retention). Temporal boundary shifts exhibit moderate degradation (85.7\% retention). However, character-level typographical noise causes severe degradation (57.1\% retention, 30.0\% absolute drop), exposing the vulnerability of exact token-matching in the schema retriever.
 
-\section{Cross-Database Generalization on Spider}
-To examine zero-shot transferability beyond the single-warehouse setting, we evaluated the identical multi-stage pipeline directly on a stratified sample of \SpiderSampleQueries{} queries across \SpiderUniqueDatabases{} distinct SQLite databases from the public Spider benchmark \cite{yu2018spider} (Table~\ref{tab:spider_evaluation}).
+\section{Cross-Schema Transfer Evaluation}
+To examine whether performance in a controlled, explicitly modeled relational warehouse transfers to heterogeneous unseen schemas, we evaluated the identical multi-stage pipeline on a small stratified transfer probe of \SpiderSampleQueries{} queries across \SpiderUniqueDatabases{} distinct SQLite databases from the public Spider benchmark \cite{yu2018spider} (Table~\ref{tab:spider_evaluation}). We emphasize that this 50-query evaluation serves as a transfer probe across 20 unseen databases, not a comprehensive evaluation on the entire 1,034-query Spider benchmark.
 
 \IfFileExists{tables/tab_spider_evaluation.tex}{\input{tables/tab_spider_evaluation.tex}}{\input{../tables/tab_spider_evaluation.tex}}
 
-While the pipeline maintains \SpiderExecutionSuccess{} SQL Execution Success across all 20 external databases, Result Equivalence drops to \SpiderEquivalentAccuracy{} (9/50 queries). Analysis reveals the key transfer bottlenecks: (1) schema-linking assumptions tuned for domain-specific foreign-key graphs do not automatically generalize to arbitrary external table naming conventions without schema adaptation; (2) query plans frequently hit the safe fallback when cross-table foreign-key relationships are undeclared in raw SQLite headers; and (3) complex subqueries and multi-way nested joins in Spider exceed the grain-mapping templates. This finding confirms the stop-condition boundary: adapting the pipeline to achieve high Spider scores would require altering the core warehouse-grounding architecture.
+Under zero-shot transfer, the system preserved execution reliability (100.0\% SQL Execution Success across all 20 external databases) but experienced a substantial decline in semantic equivalence, achieving \SpiderEquivalentAccuracy{} Result Equivalence (9/50 matches). This empirical result demonstrates that strong performance within an explicitly modeled enterprise data warehouse does not automatically transfer to heterogeneous, uncurated external schemas without database-specific catalog introspection and schema tuning. We intentionally report this as an empirical boundary of the architecture, adhering to the experimental stop-condition rather than re-engineering the warehouse pipeline into a generic schema linker.
 
 \section{Limitations and Threats to Validity}
 We explicitly document the scientific and operational limitations of this study:
 \begin{enumerate}\sloppy
-    \item \textbf{Single Data Warehouse Focus vs.\ Cross-Schema Transfer:} While achieving 73.4\% equivalence on the in-depth Olist warehouse (9 tables, 100k orders), zero-shot transfer on the Spider cross-database subset dropped to 18.0\%, demonstrating that deep schema grounding requires database-specific catalog introspection.
-    \item \textbf{Custom Frozen Benchmark:} The primary 500-query benchmark is a custom frozen corpus. All records and cryptographic hashes are permanently archived for full auditability.
-    \item \textbf{Inference Latency Overhead:} Multi-stage retrieval, planning, validation, and verification incur a mean latency of \HeadlineMeanLatency{} ($p95$: \HeadlinePNinetyFiveLatency{}), making this architecture suited for asynchronous analytics rather than sub-second interactive search.
-    \item \textbf{Hard Query Degradation:} Result equivalence drops to 44.55\% on hard queries and 32.56\% on aggregated table queries, reflecting persistent limitations in multi-step CTE nesting and window functions.
-    \item \textbf{Typographical Sensitivity:} The schema retriever degrades significantly under typographical noise (57.1\% retention), indicating the necessity of fuzzy edit-distance indexing.
-    \item \textbf{False-Positive Repair Regressions:} Heuristic repair rules induced regressions in 22 out of 101 triggered cases in this evaluation setting, underscoring the need for uncertainty-aware gating before applying automated repairs.
-    \item \textbf{Empirical Comparator Scope:} The row-multiset comparator is an empirical evaluation metric with numerical tolerance under the defined comparator, not a formal mathematical proof of semantic correctness.
+    \item \textbf{Single Primary Warehouse \& In-Domain Assumptions:} The primary 500-query benchmark is conducted on the Brazilian E-Commerce (Olist) data warehouse (9 tables, 100,000+ orders) with SQLite execution. Schema grounding assumptions tuned for this enterprise schema do not automatically translate to arbitrary domains.
+    \item \textbf{Cross-Schema Transfer Gap (18.0\% Spider Result):} On the 20-database, 50-query Spider transfer probe, result equivalence dropped to 18.0\%, demonstrating a pronounced semantic-generalization gap on heterogeneous external schemas.
+    \item \textbf{Sample Size of Transfer Probe:} The Spider transfer evaluation is a targeted 50-query stratified probe across 20 databases, not a full benchmark run.
+    \item \textbf{Inference Latency Overhead:} Multi-stage retrieval, planning, validation, and verification incur a mean latency of \HeadlineMeanLatency{} ($p95$: \HeadlinePNinetyFiveLatency{}), making this architecture suited for asynchronous business intelligence rather than sub-second interactive querying.
+    \item \textbf{Hard Query Complexity Ceiling:} Result equivalence drops to 44.55\% on hard queries and 32.56\% on complex aggregated tables, reflecting persistent challenges in multi-step CTE nesting and window functions.
+    \item \textbf{Typographical Vulnerability:} The schema retriever degrades significantly under typographical perturbations (57.1\% retention), indicating the necessity of fuzzy edit-distance indexing.
+    \item \textbf{False-Positive Repair Regressions:} Heuristic repair rules induced regressions in 22 out of 101 triggered cases in this evaluation setting, confirming that syntactic repair success is not equivalent to semantic recovery.
+    \item \textbf{Empirical Comparator Scope:} The row-multiset comparator is an empirical evaluation criterion with numerical tolerance under the defined comparator, not a formal mathematical proof of semantic correctness.
     \item \textbf{Ablation Sample Sizes:} Component ablations ($N=100$) and synthetic perturbation tests ($N=50$) use smaller sample sizes than the main 500-query benchmark.
 \end{enumerate}
+
 
 
 \section{Reproducibility and Open Artifacts}

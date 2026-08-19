@@ -14,34 +14,51 @@
 
 ## Abstract
 
-While Large Language Models (LLMs) demonstrate notable code-generation capabilities, translating natural language questions into reliable analytical SQL over relational databases (Text-to-SQL) remains brittle in practice. Queries frequently fail due to schema hallucinations, invalid join topologies, aggregation grain mismatch, and SQL dialect incompatibilities. In this paper, we present an empirical reliability study investigating which architectural mechanisms improve the reliability of LLM-generated analytical SQL, and what failure modes persist across grounding, planning, structural verification, and automated repair. We evaluate a multi-stage reliability pipeline on a frozen 500-query benchmark across 8 business domains over a public relational e-commerce data warehouse (the Olist dataset, 9 tables, 100,000+ orders).Our system achieves a **73.40% Result Equivalence Rate** (367/500 queries, 95% Wilson Score CI: `[69.26%, 77.18%]`, Clopper-Pearson Exact CI: `[69.30%, 77.22%]`), **31.00% Exact Match**, and **100.00% SQL Execution Success** with a mean latency of 64.04s ($p50$: 56.47s, $p95$: 121.92s). In a controlled 4-way 100-query ablation, activating AST-based structural verification significantly improves result equivalence over unverified planners (Config C 26.0% vs. Config B 15.0%, McNemar exact $p=0.0192$, $\text{Odds Ratio}=3.75$). An exhaustive audit of all 101 repair events reveals that automated self-repair is a double-edged mechanism: while 97 of 101 post-repair queries (96.0%) were syntactically valid and preserved 49 already-correct queries, repair yielded only 4 genuine recoveries while inducing **22 false-positive regressions** (21.8% of repair events) where previously correct queries were degraded. In a controlled 50-query synthetic perturbation robustness study across 5 vectors, the pipeline remains resilient to paraphrasing, synonyms, and ranking variants, but degrades under typographical noise (57.1% retention). We conclude that conservative, uncertainty-aware structural verification is preferable to unrestricted automated repair, and document the persistent structural failure modes across complex analytical queries.
+While Large Language Models (LLMs) demonstrate notable code-generation capabilities, translating natural language questions into reliable analytical SQL over relational databases (Text-to-SQL) remains brittle in practice. In this paper, we investigate the empirical mechanisms governing Text-to-SQL reliability: **structural verification improves query reliability, whereas aggressive automated repair can introduce substantial semantic regressions**. We evaluate a multi-stage reliability pipeline on a frozen 500-query benchmark across 8 business domains over a public relational e-commerce data warehouse (the Olist dataset, 9 tables, 100,000+ orders). Our system achieves a **73.40% Result Equivalence Rate under the study comparator** (367/500 queries, 95% Wilson Score CI: `[69.26%, 77.18%]`, Clopper-Pearson Exact CI: `[69.30%, 77.22%]`), **31.00% Exact Match**, and **100.00% SQL Execution Success** with a mean latency of 64.04s ($p50$: 56.47s, $p95$: 121.92s). In a controlled 4-way 100-query ablation, activating deterministic Abstract Syntax Tree (AST) structural verification significantly improves result equivalence over unverified planning (Config C 26.0% vs. Config B 15.0%, McNemar exact $p=0.0192$, $\text{Odds Ratio}=3.75$). However, an exhaustive audit of all 101 repair events reveals that automated self-repair is a double-edged mechanism: while 97 of 101 post-repair queries (96.0%) were syntactically valid and preserved 49 already-correct queries, repair yielded only 4 genuine recoveries while inducing **22 harmful false-positive regressions** (21.8% of repair events) where previously correct queries were degraded. Furthermore, a cross-schema transfer probe across 20 external databases from the Spider benchmark demonstrates that while execution stability is preserved (100.0%), result equivalence drops to **18.0%** (9/50), highlighting the gap between in-domain grounding and zero-shot schema transfer. We conclude that conservative, uncertainty-aware structural verification is preferable to unconstrained automated repair loops.
 
 ---
 
-## 1. Introduction and Research Questions
+## 1. Introduction and Central Thesis
 
 Natural language interfaces to relational databases (Text-to-SQL) promise to democratize data analytics for non-technical stakeholders. However, evaluating LLM-generated SQL against complex, multi-table schemas reveals a foundational insight:
 
 > **Executable SQL is not necessarily reliable analytical SQL.**
 
-A query may compile cleanly and execute without database runtime exceptions, yet return subtly corrupted figures due to several systemic failure modes:
-1. **Schema Grounding Hallucinations:** LLMs frequently invent nonexistent columns (e.g., querying `order_amount` instead of `price`), guess unindexed relational join keys, or join tables across disconnected foreign-key topologies.
-2. **Join-Path & Topology Errors:** In multi-table relational schemas, joining distant entities without necessary intermediate bridging tables produces missing data or uncontrolled cartesian products.
-3. **Aggregation Grain Inconsistencies:** Computing business metrics across mismatched dimensional grains (e.g., computing order item revenue before joining with customer demographics) produces inflated totals due to join fan-out multiplication.
-4. **Filtering & Ranking Errors:** Queries frequently omit critical domain-specific predicates (e.g., `order_status = 'delivered'`) or invert ordering directions in ranking clauses.
-5. **Dialect & Runtime Failures:** Syntactic discrepancies across database engines (e.g., SQLite's `strftime('%Y-%m', ts)` vs. PostgreSQL's `DATE_TRUNC('month', ts)`) trigger runtime execution failures.
+A query may compile cleanly and execute without database runtime exceptions, yet return subtly corrupted figures due to systemic structural failure modes: schema hallucinations, join-path omissions, aggregation grain mismatches, and filter inconsistencies.
 
-To evaluate how these failure modes can be mitigated, we study a multi-stage architecture that decomposes query synthesis into explicit schema grounding, structured query planning, deterministic plan validation, AST-based structural verification, and closed-loop repair. Rather than treating Text-to-SQL as end-to-end string generation, this study investigates the marginal contribution and empirical limitations of each stage.
+### Central Thesis
+Rather than presenting Text-to-SQL as an unconstrained agentic pipeline, this empirical study establishes that:
+> **Deterministic structural verification improves Text-to-SQL reliability, while aggressive automated repair can introduce semantic regressions.**
 
-We formulate the central research question:
-> **Which architectural mechanisms improve the reliability of LLM-generated analytical SQL, and what failure modes remain after grounding, planning, verification, and repair?**
+Our evidence directly supports this thesis:
+1. **Verification Benefit:** In a controlled ablation, activating AST-based structural verification improves result equivalence from **15.0% to 26.0%** over unverified planning (McNemar exact $p=0.0192$, $\text{OR}=3.75$).
+2. **Repair Hazard:** An audit of all 101 repair events reveals that compiler execution validity masks semantic degradation, producing **22 harmful false-positive regressions** against only **4 genuine recoveries**.
 
-Specifically, we address five explicit research questions:
-- **RQ1 (Overall Reliability):** Does the multi-stage reliability pipeline improve result equivalence on complex relational queries?
-- **RQ2 (Marginal Verification Effect):** What is the marginal impact of deterministic AST structural verification over unverified query planning?
-- **RQ3 (Automated Repair Dynamics):** Does automated repair genuinely recover incorrect queries without degrading already-correct ones?
-- **RQ4 (Failure Taxonomy):** What structural failure modes dominate the remaining non-equivalent queries?
-- **RQ5 (Controlled Perturbation Robustness):** How sensitive is the system to controlled lexical, temporal, and typographical perturbations?
+---
+
+## 2. Research Questions and Summary of Findings
+
+- **RQ1: Overall Reliability --- Does the multi-stage pipeline achieve high result equivalence on a complex data warehouse?**  
+  $\rightarrow$ **Answer:** On the 500-query benchmark across 8 domains, the system achieves **73.40% Result Equivalence** under the study comparator (95% Wilson CI: `[69.26%, 77.18%]`) and **100.00% SQL Execution Success**.
+- **RQ2: Verification Impact --- What is the marginal effect of deterministic AST structural verification?**  
+  $\rightarrow$ **Answer:** Adding AST structural verification significantly increases execution reliability from 34.0% to 65.0% and result equivalence from 15.0% to 26.0% (McNemar exact $p=0.0192$, $\text{OR}=3.75$).
+- **RQ3: Repair Dynamics --- Does automated self-repair reliably fix broken queries without harming valid ones?**  
+  $\rightarrow$ **Answer:** No. While 96.0% of post-repair queries execute cleanly and 49 correct queries are maintained, repair produced only **4 genuine recoveries** while causing **22 false-positive regressions**.
+- **RQ4: Failure Taxonomy --- What structural failure modes dominate remaining non-equivalent queries?**  
+  $\rightarrow$ **Answer:** Among the 133 non-equivalent queries, failure is dominated by missing join paths (27.8%), filter omissions/errors (24.8%), and aggregation mismatches (24.1%).
+- **RQ5: Cross-Schema Transfer --- Does warehouse-grounded reliability transfer to unseen external schemas?**  
+  $\rightarrow$ **Answer:** Execution stability is fully preserved (100.0%), but result equivalence drops to **18.0%** (9/50) on a 20-database Spider transfer probe, exposing the gap between deep schema grounding and zero-shot transfer.
+
+---
+
+## 3. Summary of Contributions
+
+1. **Controlled Empirical Decomposition:** We evaluate the marginal effect of deterministic AST verification over unverified planning, demonstrating a statistically significant reliability gain ($p=0.0192$).
+2. **Repair-Risk Characterization:** We present an exhaustive 4-way semantic audit of 101 repair events, showing that execution-valid repair can induce substantial false-positive regressions (22 harmed vs. 4 recovered).
+3. **Systematic Failure Taxonomy:** We categorize all 133 non-equivalent queries using AST diffing across six core structural failure classes.
+4. **Cross-Schema Transfer Probe:** We report zero-shot transfer evaluation across 20 unseen SQLite databases from the Spider benchmark, demonstrating execution robustness alongside a marked semantic generalization drop.
+5. **Audited Open Science Package:** We release all source code, frozen benchmark definitions, evaluation scripts, LaTeX manuscripts, and a cryptographic SHA-256 artifact manifest.
+
 
 ---
 

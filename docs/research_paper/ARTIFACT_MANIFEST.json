@@ -145,8 +145,8 @@
       "is_external": false
     },
     "docs/research_paper/latex/main.tex": {
-      "sha256": "ea8095f064583c7b3189b3e8605bce24c414ac84746d4ee47ac129ea78fa17b4",
-      "size_bytes": 28080,
+      "sha256": "ef079e1ae6ad1cb6bce7896e401a6b4ce557ec208c6760fac459ca18a6cf39be",
+      "size_bytes": 29946,
       "is_external": false
     },
     "docs/research_paper/latex/references.bib": {
@@ -165,8 +165,8 @@
       "is_external": false
     },
     "docs/research_paper/PAPER_DRAFT.md": {
-      "sha256": "79cc4071f680e5c2da6633025e741986bdbf9f6fdd2dbc0e50f874fa5886cb68",
-      "size_bytes": 26809,
+      "sha256": "a4fad878189c660b0cbce96ea6e31b125ab738f7f971465e9d4fadb7b527bd0d",
+      "size_bytes": 27864,
       "is_external": false
     },
     "docs/research_paper/PAPER_READINESS_AUDIT.md": {
@@ -342,6 +342,11 @@
     "results/spider/summary.json": {
       "sha256": "698db227266ff0d288cf3905b38a2e60eccb14194e95d41ce903019dd3a4e358",
       "size_bytes": 2148,
+      "is_external": false
+    },
+    "docs/research_paper/paper.pdf": {
+      "sha256": "3151d92e06dd2e42ff87dfd23ad866c3e5fc54bc2a8a8d7c4da4425c228d8a29",
+      "size_bytes": 1643427,
       "is_external": false
     }
   },
