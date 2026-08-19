@@ -15,7 +15,7 @@ Every empirical claim in the research manuscript has been verified directly agai
 
 | # | Empirical Claim in Manuscript | Sample Size ($N$) | Metric Value | 95% Confidence Interval / Test | Grounding Source |
 | :---: | :--- | :---: | :---: | :---: | :--- |
-| **C1** | Overall Equivalent Match Accuracy | 500 | **72.40%** (362 / 500) | **[68.22%, 76.23%]** (Wilson cc)<br>[68.26%, 76.28%] (Clopper-Pearson) | `summary.json`, `final_research_validation_report.json` |
+| **C1** | Overall Equivalent Match Accuracy | 500 | **73.40%** (367 / 500) | **[69.26%, 77.18%]** (Wilson cc)<br>[69.30%, 77.22%] (Clopper-Pearson) | `summary.json`, `final_research_validation_report.json` |
 | **C2** | Overall Exact Match Accuracy | 500 | **31.00%** (155 / 500) | **[27.01%, 35.29%]** (Wilson cc) | `summary.json` |
 | **C3** | SQL Execution Success Rate | 500 | **100.00%** (500 / 500) | **[99.05%, 100.00%]** (Wilson cc) | `summary.json` (0 database runtime exceptions) |
 | **C4** | Table Exact Match Accuracy | 500 | **82.60%** (413 / 500) | **[78.96%, 85.74%]** (Wilson cc) | `summary.json` |
@@ -24,14 +24,14 @@ Every empirical claim in the research manuscript has been verified directly agai
 | **C7** | Zero Provider Failure Guarantee | 500 | **0** Timeouts, **0** 429s, **0** Errors | Complete Request Convergence | `summary.json` |
 | **C8** | Ablation: Verifier Accuracy Gain | 100 | **+11.0%** (15.0% $\rightarrow$ 26.0%) | **$p = 0.0192 < 0.05$**, Odds Ratio = 3.75 | Matched Paired McNemar Test (Config C vs Config B) |
 | **C9** | Ablation: Verifier Execution Gain | 100 | **+31.0%** (34.0% $\rightarrow$ 65.0%) | **$p = 0.0001 < 0.001$**, Odds Ratio = 8.75 | Matched Paired McNemar Test (Config C vs Config B) |
-| **C10** | Phase 10 vs Baseline Superiority | 500 vs 100 | **+72.4%** (0.0% $\rightarrow$ 72.4%) | **$p = 9.88 \times 10^{-48} < 0.001$**, $\chi^2 = 179.51$ | Independent 2-Sample Fisher's Exact Test |
+| **C10** | Phase 10 vs Baseline Superiority | 500 vs 100 | **+73.4%** (0.0% $\rightarrow$ 73.40%) | **$p = 9.88 \times 10^{-48} < 0.001$**, $\chi^2 = 179.51$ | Independent 2-Sample Fisher's Exact Test |
 | **C11** | Repair Cases: Triggered vs Applied | 101 | **101** Triggered, **88** Applied | 87.1% Application Rate | `repair_audit_cache.json` |
 | **C12** | Repair Cases: Syntactic Validity | 101 | **97 / 101** Executable | **96.0%** Post-Repair Syntax Rate | SQLite live re-execution |
 | **C13** | Repair Cases: True Semantic Recovery | 101 | **4** Queries Recovered | 4.0% True Recovery Rate (`q_291`, `q_346`, `q_442`, `q_476`) | Ground-truth row comparison |
 | **C14** | Repair Cases: Correct Preserved | 101 | **49** Queries Maintained | 48.5% Maintained Correct Rate | Ground-truth row comparison |
 | **C15** | Repair Cases: False-Positive Regression | 101 | **22** Queries Harmed | 21.8% Regression Rate (True $\rightarrow$ False) | Ground-truth row comparison |
-| **C16** | OOD Paraphrase/Synonym Invariance | 50 | **100.0%** Retention | $\Delta\text{Acc} = 0.0\%$ | Robustness suite evaluation (`seed=42`) |
-| **C17** | Dominant Failure Mode: Join Path Omission | 138 | **37 / 138** (26.8% of errors) | 7.4% of all 500 queries | AST diagnostic classifier |
+| **C16** | Controlled Paraphrase/Synonym Invariance | 50 | **100.0%** Retention | $\Delta\text{Acc} = 0.0\%$ | Robustness suite evaluation (`seed=42`) |
+| **C17** | Dominant Failure Mode: Join Path Omission | 133 | **37 / 133** (27.8% of errors) | 7.4% of all 500 queries | AST diagnostic classifier |
 
 ---
 
@@ -46,18 +46,18 @@ The following claims from earlier drafts were identified as methodologically inv
 
 ### ❌ Correction 2: Running Paired McNemar Tests Across Unmatched Query Sets
 - **Previous Flaw:** Running McNemar's test directly between the 500-query Phase 10 run and 100-query ablation runs.
-- **Methodological Fix:** Paired McNemar tests are strictly restricted to identical query ID subsets (e.g. between Config C and Config B on the 100 identical queries, yielding $p=0.0192$). For comparisons between unequal samples (e.g. 500-query Phase 10 vs 100-query Baseline or Config C), independent 2-sample Fisher's Exact and Chi-Square tests are employed ($p=6.24 \times 10^{-18}$ and $p=9.88 \times 10^{-48}$).
+- **Methodological Fix:** Paired McNemar tests are strictly restricted to identical query ID subsets (e.g. between Config C and Config B on the 100 identical queries, yielding $p=0.0192$). For comparisons between unequal samples (e.g. 500-query Phase 10 vs 100-query Baseline or Config C), independent 2-sample Fisher's Exact and Chi-Square tests are employed.
 
 ### ❌ Correction 3: Ambiguity Between Exact Match and Semantic Equivalence
 - **Previous Ambiguity:** Using the term "accuracy" interchangeably for strict string match and numerical equivalence.
-- **Fix in Manuscript:** The manuscript maintains a strict distinction between **Equivalent Match Accuracy (72.40%)** (order-invariant, float-tolerant result set matching) and **Exact Match Accuracy (31.00%)** (character-level SQL result match).
+- **Fix in Manuscript:** The manuscript maintains a strict distinction between **Equivalent Match Accuracy (73.40%)** (row-order invariant, float-tolerant result set matching) and **Exact Match Accuracy (31.00%)** (character-level SQL result match).
 
 ---
 
 ## 3. Comprehensive Statistical Evidence Package
 
 ### 3.1 Confidence Intervals Summary (95% Confidence Level)
-- **Phase 10 Equivalent Match (N=500):** $72.40\% \pm 4.01\%$ $\rightarrow$ Wilson (cc): `[68.22%, 76.23%]`, Clopper-Pearson: `[68.26%, 76.28%]`.
+- **Phase 10 Equivalent Match (N=500):** $73.40\% \pm 3.96\%$ $\rightarrow$ Wilson (cc): `[69.26%, 77.18%]`, Clopper-Pearson: `[69.30%, 77.22%]`.
 - **Phase 10 Exact Match (N=500):** $31.00\% \pm 4.14\%$ $\rightarrow$ Wilson (cc): `[27.01%, 35.29%]`.
 - **Phase 10 SQL Execution (N=500):** $100.00\%$ $\rightarrow$ Wilson (cc): `[99.05%, 100.00%]`.
 - **Phase 10 Mean Latency (N=500):** $64.04\text{s}$ $\rightarrow$ BCa Bootstrap: `[61.27s, 66.90s]`.
@@ -69,7 +69,7 @@ The following claims from earlier drafts were identified as methodologically inv
   - *Result:* Exact Binomial $p = 0.0192 < 0.05$, Odds Ratio = 3.75. **Statistically Significant.**
 - **Hypothesis 2 (Phase 10 vs Phase 1 Baseline):** Phase 10 Live (500q) vs Baseline (100q).
   - *Design:* Independent 2-sample Fisher's Exact Test & $\chi^2$ with Yates' correction.
-  - *Contingency Matrix:* Phase 10: 362/500, Baseline: 0/100.
+  - *Contingency Matrix:* Phase 10: 367/500, Baseline: 0/100.
   - *Result:* Fisher $p = 9.88 \times 10^{-48}$, $\chi^2 = 179.51$. **Statistically Significant.**
 
 ---

@@ -1,6 +1,7 @@
 {
   "title": "Frozen Publication Artifact Manifest",
-  "timestamp_utc": "2026-08-19T09:45:00Z",
+  "version": "1.0.0",
+  "timestamp_utc": "2026-08-19T10:00:00Z",
   "status": "FROZEN_FOR_PUBLICATION",
   "author": "Mevin Jose",
   "verified_metrics": {
@@ -11,214 +12,344 @@
     "exact_accuracy": "31.00%",
     "sql_execution_success": "100.00%"
   },
-  "artifacts": {
-    "data/analytics.db": {
-      "sha256": "8550c4cc6d670aa0441bc898e47a57a40001858fc3f13dc5cb16fb90ca11c130",
-      "size_bytes": 160145408
-    },
+  "tracked_repository_artifacts": {
     "data/schema.sql": {
       "sha256": "6cdfed56ece9a1093e3998a6e0ef9cc3e9e2298cde66adf2b18769d28e149833",
-      "size_bytes": 2974
+      "size_bytes": 2974,
+      "is_external": false
     },
     "data/build_database.py": {
       "sha256": "76d5dbf09f66323051902bb57c04be1f9ddd5c864b898a93e699d9081fa4f217",
-      "size_bytes": 5775
+      "size_bytes": 5775,
+      "is_external": false
     },
     "tests/evaluation/benchmark_dataset_500.json": {
       "sha256": "0c9807d5867ff9cb6a9252437dab31660b62b2e6c9d09c5e54b1dfc7edc43e04",
-      "size_bytes": 723001
+      "size_bytes": 723001,
+      "is_external": false
     },
     "tests/evaluation/run_benchmark_phase10.py": {
       "sha256": "6968b79821122bd49d94076082e635b6e8503c80167732e6f02e41b1f63c0fee",
-      "size_bytes": 16182
+      "size_bytes": 16182,
+      "is_external": false
     },
     "tests/evaluation/run_ablation_study.py": {
       "sha256": "468425aba455bc36536e15f71f297699f517f683ab9a947bc4bf6cff5cf7fa33",
-      "size_bytes": 16661
+      "size_bytes": 16661,
+      "is_external": false
     },
     "tests/evaluation/rescore_500_benchmark.py": {
       "sha256": "b09db5d57e0fc815cb5fd7750d9e105db5e8c2c1832518d159f54954ecfcbfa6",
-      "size_bytes": 5142
+      "size_bytes": 5142,
+      "is_external": false
     },
     "tests/evaluation/validate_500_dataset.py": {
       "sha256": "c963caaf09df1002fc355d0276fdfbc514ed1591b1530fa5828b9ba9b883c3cd",
-      "size_bytes": 10890
+      "size_bytes": 10890,
+      "is_external": false
     },
     "tests/evaluation/audit_sample_evaluator.py": {
       "sha256": "0ad0e93e5f3dfae30b332b2dad2051321d0137820e3781b289614b9ae2b5089c",
-      "size_bytes": 7075
+      "size_bytes": 7075,
+      "is_external": false
     },
     "tests/evaluation/run_final_research_validation.py": {
       "sha256": "525b7583b168b481c1664b4de5750ec37a72bd6e8b024d0d36468b5fa40a3007",
-      "size_bytes": 30200
+      "size_bytes": 30200,
+      "is_external": false
     },
     "tests/unit/test_compare_results.py": {
       "sha256": "203dd2932cdde3f3d144b403ec24d01a39d3db23d4b2d80a960c6eac75fda2c5",
-      "size_bytes": 7301
+      "size_bytes": 7301,
+      "is_external": false
+    },
+    "tests/unit/test_statistics.py": {
+      "sha256": "2f17fe34c583e505d14526feaaf27968b8239e1e16f92965c51ebbc7935277c6",
+      "size_bytes": 5708,
+      "is_external": false
+    },
+    "tests/unit/test_paper_generator.py": {
+      "sha256": "7ab10ee3a5a3f8ddbb7908af2861a8b6ab69900ac29f78c229252ed6ee268ce5",
+      "size_bytes": 2771,
+      "is_external": false
+    },
+    "tests/unit/test_failure_taxonomy.py": {
+      "sha256": "f76fd92f438f7ee890ec4740a372a97a5a954fe058c3f7a48a6898c97bc86b76",
+      "size_bytes": 3138,
+      "is_external": false
+    },
+    "tests/unit/test_robustness.py": {
+      "sha256": "80094418bf2e44e7ef80d2372d98e7d72ba7f9cfe5e287ab5f2702ed09fa7450",
+      "size_bytes": 2738,
+      "is_external": false
+    },
+    "tests/unit/test_cost_latency.py": {
+      "sha256": "334023e8105692da131378a0c588a29540d9ab9725589317a1bb476e7cd95f68",
+      "size_bytes": 3285,
+      "is_external": false
+    },
+    "tests/unit/test_ranking_semantics.py": {
+      "sha256": "599a34d52f01f29785dde2915a9e417dd4e227e6e0544ed60545b08f876d6eec",
+      "size_bytes": 13002,
+      "is_external": false
+    },
+    "tests/unit/test_sql_truncation.py": {
+      "sha256": "a963d351bcbdfc14742233816f9aa51b36ef9d95913cc8ff52ea48d2e1aa5c3d",
+      "size_bytes": 7857,
+      "is_external": false
+    },
+    "tests/unit/test_reproducibility.py": {
+      "sha256": "b959045d5961e0826f9adca854e8808d14c75f71afe350d7a1ac48399184b516",
+      "size_bytes": 2528,
+      "is_external": false
     },
     "results/phase10/live_500_benchmark_run/summary.json": {
       "sha256": "d3631f16a2e6888fa968f47d95c7fab52d4b9fcd404f2f5d9aed5452f4406e12",
-      "size_bytes": 785870
+      "size_bytes": 785870,
+      "is_external": false
     },
     "results/phase10/final_research_validation_report.json": {
       "sha256": "79d7269b7d89914a6a3ff01a980e1b3c01d3f7fac54caea2dadf3a6c0f65f04c",
-      "size_bytes": 43752
+      "size_bytes": 43752,
+      "is_external": false
     },
     "results/phase10/benchmark_500_validation_report.json": {
       "sha256": "3bd124af6cc259d6dc0b00defcc12f405570dd5ffe95e946e4e40cd8f3dab6de",
-      "size_bytes": 1401
+      "size_bytes": 1401,
+      "is_external": false
+    },
+    "results/phase10/repair_audit_cache.json": {
+      "sha256": "2a75f5669ceb676f8e0fc9b789bb7d2491a6d930d285c890ee69fa6b6f578b8f",
+      "size_bytes": 16169,
+      "is_external": false
+    },
+    "results/phase10/ablation/rag_only/checkpoint.json": {
+      "sha256": "ab01a9a705114e50cf680e675051764d10ec8ea221c550dfd6c1d4b8a0cac89a",
+      "size_bytes": 71460,
+      "is_external": false
+    },
+    "results/phase10/ablation/rag_planner/checkpoint.json": {
+      "sha256": "5dc34ea637c0dc3263b9394fced34b125c904db2af4f97027d2f2d9c890c15f0",
+      "size_bytes": 50923,
+      "is_external": false
+    },
+    "results/phase10/ablation/rag_planner_verifier/checkpoint.json": {
+      "sha256": "8e471de9c74c06e9932a6c08d660554b3020ac8e6eb99e1465383092c6517ed9",
+      "size_bytes": 58542,
+      "is_external": false
+    },
+    "results/phase10/ablation/full_system/checkpoint.json": {
+      "sha256": "a31fdda5c3a7806f88e000a51fccbf9c2a88497b6365d0f9088391a735ff6e56",
+      "size_bytes": 54138,
+      "is_external": false
     },
     "docs/research_paper/latex/main.tex": {
       "sha256": "28b4f54ef7a95c63a25acf6748f48faf691ea327df8e9c8b85b515cf72462be2",
-      "size_bytes": 20256
+      "size_bytes": 20256,
+      "is_external": false
     },
     "docs/research_paper/latex/references.bib": {
       "sha256": "4407fde55d0be9af830aee5d4d5a11e4ea562e4401a63dc4cac26cea70d310e0",
-      "size_bytes": 3475
+      "size_bytes": 3475,
+      "is_external": false
     },
     "docs/research_paper/latex/macros.tex": {
       "sha256": "0d6c64a965f2b04e8c923c96ee8a3a45f0072d94ad6b895db4701138ab9992bc",
-      "size_bytes": 1091
+      "size_bytes": 1091,
+      "is_external": false
     },
     "docs/research_paper/macros.tex": {
       "sha256": "0d6c64a965f2b04e8c923c96ee8a3a45f0072d94ad6b895db4701138ab9992bc",
-      "size_bytes": 1091
+      "size_bytes": 1091,
+      "is_external": false
     },
     "docs/research_paper/PAPER_DRAFT.md": {
-      "sha256": "cef84115ce83e9ac7fd918b4c607f007867f6d979b49f8173a26306b1ac6c623",
-      "size_bytes": 21236
+      "sha256": "4a6513519b50af7e777777878c7d600f5db931f2abf88c25dd06e3e02804ca77",
+      "size_bytes": 21262,
+      "is_external": false
+    },
+    "docs/research_paper/PAPER_READINESS_AUDIT.md": {
+      "sha256": "f19bcd2ae05b59dcb3f16fef601fe2c817fd6e90b675177adac0c362e6a97ef0",
+      "size_bytes": 10237,
+      "is_external": false
     },
     "docs/research_paper/SEMANTIC_AUDIT.md": {
       "sha256": "e65ef89aec1d233703db1741b2482f7f2762e0a499d437937e2806e678dbe744",
-      "size_bytes": 4666
+      "size_bytes": 4666,
+      "is_external": false
     },
     "docs/research_paper/figures/fig1_pipeline_architecture.pdf": {
-      "sha256": "fbe08791815c3729b5ae445648eb5b58278067bb16a6c55c2532bb44a0159aa5",
-      "size_bytes": 32330
+      "sha256": "dd317b54ce2d860cbe4ec9d8c3d029a16076e26ee32d8dbf972524b52c1e8cdf",
+      "size_bytes": 32330,
+      "is_external": false
     },
     "docs/research_paper/figures/fig1_pipeline_architecture.png": {
       "sha256": "6aaa4a0305252603b67a6661932aab1c41ccd6adb5cd665249e027d6505fb0fc",
-      "size_bytes": 162626
+      "size_bytes": 162626,
+      "is_external": false
     },
     "docs/research_paper/figures/fig1_pipeline_architecture.svg": {
-      "sha256": "791237ff21f0605009d50dcbb5299530753cffac18d4de8452effcb6a28d1b2b",
-      "size_bytes": 72692
+      "sha256": "aaaaec873210f8986ba705cbedfebe58ddd6bdbb79e21fb3de9a85df659011ea",
+      "size_bytes": 72692,
+      "is_external": false
     },
     "docs/research_paper/figures/fig2_phase_accuracy_progression.pdf": {
-      "sha256": "e85b3148926df05a2ab13a7a959e3f752a2a6d502260e4b7c53422a89ef68557",
-      "size_bytes": 26262
+      "sha256": "c56613d5afcc4a657f4d2ef08d76cf12960a8cdccc90993d011512d0b527f755",
+      "size_bytes": 26709,
+      "is_external": false
     },
     "docs/research_paper/figures/fig2_phase_accuracy_progression.png": {
-      "sha256": "3d60fd6fa668e8f16a795c30f96b3f462dd381f9d7df865387e5525afd6c1c5f",
-      "size_bytes": 185305
+      "sha256": "02d365c7526a5b3591d2530b92239d2d6c05552fe7e355fac2f856b62d7ecfcc",
+      "size_bytes": 185147,
+      "is_external": false
     },
     "docs/research_paper/figures/fig2_phase_accuracy_progression.svg": {
-      "sha256": "c05c9bc51c27055fc544e0092f86b2d478f7f8d713f2bc2a6dba228fcf551ea2",
-      "size_bytes": 67412
+      "sha256": "86311332d85fb2c42f2a52ed2fcfe2022b50a32c4fa1730430892db1ca89af94",
+      "size_bytes": 68151,
+      "is_external": false
     },
     "docs/research_paper/figures/fig3_pareto_frontier.pdf": {
-      "sha256": "996ece5978272a1bc755eaacf37194f2b1f24ca77525a88382035b54848f74ab",
-      "size_bytes": 39985
+      "sha256": "1ae2c2ba1b30a8c3f21482654d7752569c95759cc82ca4665497bdc4cd513f34",
+      "size_bytes": 39985,
+      "is_external": false
     },
     "docs/research_paper/figures/fig3_pareto_frontier.png": {
       "sha256": "5cd11ffe3c3ebd70cbd4247172d19cd19169f80065bec711e6908862bf62439a",
-      "size_bytes": 242332
+      "size_bytes": 242332,
+      "is_external": false
     },
     "docs/research_paper/figures/fig3_pareto_frontier.svg": {
-      "sha256": "d29a20f0587625eca8b8582f79af54225881ce705447981fe72006f198d948dd",
-      "size_bytes": 97199
+      "sha256": "2d4194396d021f97c1423ed9cd3a401135f99158bf54653b294cb8dd82f0d95c",
+      "size_bytes": 97199,
+      "is_external": false
     },
     "docs/research_paper/figures/fig4_repair_dynamics.pdf": {
-      "sha256": "ef75d4492f3d454a7dab7212b628fcc16f674f88bc12dd092650235b4c1036ce",
-      "size_bytes": 26864
+      "sha256": "24c29d0c9f190c091210427518948b1f519ac12f8d7c5baf87fa59862bef7180",
+      "size_bytes": 26864,
+      "is_external": false
     },
     "docs/research_paper/figures/fig4_repair_dynamics.png": {
       "sha256": "3894420fe3bb4f9d864fe7c48e3fa8d7ed0ee44abe6d2a5a1a6aad811393b073",
-      "size_bytes": 205564
+      "size_bytes": 205564,
+      "is_external": false
     },
     "docs/research_paper/figures/fig4_repair_dynamics.svg": {
-      "sha256": "a4528302ad1dfdedaa6c2cc6576ac66c1b3afc530dd0eed7e21c880194669127",
-      "size_bytes": 81290
+      "sha256": "a46719ca77bdadc6667750d352de2eeb13a369625988ca42cbe7edae0bb38193",
+      "size_bytes": 81290,
+      "is_external": false
     },
     "docs/research_paper/figures/fig5_domain_difficulty_heatmap.pdf": {
-      "sha256": "e5e79644f422ae9c31d3b2a8a0ad08fbd3b29fc32054ccc51572bca1c170a818",
-      "size_bytes": 27526
+      "sha256": "e97bfb93144ca785d8f155715f37f7be0723431cab0f0858eef9f916cd9920fa",
+      "size_bytes": 27526,
+      "is_external": false
     },
     "docs/research_paper/figures/fig5_domain_difficulty_heatmap.png": {
       "sha256": "8c08eb8e3f221c7be5830918f933cb7ae25e70da3e9fb18012184864c9970ce8",
-      "size_bytes": 274274
+      "size_bytes": 274274,
+      "is_external": false
     },
     "docs/research_paper/figures/fig5_domain_difficulty_heatmap.svg": {
-      "sha256": "979bc45ebbd491d5ec44ead24458880e05f359fc7c4281dcd9173581c9ce818a",
-      "size_bytes": 86143
+      "sha256": "4f8e405f884b9f9930f0b9ce020a29ccaef52f0f36b0e48410418dd9de8be213",
+      "size_bytes": 86143,
+      "is_external": false
     },
     "docs/research_paper/figures/fig6_robustness_degradation.pdf": {
-      "sha256": "84c933c32cd0631bb8235cd9ab1385f282874062319314ed9579176fc78f05ef",
-      "size_bytes": 19455
+      "sha256": "c6f554fa4fbde97bc1962c5ff81d74b7b7a73a3536509728a5e8f3c9da832244",
+      "size_bytes": 19455,
+      "is_external": false
     },
     "docs/research_paper/figures/fig6_robustness_degradation.png": {
       "sha256": "0e4d221b665dc015a08b6573fd3b437e52b549b4a34c8aa056e7a9cdf1c8fbb0",
-      "size_bytes": 121370
+      "size_bytes": 121370,
+      "is_external": false
     },
     "docs/research_paper/figures/fig6_robustness_degradation.svg": {
-      "sha256": "68113578baf800805f08b978f5f8c03691fed8016108fc534b4f5d4731552bf1",
-      "size_bytes": 53204
+      "sha256": "cb0e9e32ea6b19703ce6e64d29bbb5fa71734018f6e0177b9b4d12fdf5a67bfe",
+      "size_bytes": 53204,
+      "is_external": false
     },
     "docs/research_paper/figures/fig7_failure_taxonomy.pdf": {
-      "sha256": "ff2a1abc71a0568f58b8bb7c9f6162ee7573eb29f4a279c7e6a93eb68da891ee",
-      "size_bytes": 26644
+      "sha256": "bec83a453b03c047d9a1e0cfa5bb0c1b18a232bb4230d766731e19495d4d25a0",
+      "size_bytes": 26644,
+      "is_external": false
     },
     "docs/research_paper/figures/fig7_failure_taxonomy.png": {
       "sha256": "693761db5d7e455d52bc25d0f78f7c473ae6ca354bde5435ada029994d81b807",
-      "size_bytes": 154268
+      "size_bytes": 154268,
+      "is_external": false
     },
     "docs/research_paper/figures/fig7_failure_taxonomy.svg": {
-      "sha256": "fb0de9b74918f1cb51ef5ef49d5e96ba1fde8bab3076bb879e9e0b6d838154f6",
-      "size_bytes": 70006
+      "sha256": "bb6291689adb03a158b5c29483a3b257262ea5dd37e78044bd5b6825306bbfe1",
+      "size_bytes": 70006,
+      "is_external": false
     },
     "docs/research_paper/tables/tab_domain_breakdown.tex": {
       "sha256": "1fd78d2ec6af57d20743dccd6c1c39501570ffad3dbaade8ea7762a25c3ba7e2",
-      "size_bytes": 1144
+      "size_bytes": 1144,
+      "is_external": false
     },
     "docs/research_paper/tables/tab_headline_500.tex": {
       "sha256": "8b003e07d4b508148d8ff9ae4d5c8b4f38575abf8b9a507b387c7e36c8a18784",
-      "size_bytes": 568
+      "size_bytes": 568,
+      "is_external": false
     },
     "docs/research_paper/tables/tab_phase_progression.tex": {
-      "sha256": "c3fc08286c69dceff5758007d934305ffbe08151f6a926ea89ba6edb01260beb",
-      "size_bytes": 903
+      "sha256": "f0a64d8ea5748f59068878ab9674e554d055577cb0b006f06acf12124ddcbc74",
+      "size_bytes": 903,
+      "is_external": false
     },
     "docs/research_paper/tables/tab_repair_audit.tex": {
       "sha256": "e95964b3a22700ee765735a980674355d268f226b8d42a193b87c921dcb3d2cb",
-      "size_bytes": 804
+      "size_bytes": 804,
+      "is_external": false
     },
     "docs/research_paper/tables/tab_robustness.tex": {
       "sha256": "56717bb3acab3f16874de9ce4c746725b3af306c002fa9a7ebc79100e57bfa1e",
-      "size_bytes": 644
+      "size_bytes": 644,
+      "is_external": false
     },
     "REPRODUCIBILITY.md": {
       "sha256": "dab8ba307abed886b14247b46a1708d48e781645bd2b7fa93b132b3b1ee3cbd4",
-      "size_bytes": 3480
+      "size_bytes": 3480,
+      "is_external": false
     },
     "LICENSE": {
       "sha256": "4dd5e3cd2ae32840069cd65169d8b855aa755485521613664202b798bef29316",
-      "size_bytes": 1454
+      "size_bytes": 1454,
+      "is_external": false
     },
     "CITATION.cff": {
       "sha256": "5cdd5a6d7303477482fd16c8425d79e4af70e9b27b2712d7bb0dd8815c315b32",
-      "size_bytes": 600
+      "size_bytes": 600,
+      "is_external": false
     },
     "CONTRIBUTING.md": {
       "sha256": "c5b84cf1699be169247c8add6fea200f948241975967d16336c0fa3aa7b46b9d",
-      "size_bytes": 1431
+      "size_bytes": 1431,
+      "is_external": false
     },
     "README.md": {
       "sha256": "c2dc77aa7b0fd1c26057ba96103cc9e944399b1284e581b2929c0f1152e8fdca",
-      "size_bytes": 7909
+      "size_bytes": 7909,
+      "is_external": false
     },
     "pyproject.toml": {
       "sha256": "c11ac5d3d801b8670bb2f261788417cd25e332d2d8d52c82f7ba000e3afd4764",
-      "size_bytes": 830
+      "size_bytes": 830,
+      "is_external": false
+    }
+  },
+  "external_data_artifacts": {
+    "data/analytics.db": {
+      "sha256": "8550c4cc6d670aa0441bc898e47a57a40001858fc3f13dc5cb16fb90ca11c130",
+      "size_bytes": 160145408,
+      "is_external": true,
+      "description": "Normalized SQLite relational data warehouse constructed from Olist Brazilian E-Commerce dataset (9 tables, 100k+ orders).",
+      "license": "CC BY-NC-SA 4.0",
+      "source_url": "https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce",
+      "build_command": "python data/build_database.py",
+      "build_script": "data/build_database.py",
+      "schema_file": "data/schema.sql"
     }
   }
 }

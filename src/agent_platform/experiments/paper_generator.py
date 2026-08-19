@@ -166,7 +166,7 @@ def plot_phase_progression(records: List[PhaseBenchmarkRecord], output_prefix: P
 
     plt.tight_layout()
     for ext in ["png", "pdf", "svg"]:
-        fig.savefig(output_prefix.with_suffix(f".{ext}"))
+        fig.savefig(str(output_prefix.with_suffix(f".{ext}")))
     plt.close(fig)
 
 
@@ -213,7 +213,7 @@ def plot_pareto_frontier(pareto_points: List[ParetoPoint], output_prefix: Path) 
 
     plt.tight_layout()
     for ext in ["png", "pdf", "svg"]:
-        fig.savefig(output_prefix.with_suffix(f".{ext}"))
+        fig.savefig(str(output_prefix.with_suffix(f".{ext}")))
     plt.close(fig)
 
 
@@ -264,7 +264,7 @@ def plot_repair_dynamics(repair_data: dict[str, Any], output_prefix: Path) -> No
     plt.suptitle("Figure 4: Granular Audit of the 101 Repair Cases in Phase 10", fontsize=13, y=1.02)
     plt.tight_layout()
     for ext in ["png", "pdf", "svg"]:
-        fig.savefig(output_prefix.with_suffix(f".{ext}"))
+        fig.savefig(str(output_prefix.with_suffix(f".{ext}")))
     plt.close(fig)
 
 
@@ -289,7 +289,7 @@ def plot_domain_difficulty_heatmap(subgroups_domain: dict[str, Any], output_pref
 
     plt.tight_layout()
     for ext in ["png", "pdf", "svg"]:
-        fig.savefig(output_prefix.with_suffix(f".{ext}"))
+        fig.savefig(str(output_prefix.with_suffix(f".{ext}")))
     plt.close(fig)
 
 
@@ -315,7 +315,7 @@ def plot_robustness_degradation(reports: dict[str, Any], output_prefix: Path) ->
 
     plt.tight_layout()
     for ext in ["png", "pdf", "svg"]:
-        fig.savefig(output_prefix.with_suffix(f".{ext}"))
+        fig.savefig(str(output_prefix.with_suffix(f".{ext}")))
     plt.close(fig)
 
 
@@ -342,7 +342,7 @@ def plot_failure_taxonomy(taxonomy_data: dict[str, Any], output_prefix: Path) ->
 
     plt.tight_layout()
     for ext in ["png", "pdf", "svg"]:
-        fig.savefig(output_prefix.with_suffix(f".{ext}"))
+        fig.savefig(str(output_prefix.with_suffix(f".{ext}")))
     plt.close(fig)
 
 

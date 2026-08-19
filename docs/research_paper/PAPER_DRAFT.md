@@ -85,8 +85,8 @@ Table 1 summarizes the headline results audited directly from raw per-query benc
 
 | Metric | Phase 10 Empirical Value | 95% Confidence Interval | Method |
 | :--- | :---: | :---: | :--- |
-| **Equivalent Match Rate** | **72.40%** (362 / 500) | **[68.22%, 76.23%]** | Wilson Score (cc) |
-| *Clopper-Pearson Exact CI* | 72.40% (362 / 500) | [68.26%, 76.28%] | Clopper-Pearson Exact |
+| **Equivalent Match Rate** | **73.40%** (367 / 500) | **[69.26%, 77.18%]** | Wilson Score (cc) |
+| *Clopper-Pearson Exact CI* | 73.40% (367 / 500) | [69.30%, 77.22%] | Clopper-Pearson Exact |
 | **Exact Match Rate** | **31.00%** (155 / 500) | [27.01%, 35.29%] | Wilson Score (cc) |
 | **SQL Execution Success Rate** | **100.00%** (500 / 500) | [99.05%, 100.00%] | Wilson Score (cc) |
 | **Table Exact Match Accuracy** | **82.60%** (413 / 500) | [78.96%, 85.74%] | Wilson Score (cc) |
@@ -114,11 +114,11 @@ To measure the marginal impact of each architectural stage, we evaluated four co
 | **Config D** | Full System (with Evaluator) | 14.0% [8.1%, 22.7%] | 10.0% | 45.0% | 232.63s | 240.00s |
 
 ### Methodological Distinction in Statistical Comparisons:
-- **Causal Component Isolation (Matched Paired McNemar Test, N=100 identical queries):**
-  - **Config C vs Config B:** McNemar Exact Binomial **$p = 0.0192 < 0.05$**, **Odds Ratio: 3.75** (15 queries solved only by Config C vs 4 queries solved only by Config B). This establishes a statistically significant causal benefit for AST Semantic Verification & Repair.
+- **Component Isolation (Matched Paired McNemar Test, N=100 identical queries):**
+  - **Config C vs Config B:** McNemar Exact Binomial **$p = 0.0192 < 0.05$**, **Odds Ratio: 3.75** (15 queries solved only by Config C vs 4 queries solved only by Config B). This demonstrates a statistically significant stability improvement for AST Semantic Verification & Repair over unverified planning.
   - **Config C vs Config A:** McNemar Exact Binomial $p = 0.2100$, Odds Ratio: 1.88.
 - **End-to-End System Evolution (Independent 2-Sample Fisher's Exact Test, 500q vs 100q):**
-  - Comparing the finalized Phase 10 live system (72.40%, 362/500) against the early Phase 1 baseline (0.0%, 0/100) confirms a statistically significant distributional difference ($p = 9.88 \times 10^{-48}$, $\chi^2 = 179.51$). We note that because Phase 10 and Phase 1 differ in sample size, prompt optimization, and schema grounding, this test demonstrates aggregate milestone progress rather than isolated single-component causality.
+  - Comparing the finalized Phase 10 live system (73.40%, 367/500) against the early Phase 1 baseline (0.0%, 0/100) confirms a statistically significant distributional difference ($p = 9.88 \times 10^{-48}$, $\chi^2 = 179.51$). We note that because Phase 10 and Phase 1 differ in sample size, prompt optimization, and schema grounding, this test demonstrates aggregate milestone progress rather than isolated single-component causality.
 
 ![Figure 3: Accuracy-Latency Trade-off](figures/fig3_pareto_frontier.png)
 *Figure 3: Accuracy–Latency Trade-off with Cost-Scaled Configurations (Configuration trade-off trajectory on accuracy vs. latency; marker size $\propto$ cost).*
@@ -157,12 +157,12 @@ We conducted an exhaustive audit across all 101 repair events in the 500-query b
 
 ### 7.1 Business Domain Breakdown
 - **Orders & Transactions:** **90.77%** (59/65, 95% CI: `[80.34%, 96.19%]`) — Table Prec: 99.2%, Rec: 100.0%.
-- **Sellers & Fulfillment:** **88.33%** (53/60, 95% CI: `[76.82%, 94.79%]`) — Table Prec: 88.6%, Rec: 100.0%.
-- **Customers & Geography:** **78.46%** (51/65, 95% CI: `[66.19%, 87.32%]`) — Table Prec: 99.5%, Rec: 97.4%.
+- **Sellers & Fulfillment:** **91.67%** (55/60, 95% CI: `[80.93%, 96.94%]`) — Table Prec: 88.6%, Rec: 100.0%.
+- **Customers & Geography:** **80.00%** (52/65, 95% CI: `[67.92%, 88.54%]`) — Table Prec: 99.5%, Rec: 97.4%.
 - **Products & Categories:** **76.92%** (50/65, 95% CI: `[64.52%, 86.10%]`) — Table Prec: 94.1%, Rec: 100.0%.
 - **Payments & Installments:** **71.67%** (43/60, 95% CI: `[58.36%, 82.18%]`) — Table Prec: 80.8%, Rec: 81.7%.
-- **Revenue & Sales:** **69.23%** (45/65, 95% CI: `[56.41%, 79.77%]`) — Table Prec: 97.7%, Rec: 92.3%.
-- **Logistics & Operations:** **55.00%** (33/60, 95% CI: `[41.69%, 67.67%]`) — Table Prec: 94.2%, Rec: 100.0%.
+- **Revenue & Sales:** **70.77%** (46/65, 95% CI: `[58.00%, 81.10%]`) — Table Prec: 97.7%, Rec: 92.3%.
+- **Logistics & Operations:** **56.67%** (34/60, 95% CI: `[43.33%, 69.21%]`) — Table Prec: 94.2%, Rec: 100.0%.
 - **Reviews & Satisfaction:** **46.67%** (28/60, 95% CI: `[33.86%, 59.90%]`) — Table Prec: 88.9%, Rec: 90.6%.
 
 ### 7.2 Difficulty & Query Type Stratification
@@ -176,18 +176,18 @@ We conducted an exhaustive audit across all 101 repair events in the 500-query b
 
 ---
 
-## 8. Failure Taxonomy Analysis (138 Non-Equivalent Queries)
+## 8. Failure Taxonomy Analysis (133 Non-Equivalent Queries)
 
 ![Figure 7: Failure Taxonomy Distribution](figures/fig7_failure_taxonomy.png)
-*Figure 7: Scientific Failure Taxonomy Distribution across 138 Non-Equivalent Queries.*
+*Figure 7: Scientific Failure Taxonomy Distribution across 133 Non-Equivalent Queries.*
 
-We analyzed all 138 non-equivalent queries using AST diffing against ground truth SQL:
-1. **Schema Missing Join Path (37 queries, 26.8% of errors / 7.4% of total):** Omission of intermediate bridging tables (e.g., joining `order_reviews` to `customers` without including `orders`).
-2. **Semantic Aggregation Mismatch (32 queries, 23.2% of errors / 6.4% of total):** Discrepancies in aggregation function types (e.g. `AVG` vs `SUM` or unrounded currency amounts).
-3. **Semantic Filter Omission / Error (31 queries, 22.5% of errors / 6.2% of total):** Missing domain-specific predicates such as `order_status = 'delivered'` or using `shipping_limit_date` instead of `order_purchase_timestamp`.
-4. **Schema Hallucinated Table (17 queries, 12.3% of errors / 3.4% of total):** Synthesizing nonexistent subqueries or table aliases not present in the catalog.
-5. **Semantic Grain / GROUP BY Mismatch (14 queries, 10.1% of errors / 2.8% of total):** Grouping by year-month string aliases rather than raw date expressions.
-6. **Semantic Ranking Order Mismatch (7 queries, 5.1% of errors / 1.4% of total):** Inverted or missing `ORDER BY` clauses in top-k rankings.
+We analyzed all 133 non-equivalent queries using AST diffing against ground truth SQL:
+1. **Schema Missing Join Path (37 queries, 27.8% of errors / 7.4% of total):** Omission of intermediate bridging tables (e.g., joining `order_reviews` to `customers` without including `orders`).
+2. **Semantic Aggregation Mismatch (32 queries, 24.1% of errors / 6.4% of total):** Discrepancies in aggregation function types (e.g. `AVG` vs `SUM` or unrounded currency amounts).
+3. **Semantic Filter Omission / Error (31 queries, 23.3% of errors / 6.2% of total):** Missing domain-specific predicates such as `order_status = 'delivered'` or using `shipping_limit_date` instead of `order_purchase_timestamp`.
+4. **Schema Hallucinated Table (17 queries, 12.8% of errors / 3.4% of total):** Synthesizing nonexistent subqueries or table aliases not present in the catalog.
+5. **Semantic Grain / GROUP BY Mismatch (14 queries, 10.5% of errors / 2.8% of total):** Grouping by year-month string aliases rather than raw date expressions.
+6. **Semantic Ranking Order Mismatch (7 queries, 5.3% of errors / 1.4% of total):** Inverted or missing `ORDER BY` clauses in top-k rankings.
 
 ---
 
@@ -226,7 +226,7 @@ We explicitly document the scientific and operational limitations of this study:
 
 ## 11. Conclusion & Future Work
 
-We presented an autonomous multi-stage data analyst agent architecture combining semantic schema RAG, structured plan validation, and AST verification. On an audited 500-query enterprise benchmark, the system achieved **72.40% Equivalent Match Accuracy** and **100.0% SQL Execution Reliability**. Our controlled ablation demonstrated that AST verification yields statistically significant accuracy improvements ($p=0.0192$), while our granular 101-case repair audit provided foundational empirical evidence on self-repair trade-offs.
+We presented an autonomous multi-stage data analyst agent architecture combining semantic schema RAG, structured plan validation, and AST verification. On an audited 500-query enterprise benchmark, the system achieved **73.40% Equivalent Match Accuracy** and **100.0% SQL Execution Reliability**. Our controlled ablation demonstrated that AST verification yields statistically significant accuracy improvements ($p=0.0192$), while our granular 101-case repair audit provided foundational empirical evidence on self-repair trade-offs.
 
 Future work will focus on:
 1. **Uncertainty-Gated Repair:** Transitioning from heuristic rules to Bayesian uncertainty gating to eliminate false-positive repair regressions.
