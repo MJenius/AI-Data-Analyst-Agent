@@ -1,0 +1,65 @@
+{
+  "experiment_id": "phase10_500_benchmark_experiment",
+  "timestamp_utc": "2026-08-19T10:59:42.684663+00:00",
+  "title": "Phase 10: 500-Query Benchmark Reproducibility Manifest",
+  "description": "Cryptographically sealed configuration and environment manifest for the 500-query benchmark.",
+  "dataset": {
+    "path": "C:\\Users\\mjeni\\OneDrive\\Desktop\\Own Projects\\Data Analyst Agent\\tests\\evaluation\\benchmark_dataset_500.json",
+    "sha256": "0c9807d5867ff9cb6a9252437dab31660b62b2e6c9d09c5e54b1dfc7edc43e04",
+    "total_items": 500,
+    "item_keys_sample": [
+      "question",
+      "expected_tables",
+      "expected_metrics",
+      "expected_sql",
+      "category",
+      "domain",
+      "query_type",
+      "difficulty",
+      "id",
+      "expected_result"
+    ]
+  },
+  "database": {
+    "path": "C:\\Users\\mjeni\\OneDrive\\Desktop\\Own Projects\\Data Analyst Agent\\data\\analytics.db",
+    "sha256": "8550c4cc6d670aa0441bc898e47a57a40001858fc3f13dc5cb16fb90ca11c130",
+    "size_bytes": 160145408,
+    "table_names": [
+      "customers",
+      "geolocation",
+      "order_items",
+      "order_payments",
+      "order_reviews",
+      "orders",
+      "product_category_name_translation",
+      "products",
+      "sellers"
+    ],
+    "total_row_count": 1550922
+  },
+  "model_config": {
+    "model_name": "nvidia/llama-3.1-nemotron-70b-instruct",
+    "provider": "nvidia_nim",
+    "temperature": 0.0,
+    "max_tokens": 4096,
+    "top_p": 1.0,
+    "seed": 42,
+    "concurrency_workers": 4,
+    "system_prompt_hashes": {}
+  },
+  "environment": {
+    "os_name": "Windows",
+    "os_release": "11",
+    "os_version": "10.0.26200",
+    "machine_arch": "AMD64",
+    "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+    "python_version": "3.14.7",
+    "python_compiler": "MSC v.1944 64 bit (AMD64)",
+    "python_executable": "C:\\Users\\mjeni\\OneDrive\\Desktop\\Own Projects\\Data Analyst Agent\\.venv\\Scripts\\python.exe",
+    "git_commit_sha": "aaf5e590f8e824bd8fd87a1aa8aa52af831934fc",
+    "git_branch": "feat/research-grade-upgrade",
+    "git_is_dirty": true,
+    "dependencies_hash": "5fdfb67c6385b92c370d7ed7c5b082a048b6a731ad518ce46be8d4608d4e3594"
+  },
+  "custom_parameters": {}
+}

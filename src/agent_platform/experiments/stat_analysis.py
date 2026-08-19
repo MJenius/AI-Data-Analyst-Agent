@@ -671,6 +671,7 @@ def format_latex_phase_table(records: List[PhaseBenchmarkRecord], caption: str =
         r"\small",
         r"\caption{" + caption + r"}",
         r"\label{tab:phase_progression}",
+        r"\resizebox{\textwidth}{!}{%",
         r"\begin{tabular}{lcccccc}",
         r"\toprule",
         r"\textbf{Phase / System Variant} & \textbf{N} & \textbf{Result Equivalence (95\% CI)} & \textbf{Exact Match} & \textbf{SQL Exec} & \textbf{Table Rec} & \textbf{Latency (s)} \\",
@@ -686,7 +687,8 @@ def format_latex_phase_table(records: List[PhaseBenchmarkRecord], caption: str =
 
     lines.extend([
         r"\bottomrule",
-        r"\end{tabular}",
+        r"\end{tabular}%",
+        r"}",
         r"\end{table*}",
     ])
     return "\n".join(lines)

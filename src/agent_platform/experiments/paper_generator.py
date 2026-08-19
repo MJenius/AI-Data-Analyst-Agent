@@ -129,7 +129,7 @@ def plot_pipeline_architecture(output_prefix: Path) -> None:
         ha="center", va="center", fontsize=9.5, weight="bold", color="#d95f02"
     )
 
-    plt.title("Figure 1: Reliability-Oriented Multi-Stage Architecture with Structural Verification & Repair", pad=15)
+    plt.title("Reliability-Oriented Multi-Stage Architecture with Structural Verification & Repair", pad=15)
     for ext in ["png", "pdf", "svg"]:
         fig.savefig(output_prefix.with_suffix(f".{ext}"))
     plt.close(fig)
@@ -152,7 +152,7 @@ def plot_phase_progression(records: List[PhaseBenchmarkRecord], output_prefix: P
     rects2 = ax.bar(x + width/2, exact_rates, width, label="Exact Match", color="#7570b3")
 
     ax.set_ylabel("Rate (%)")
-    ax.set_title("Figure 2: Empirical Progression Across Development Milestones and Component Ablations")
+    ax.set_title("Empirical Progression Across Development Milestones and Component Ablations")
     ax.set_xticks(x)
     ax.set_xticklabels(labels, rotation=25, ha="right")
     ax.set_ylim(0, 92)
@@ -206,7 +206,7 @@ def plot_pareto_frontier(pareto_points: List[ParetoPoint], output_prefix: Path) 
 
     ax.set_xlabel("Median Latency p50 (seconds) $\\rightarrow$ Lower is Better")
     ax.set_ylabel("Result Equivalence Rate (%) $\\rightarrow$ Higher is Better")
-    ax.set_title("Figure 3: Accuracy–Latency Trade-off with Cost-Scaled Configurations")
+    ax.set_title("Accuracy–Latency Trade-off with Cost-Scaled Configurations")
     ax.set_xlim(35, 270)
     ax.set_ylim(5, 82)
     ax.legend(loc="upper right")
@@ -261,7 +261,7 @@ def plot_repair_dynamics(repair_data: dict[str, Any], output_prefix: Path) -> No
         h = b.get_height()
         ax2.annotate(f"{h} ({h/101*100:.1f}%)", xy=(b.get_x() + b.get_width()/2, h), xytext=(0, 4), textcoords="offset points", ha="center", fontsize=8.5, weight="bold")
 
-    plt.suptitle("Figure 4: Granular Audit of the 101 Repair Cases in Phase 10", fontsize=13, y=1.02)
+    plt.suptitle("Granular Audit of the 101 Repair Cases in Phase 10", fontsize=13, y=1.02)
     plt.tight_layout()
     for ext in ["png", "pdf", "svg"]:
         fig.savefig(str(output_prefix.with_suffix(f".{ext}")))
@@ -284,7 +284,7 @@ def plot_domain_difficulty_heatmap(subgroups_domain: dict[str, Any], output_pref
         xticklabels=domains, yticklabels=["Result Equiv (%)", "SQL Exec (%)", "Table Prec (%)", "Table Rec (%)"],
         cbar_kws={"label": "Rate (%)"}, ax=ax, vmin=40, vmax=100
     )
-    ax.set_title("Figure 5: Performance Stratification Across E-Commerce Business Domains (500 Queries)")
+    ax.set_title("Performance Stratification Across E-Commerce Business Domains (500 Queries)")
     plt.xticks(rotation=25, ha="right")
 
     plt.tight_layout()
@@ -307,7 +307,7 @@ def plot_robustness_degradation(reports: dict[str, Any], output_prefix: Path) ->
     ax.bar(x + width/2, perturbed, width, label="Perturbed (Synthetic Vector)", color="#d95f02")
 
     ax.set_ylabel("Result Equivalence Rate (%)")
-    ax.set_title("Figure 6: Robustness Under Controlled Synthetic Perturbations\n(N=50 total; 10 queries per perturbation vector)")
+    ax.set_title("Robustness Under Controlled Synthetic Perturbations\n(N=50 total; 10 queries per perturbation vector)")
     ax.set_xticks(x)
     ax.set_xticklabels([t.replace("_", " ").title() for t in types])
     ax.set_ylim(0, 100)
@@ -334,7 +334,7 @@ def plot_failure_taxonomy(taxonomy_data: dict[str, Any], output_prefix: Path) ->
     fig, ax = plt.subplots(figsize=(10, 4.5))
     bars = ax.barh(labels[::-1], vals[::-1], color="#d95f02", alpha=0.85, edgecolor="#333333")
     ax.set_xlabel(f"Error Count (out of {total_failures} non-equivalent queries)")
-    ax.set_title(f"Figure 7: Scientific Failure Taxonomy Distribution across {total_failures} Non-Equivalent Queries")
+    ax.set_title(f"Scientific Failure Taxonomy Distribution across {total_failures} Non-Equivalent Queries")
 
     for idx, (b, pct) in enumerate(zip(bars, pcts[::-1])):
         w = b.get_width()
@@ -351,6 +351,7 @@ def plot_failure_taxonomy(taxonomy_data: dict[str, Any], output_prefix: Path) ->
 # ============================================================================
 
 def export_latex_tables(report: dict[str, Any], tables_dir: Path) -> None:
+    """Generates all publication LaTeX tables."""
     tables_dir.mkdir(parents=True, exist_ok=True)
 
     # 1. Headline Table
@@ -387,6 +388,7 @@ def export_latex_tables(report: dict[str, Any], tables_dir: Path) -> None:
         r"\small",
         r"\caption{Performance Breakdown Across 8 Business Domains (Phase 10, N=500)}",
         r"\label{tab:domain_breakdown}",
+        r"\resizebox{\textwidth}{!}{%",
         r"\begin{tabular}{lcccccc}",
         r"\toprule",
         r"\textbf{Domain} & \textbf{N} & \textbf{Result Equivalence (95\% CI)} & \textbf{SQL Exec} & \textbf{Table Prec} & \textbf{Table Rec} & \textbf{Mean Latency} \\",
@@ -398,7 +400,7 @@ def export_latex_tables(report: dict[str, Any], tables_dir: Path) -> None:
         lines_dom.append(
             f"{escaped_d_name} & {m.get('sample_size', 0)} & {ci_str} & {m.get('sql_success_rate', 0)*100:.1f}\\% & {m.get('table_precision', 0)*100:.1f}\\% & {m.get('table_recall', 0)*100:.1f}\\% & {m.get('mean_latency', 0):.1f}s \\\\"
         )
-    lines_dom.extend([r"\bottomrule", r"\end{tabular}", r"\end{table*}"])
+    lines_dom.extend([r"\bottomrule", r"\end{tabular}%", r"}", r"\end{table*}"])
     with open(tables_dir / "tab_domain_breakdown.tex", "w", encoding="utf-8") as f:
         f.write("\n".join(lines_dom))
 

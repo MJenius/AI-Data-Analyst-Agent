@@ -1,7 +1,7 @@
 [project]
 name = "end-to-end-ai-agent-platform"
 version = "0.1.0"
-description = "Production-grade agentic analytics platform vertical slice."
+description = "Reliability-oriented agentic analytics platform and empirical Text-to-SQL research pipeline."
 requires-python = ">=3.11"
 dependencies = [
     "fastapi>=0.115.0",

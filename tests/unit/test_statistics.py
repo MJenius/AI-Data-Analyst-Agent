@@ -132,8 +132,8 @@ def test_benchmark_statistical_analyzer():
 
 def test_independent_two_sample_proportion_test():
     from agent_platform.experiments.stat_analysis import independent_two_sample_proportion_test
-    # 362 / 500 (72.4%) vs 26 / 100 (26.0%)
-    res = independent_two_sample_proportion_test(362, 500, 26, 100)
+    # 367 / 500 (73.4%) vs 26 / 100 (26.0%)
+    res = independent_two_sample_proportion_test(367, 500, 26, 100)
     assert res.is_significant
     assert res.p_value < 1e-10
     assert res.effect_size > 1.0

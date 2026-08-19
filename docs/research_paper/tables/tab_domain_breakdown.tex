@@ -3,6 +3,7 @@
 \small
 \caption{Performance Breakdown Across 8 Business Domains (Phase 10, N=500)}
 \label{tab:domain_breakdown}
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{lcccccc}
 \toprule
 \textbf{Domain} & \textbf{N} & \textbf{Result Equivalence (95\% CI)} & \textbf{SQL Exec} & \textbf{Table Prec} & \textbf{Table Rec} & \textbf{Mean Latency} \\
@@ -16,5 +17,6 @@ Revenue \& Sales & 65 & 70.8\% [58.0\%, 81.1\%] & 100.0\% & 97.7\% & 92.3\% & 74
 Reviews \& Satisfaction & 60 & 46.7\% [33.9\%, 59.9\%] & 100.0\% & 88.9\% & 90.6\% & 66.6s \\
 Sellers \& Fulfillment & 60 & 91.7\% [80.9\%, 96.9\%] & 100.0\% & 88.6\% & 100.0\% & 65.4s \\
 \bottomrule
-\end{tabular}
+\end{tabular}%
+}
 \end{table*}

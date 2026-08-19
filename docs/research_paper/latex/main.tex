@@ -10,7 +10,10 @@
 \usepackage{cite}
 \usepackage{url}
 \usepackage{multirow}
-\geometry{margin=1in}
+\geometry{margin=0.95in}
+
+% Search paths for graphics
+\graphicspath{{figures/}{../figures/}{./}}
 
 % Include auto-generated macros
 \IfFileExists{macros.tex}{\input{macros.tex}}{\input{../macros.tex}}
@@ -26,7 +29,7 @@
 \maketitle
 
 \begin{abstract}
-While Large Language Models (LLMs) demonstrate notable code-generation capabilities, translating natural language questions into reliable analytical SQL over relational databases (Text-to-SQL) remains brittle in practice. Queries frequently fail due to schema hallucinations, invalid join topologies, aggregation grain mismatch, and SQL dialect incompatibilities. In this paper, we present an empirical reliability study investigating which architectural mechanisms improve the reliability of LLM-generated analytical SQL, and what failure modes persist across grounding, planning, structural verification, and automated repair. We evaluate a multi-stage reliability pipeline on a frozen 500-query benchmark across 8 business domains over a public relational e-commerce data warehouse (the Olist dataset, 9 tables, 100,000+ orders). Our system achieves a \textbf{\HeadlineEquivalentAccuracy{} Result Equivalence Rate} (367/500 queries, 95\% Wilson Score CI: [\HeadlineEquivalentCILower{}, \HeadlineEquivalentCIUpper{}]), \textbf{\HeadlineExactMatchAccuracy{} Exact Match}, and \textbf{\HeadlineSQLExecutionSuccess{} SQL Execution Success} with a mean latency of \HeadlineMeanLatency{} ($p50$: \HeadlinePFiftyLatency{}, $p95$: \HeadlinePNinetyFiveLatency{}). In a controlled 4-way 100-query ablation, activating AST-based structural verification significantly improves result equivalence over unverified planners (Config~C 26.0\% vs.\ Config~B 15.0\%, McNemar exact $p=0.0192$, $\text{OR}=3.75$). An exhaustive audit of all \TotalRepairTriggered{} repair events reveals that automated self-repair is a double-edged mechanism: while repair maintained \RepairSyntaxSuccessRate{} syntactic validity and preserved \RepairMaintainedCount{} already-correct queries, it yielded only \RepairTrulyRecoveredCount{} genuine recoveries while inducing \RepairHarmedFalsePositiveCount{} false-positive regressions. In a controlled 50-query synthetic perturbation robustness study across 5 vectors, the pipeline remains resilient to paraphrasing, synonyms, and ranking variants, but degrades under typographical noise (57.1\% retention). We conclude that conservative, uncertainty-aware structural verification is preferable to unrestricted automated repair, and document the persistent structural failure modes across complex analytical queries.
+While Large Language Models (LLMs) demonstrate notable code-generation capabilities, translating natural language questions into reliable analytical SQL over relational databases (Text-to-SQL) remains brittle in practice. Queries frequently fail due to schema hallucinations, invalid join topologies, aggregation grain mismatch, and SQL dialect incompatibilities. In this paper, we present an empirical reliability study investigating which architectural mechanisms improve the reliability of LLM-generated analytical SQL, and what failure modes persist across grounding, planning, structural verification, and automated repair. We evaluate a multi-stage reliability pipeline on a frozen 500-query benchmark across 8 business domains over a public relational e-commerce data warehouse (the Olist dataset, 9 tables, 100,000+ orders). Our system achieves a \textbf{\HeadlineEquivalentAccuracy{} Result Equivalence Rate under the study comparator} (367/500 queries, 95\% Wilson Score CI: [\HeadlineEquivalentCILower{}, \HeadlineEquivalentCIUpper{}]), \textbf{\HeadlineExactMatchAccuracy{} Exact Match}, and \textbf{\HeadlineSQLExecutionSuccess{} SQL Execution Success} with a mean latency of \HeadlineMeanLatency{} ($p50$: \HeadlinePFiftyLatency{}, $p95$: \HeadlinePNinetyFiveLatency{}). In a controlled 4-way 100-query ablation, activating AST-based structural verification significantly improves result equivalence over unverified planners (Config~C 26.0\% vs.\ Config~B 15.0\%, McNemar exact $p=0.0192$, $\text{OR}=3.75$). An exhaustive audit of all \TotalRepairTriggered{} repair events reveals that automated self-repair is a double-edged mechanism: while repair maintained \RepairSyntaxSuccessRate{} syntactic validity and preserved \RepairMaintainedCount{} already-correct queries, it yielded only \RepairTrulyRecoveredCount{} genuine recoveries while inducing \RepairHarmedFalsePositiveCount{} false-positive regressions. In a controlled 50-query synthetic perturbation robustness study across 5 vectors, the pipeline remains resilient to paraphrasing, synonyms, and ranking variants, but degrades under typographical noise (57.1\% retention). We conclude that conservative, uncertainty-aware structural verification is preferable to unrestricted automated repair, and document the persistent structural failure modes across complex analytical queries.
 \end{abstract}
 
 \section{Introduction and Research Questions}
@@ -35,7 +38,7 @@ Natural language interfaces to relational databases (Text-to-SQL) have received 
 \textit{Executable SQL is not necessarily reliable analytical SQL.}
 \end{center}
 A query may compile cleanly and execute without database runtime exceptions, yet return subtly corrupted figures due to several systemic failure modes:
-\begin{enumerate}
+\begin{enumerate}\sloppy
     \item \textbf{Schema Grounding Hallucinations:} LLMs frequently invent nonexistent columns (e.g., querying \texttt{order\_amount} instead of \texttt{price}), guess unindexed foreign keys, or join tables across disconnected topologies.
     \item \textbf{Join-Path \& Topology Errors:} In multi-table relational schemas, joining distant entities without necessary intermediate bridging tables creates invalid query semantics or cartesian fan-out.
     \item \textbf{Aggregation Grain Inconsistencies:} Computing metrics across mismatched dimensional grains (e.g., joining order items before aggregating customer attributes) produces inflated totals due to join fan-out multiplication.
@@ -61,7 +64,7 @@ Specifically, we address five explicit research questions:
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=0.95\textwidth]{../figures/fig1_pipeline_architecture.pdf}
+\includegraphics[width=0.92\textwidth]{fig1_pipeline_architecture.pdf}
 \caption{Reliability-Oriented Multi-Stage Architecture: Natural language questions are translated into verified execution results through graph-guided schema RAG, structured DAG planning, deterministic plan validation, AST structural verification, and verifier-triggered repair.}
 \label{fig:architecture}
 \end{figure*}
@@ -98,7 +101,7 @@ When violations are identified, the verifier triggers targeted closed-loop repai
 
 \subsection{Data Warehouse \& Benchmark Corpus}
 We evaluate our system on an enterprise-style relational schema constructed from the Brazilian E-Commerce Public Dataset (Olist \cite{olist2018kaggle}):
-\begin{itemize}
+\begin{itemize}\sloppy
     \item \textbf{9 Relational Tables:} \texttt{customers}, \texttt{orders}, \texttt{order\_items}, \texttt{order\_payments}, \texttt{order\_reviews}, \texttt{products}, \texttt{sellers}, \texttt{geolocation}, and \texttt{product\_category\_name\_translation}.
     \item \textbf{Scale:} 100,000+ customer orders, 112,650 order items, and 1,000,000+ geolocation points.
     \item \textbf{Benchmark Corpus:} A frozen 500-query benchmark dataset (\texttt{benchmark\_dataset\_500.json}) stratified across 8 business domains and 3 difficulty tiers (Easy: 114, Medium: 276, Hard: 110).
@@ -106,7 +109,7 @@ We evaluate our system on an enterprise-style relational schema constructed from
 
 \subsection{Evaluation Metrics \& Methodological Definitions}
 \begin{itemize}
-    \item \textbf{Result Equivalence Rate (95\% Wilson CI):} Evaluates whether executed SQL results match ground-truth result sets under row-order invariance (comparing row multisets via item Counters) with numerical tolerance ($\epsilon=0.01$) and string whitespace normalization. Positional column semantics are preserved. We emphasize that result equivalence is an empirical evaluation criterion, not a formal mathematical proof of semantic correctness.
+    \item \textbf{Result Equivalence Rate under the Study Comparator (95\% Wilson CI):} Evaluates whether executed SQL results match ground-truth result sets under row-order invariance (comparing row multisets via item Counters) with numerical tolerance ($\epsilon=0.01$) and string whitespace normalization. Positional column semantics are preserved. We emphasize that result equivalence is an empirical evaluation criterion under the study comparator, not a generic classification accuracy or formal mathematical proof of semantic correctness.
     \item \textbf{Exact Match Rate:} Strict character-for-character equality of raw SQL output rows and column headers.
     \item \textbf{SQL Execution Success Rate:} Percentage of generated queries that execute without database engine runtime errors. Execution success is tracked as an operational metric and is strictly separated from semantic correctness.
     \item \textbf{Table Precision, Recall, and Exact Match:} Measuring table-retrieval alignment between generated and ground-truth queries.
@@ -119,18 +122,18 @@ Table~\ref{tab:headline_performance} reports the headline results across all \Be
 
 \IfFileExists{tables/tab_headline_500.tex}{\input{tables/tab_headline_500.tex}}{\input{../tables/tab_headline_500.tex}}
 
-The system achieves a \textbf{\HeadlineEquivalentAccuracy{} Result Equivalence Rate} (\HeadlineEquivalentCILower{}--\HeadlineEquivalentCIUpper{}, 95\% Wilson Score CI; Clopper-Pearson Exact CI: [69.30\%, 77.22\%]), \textbf{\HeadlineExactMatchAccuracy{} Exact Match}, and \textbf{\HeadlineSQLExecutionSuccess{} SQL Execution Success} with zero provider timeouts, HTTP 429 exceptions, or unhandled errors. Mean query execution latency is \HeadlineMeanLatency{} ($p50$: \HeadlinePFiftyLatency{}, $p95$: \HeadlinePNinetyFiveLatency{}).
+The system achieves a \textbf{\HeadlineEquivalentAccuracy{} Result Equivalence Rate under the study comparator} (\HeadlineEquivalentCILower{}--\HeadlineEquivalentCIUpper{}, 95\% Wilson Score CI; Clopper-Pearson Exact CI: [69.30\%, 77.22\%]), \textbf{\HeadlineExactMatchAccuracy{} Exact Match}, and \textbf{\HeadlineSQLExecutionSuccess{} SQL Execution Success} with zero provider timeouts, HTTP 429 exceptions, or unhandled errors. Mean query execution latency is \HeadlineMeanLatency{} ($p50$: \HeadlinePFiftyLatency{}, $p95$: \HeadlinePNinetyFiveLatency{}).
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.48\textwidth]{../figures/fig2_phase_accuracy_progression.pdf}
+\includegraphics[width=0.82\textwidth]{fig2_phase_accuracy_progression.pdf}
 \caption{Empirical progression across development milestones and component configurations with 95\% Wilson score confidence intervals.}
 \label{fig:progression}
 \end{figure}
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.48\textwidth]{../figures/fig3_pareto_frontier.pdf}
+\includegraphics[width=0.82\textwidth]{fig3_pareto_frontier.pdf}
 \caption{Accuracy--Latency trade-off across evaluated configurations (marker size proportional to estimated token cost).}
 \label{fig:pareto}
 \end{figure}
@@ -144,7 +147,7 @@ Performance varies across business domains and difficulty tiers (Table~\ref{tab:
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.48\textwidth]{../figures/fig5_domain_difficulty_heatmap.pdf}
+\includegraphics[width=0.82\textwidth]{fig5_domain_difficulty_heatmap.pdf}
 \caption{Performance Stratification Across Business Domains and Difficulty Tiers (500 Queries).}
 \label{fig:heatmap}
 \end{figure}
@@ -152,7 +155,7 @@ Performance varies across business domains and difficulty tiers (Table~\ref{tab:
 \begin{itemize}
     \item \textbf{Domain Differences:} \textit{Orders \& Transactions} (90.8\%) and \textit{Sellers \& Fulfillment} (91.7\%) achieve high result equivalence due to direct primary-foreign key links. Conversely, \textit{Reviews \& Satisfaction} (46.7\%) and \textit{Logistics \& Operations} (56.7\%) present lower equivalence due to complex multi-table bridge joins and date-arithmetic nuances.
     \item \textbf{Difficulty Tiers:} Easy queries achieve 88.60\% equivalence (101/114), Medium queries achieve 76.81\% (212/276), and Hard queries drop to 44.55\% (49/110).
-    \item \textbf{Query Type Breakdown:} Single-value queries achieve 90.30\% (242/268), Time-series queries achieve 87.76\% (43/49), Ranked-list queries achieve 48.57\% (68/140), and Aggregated-table queries achieve 32.56\% (14/43).
+    \item \textbf{Query Type Breakdown:} Single-value queries achieve 90.30\% (242/268), time-series queries achieve 87.76\% (43/49), ranked-list queries achieve 48.57\% (68/140), and aggregated tables achieve 32.56\% (14/43).
 \end{itemize}
 
 \section{Controlled Component Ablation}
@@ -176,7 +179,7 @@ To evaluate the true dynamics of automated self-repair, we conducted an exhausti
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.48\textwidth]{../figures/fig4_repair_dynamics.pdf}
+\includegraphics[width=0.82\textwidth]{fig4_repair_dynamics.pdf}
 \caption{Granular Audit of the 101 Repair Cases: Syntactic Validity Pipeline (Panel A) and Pre $\rightarrow$ Post Semantic Transitions (Panel B: 49 maintained, 26 remained incorrect, 22 harmed false positives, 4 truly recovered).}
 \label{fig:repair}
 \end{figure}
@@ -204,7 +207,7 @@ We analyzed all \TotalFailuresAnalyzed{} non-equivalent queries from the 500-que
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.48\textwidth]{../figures/fig7_failure_taxonomy.pdf}
+\includegraphics[width=0.82\textwidth]{fig7_failure_taxonomy.pdf}
 \caption{Scientific Failure Taxonomy Distribution across \TotalFailuresAnalyzed{} Non-Equivalent Queries.}
 \label{fig:taxonomy}
 \end{figure}
@@ -216,7 +219,7 @@ To examine sensitivity to controlled lexical and semantic shifts, we evaluated a
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.48\textwidth]{../figures/fig6_robustness_degradation.pdf}
+\includegraphics[width=0.82\textwidth]{fig6_robustness_degradation.pdf}
 \caption{Robustness under controlled synthetic perturbations ($N=50$ total; 10 queries per perturbation vector).}
 \label{fig:robustness}
 \end{figure}
@@ -226,14 +229,14 @@ The pipeline demonstrates high retention under query paraphrasing (80.0\% retent
 
 \section{Limitations and Threats to Validity}
 We explicitly document the scientific and operational limitations of this study:
-\begin{enumerate}
+\begin{enumerate}\sloppy
     \item \textbf{Single Data Warehouse Schema:} All evaluations were conducted on the Olist e-commerce relational schema (9 tables, 100k orders). While architecturally representative of relational star/snowflake schemas, our results do not claim zero-shot transfer to financial, healthcare, or graph database schemas without domain-specific schema RAG tuning.
     \item \textbf{Custom Frozen Benchmark:} The 500-query benchmark is a custom frozen corpus. Although stratified across domains and difficulty tiers, evaluations on external public benchmarks (e.g., Spider, BIRD) remain necessary for cross-benchmark comparison.
     \item \textbf{Inference Latency Overhead:} Multi-stage retrieval, planning, validation, and verification incur a mean latency of \HeadlineMeanLatency{} ($p95$: \HeadlinePNinetyFiveLatency{}), making this architecture suited for asynchronous analytics rather than sub-second interactive search.
     \item \textbf{Hard Query Degradation:} Result equivalence drops to 44.55\% on hard queries and 32.56\% on aggregated table queries, reflecting persistent limitations in multi-step CTE nesting and window functions.
     \item \textbf{Typographical Sensitivity:} The schema retriever degrades significantly under typographical noise (57.1\% retention), indicating the necessity of fuzzy edit-distance indexing.
     \item \textbf{False-Positive Repair Regressions:} Heuristic repair rules induced regressions in 22 out of 101 triggered cases, underscoring the need for uncertainty-aware gating before applying automated repairs.
-    \item \textbf{Empirical Comparator Scope:} The row-multiset comparator is an empirical evaluation metric with numerical tolerance, not a formal mathematical proof of semantic correctness.
+    \item \textbf{Empirical Comparator Scope:} The row-multiset comparator is an empirical evaluation metric with numerical tolerance under the defined comparator, not a formal mathematical proof of semantic correctness.
     \item \textbf{Ablation Sample Sizes:} Component ablations ($N=100$) and synthetic perturbation tests ($N=50$) use smaller sample sizes than the main 500-query benchmark.
 \end{enumerate}
 
@@ -247,7 +250,7 @@ All code, benchmark definitions, evaluation scripts, and manuscript sources are 
 \end{itemize}
 
 \section{Conclusion}
-In this study, we investigated the architectural mechanisms governing the reliability of LLM-generated analytical SQL over a public relational e-commerce data warehouse. On an audited 500-query benchmark, our multi-stage pipeline achieved a \textbf{\HeadlineEquivalentAccuracy{} Result Equivalence Rate} and \textbf{\HeadlineSQLExecutionSuccess{} SQL Execution Success}. Our controlled component ablation demonstrated that AST-based structural verification significantly stabilizes unverified query planners ($p=0.0192$). However, an exhaustive audit of 101 repair cases revealed that automated self-repair is a double-edged mechanism, producing \RepairHarmedFalsePositiveCount{} harmful false-positive regressions against only \RepairTrulyRecoveredCount{} genuine recoveries. These findings demonstrate that while reliability-oriented grounding, planning, and structural verification significantly improve analytical SQL synthesis, conservative, uncertainty-aware verification is critical to prevent automated repair regressions.
+In this study, we investigated the architectural mechanisms governing the reliability of LLM-generated analytical SQL over a public relational e-commerce data warehouse. On an audited 500-query benchmark, our multi-stage pipeline achieved a \textbf{\HeadlineEquivalentAccuracy{} Result Equivalence Rate under the study comparator} and \textbf{\HeadlineSQLExecutionSuccess{} SQL Execution Success}. Our controlled component ablation demonstrated that AST-based structural verification significantly stabilizes unverified query planners ($p=0.0192$). However, an exhaustive audit of 101 repair cases revealed that automated self-repair is a double-edged mechanism, producing \RepairHarmedFalsePositiveCount{} harmful false-positive regressions against only \RepairTrulyRecoveredCount{} genuine recoveries. These findings demonstrate that while reliability-oriented grounding, planning, and structural verification significantly improve analytical SQL synthesis, conservative, uncertainty-aware verification is critical to prevent automated repair regressions.
 
 \bibliographystyle{plain}
 \bibliography{references}
