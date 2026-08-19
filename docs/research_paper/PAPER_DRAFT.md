@@ -1,6 +1,6 @@
 # Autonomous Enterprise Data Analysis via Semantic Schema Grounding, Plan Validation, and Multi-Turn SQL AST Repair
 
-**Authors:** Mevin Jose  
+**Author:** Mevin Jose  
 **Date:** August 2026  
 **Status:** Pre-print & Submission-Ready Manuscript  
 **Primary Source of Truth:** `docs/research_paper/latex/main.tex` (This Markdown document is a synchronized non-authoritative companion)  

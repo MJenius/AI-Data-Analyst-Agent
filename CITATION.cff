@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "If you use this software, benchmark, or findings in your research, please cite it as below."
-authors:
+author:
   - name: "Mevin Jose"
 title: "Autonomous Enterprise Data Analysis via Semantic Schema Grounding, Plan Validation, and Multi-Turn SQL AST Repair"
 version: 1.0.0
