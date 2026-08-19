@@ -3,27 +3,27 @@
   "timestamp_utc": "2026-08-19T05:30:00Z",
   "headline_metrics": {
     "total_queries": 500,
-    "equivalent_matches": 362,
-    "equivalent_rate": 0.724,
+    "equivalent_matches": 367,
+    "equivalent_rate": 0.734,
     "equivalent_ci_wilson_95": {
-      "estimate": 0.724,
-      "ci_lower": 0.6822,
-      "ci_upper": 0.7623,
+      "estimate": 0.734,
+      "ci_lower": 0.6926,
+      "ci_upper": 0.7718,
       "confidence_level": 0.95,
       "method": "wilson_cc",
       "sample_size": 500,
-      "successes": 362,
-      "formatted": "72.4% [68.2%, 76.2%]"
+      "successes": 367,
+      "formatted": "73.4% [69.3%, 77.2%]"
     },
     "equivalent_ci_clopper_pearson_95": {
-      "estimate": 0.724,
-      "ci_lower": 0.6826,
-      "ci_upper": 0.7628,
+      "estimate": 0.734,
+      "ci_lower": 0.693,
+      "ci_upper": 0.7722,
       "confidence_level": 0.95,
       "method": "clopper_pearson",
       "sample_size": 500,
-      "successes": 362,
-      "formatted": "72.4% [68.3%, 76.3%]"
+      "successes": 367,
+      "formatted": "73.4% [69.3%, 77.2%]"
     },
     "exact_matches": 155,
     "exact_rate": 0.31,
@@ -409,11 +409,11 @@
         "Customers & Geography": {
           "group_name": "Customers & Geography",
           "sample_size": 65,
-          "success_count": 51,
-          "accuracy": 0.7846,
-          "ci_lower": 0.6619,
-          "ci_upper": 0.8732,
-          "ci_formatted": "78.5% [66.2%, 87.3%]",
+          "success_count": 52,
+          "accuracy": 0.8,
+          "ci_lower": 0.6788,
+          "ci_upper": 0.8852,
+          "ci_formatted": "80.0% [67.9%, 88.5%]",
           "mean_latency": 56.73,
           "p95_latency": 107.88,
           "sql_success_rate": 1.0,
@@ -423,11 +423,11 @@
         "Logistics & Operations": {
           "group_name": "Logistics & Operations",
           "sample_size": 60,
-          "success_count": 33,
-          "accuracy": 0.55,
-          "ci_lower": 0.4169,
-          "ci_upper": 0.6767,
-          "ci_formatted": "55.0% [41.7%, 67.7%]",
+          "success_count": 34,
+          "accuracy": 0.5667,
+          "ci_lower": 0.433,
+          "ci_upper": 0.6918,
+          "ci_formatted": "56.7% [43.3%, 69.2%]",
           "mean_latency": 61.69,
           "p95_latency": 120.01,
           "sql_success_rate": 1.0,
@@ -479,11 +479,11 @@
         "Revenue & Sales": {
           "group_name": "Revenue & Sales",
           "sample_size": 65,
-          "success_count": 45,
-          "accuracy": 0.6923,
-          "ci_lower": 0.5641,
-          "ci_upper": 0.7977,
-          "ci_formatted": "69.2% [56.4%, 79.8%]",
+          "success_count": 46,
+          "accuracy": 0.7077,
+          "ci_lower": 0.58,
+          "ci_upper": 0.8106,
+          "ci_formatted": "70.8% [58.0%, 81.1%]",
           "mean_latency": 74.83,
           "p95_latency": 138.72,
           "sql_success_rate": 1.0,
@@ -507,11 +507,11 @@
         "Sellers & Fulfillment": {
           "group_name": "Sellers & Fulfillment",
           "sample_size": 60,
-          "success_count": 53,
-          "accuracy": 0.8833,
-          "ci_lower": 0.7682,
-          "ci_upper": 0.9479,
-          "ci_formatted": "88.3% [76.8%, 94.8%]",
+          "success_count": 55,
+          "accuracy": 0.9167,
+          "ci_lower": 0.8088,
+          "ci_upper": 0.9689,
+          "ci_formatted": "91.7% [80.9%, 96.9%]",
           "mean_latency": 65.43,
           "p95_latency": 113.29,
           "sql_success_rate": 1.0,
@@ -537,11 +537,11 @@
         "hard": {
           "group_name": "hard",
           "sample_size": 110,
-          "success_count": 49,
-          "accuracy": 0.4455,
-          "ci_lower": 0.3517,
-          "ci_upper": 0.5431,
-          "ci_formatted": "44.5% [35.2%, 54.3%]",
+          "success_count": 52,
+          "accuracy": 0.4727,
+          "ci_lower": 0.3776,
+          "ci_upper": 0.5698,
+          "ci_formatted": "47.3% [37.8%, 57.0%]",
           "mean_latency": 65.78,
           "p95_latency": 119.92,
           "sql_success_rate": 1.0,
@@ -551,11 +551,11 @@
         "medium": {
           "group_name": "medium",
           "sample_size": 276,
-          "success_count": 212,
-          "accuracy": 0.7681,
-          "ci_lower": 0.7129,
-          "ci_upper": 0.8157,
-          "ci_formatted": "76.8% [71.3%, 81.6%]",
+          "success_count": 214,
+          "accuracy": 0.7754,
+          "ci_lower": 0.7206,
+          "ci_upper": 0.8223,
+          "ci_formatted": "77.5% [72.1%, 82.2%]",
           "mean_latency": 64.69,
           "p95_latency": 130.73,
           "sql_success_rate": 1.0,
@@ -567,11 +567,11 @@
         "aggregated_table": {
           "group_name": "aggregated_table",
           "sample_size": 43,
-          "success_count": 10,
-          "accuracy": 0.2326,
-          "ci_lower": 0.1228,
-          "ci_upper": 0.39,
-          "ci_formatted": "23.3% [12.3%, 39.0%]",
+          "success_count": 14,
+          "accuracy": 0.3256,
+          "ci_lower": 0.1954,
+          "ci_upper": 0.4866,
+          "ci_formatted": "32.6% [19.5%, 48.7%]",
           "mean_latency": 74.03,
           "p95_latency": 135.47,
           "sql_success_rate": 1.0,
@@ -581,11 +581,11 @@
         "ranked_list": {
           "group_name": "ranked_list",
           "sample_size": 140,
-          "success_count": 67,
-          "accuracy": 0.4786,
-          "ci_lower": 0.3941,
-          "ci_upper": 0.5643,
-          "ci_formatted": "47.9% [39.4%, 56.4%]",
+          "success_count": 68,
+          "accuracy": 0.4857,
+          "ci_lower": 0.401,
+          "ci_upper": 0.5713,
+          "ci_formatted": "48.6% [40.1%, 57.1%]",
           "mean_latency": 73.73,
           "p95_latency": 143.85,
           "sql_success_rate": 1.0,
@@ -623,82 +623,6 @@
       }
     },
     "phase_records": {
-      "baseline": {
-        "phase_id": "baseline",
-        "label": "Phase 1: Baseline",
-        "total_queries": 100,
-        "equivalent_matches": 0,
-        "equivalent_rate": 0.0,
-        "equivalent_ci": "0.0% [0.0%, 4.6%]",
-        "exact_matches": 0,
-        "exact_rate": 0.0,
-        "exact_ci": "0.0% [0.0%, 4.6%]",
-        "sql_execution_successes": 0,
-        "sql_success_rate": 0.0,
-        "sql_success_ci": "0.0% [0.0%, 4.6%]",
-        "table_precision": 0.0,
-        "table_recall": 0.0,
-        "mean_latency": 7.09,
-        "p50_latency": 6.92,
-        "p95_latency": 12.34
-      },
-      "phase7": {
-        "phase_id": "phase7",
-        "label": "Phase 7: Plan Grounding",
-        "total_queries": 100,
-        "equivalent_matches": 0,
-        "equivalent_rate": 0.0,
-        "equivalent_ci": "0.0% [0.0%, 4.6%]",
-        "exact_matches": 0,
-        "exact_rate": 0.0,
-        "exact_ci": "0.0% [0.0%, 4.6%]",
-        "sql_execution_successes": 100,
-        "sql_success_rate": 1.0,
-        "sql_success_ci": "100.0% [95.4%, 100.0%]",
-        "table_precision": 0.8558,
-        "table_recall": 0.95,
-        "mean_latency": 71.18,
-        "p50_latency": 65.3,
-        "p95_latency": 121.6
-      },
-      "phase8": {
-        "phase_id": "phase8",
-        "label": "Phase 8: Semantic Alignment",
-        "total_queries": 100,
-        "equivalent_matches": 0,
-        "equivalent_rate": 0.0,
-        "equivalent_ci": "0.0% [0.0%, 4.6%]",
-        "exact_matches": 0,
-        "exact_rate": 0.0,
-        "exact_ci": "0.0% [0.0%, 4.6%]",
-        "sql_execution_successes": 100,
-        "sql_success_rate": 1.0,
-        "sql_success_ci": "100.0% [95.4%, 100.0%]",
-        "table_precision": 0.8383,
-        "table_recall": 0.925,
-        "mean_latency": 89.73,
-        "p50_latency": 79.41,
-        "p95_latency": 162.12
-      },
-      "phase9": {
-        "phase_id": "phase9",
-        "label": "Phase 9: Concurrency v2",
-        "total_queries": 100,
-        "equivalent_matches": 0,
-        "equivalent_rate": 0.0,
-        "equivalent_ci": "0.0% [0.0%, 4.6%]",
-        "exact_matches": 0,
-        "exact_rate": 0.0,
-        "exact_ci": "0.0% [0.0%, 4.6%]",
-        "sql_execution_successes": 100,
-        "sql_success_rate": 1.0,
-        "sql_success_ci": "100.0% [95.4%, 100.0%]",
-        "table_precision": 0.7933,
-        "table_recall": 0.9583,
-        "mean_latency": 0.0,
-        "p50_latency": 0.0,
-        "p95_latency": 0.0
-      },
       "ablation_a": {
         "phase_id": "ablation_a",
         "label": "Ablation A: RAG Only",
@@ -779,9 +703,9 @@
         "phase_id": "phase10_500",
         "label": "Phase 10: 500-Query Live",
         "total_queries": 500,
-        "equivalent_matches": 362,
-        "equivalent_rate": 0.724,
-        "equivalent_ci": "72.4% [68.2%, 76.2%]",
+        "equivalent_matches": 367,
+        "equivalent_rate": 0.734,
+        "equivalent_ci": "73.4% [69.3%, 77.2%]",
         "exact_matches": 155,
         "exact_rate": 0.31,
         "exact_ci": "31.0% [27.0%, 35.3%]",
@@ -852,58 +776,30 @@
     "independent_proportion_tests": {
       "phase10_500_vs_ablation_c_independent": {
         "test_name": "Fisher's Exact Test / Chi-Square (Independent)",
-        "statistic": 76.5041,
-        "p_value": 6.23877e-18,
+        "statistic": 80.77,
+        "p_value": 9.22313e-19,
         "is_significant": true,
         "alpha": 0.050000000000000044,
-        "effect_size": 7.466,
-        "interpretation": "Statistically significant difference in proportions (Group A: 72.4%, Group B: 26.0%, Fisher p=6.239e-18, OR=7.47).",
+        "effect_size": 7.8537,
+        "interpretation": "Statistically significant difference in proportions (Group A: 73.4%, Group B: 26.0%, Fisher p=9.223e-19, OR=7.85).",
         "details": {
           "group_a": {
-            "successes": 362,
+            "successes": 367,
             "total": 500,
-            "rate": 0.724
+            "rate": 0.734
           },
           "group_b": {
             "successes": 26,
             "total": 100,
             "rate": 0.26
           },
-          "rate_difference": 0.46399999999999997,
-          "odds_ratio": 7.465997770345597,
-          "fisher_p_value": 6.238765817542817e-18,
-          "chi2_statistic": 76.50408480840304,
-          "chi2_p_value": 2.197579554692225e-18,
+          "rate_difference": 0.474,
+          "odds_ratio": 7.853672643146328,
+          "fisher_p_value": 9.223130354795278e-19,
+          "chi2_statistic": 80.76999668104878,
+          "chi2_p_value": 2.5357897468393495e-19,
           "phase_a": "phase10_500",
           "phase_b": "ablation_c"
-        }
-      },
-      "phase10_500_vs_baseline_independent": {
-        "test_name": "Fisher's Exact Test / Chi-Square (Independent)",
-        "statistic": 179.5083,
-        "p_value": 9.88357e-48,
-        "is_significant": true,
-        "alpha": 0.050000000000000044,
-        "effect_size": Infinity,
-        "interpretation": "Statistically significant difference in proportions (Group A: 72.4%, Group B: 0.0%, Fisher p=9.884e-48, OR=inf).",
-        "details": {
-          "group_a": {
-            "successes": 362,
-            "total": 500,
-            "rate": 0.724
-          },
-          "group_b": {
-            "successes": 0,
-            "total": 100,
-            "rate": 0.0
-          },
-          "rate_difference": 0.724,
-          "odds_ratio": Infinity,
-          "fisher_p_value": 9.883573108523085e-48,
-          "chi2_statistic": 179.50833372022845,
-          "chi2_p_value": 6.205428933170685e-41,
-          "phase_a": "phase10_500",
-          "phase_b": "baseline"
         }
       }
     }
@@ -916,11 +812,11 @@
       "paraphrase": {
         "perturbation_type": "paraphrase",
         "sample_size": 10,
-        "clean_accuracy": 0.4,
+        "clean_accuracy": 0.5,
         "perturbed_accuracy": 0.4,
-        "absolute_drop": 0.0,
-        "retention_rate": 1.0,
-        "degradation_percent": "0.0%"
+        "absolute_drop": 0.1,
+        "retention_rate": 0.8,
+        "degradation_percent": "20.0%"
       },
       "ranking_variant": {
         "perturbation_type": "ranking_variant",
@@ -934,8 +830,8 @@
       "synonym": {
         "perturbation_type": "synonym",
         "sample_size": 10,
-        "clean_accuracy": 0.7,
-        "perturbed_accuracy": 0.7,
+        "clean_accuracy": 0.8,
+        "perturbed_accuracy": 0.8,
         "absolute_drop": 0.0,
         "retention_rate": 1.0,
         "degradation_percent": "0.0%"
@@ -943,11 +839,11 @@
       "temporal_variant": {
         "perturbation_type": "temporal_variant",
         "sample_size": 10,
-        "clean_accuracy": 0.8,
-        "perturbed_accuracy": 0.7,
+        "clean_accuracy": 0.7,
+        "perturbed_accuracy": 0.6,
         "absolute_drop": 0.1,
-        "retention_rate": 0.875,
-        "degradation_percent": "12.5%"
+        "retention_rate": 0.8571,
+        "degradation_percent": "14.3%"
       },
       "typo": {
         "perturbation_type": "typo",
@@ -962,35 +858,33 @@
   },
   "failure_taxonomy": {
     "total_analyzed": 500,
-    "total_failures": 138,
+    "total_failures": 133,
     "failure_summary": {
       "total_analyzed": 500,
       "failure_counts": {
-        "semantic_filter_omission_or_error": 31,
-        "success": 362,
+        "semantic_filter_omission_or_error": 33,
+        "success": 367,
         "semantic_aggregation_mismatch": 32,
-        "semantic_ranking_order_mismatch": 7,
         "schema_missing_join_path": 37,
-        "schema_hallucinated_table": 17,
-        "semantic_grain_group_by_mismatch": 14
+        "semantic_grain_group_by_mismatch": 14,
+        "semantic_ranking_order_mismatch": 2,
+        "schema_hallucinated_table": 15
       },
       "failure_percentages": {
-        "semantic_filter_omission_or_error": 6.2,
-        "success": 72.4,
+        "semantic_filter_omission_or_error": 6.6,
+        "success": 73.4,
         "semantic_aggregation_mismatch": 6.4,
-        "semantic_ranking_order_mismatch": 1.4,
         "schema_missing_join_path": 7.4,
-        "schema_hallucinated_table": 3.4,
-        "semantic_grain_group_by_mismatch": 2.8
+        "semantic_grain_group_by_mismatch": 2.8,
+        "semantic_ranking_order_mismatch": 0.4,
+        "schema_hallucinated_table": 3.0
       },
       "by_domain_category": {
         "Revenue & Sales": {
-          "semantic_filter_omission_or_error": 3,
-          "success": 45,
+          "semantic_filter_omission_or_error": 4,
+          "success": 46,
           "semantic_aggregation_mismatch": 2,
-          "semantic_ranking_order_mismatch": 1,
           "schema_missing_join_path": 9,
-          "schema_hallucinated_table": 1,
           "semantic_grain_group_by_mismatch": 4
         },
         "Orders & Transactions": {
@@ -999,8 +893,7 @@
           "semantic_grain_group_by_mismatch": 5
         },
         "Customers & Geography": {
-          "success": 51,
-          "semantic_ranking_order_mismatch": 1,
+          "success": 52,
           "schema_missing_join_path": 5,
           "semantic_filter_omission_or_error": 7,
           "semantic_grain_group_by_mismatch": 1
@@ -1014,24 +907,22 @@
           "semantic_grain_group_by_mismatch": 1
         },
         "Logistics & Operations": {
-          "success": 33,
+          "success": 34,
           "semantic_filter_omission_or_error": 6,
           "semantic_aggregation_mismatch": 8,
-          "schema_hallucinated_table": 11,
+          "schema_hallucinated_table": 10,
           "semantic_ranking_order_mismatch": 1,
           "semantic_grain_group_by_mismatch": 1
         },
         "Sellers & Fulfillment": {
-          "success": 53,
-          "semantic_ranking_order_mismatch": 2,
+          "success": 55,
           "semantic_filter_omission_or_error": 4,
           "semantic_aggregation_mismatch": 1
         },
         "Payments & Installments": {
           "success": 43,
           "semantic_aggregation_mismatch": 1,
-          "semantic_filter_omission_or_error": 2,
-          "semantic_ranking_order_mismatch": 1,
+          "semantic_filter_omission_or_error": 3,
           "schema_missing_join_path": 11,
           "semantic_grain_group_by_mismatch": 2
         },
@@ -1053,20 +944,19 @@
           "schema_hallucinated_table": 1
         },
         "medium": {
-          "success": 212,
-          "semantic_filter_omission_or_error": 26,
-          "semantic_ranking_order_mismatch": 3,
+          "success": 214,
+          "semantic_filter_omission_or_error": 27,
           "schema_missing_join_path": 22,
           "semantic_grain_group_by_mismatch": 9,
           "semantic_aggregation_mismatch": 3,
           "schema_hallucinated_table": 1
         },
         "hard": {
-          "success": 49,
+          "success": 52,
           "semantic_aggregation_mismatch": 27,
-          "schema_hallucinated_table": 15,
-          "semantic_ranking_order_mismatch": 4,
-          "semantic_filter_omission_or_error": 4,
+          "semantic_ranking_order_mismatch": 2,
+          "schema_hallucinated_table": 13,
+          "semantic_filter_omission_or_error": 5,
           "schema_missing_join_path": 11
         }
       }
@@ -1090,15 +980,6 @@
         "actual_sql": "SELECT\n            p.product_category_name,\n            COUNT(DISTINCT o.order_id) AS order_count,\n            ROUND(SUM(oi.price), 2) AS total_revenue\n        FROM order_items oi\n        JOIN orders o ON o.order_id = oi.order_id\n        JOIN products p ON p.product_id = oi.product_id\n        GROUP BY p.product_category_name\n        ORDER BY total_revenue DESC\n        LIMIT 10",
         "expected_sql": "SELECT CASE WHEN strftime('%m', o.order_purchase_timestamp) BETWEEN '01' AND '03' THEN '2017-Q1' WHEN strftime('%m', o.order_purchase_timestamp) BETWEEN '04' AND '06' THEN '2017-Q2' WHEN strftime('%m', o.order_purchase_timestamp) BETWEEN '07' AND '09' THEN '2017-Q3' ELSE '2017-Q4' END AS quarter, ROUND(SUM(oi.price), 2) AS total_revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id WHERE strftime('%Y', o.order_purchase_timestamp) = '2017' GROUP BY quarter ORDER BY quarter"
       },
-      "semantic_ranking_order_mismatch": {
-        "query_id": "q_023",
-        "question": "What is the breakdown of revenue and freight value by order status?",
-        "domain": "Revenue & Sales",
-        "difficulty": "medium",
-        "root_cause": "Mismatch in ORDER BY / ranking clause.",
-        "actual_sql": "SELECT o.order_status, SUM(oi.price) AS total_revenue, SUM(oi.freight_value) AS total_freight_value FROM order_items oi JOIN orders o ON oi.order_id = o.order_id GROUP BY o.order_status",
-        "expected_sql": "SELECT o.order_status, ROUND(SUM(oi.price), 2) AS total_revenue, ROUND(SUM(oi.freight_value), 2) AS total_freight FROM orders o JOIN order_items oi ON o.order_id = oi.order_id GROUP BY o.order_status ORDER BY total_revenue DESC"
-      },
       "schema_missing_join_path": {
         "query_id": "q_027",
         "question": "What are the top 3 highest revenue days in 2017?",
@@ -1108,15 +989,6 @@
         "actual_sql": "SELECT\n  strftime('%Y-%m-%d', shipping_limit_date) AS day,\n  SUM(price) AS total_revenue\nFROM order_items\nWHERE strftime('%Y', shipping_limit_date) = '2017'\nGROUP BY day\nORDER BY total_revenue DESC\nLIMIT 3",
         "expected_sql": "SELECT strftime('%Y-%m-%d', o.order_purchase_timestamp) AS day, ROUND(SUM(oi.price), 2) AS total_revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id WHERE strftime('%Y', o.order_purchase_timestamp) = '2017' GROUP BY day ORDER BY total_revenue DESC LIMIT 3"
       },
-      "schema_hallucinated_table": {
-        "query_id": "q_041",
-        "question": "What are the top 15 months by average order value?",
-        "domain": "Revenue & Sales",
-        "difficulty": "hard",
-        "root_cause": "Query joined hallucinated tables: {'monthly'}",
-        "actual_sql": "WITH monthly AS (\n  SELECT\n    strftime('%Y-%m', o.order_purchase_timestamp) AS month,\n    SUM(oi.price) AS total_price,\n    COUNT(DISTINCT oi.order_id) AS order_count\n  FROM order_items oi\n  JOIN orders o ON oi.order_id = o.order_id\n  GROUP BY month\n)\nSELECT\n  month,\n  ROUND(total_price * 1.0 / order_count, 2) AS average_order_value\nFROM monthly\nORDER BY average_order_value DESC\nLIMIT 15",
-        "expected_sql": "SELECT strftime('%Y-%m', o.order_purchase_timestamp) AS month, ROUND(CAST(SUM(oi.price) AS REAL) / COUNT(DISTINCT o.order_id), 2) AS aov FROM orders o JOIN order_items oi ON o.order_id = oi.order_id GROUP BY month ORDER BY aov DESC LIMIT 15"
-      },
       "semantic_grain_group_by_mismatch": {
         "query_id": "q_049",
         "question": "What was the total revenue in month 2017-04?",
@@ -1125,6 +997,24 @@
         "root_cause": "Mismatch in GROUP BY grain or presence.",
         "actual_sql": "SELECT substr(o.order_purchase_timestamp, 1, 7) AS month, SUM(oi.price) AS total_revenue FROM order_items oi JOIN orders o ON oi.order_id = o.order_id WHERE substr(o.order_purchase_timestamp, 1, 7) = '2017-04' GROUP BY month",
         "expected_sql": "SELECT ROUND(SUM(oi.price), 2) AS monthly_revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id WHERE strftime('%Y-%m', o.order_purchase_timestamp) = '2017-04'"
+      },
+      "semantic_ranking_order_mismatch": {
+        "query_id": "q_205",
+        "question": "What is the revenue and units sold summary by English category translation?",
+        "domain": "Products & Categories",
+        "difficulty": "hard",
+        "root_cause": "Mismatch in ORDER BY / ranking clause.",
+        "actual_sql": "SELECT t.product_category_name_english AS english_category, SUM(i.price) AS revenue, COUNT(*) AS units_sold FROM order_items i JOIN products p ON i.product_id = p.product_id JOIN product_category_name_translation t ON p.product_category_name = t.product_category_name GROUP BY t.product_category_name_english",
+        "expected_sql": "SELECT t.product_category_name_english, COUNT(*) AS units_sold, ROUND(SUM(oi.price), 2) AS total_revenue FROM products p JOIN order_items oi ON p.product_id = oi.product_id JOIN product_category_name_translation t ON p.product_category_name = t.product_category_name GROUP BY t.product_category_name_english ORDER BY total_revenue DESC"
+      },
+      "schema_hallucinated_table": {
+        "query_id": "q_206",
+        "question": "What is the average product weight (in grams) and item count for the top 3 highest revenue categories?",
+        "domain": "Products & Categories",
+        "difficulty": "hard",
+        "root_cause": "Query joined hallucinated tables: {'revenue', 'top_categories'}",
+        "actual_sql": "WITH revenue AS (\n  SELECT p.product_category_name,\n         SUM(oi.price) AS revenue\n  FROM order_items oi\n  JOIN products p ON oi.product_id = p.product_id\n  GROUP BY p.product_category_name\n),\ntop_categories AS (\n  SELECT product_category_name, revenue\n  FROM revenue\n  ORDER BY revenue DESC\n  LIMIT 3\n)\nSELECT tc.product_category_name,\n       AVG(p.product_weight_g) AS avg_product_weight_g,\n       COUNT(*) AS item_count\nFROM order_items oi\nJOIN products p ON oi.product_id = p.product_id\nJOIN top_categories tc ON p.product_category_name = tc.product_category_name\nGROUP BY tc.product_category_name\nORDER BY tc.revenue DESC",
+        "expected_sql": "SELECT p.product_category_name, ROUND(AVG(p.product_weight_g), 2) AS avg_weight_g, ROUND(SUM(oi.price), 2) AS total_revenue FROM products p JOIN order_items oi ON p.product_id = oi.product_id WHERE p.product_category_name IS NOT NULL GROUP BY p.product_category_name ORDER BY total_revenue DESC LIMIT 3"
       }
     }
   }

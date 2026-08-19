@@ -7,9 +7,6 @@
 \toprule
 \textbf{Phase / System Variant} & \textbf{N} & \textbf{Equivalent Match (95\% CI)} & \textbf{Exact Match} & \textbf{SQL Exec} & \textbf{Table Rec} & \textbf{Latency (s)} \\
 \midrule
-Phase 1: Baseline & 100 & 0.0\% [0.0, 4.6] & 0.0\% & 0.0\% & 0.0\% & 7.1 (p95: 12.3) \\
-Phase 7: Plan Grounding & 100 & 0.0\% [0.0, 4.6] & 0.0\% & 100.0\% & 95.0\% & 71.2 (p95: 121.6) \\
-Phase 8: Semantic Alignment & 100 & 0.0\% [0.0, 4.6] & 0.0\% & 100.0\% & 92.5\% & 89.7 (p95: 162.1) \\
 Ablation A: RAG Only & 100 & 19.0\% [12.1, 28.3] & 7.0\% & 99.0\% & 0.0\% & 153.0 (p95: 309.1) \\
 Ablation B: RAG+Planner & 100 & 15.0\% [8.9, 23.9] & 7.0\% & 34.0\% & 0.0\% & 85.8 (p95: 93.1) \\
 Ablation C: RAG+Plan+Verify & 100 & 26.0\% [18.0, 35.9] & 13.0\% & 65.0\% & 0.0\% & 209.4 (p95: 240.0) \\

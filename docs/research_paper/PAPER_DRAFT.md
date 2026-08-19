@@ -1,11 +1,14 @@
 # Autonomous Enterprise Data Analysis via Semantic Schema Grounding, Plan Validation, and Multi-Turn SQL AST Repair
 
-**Authors:** Research & Engineering Team, Agent Platform Division  
+**Authors:** Mevin Jose, Agent Platform Division  
 **Date:** August 2026  
 **Status:** Pre-print & Submission-Ready Manuscript  
+**Primary Source of Truth:** `docs/research_paper/latex/main.tex` (This Markdown document is a synchronized non-authoritative companion)  
 **Artifact Package:** `docs/research_paper/` (Figures 1–7, LaTeX Tables, `macros.tex`)  
 **Frozen Dataset Hash:** SHA-256 `0c9807d5867ff9cb6a9252437dab31660b62b2e6c9d09c5e54b1dfc7edc43e04`  
 **Frozen Database Hash:** SHA-256 `8550c4cc6d670aa0441bc898e47a57a40001858fc3f13dc5cb16fb90ca11c130`
+
+> **Note on Authority:** The LaTeX manuscript (`docs/research_paper/latex/main.tex`) is the single publication source of truth. This Markdown document is maintained as a human-readable companion.
 
 ---
 
@@ -16,11 +19,11 @@ While Large Language Models (LLMs) exhibit strong conversational coding capabili
 2. **Structured DAG Query Planning** with deterministic pre-execution constraint validation.
 3. **AST-Level SQL Semantic Verification** with closed-loop multi-turn self-correction and grain repair.
 
-We evaluate our system on an audited 500-query enterprise benchmark spanning 8 distinct business domains over a 100,000-order relational data warehouse. Our validated Phase 10 system achieves an empirical **72.40% Equivalent Match Accuracy** (362/500 queries, 95% Wilson Score CI: `[68.22%, 76.23%]`, Clopper-Pearson Exact CI: `[68.26%, 76.28%]`), **31.00% Exact Match Accuracy** (155/500 queries, 95% CI: `[27.01%, 35.29%]`), and **100.0% SQL Execution Success** (500/500 queries) with zero provider timeouts or HTTP 429 rate limit exceptions.
+We evaluate our system on an audited 500-query enterprise benchmark spanning 8 distinct business domains over a 100,000-order relational data warehouse. Our validated Phase 10 system achieves an empirical **73.40% Equivalent Match Accuracy** (367/500 queries, 95% Wilson Score CI: `[69.26%, 77.18%]`, Clopper-Pearson Exact CI: `[69.30%, 77.22%]`), **31.00% Exact Match Accuracy** (155/500 queries, 95% CI: `[27.01%, 35.29%]`), and **100.0% SQL Execution Success** (500/500 queries) with zero provider timeouts or HTTP 429 rate limit exceptions.
 
-In a controlled 100-query component ablation on identical query instances, AST semantic verification delivers a statistically significant **+11.0% absolute accuracy boost** over unverified planners ($p = 0.0192$, Odds Ratio = 3.75 via matched McNemar paired testing). An exhaustive audit of the 101 repair events demonstrates that agent self-repair is a nuanced, dual-edged mechanism: while repair maintained 96.0% syntactic execution validity, preserved 49 already-correct queries, and truly recovered 4 broken queries, over-aggressive repair rules caused **22 false-positive regressions** (21.8% of repair cases) where semantically correct queries were degraded. 
+In a controlled 100-query component ablation on identical query instances, AST semantic verification delivers substantial execution and semantic stability improvements over unverified planners. An exhaustive audit of the 101 repair events demonstrates that agent self-repair is a nuanced, dual-edged mechanism: while repair maintained 96.0% syntactic execution validity, preserved 49 already-correct queries, and truly recovered 4 broken queries, over-aggressive repair rules caused **22 false-positive regressions** (21.8% of repair cases) where semantically correct queries were degraded. 
 
-Furthermore, we report an AST failure taxonomy classifying 138 non-equivalent queries, a controlled 50-query out-of-distribution (OOD) perturbation robustness study across 5 vectors, and latency-cost Pareto optimality curves. We conclude with a candid discussion of limitations, including schema specificity, inference latency overhead, and typographical vulnerability.
+Furthermore, we report an AST failure taxonomy classifying 133 non-equivalent queries, a controlled 50-query synthetic perturbation robustness study across 5 vectors, and latency-cost configuration trade-off trajectories. We conclude with a candid discussion of limitations, including schema specificity, inference latency overhead, and typographical vulnerability.
 
 ---
 

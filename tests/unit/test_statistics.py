@@ -4,7 +4,7 @@ import math
 import numpy as np
 import pytest
 
-from agent_platform.experiments.statistics import (
+from agent_platform.experiments.stat_analysis import (
     BenchmarkStatisticalAnalyzer,
     ConfidenceInterval,
     SubgroupMetric,
@@ -131,7 +131,7 @@ def test_benchmark_statistical_analyzer():
 
 
 def test_independent_two_sample_proportion_test():
-    from agent_platform.experiments.statistics import independent_two_sample_proportion_test
+    from agent_platform.experiments.stat_analysis import independent_two_sample_proportion_test
     # 362 / 500 (72.4%) vs 26 / 100 (26.0%)
     res = independent_two_sample_proportion_test(362, 500, 26, 100)
     assert res.is_significant

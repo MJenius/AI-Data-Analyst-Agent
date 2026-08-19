@@ -12,7 +12,7 @@ from agent_platform.experiments.paper_generator import (
     plot_pipeline_architecture,
     plot_robustness_degradation,
 )
-from agent_platform.experiments.statistics import ConfidenceInterval, PhaseBenchmarkRecord, SubgroupMetric
+from agent_platform.experiments.stat_analysis import ConfidenceInterval, PhaseBenchmarkRecord, SubgroupMetric
 
 
 def test_figure_plotting(tmp_path: Path):

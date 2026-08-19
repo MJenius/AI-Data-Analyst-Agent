@@ -49,7 +49,7 @@ from agent_platform.experiments.robustness import (
     RobustnessSuiteBuilder,
     evaluate_robustness_drop,
 )
-from agent_platform.experiments.statistics import (
+from agent_platform.experiments.stat_analysis import (
     BenchmarkStatisticalAnalyzer,
     ConfidenceInterval,
     analyze_stratified_subgroups,

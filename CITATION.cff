@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use this software, benchmark, or findings in your research, please cite it as below."
+authors:
+  - name: "Mevin Jose"
+title: "Autonomous Enterprise Data Analysis via Semantic Schema Grounding, Plan Validation, and Multi-Turn SQL AST Repair"
+version: 1.0.0
+date-released: 2026-08-19
+url: "https://github.com/MJenius/AI-Data-Analyst-Agent"
+repository-code: "https://github.com/MJenius/AI-Data-Analyst-Agent"
+keywords:
+  - "Text-to-SQL"
+  - "AI Agents"
+  - "RAG"
+  - "Semantic Verification"
+  - "Data Analytics"
+  - "AST Repair"
+  - "Database Systems"
+license: "MIT"

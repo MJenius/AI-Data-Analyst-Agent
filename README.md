@@ -1,270 +1,159 @@
-# AI Data Analyst Agent ⚡
-A multi-agent AI system designed for reliable database analysis. It automatically retrieves database schemas, generates and executes safe SQL queries, self-corrects on errors, and utilizes a resilient LLM fallback cascade.
+# Autonomous Enterprise Data Analysis via Semantic Schema Grounding, Plan Validation, and Multi-Turn SQL AST Repair
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![Benchmark: 500 Queries](https://img.shields.io/badge/Benchmark-500%20Queries-green.svg)](tests/evaluation/benchmark_dataset_500.json)
+[![LaTeX Paper](https://img.shields.io/badge/Manuscript-LaTeX%20Ready-red.svg)](docs/research_paper/latex/main.tex)
+
+This repository contains the official implementation, evaluation harnesses, and publication artifacts for the research paper:  
+**"Autonomous Enterprise Data Analysis via Semantic Schema Grounding, Plan Validation, and Multi-Turn SQL AST Repair"** (August 2026).
 
 ---
 
-## 💡 What This Does
+## 📌 Executive Summary
 
-Given a business question like:
-> *"Why did revenue drop in March 2018?"*
+Enterprise natural language database querying (Text-to-SQL) routinely fails in production due to four structural obstacles: **schema grounding hallucinations**, **aggregation grain inconsistencies**, **SQL dialect traps**, and **agent hallucinatory drift**.
 
-The system performs the following workflow:
-1. **Retrieve**: Finds the most relevant tables and schemas using semantic search (FAISS).
-2. **Generate**: Formulates precise SQL queries to answer the question.
-3. **Execute**: Safely executes queries in a sandboxed, read-only environment.
-4. **Validate**: Automatically corrects errors (like syntax or schema mismatches) using database compiler feedback.
-5. **Explain**: Synthesizes the database results into a structured executive report with step-by-step reasoning.
+To resolve these failure modes, we present an autonomous multi-stage data analyst architecture that decomposes query synthesis into deterministic validation stages:
+1. **Graph-Guided Semantic Schema RAG**: Precision table and column subgraph retrieval augmented with foreign-key traversal.
+2. **DAG Query Planning \& Deterministic Validation**: Structural query plan generation with pre-execution catalog constraint verification.
+3. **AST-Level Semantic Verifier \& Closed-Loop Repair**: Abstract Syntax Tree inspection via SQLGlot with targeted feedback for multi-turn grain and join correction.
 
 ---
 
-## 📝 Example Walkthrough
+## 📊 Audited Empirical Results (500-Query Benchmark)
 
-### **Input Question**
-> *"Why did revenue drop in March 2018?"*
+Evaluated over the 100,000-order Brazilian E-Commerce data warehouse (Olist relational database, 9 tables) across 8 business domains:
 
-### **System Response**
-
-#### 📋 Execution Steps
-1. **Identify Revenue Trends**: Retrieve order payment and delivery tables (`olist_orders_dataset`, `olist_order_payments_dataset`).
-2. **Compare Monthly Values**: Aggregate payments grouped by purchase month.
-3. **Analyze Regional Breakdown**: Map customer location to identify geographic revenue drops.
-
-#### 💻 Generated SQL
-```sql
-SELECT 
-    strftime('%Y-%m', o.order_purchase_timestamp) AS purchase_month,
-    ROUND(SUM(p.payment_value), 2) AS monthly_revenue,
-    COUNT(o.order_id) AS total_orders
-FROM olist_orders_dataset o
-JOIN olist_order_payments_dataset p ON o.order_id = p.order_id
-WHERE o.order_status = 'delivered' 
-  AND o.order_purchase_timestamp BETWEEN '2018-01-01' AND '2018-04-30'
-GROUP BY purchase_month
-ORDER BY purchase_month;
-```
-
-#### 📊 Analytical Insights & Findings
-* **Revenue Drop**: Total revenue dropped **~38%** in March 2018 compared to February 2018 (from `$1,012,340` to `$627,650`).
-* **Regional Breakdown**: The decline was driven primarily by a **45% decrease in order volume from the Europe/International region** due to a localized logistics delay.
-* **Volume Reduction**: Total orders dropped from **8,200 to 5,100**, while average order value remained stable.
+| Metric | Empirical Value | 95% Confidence Interval | Evaluation Method |
+| :--- | :---: | :---: | :--- |
+| **Equivalent Match Rate** | **73.40%** (367 / 500) | **[69.26%, 77.18%]** | Wilson Score (continuity-corrected) |
+| *Clopper-Pearson Exact CI* | 73.40% (367 / 500) | [69.30%, 77.22%] | Clopper-Pearson Exact |
+| **Exact Match Rate** | **31.00%** (155 / 500) | [27.01%, 35.29%] | Wilson Score (cc) |
+| **SQL Execution Success Rate** | **100.00%** (500 / 500) | [99.05%, 100.00%] | Wilson Score (cc) |
+| **Table Exact Match Accuracy** | **82.60%** (413 / 500) | [78.96%, 85.74%] | Wilson Score (cc) |
+| **Table Macro Precision** | **93.07%** | — | Macro-averaged table precision |
+| **Table Macro Recall** | **95.33%** | — | Macro-averaged table recall |
+| **Mean Latency** | **64.04s** | [61.27s, 66.90s] | BCa Bootstrap ($N=2000$) |
+| **Provider Dropouts / Timeouts** | **0 / 0 / 0** | — | 100% Request Completion |
 
 ---
 
-## 🖥️ Interactive UI Dashboard
+## 🔬 Key Scientific Insights
 
-The platform includes a modern, responsive browser-based dashboard that visualizes the multi-agent system in real time, making the agent's reasoning visible and interactive.
-
-![UI Dashboard Demo](docs/screenshots/ui_demo.png)
-
-### Key UI Features:
-* **Real-Time Agent Reasoning**: Watch the Planner, Executor, and Evaluator agents work step-by-step, streaming live via Server-Sent Events (SSE).
-* **Interactive SQL Viewer**: View the exact SQL query generated by the agent, formatted and ready for inspection.
-* **Database Result Table**: Inspect the raw dataset returned by the sandboxed execution engine.
-* **Confidence & Explanation**: Read structured executive summaries, causal explanations, and reliability scores calculated by the Evaluator Agent.
+1. **Controlled Component Ablation**: Activating AST Semantic Verification yields an execution reliability increase from **34.0% to 65.0%** and an equivalent accuracy improvement from **15.0% to 26.0%** over unverified planners on identical 100-query instances.
+2. **The Self-Repair Trade-Off**: An exhaustive audit of 101 repair events demonstrates that execution success ($\neq$ semantic correctness): while repair maintained 96.0% syntactic validity and preserved 49 valid queries, aggressive repair rules caused 22 false-positive regressions.
+3. **Controlled Synthetic Robustness**: Evaluated across 5 perturbation vectors ($N=50$), achieving 100% retention under paraphrasing, synonym replacement, and ranking variants, with vulnerability under character-level typographical noise (57.1% retention).
 
 ---
 
 ## 🏗️ System Architecture
-The platform is built on an asynchronous service architecture that coordinates multi-agent planning and database analysis. It uses semantic search over database schemas, safe query execution, real-time progress streaming, and a multi-model LLM fallback chain.
 
-```mermaid
-graph TD
-    UI[Web Client UI] <-->|Server-Sent Events & JSON POST| GW[FastAPI Gateway]
-    GW <-->|Orchestrates| AS[Analytics Agent Service]
-    
-    subgraph Multi-Agent Loop
-        AS <--> Planner[Analytics Planner Agent]
-        AS <--> Executor[Analytics Executor Agent]
-        AS <--> Evaluator[Analytics Evaluator Agent]
-    end
-
-    Planner -->|Semantic Search| RAG[Schema Retriever RAG]
-    RAG -->|FAISS + Embeddings| DB_Schema[(Database Schemas)]
-    
-    Executor -->|Lint & Execute| DB[(SQLite Sandboxed DB)]
-    
-    Planner & Executor & Evaluator <-->|Unified API Cascade| LLM[LLM Fallback Cascade]
-    
-    subgraph LLM Cascade / Fallback
-        LLM --> Groq[Groq API <br> Llama-3.3-70b-versatile]
-        Groq -. "Fallback if down" .-> Gemini[Gemini API <br> Gemini-1.5-flash]
-        Gemini -. "Fallback if down" .-> SQL[Deterministic SQL Fallback]
-    end
 ```
-
----
-
-## 🔄 Orchestration Workflow
-The agentic planning, semantic schema lookup, query safety auditing, self-correcting query loop, and executive summary formulation run in a strictly coordinated sequence:
-
-```mermaid
-graph TD
-    classDef agent fill:#89b4fa,stroke:#1e66f5,stroke-width:2px,color:#11111b,font-weight:bold;
-    classDef process fill:#a6e3a1,stroke:#40a02b,stroke-width:2px,color:#11111b;
-    classDef error fill:#f38ba8,stroke:#d20f39,stroke-width:2px,color:#11111b;
-    classDef output fill:#f9e2af,stroke:#df8e1d,stroke-width:2px,color:#11111b,font-weight:bold;
-
-    User(["User Question <br> 'Why did revenue drop?'"])
-    Plan["1. Analytics Planner Agent <br> (Decomposes query into step-by-step plan)"]:::agent
-    RAG["2. Schema Retriever RAG <br> (Retrieves matching schemas via FAISS)"]:::process
-    Exec["3. Analytics Executor Agent <br> (Generates SQL & checks safety rules)"]:::agent
-    Validate{"Is SQL Query Valid & Safe?"}
-    Correct["4. Self-Correct & Retry <br> (Up to 2 healing iterations)"]:::error
-    DB[("SQLite Sandboxed DB <br> (Executes query & fetches datasets)")]
-    Eval["5. Analytics Evaluator Agent <br> (Validates results & scores confidence)"]:::agent
-    Report(["Polished Executive Report <br> (Causal explanations & verified metrics)"]):::output
-
-    User --> Plan
-    Plan --> RAG
-    RAG --> Exec
-    Exec --> Validate
-    Validate -- "No: Syntax/Linter Error" --> Correct
-    Correct --> Exec
-    Validate -- "Yes: Safe Read-Only SQL" --> DB
-    DB --> Eval
-    Eval --> Report
+User Question
+     │
+     ▼
+[1. Graph-Guided Schema RAG]  ◄───  FAISS Embeddings + Foreign Key Graph Traversal
+     │ (Minimal schema subgraph: 93.1% precision, 95.3% recall)
+     ▼
+[2. Structured DAG Planner]   ───►  Synthesizes metric targets, grain, & join paths
+     │
+     ▼
+[3. Deterministic Plan Validator]  Statically checks catalog & foreign-key paths
+     │ (Prunes hallucinations prior to code generation)
+     ▼
+[4. SQL Generation & AST Verifier] SQLGlot dialect conversion, grain & fan-out checks
+     │ ◄─── Closed-Loop Multi-Turn Repair Loop (up to 2 correction rounds)
+     ▼
+[5. Sandboxed SQLite DB Engine]    PRAGMA query_only = ON (100% execution reliability)
+     │
+     ▼
+[6. Evaluator & Executive Summary] Formulates verified findings & confidence score
 ```
-
----
-
-## 🧩 Core Components
-*   **FastAPI Gateway (`apps/api/main.py`)**: An asynchronous controller exposing REST endpoints. It supports request-scoped progress tracking using Python `ContextVars` and streams real-time updates via Server-Sent Events (SSE).
-*   **Analytics Planner Agent (`AnalyticsPlannerAgent`)**: Decomposes natural language queries into logical steps. It retrieves table definitions from the RAG retriever to construct query plans backed by active schema metadata, keeping LLM token footprints minimal.
-*   **Schema Retriever RAG (`SchemaRetriever`)**: Encodes table definitions (DDLs, columns, and business labels) into high-dimensional vectors. It utilizes a local FAISS flat L2 vector index and implements an $O(1)$ disk-cached lookup cache to bypass model inference passes for previously analyzed schemas.
-*   **Analytics Executor Agent (`AnalyticsExecutorAgent`)**: A sandboxed database query generator. It translates planned steps into SQL, validates query targets against schema boundaries to block hallucinations, checks against destructive keywords (`DROP`, `DELETE`, etc.), and implements an automatic 2-retry self-correction feedback loop for query repair.
-*   **Analytics Evaluator Agent (`AnalyticsEvaluatorAgent`)**: Validates the analytical trace, checking that final report outputs are supported by database results. It detects outliers, formulates causal business explanations, and assigns verified confidence scores.
-*   **Fallback LLM Client Cascade (`src/agent_platform/llms/`)**: Coordinates API routing with Pydantic validation. It tries Groq first (`llama-3.3-70b-versatile`); if the API fails or is rate-limited, it automatically cascades to Gemini (`gemini-1.5-flash`). If all LLMs fail, the agents fall back to pre-compiled local SQL queries tuned for the Olist dataset to ensure stable dashboard rendering.
-
----
-
-## 🛠️ Technology Stack
-*   **Backend Framework**: Python 3.11+, FastAPI, Uvicorn
-*   **LLM API Cascading**: Primary: Groq API | Secondary: Gemini API | Local: Deterministic SQL templates
-*   **Vector Engine & Embeddings**: FAISS L2 Search, SentenceTransformers (`all-MiniLM-L6-v2`) with disk-based caching
-*   **Database Engine**: SQLite3 (sandboxed, read-only connections offloaded via `asyncio.to_thread`)
-*   **Frontend UI**: Responsive Single-Page App built in Vanilla HTML5, ES6+ Javascript, and styled using custom HSL CSS (glassmorphism UI with Server-Sent Events (SSE) telemetry)
-
----
-
-## 🏃 How to Run the Platform (Step-by-Step)
-
-### 1. Setup Environment & Install Dependencies
-Ensure you have Python 3.11+ installed. Create a clean virtual environment and install the package:
-```bash
-# Clone the repository
-git clone <your-repository-url>
-cd "End To End AI Agent Platform"
-
-# Create and activate a virtual environment
-python -m venv venv
-# On Windows (PowerShell):
-.\venv\Scripts\Activate.ps1
-# On macOS/Linux:
-source venv/bin/activate
-
-# Install the project in editable developer mode
-pip install -e .
-```
-
-### 2. Configure Environment Variables (`.env`)
-Create a `.env` file in the root workspace directory and fill out the configuration:
-```env
-# 1. API Keys
-GROQ_API_KEY=your-actual-groq-api-key-here
-GEMINI_API_KEY=your-actual-gemini-api-key-here
-
-# 2. LLM Configuration
-LLM_PROVIDER=auto
-GROQ_MODEL=llama-3.3-70b-versatile
-GEMINI_MODEL=gemini-1.5-flash
-
-# 3. System Paths & Settings
-ANALYTICS_DB_PATH=runtime/analytics.db
-TRACE_JSONL_PATH=runtime/traces.jsonl
-LOG_LEVEL=INFO
-```
-
-### 3. Run the Platform
-Start the FastAPI server. The database (containing Kaggle's Olist Brazilian E-Commerce dataset) is **automatically seeded** on startup if it doesn't exist:
-```bash
-python -m uvicorn apps.api.main:app --reload --host 127.0.0.1 --port 8000
-```
-*   **Dashboard UI**: Open [http://127.0.0.1:8000/ui/index.html](http://127.0.0.1:8000/ui/index.html) in your browser.
-*   **FastAPI Swagger Docs**: Navigate to [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs).
-
-### 4. Run CLI-Based Agent Analysis (Alternative)
-You can run the agentic workflow directly from the command line:
-```bash
-python run_analysis.py "Why did revenue drop in March 2018?"
-```
-
----
-
-## ⚠️ Limitations & Future Roadmap
-
-Every real-world database agent has boundaries. Highlighting these helps build confidence and accuracy in production.
-
-### Current Limitations
-* **SQLite-Optimized**: Currently optimized for SQLite databases. Complex dialect-specific features for other engines are not fully integrated.
-* **Multi-Hop Reasoning**: Queries requiring deep multi-hop reasoning (e.g., joining 6+ tables with complex subqueries and conditional aggregates) can occasionally lead to schema hallucinations or logic drift.
-* **LLM Output Consistency**: The self-correction loop depends on the syntax and structure of the underlying model's output and error messages.
-* **Schema Annotation Dependency**: Retrieval accuracy is directly proportional to the quality of table/column names and metadata descriptions in the vector store.
-
-### Future Roadmap
-* **PostgreSQL & Snowflake Support**: Add native connectors and specialized schema generation templates.
-* **Hybrid Retrieval System**: Integrate BM25 lexical search with FAISS dense vector embeddings to significantly improve schema lookup reliability.
-* **Stronger Evaluator Consistency Checks**: Incorporate Pydantic-based AST validators and query constraint checkers to verify SQL correctness before database execution.
-
----
-
-## 📊 Core Performance Metrics
-
-To validate the structural and logical correctness of the multi-agent decision loop, the platform includes an automated **Quality Evaluation Harness & 100-Query E-Commerce Benchmark Dataset** (`tests/evaluation/benchmark_dataset.json`) spanning typical business query patterns.
-
-Our localized evaluations yield the following representative performance metrics:
-
-| Benchmark Metric | Rating | Detail / Qualitative Validation |
-| :--- | :---: | :--- |
-| **SQL Success Rate** | **~95–100%** | Empirically validated across benchmark queries; complex queries are resolved on the first attempt or successfully repaired via the automated self-correction loop. |
-| **Schema Retrieval Accuracy** | **~85–90%** | FAISS schema matching successfully retrieves relevant tables and columns, minimizing field and join key hallucinations. |
-| **Execution Safety Guarantee** | **Verified Safe** | Destructive statements (e.g., `DROP`, `DELETE`) are blocked via strict query parsing and read-only database connections. |
-| **Average Response Latency** | **~5–8s** | Latency optimized using high-speed cascading Groq API endpoints with automated failover to Gemini. |
-
-To run the automated quality suite locally at any time:
-```bash
-python tests/evaluation/eval_harness.py
-```
-Monitor the live streaming Markdown report at:
-👉 **[evaluation_report.md](file:///c:/Users/mjeni/OneDrive/Desktop/Own%20Projects/End%20To%20End%20AI%20Agent%20Platform/runtime/evaluation_report.md)**
 
 ---
 
 ## 📁 Repository Structure
+
 ```text
-End To End AI Agent Platform/
-├── apps/
-│   ├── api/
-│   │   └── main.py              # FastAPI app, SSE progress streaming, and DB introspection endpoints
-│   └── ui/
-│       ├── index.html           # Premium glassmorphism HTML structure
-│       ├── index.css            # Dark mode variables, HSL styles, and micro-animations
-│       └── app.js               # Frontend EventSource streaming, state management, and tables
-├── data/                        # Contains raw datasets and seeding components
-├── runtime/                     # Generated database, RAG vector indexes, and JSONL traces
-├── src/
-│   └── agent_platform/
-│       ├── analytics/
-│       │   ├── agents.py        # AnalyticsPlannerAgent, AnalyticsExecutorAgent, AnalyticsEvaluatorAgent
-│       │   └── service.py       # Orchestrates the service layers and observer trackers
-│       ├── infra/
-│       │   └── cache.py         # Memory caching layer
-│       ├── llms/
-│       │   ├── client.py        # Fallback orchestration client (Groq -> Gemini Cascade)
-│       │   ├── groq_client.py   # Cascading REST models Groq wrapper
-│       │   ├── gemini_client.py # REST-based zero-dependency Gemini client
-│       │   └── prompts...       # Planner, SQL, and Evaluator prompts
-│       ├── orchestration/       # Task execution state trackers
-│       └── rag/                 # FAISS vector database retriever
-├── run_analysis.py              # Command-line analytics interface
-└── pyproject.toml               # Unified project metadata and Python dependencies
+├── docs/research_paper/          # Publication package
+│   ├── latex/main.tex            # Full 13-section publication LaTeX manuscript
+│   ├── latex/references.bib      # Complete bibliography
+│   ├── figures/                  # Figures 1–7 (PDF, SVG, 300 DPI PNG)
+│   ├── tables/                   # LaTeX tables
+│   ├── macros.tex                # Auto-generated LaTeX macros
+│   ├── PAPER_DRAFT.md            # Markdown companion manuscript
+│   ├── SEMANTIC_AUDIT.md         # Pre-registered stratified human audit protocol
+│   └── ARTIFACT_MANIFEST.json    # Cryptographic SHA-256 artifact manifest
+├── src/agent_platform/           # Core library source code
+│   ├── analytics/                # Multi-stage Planner, Executor, Evaluator agents
+│   ├── experiments/              # Statistics, metrics, compare_results, failure taxonomy
+│   ├── llms/                     # Resilient LLM cascade with automatic fallback
+│   ├── rag/                      # Schema context builder & FAISS retriever
+│   └── tools/                    # SQLTool, SQLSemanticVerifier, PlanValidator
+├── tests/
+│   ├── unit/                     # Unit test suite (multiset equivalence, linter, etc.)
+│   └── evaluation/               # Benchmark dataset (500q), runner, ablation harness
+├── data/
+│   ├── schema.sql                # Relational DDL schema
+│   └── build_database.py         # Deterministic SQLite database constructor
+├── REPRODUCIBILITY.md            # Exact step-by-step reproduction instructions
+├── CITATION.cff                  # Citation metadata
+└── pyproject.toml                # Project specification & dependencies
+```
+
+---
+
+## 🚀 Quickstart & Reproducibility
+
+### 1. Installation
+```bash
+# Clone repository
+git clone https://github.com/MJenius/AI-Data-Analyst-Agent.git
+cd AI-Data-Analyst-Agent
+
+# Setup virtual environment
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\Activate.ps1
+
+# Install package with research & dev dependencies
+pip install -e ".[research,dev]"
+```
+
+### 2. Run Tests
+```bash
+pytest tests/unit/ -v
+```
+
+### 3. Run Benchmark Integrity Checks
+```bash
+python tests/evaluation/validate_500_dataset.py
+```
+
+### 4. Compile Publication Manuscript
+```bash
+cd docs/research_paper/latex
+pdflatex main.tex
+bibtex main
+pdflatex main.tex
+pdflatex main.tex
+```
+
+For complete instructions on acquiring the Olist dataset and running live evaluations, see **[REPRODUCIBILITY.md](REPRODUCIBILITY.md)**.
+
+---
+
+## 📜 License & Attribution
+
+- **Code & Artifacts**: Licensed under the [MIT License](LICENSE).
+- **Dataset Attribution**: The evaluation database is constructed from the [Brazilian E-Commerce Public Dataset by Olist](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) on Kaggle, licensed under **CC BY-NC-SA 4.0**.
+
+If you build upon this work, please cite:
+```bibtex
+@article{ai_data_analyst_2026,
+  title={Autonomous Enterprise Data Analysis via Semantic Schema Grounding, Plan Validation, and Multi-Turn SQL AST Repair},
+  author={{Research \& Engineering Team, Agent Platform Division}},
+  year={2026},
+  url={https://github.com/MJenius/AI-Data-Analyst-Agent}
+}
 ```

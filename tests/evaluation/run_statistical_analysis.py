@@ -11,7 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "src"))
 
-from agent_platform.experiments.statistics import (
+from agent_platform.experiments.stat_analysis import (
     BenchmarkStatisticalAnalyzer,
     analyze_stratified_subgroups,
     format_markdown_phase_table,

@@ -79,29 +79,7 @@ def run_query_in_db(sql: str, db_path: Path) -> dict[str, Any]:
         conn.close()
 
 
-def compare_results(actual_rows: list[dict], expected_rows: list[dict]) -> dict[str, Any]:
-    if not actual_rows and not expected_rows:
-        return {"exact_match": True, "equivalent_match": True, "row_count_match": True}
-    if not actual_rows or not expected_rows:
-        return {"exact_match": False, "equivalent_match": False, "row_count_match": False}
-
-    exact_match = (actual_rows == expected_rows)
-    equivalent = True
-    if len(actual_rows) != len(expected_rows):
-        equivalent = False
-    else:
-        for a_row, e_row in zip(actual_rows, expected_rows):
-            a_vals = [round(v, 2) if isinstance(v, (int, float)) else str(v).strip().lower() for v in a_row.values()]
-            e_vals = [round(v, 2) if isinstance(v, (int, float)) else str(v).strip().lower() for v in e_row.values()]
-            if sorted(a_vals, key=str) != sorted(e_vals, key=str):
-                equivalent = False
-                break
-
-    return {
-        "exact_match": exact_match,
-        "equivalent_match": equivalent or exact_match,
-        "row_count_match": len(actual_rows) == len(expected_rows),
-    }
+from agent_platform.experiments.compare_results import compare_results  # noqa: E402
 
 
 def extract_tables_from_sql(sql: str | None) -> list[str]:

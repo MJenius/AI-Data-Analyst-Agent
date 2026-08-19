@@ -1,0 +1,56 @@
+name: Research CI & Verification
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test-and-validate:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[research,dev]"
+
+      - name: Run unit & regression tests
+        run: |
+          pytest tests/unit/ -v
+
+      - name: Validate 500-query benchmark dataset integrity
+        run: |
+          python tests/evaluation/validate_500_dataset.py
+
+      - name: Verify artifact manifest hashes (where files present)
+        run: |
+          python -c "
+          import json, hashlib, pathlib
+          manifest = json.load(open('docs/research_paper/ARTIFACT_MANIFEST.json'))
+          missing, mismatch = [], []
+          for path_str, meta in manifest.get('artifacts', {}).items():
+              p = pathlib.Path(path_str)
+              if p.exists():
+                  h = hashlib.sha256(p.read_bytes()).hexdigest()
+                  if h != meta['sha256']:
+                      mismatch.append((path_str, h, meta['sha256']))
+              else:
+                  missing.append(path_str)
+          print(f'Checked manifest: {len(manifest.get(\"artifacts\", {}))} entries. Missing: {len(missing)}, Mismatches: {len(mismatch)}')
+          if mismatch:
+              raise ValueError(f'Hash mismatches found: {mismatch}')
+          "

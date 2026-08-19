@@ -18,8 +18,13 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
+
+ROOT = Path(__file__).resolve().parents[3]
+SRC_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(SRC_ROOT))
 
 import matplotlib
 matplotlib.use("Agg")  # Non-interactive backend
@@ -45,7 +50,7 @@ from agent_platform.experiments.robustness import (
     RobustnessSuiteBuilder,
     evaluate_robustness_drop,
 )
-from agent_platform.experiments.statistics import (
+from agent_platform.experiments.stat_analysis import (
     BenchmarkStatisticalAnalyzer,
     PhaseBenchmarkRecord,
     analyze_stratified_subgroups,
@@ -389,8 +394,9 @@ def export_latex_tables(report: dict[str, Any], tables_dir: Path) -> None:
     ]
     for d_name, m in domains.items():
         ci_str = f"{m.get('accuracy', 0)*100:.1f}\\% [{m.get('ci_lower', 0)*100:.1f}\\%, {m.get('ci_upper', 0)*100:.1f}\\%]"
+        escaped_d_name = d_name.replace("&", r"\&")
         lines_dom.append(
-            f"{d_name} & {m.get('sample_size', 0)} & {ci_str} & {m.get('sql_success_rate', 0)*100:.1f}\\% & {m.get('table_precision', 0)*100:.1f}\\% & {m.get('table_recall', 0)*100:.1f}\\% & {m.get('mean_latency', 0):.1f}s \\\\"
+            f"{escaped_d_name} & {m.get('sample_size', 0)} & {ci_str} & {m.get('sql_success_rate', 0)*100:.1f}\\% & {m.get('table_precision', 0)*100:.1f}\\% & {m.get('table_recall', 0)*100:.1f}\\% & {m.get('mean_latency', 0):.1f}s \\\\"
         )
     lines_dom.extend([r"\bottomrule", r"\end{tabular}", r"\end{table*}"])
     with open(tables_dir / "tab_domain_breakdown.tex", "w", encoding="utf-8") as f:
@@ -403,7 +409,7 @@ def export_latex_tables(report: dict[str, Any], tables_dir: Path) -> None:
         r"\begin{table}[t]",
         r"\centering",
         r"\small",
-        r"\caption{Granular Lifecycle & Semantic Transition Audit of 101 Repair Cases}",
+        r"\caption{Granular Lifecycle \& Semantic Transition Audit of 101 Repair Cases}",
         r"\label{tab:repair_audit}",
         r"\begin{tabular}{lcc}",
         r"\toprule",
@@ -425,13 +431,13 @@ def export_latex_tables(report: dict[str, Any], tables_dir: Path) -> None:
     with open(tables_dir / "tab_repair_audit.tex", "w", encoding="utf-8") as f:
         f.write("\n".join(lines_rep))
 
-    # 4. OOD Robustness Table
+    # 4. Robustness Table
     ood = report.get("ood_robustness", {}).get("degradation_metrics", {})
     lines_ood = [
         r"\begin{table}[t]",
         r"\centering",
         r"\small",
-        r"\caption{Out-Of-Distribution (OOD) Robustness Degradation Under 5 Vectors}",
+        r"\caption{Controlled Synthetic Perturbation Robustness Under 5 Vectors}",
         r"\label{tab:robustness}",
         r"\begin{tabular}{lccccc}",
         r"\toprule",
@@ -483,9 +489,17 @@ def export_latex_macros(report: dict[str, Any], output_path: Path) -> None:
         f"\\newcommand{{\\AblationVerifierPValue}}{{0.0192}}",
     ]
 
+    macro_str = "\n".join(macros) + "\n"
     with open(output_path, "w", encoding="utf-8") as f:
-        f.write("\n".join(macros) + "\n")
-    logger.info("Saved LaTeX macros to %s", output_path)
+        f.write(macro_str)
+
+    # Also copy to latex directory if it exists
+    latex_macro_p = output_path.parent / "latex" / "macros.tex"
+    if latex_macro_p.parent.exists():
+        with open(latex_macro_p, "w", encoding="utf-8") as f:
+            f.write(macro_str)
+
+    logger.info("Saved LaTeX macros to %s and %s", output_path, latex_macro_p)
 
 
 # ============================================================================
@@ -589,3 +603,19 @@ class PaperArtifactCompiler:
             "figures_generated": 7,
             "output_dir": str(self.output_dir),
         }
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Compile publication figures, tables, and macros.")
+    parser.add_argument("--run-all", action="store_true", help="Compile all artifacts")
+    parser.add_argument("--output-dir", type=Path, default=ROOT / "docs" / "research_paper", help="Output directory")
+    args = parser.parse_args()
+
+    compiler = PaperArtifactCompiler(output_dir=args.output_dir)
+    res = compiler.compile_all(workspace_root=ROOT)
+    print(f"Paper artifact compilation complete: {res}")
+
+
+if __name__ == "__main__":
+    main()
+

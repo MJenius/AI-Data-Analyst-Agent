@@ -81,29 +81,7 @@ def run_query_in_db(sql: str, db_path: Path) -> dict[str, Any]:
         conn.close()
 
 
-def compare_results(actual_rows: list[dict], expected_rows: list[dict]) -> dict[str, Any]:
-    if not actual_rows and not expected_rows:
-        return {"exact_match": True, "equivalent_match": True, "row_count_match": True}
-    if not actual_rows or not expected_rows:
-        return {"exact_match": False, "equivalent_match": False, "row_count_match": False}
-
-    exact_match = (actual_rows == expected_rows)
-    equivalent = True
-    if len(actual_rows) != len(expected_rows):
-        equivalent = False
-    else:
-        for a_row, e_row in zip(actual_rows, expected_rows):
-            a_vals = [round(v, 2) if isinstance(v, (int, float)) else str(v).strip().lower() for v in a_row.values()]
-            e_vals = [round(v, 2) if isinstance(v, (int, float)) else str(v).strip().lower() for v in e_row.values()]
-            if sorted(a_vals, key=str) != sorted(e_vals, key=str):
-                equivalent = False
-                break
-
-    return {
-        "exact_match": exact_match,
-        "equivalent_match": equivalent or exact_match,
-        "row_count_match": len(actual_rows) == len(expected_rows),
-    }
+from agent_platform.experiments.compare_results import compare_results  # noqa: E402
 
 
 def extract_tables_from_sql(sql: str | None) -> list[str]:
@@ -148,22 +126,22 @@ def build_service_for_config(
     if config_name == "rag_only":
         # Config A: RAG Only (No Planner LLM, No Verifier, No Evaluator)
         planner = DummyFallbackPlannerAgent(retriever)
-        sql_tool = SQLTool(database_url=f"sqlite:///{db_path}")
+        sql_tool = SQLTool(database_url=f"sqlite:///{db_path}", enable_semantic_verification=False)
         executor = AnalyticsExecutorAgent(retriever, sql_tool, llm_client)
     elif config_name == "rag_planner":
         # Config B: RAG + Planner (LLM Planner, No Verifier, No Evaluator)
         planner = AnalyticsPlannerAgent(retriever, llm_client)
-        sql_tool = SQLTool(database_url=f"sqlite:///{db_path}")
+        sql_tool = SQLTool(database_url=f"sqlite:///{db_path}", enable_semantic_verification=False)
         executor = AnalyticsExecutorAgent(retriever, sql_tool, llm_client)
     elif config_name == "rag_planner_verifier":
         # Config C: RAG + Planner + Verifier (LLM Planner + SQLSemanticVerifier, No Evaluator)
         planner = AnalyticsPlannerAgent(retriever, llm_client)
-        sql_tool = SQLTool(database_url=f"sqlite:///{db_path}")
+        sql_tool = SQLTool(database_url=f"sqlite:///{db_path}", enable_semantic_verification=True)
         executor = AnalyticsExecutorAgent(retriever, sql_tool, llm_client)
     elif config_name == "full_system":
         # Config D: Full System (Planner + Verifier + Evaluator)
         planner = AnalyticsPlannerAgent(retriever, llm_client)
-        sql_tool = SQLTool(database_url=f"sqlite:///{db_path}")
+        sql_tool = SQLTool(database_url=f"sqlite:///{db_path}", enable_semantic_verification=True)
         executor = AnalyticsExecutorAgent(retriever, sql_tool, llm_client)
         enable_evaluator = True
     else:
@@ -197,6 +175,7 @@ async def run_single_ablation_query(
     item: dict[str, Any],
     service: AnalyticsAgentService,
     db_path: Path,
+    config_name: str = "unknown",
 ) -> dict[str, Any]:
     qid = f"q{idx:03d}"
     question = item.get("question", "")
@@ -209,6 +188,7 @@ async def run_single_ablation_query(
     actual_sql = None
     actual_result: list[dict] = []
     sql_success = False
+    response = None
 
     try:
         response = await service.analyze(question)
@@ -232,6 +212,12 @@ async def run_single_ablation_query(
     correct_tables = [t for t in expected_tables if t in queried_tables]
     table_acc = (len(correct_tables) / len(expected_tables)) if expected_tables else 1.0
 
+    # Provenance fields — derived from actual execution, never invented.
+    repair_events = response.get("repair_events", []) if response else []
+    verifier_triggered = len(repair_events) > 0 if response else False
+    repair_used = any(e.get("applied", False) for e in repair_events) if repair_events else False
+    fallback_used = response.get("fallback_used", False) if response else False
+
     return {
         "query_id": qid,
         "question": question,
@@ -245,6 +231,12 @@ async def run_single_ablation_query(
         "table_accuracy": table_acc,
         "latency_seconds": elapsed,
         "error": error,
+        # Per-query provenance
+        "configuration": config_name,
+        "verifier_triggered": verifier_triggered,
+        "repair_used": repair_used,
+        "fallback_used": fallback_used,
+        "final_validity": "valid" if sql_success and comp["equivalent_match"] else ("sql_error" if not sql_success else "semantic_mismatch"),
     }
 
 
@@ -280,7 +272,7 @@ async def run_ablation_config(
             return completed[qid]
         async with semaphore:
             try:
-                res = await asyncio.wait_for(run_single_ablation_query(idx, item, service, db_path), timeout=240.0)
+                res = await asyncio.wait_for(run_single_ablation_query(idx, item, service, db_path, config_name=config_name), timeout=240.0)
             except Exception as exc:
                 logger.error("[%s] %s failed with exception/timeout: %s", config_name, qid, exc)
                 res = {
@@ -296,6 +288,11 @@ async def run_ablation_config(
                     "table_accuracy": 0.0,
                     "latency_seconds": 240.0,
                     "error": str(exc),
+                    "configuration": config_name,
+                    "verifier_triggered": False,
+                    "repair_used": False,
+                    "fallback_used": False,
+                    "final_validity": "timeout_or_error",
                 }
             completed[qid] = res
             with open(checkpoint_file, "w", encoding="utf-8") as f:
