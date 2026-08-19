@@ -673,7 +673,7 @@ def format_latex_phase_table(records: List[PhaseBenchmarkRecord], caption: str =
         r"\label{tab:phase_progression}",
         r"\begin{tabular}{lcccccc}",
         r"\toprule",
-        r"\textbf{Phase / System Variant} & \textbf{N} & \textbf{Equivalent Match (95\% CI)} & \textbf{Exact Match} & \textbf{SQL Exec} & \textbf{Table Rec} & \textbf{Latency (s)} \\",
+        r"\textbf{Phase / System Variant} & \textbf{N} & \textbf{Result Equivalence (95\% CI)} & \textbf{Exact Match} & \textbf{SQL Exec} & \textbf{Table Rec} & \textbf{Latency (s)} \\",
         r"\midrule",
     ]
     for r in records:
@@ -695,7 +695,7 @@ def format_latex_phase_table(records: List[PhaseBenchmarkRecord], caption: str =
 def format_markdown_phase_table(records: List[PhaseBenchmarkRecord]) -> str:
     """Generates Markdown table with 95% CIs for reports."""
     lines = [
-        "| System / Phase | Queries (N) | Equivalent Match (95% CI) | Exact Match | SQL Exec Success | Table Recall | Mean Latency (p95) |",
+        "| System / Phase | Queries (N) | Result Equivalence (95% CI) | Exact Match | SQL Exec Success | Table Recall | Mean Latency (p95) |",
         "| :--- | :---: | :---: | :---: | :---: | :---: | :---: |",
     ]
     for r in records:
@@ -711,7 +711,7 @@ def format_subgroup_markdown_table(subgroups: dict[str, SubgroupMetric], title: 
     lines = [
         f"### {title}",
         "",
-        "| Subgroup / Domain | N | Equivalent Match (95% CI) | SQL Exec Success | Table Precision | Table Recall | Mean Latency |",
+        "| Subgroup / Domain | N | Result Equivalence (95% CI) | SQL Exec Success | Table Precision | Table Recall | Mean Latency |",
         "| :--- | :---: | :---: | :---: | :---: | :---: | :---: |",
     ]
     for name, m in subgroups.items():

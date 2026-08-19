@@ -1,10 +1,11 @@
 # Research Paper Readiness & Scientific Evidence Audit
 
-**Project:** Autonomous Multi-Stage Enterprise Data Analyst Agent  
+**Project:** Engineering Reliable LLM-Based Data Analysis: An Empirical Study of Schema Grounding, Planning, Verification, and SQL Repair  
+**Author:** Mevin Jose  
 **Benchmark:** Phase 10 Live 500-Query Benchmark on Olist Relational Data Warehouse  
 **Audit Date:** August 19, 2026  
 **Auditor:** Independent Research-Validation Pipeline  
-**Target Manuscript:** `docs/research_paper/PAPER_DRAFT.md`  
+**Target Manuscript:** `docs/research_paper/PAPER_DRAFT.md` & `docs/research_paper/latex/main.tex`  
 **Artifact Package:** `docs/research_paper/` (Figures 1–7, LaTeX Tables, `macros.tex`)
 
 ---
@@ -15,7 +16,7 @@ Every empirical claim in the research manuscript has been verified directly agai
 
 | # | Empirical Claim in Manuscript | Sample Size ($N$) | Metric Value | 95% Confidence Interval / Test | Grounding Source |
 | :---: | :--- | :---: | :---: | :---: | :--- |
-| **C1** | Overall Equivalent Match Accuracy | 500 | **73.40%** (367 / 500) | **[69.26%, 77.18%]** (Wilson cc)<br>[69.30%, 77.22%] (Clopper-Pearson) | `summary.json`, `final_research_validation_report.json` |
+| **C1** | Overall Result Equivalence Rate | 500 | **73.40%** (367 / 500) | **[69.26%, 77.18%]** (Wilson cc)<br>[69.30%, 77.22%] (Clopper-Pearson) | `summary.json`, `final_research_validation_report.json` |
 | **C2** | Overall Exact Match Accuracy | 500 | **31.00%** (155 / 500) | **[27.01%, 35.29%]** (Wilson cc) | `summary.json` |
 | **C3** | SQL Execution Success Rate | 500 | **100.00%** (500 / 500) | **[99.05%, 100.00%]** (Wilson cc) | `summary.json` (0 database runtime exceptions) |
 | **C4** | Table Exact Match Accuracy | 500 | **82.60%** (413 / 500) | **[78.96%, 85.74%]** (Wilson cc) | `summary.json` |
@@ -30,7 +31,7 @@ Every empirical claim in the research manuscript has been verified directly agai
 | **C13** | Repair Cases: True Semantic Recovery | 101 | **4** Queries Recovered | 4.0% True Recovery Rate (`q_291`, `q_346`, `q_442`, `q_476`) | Ground-truth row comparison |
 | **C14** | Repair Cases: Correct Preserved | 101 | **49** Queries Maintained | 48.5% Maintained Correct Rate | Ground-truth row comparison |
 | **C15** | Repair Cases: False-Positive Regression | 101 | **22** Queries Harmed | 21.8% Regression Rate (True $\rightarrow$ False) | Ground-truth row comparison |
-| **C16** | Controlled Paraphrase/Synonym Invariance | 50 | **100.0%** Retention | $\Delta\text{Acc} = 0.0\%$ | Robustness suite evaluation (`seed=42`) |
+| **C16** | Controlled Paraphrase/Synonym Invariance | 50 | **100.0%** Retention (Synonym/Ranking) | $\Delta\text{Acc} = 0.0\%$ | Robustness suite evaluation (`seed=42`) |
 | **C17** | Dominant Failure Mode: Join Path Omission | 133 | **37 / 133** (27.8% of errors) | 7.4% of all 500 queries | AST diagnostic classifier |
 
 ---
@@ -42,7 +43,7 @@ The following claims from earlier drafts were identified as methodologically inv
 ### ❌ Correction 1: Equating "Execution Success" with "Repair Success"
 - **Previous Overclaim:** *"The repair loop succeeded on 96% of triggered cases."*
 - **Empirical Grounding:** In reality, while 97 of the 101 repair cases (96.0%) executed without SQLite syntax errors, only 53 of them (52.5%) produced semantically equivalent result rows. Crucially, across the 101 verifier-triggered cases, 71 were already semantically correct before repair was considered; among these, 22 were subsequently degraded by repair (the repair loop truly recovered **4 queries** from broken to correct, but degraded **22 queries** from correct to incorrect due to aggressive aliasing and grain transformations).
-- **Fix in Manuscript:** Section 6 explicitly reports the 4-way semantic transition breakdown (+4 truly recovered, 49 maintained, 22 harmed/false positive, 26 unrecovered) as the primary scientific repair metric, explicitly warning that execution success must never be conflated with semantic repair.
+- **Fix in Manuscript:** Section 7 / 8 explicitly reports the 4-way semantic transition breakdown (+4 truly recovered, 49 maintained, 22 harmed/false positive, 26 unrecovered) as the primary scientific repair metric, explicitly warning that execution success must never be conflated with semantic repair.
 
 ### ❌ Correction 2: Running Paired McNemar Tests Across Unmatched Query Sets
 - **Previous Flaw:** Running McNemar's test directly between the 500-query Phase 10 run and 100-query ablation runs.
@@ -50,14 +51,14 @@ The following claims from earlier drafts were identified as methodologically inv
 
 ### ❌ Correction 3: Ambiguity Between Exact Match and Semantic Equivalence
 - **Previous Ambiguity:** Using the term "accuracy" interchangeably for strict string match and numerical equivalence.
-- **Fix in Manuscript:** The manuscript maintains a strict distinction between **Equivalent Match Accuracy (73.40%)** (row-order invariant, float-tolerant result set matching) and **Exact Match Accuracy (31.00%)** (character-level SQL result match).
+- **Fix in Manuscript:** The manuscript maintains a strict distinction between **Result Equivalence Rate (73.40%)** (row-order invariant, float-tolerant result set matching) and **Exact Match Rate (31.00%)** (character-level SQL result match).
 
 ---
 
 ## 3. Comprehensive Statistical Evidence Package
 
 ### 3.1 Confidence Intervals Summary (95% Confidence Level)
-- **Phase 10 Equivalent Match (N=500):** $73.40\% \pm 3.96\%$ $\rightarrow$ Wilson (cc): `[69.26%, 77.18%]`, Clopper-Pearson: `[69.30%, 77.22%]`.
+- **Phase 10 Result Equivalence (N=500):** $73.40\% \pm 3.96\%$ $\rightarrow$ Wilson (cc): `[69.26%, 77.18%]`, Clopper-Pearson: `[69.30%, 77.22%]`.
 - **Phase 10 Exact Match (N=500):** $31.00\% \pm 4.14\%$ $\rightarrow$ Wilson (cc): `[27.01%, 35.29%]`.
 - **Phase 10 SQL Execution (N=500):** $100.00\%$ $\rightarrow$ Wilson (cc): `[99.05%, 100.00%]`.
 - **Phase 10 Mean Latency (N=500):** $64.04\text{s}$ $\rightarrow$ BCa Bootstrap: `[61.27s, 66.90s]`.

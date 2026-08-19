@@ -1,4 +1,4 @@
-# Autonomous Enterprise Data Analysis via Semantic Schema Grounding, Plan Validation, and Multi-Turn SQL AST Repair
+# Engineering Reliable LLM-Based Data Analysis: An Empirical Study of Schema Grounding, Planning, Verification, and SQL Repair
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
@@ -6,28 +6,28 @@
 [![LaTeX Paper](https://img.shields.io/badge/Manuscript-LaTeX%20Ready-red.svg)](docs/research_paper/latex/main.tex)
 
 This repository contains the official implementation, evaluation harnesses, and publication artifacts for the research paper:  
-**"Autonomous Enterprise Data Analysis via Semantic Schema Grounding, Plan Validation, and Multi-Turn SQL AST Repair"** (August 2026).
+**"Engineering Reliable LLM-Based Data Analysis: An Empirical Study of Schema Grounding, Planning, Verification, and SQL Repair"** (August 2026).
 
 ---
 
 ## 📌 Executive Summary
 
-Enterprise natural language database querying (Text-to-SQL) routinely fails in production due to four structural obstacles: **schema grounding hallucinations**, **aggregation grain inconsistencies**, **SQL dialect traps**, and **agent hallucinatory drift**.
+Translating natural language questions into analytical SQL over multi-table relational databases frequently fails in practice due to five structural obstacles: **schema grounding hallucinations**, **join-path errors**, **aggregation grain inconsistencies**, **filtering/ranking errors**, and **SQL dialect incompatibilities**.
 
-To resolve these failure modes, we present an autonomous multi-stage data analyst architecture that decomposes query synthesis into deterministic validation stages:
-1. **Graph-Guided Semantic Schema RAG**: Precision table and column subgraph retrieval augmented with foreign-key traversal.
-2. **DAG Query Planning \& Deterministic Validation**: Structural query plan generation with pre-execution catalog constraint verification.
-3. **AST-Level Semantic Verifier \& Closed-Loop Repair**: Abstract Syntax Tree inspection via SQLGlot with targeted feedback for multi-turn grain and join correction.
+To investigate the mechanisms that mitigate these failure modes, we evaluate an observable, multi-stage reliability architecture decomposing analytical SQL generation into deterministic validation stages:
+1. **Graph-Guided Semantic Schema RAG**: Precision table and column subgraph retrieval augmented with foreign-key graph traversal.
+2. **DAG Query Planning & Deterministic Validation**: Structural query plan generation with pre-execution catalog constraint verification.
+3. **AST-Based Structural Verifier & Closed-Loop Repair**: Abstract Syntax Tree inspection via SQLGlot with targeted feedback for dialect normalization, grain alignment, and join correction.
 
 ---
 
 ## 📊 Audited Empirical Results (500-Query Benchmark)
 
-Evaluated over the 100,000-order Brazilian E-Commerce data warehouse (Olist relational database, 9 tables) across 8 business domains:
+Evaluated over a public relational e-commerce data warehouse (the Olist Brazilian E-Commerce dataset, 9 tables, 100,000+ orders) across 8 business domains:
 
 | Metric | Empirical Value | 95% Confidence Interval | Evaluation Method |
 | :--- | :---: | :---: | :--- |
-| **Equivalent Match Rate** | **73.40%** (367 / 500) | **[69.26%, 77.18%]** | Wilson Score (continuity-corrected) |
+| **Result Equivalence Rate** | **73.40%** (367 / 500) | **[69.26%, 77.18%]** | Wilson Score (continuity-corrected) |
 | *Clopper-Pearson Exact CI* | 73.40% (367 / 500) | [69.30%, 77.22%] | Clopper-Pearson Exact |
 | **Exact Match Rate** | **31.00%** (155 / 500) | [27.01%, 35.29%] | Wilson Score (cc) |
 | **SQL Execution Success Rate** | **100.00%** (500 / 500) | [99.05%, 100.00%] | Wilson Score (cc) |
@@ -35,21 +35,22 @@ Evaluated over the 100,000-order Brazilian E-Commerce data warehouse (Olist rela
 | **Table Macro Precision** | **93.07%** | — | Macro-averaged table precision |
 | **Table Macro Recall** | **95.33%** | — | Macro-averaged table recall |
 | **Mean Latency** | **64.04s** | [61.27s, 66.90s] | BCa Bootstrap ($N=2000$) |
-| **Provider Dropouts / Timeouts** | **0 / 0 / 0** | — | 100% Request Completion |
+| **Provider Errors / 429s / Timeouts** | **0 / 0 / 0** | — | 100% Request Completion |
 
 ---
 
 ## 🔬 Key Scientific Insights
 
-1. **Controlled Component Ablation**: Activating AST Semantic Verification yields an execution reliability increase from **34.0% to 65.0%** and an equivalent accuracy improvement from **15.0% to 26.0%** over unverified planners on identical 100-query instances.
-2. **The Self-Repair Trade-Off**: An exhaustive audit of 101 repair events demonstrates that execution success ($\neq$ semantic correctness): while repair maintained 96.0% syntactic validity and preserved 49 valid queries, aggressive repair rules caused 22 false-positive regressions.
-3. **Controlled Synthetic Robustness**: Evaluated across 5 perturbation vectors ($N=50$), achieving 100% retention under paraphrasing, synonym replacement, and ranking variants, with vulnerability under character-level typographical noise (57.1% retention).
+1. **Controlled Component Ablation**: In a 100-query matched evaluation, activating AST-based structural verification significantly increases execution reliability from **34.0% to 65.0%** and result equivalence from **15.0% to 26.0%** over unverified planners (McNemar exact $p=0.0192$, $\text{Odds Ratio}=3.75$).
+2. **The Self-Repair Trade-Off**: An exhaustive audit of 101 repair events demonstrates that compiler execution success must not be equated with semantic repair: while repair maintained 96.0% syntactic validity and preserved 49 valid queries, aggressive repair rules caused **22 false-positive regressions** against only **4 genuine recoveries**.
+3. **AST Failure Taxonomy**: Diagnostic diffing of all 133 non-equivalent queries identifies missing join paths (27.8%), filter omissions/errors (24.8%), and aggregation mismatches (24.1%) as the dominant remaining failure modes.
+4. **Controlled Synthetic Perturbation Robustness**: Evaluated across 5 perturbation vectors ($N=50$), demonstrating high retention under paraphrasing, synonym replacement, and ranking variants, with pronounced vulnerability under typographical noise (57.1% retention).
 
 ---
 
 ## 🏗️ System Architecture
 
-```
+```text
 User Question
      │
      ▼
@@ -83,6 +84,7 @@ User Question
 │   ├── tables/                   # LaTeX tables
 │   ├── macros.tex                # Auto-generated LaTeX macros
 │   ├── PAPER_DRAFT.md            # Markdown companion manuscript
+│   ├── PAPER_READINESS_AUDIT.md  # Scientific evidence audit
 │   ├── SEMANTIC_AUDIT.md         # Pre-registered stratified human audit protocol
 │   └── ARTIFACT_MANIFEST.json    # Cryptographic SHA-256 artifact manifest
 ├── src/agent_platform/           # Core library source code
@@ -150,8 +152,8 @@ For complete instructions on acquiring the Olist dataset and running live evalua
 
 If you build upon this work, please cite:
 ```bibtex
-@article{ai_data_analyst_2026,
-  title={Autonomous Enterprise Data Analysis via Semantic Schema Grounding, Plan Validation, and Multi-Turn SQL AST Repair},
+@article{jose2026engineering,
+  title={Engineering Reliable LLM-Based Data Analysis: An Empirical Study of Schema Grounding, Planning, Verification, and SQL Repair},
   author={Mevin Jose},
   year={2026},
   url={https://github.com/MJenius/AI-Data-Analyst-Agent}

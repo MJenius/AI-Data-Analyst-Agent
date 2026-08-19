@@ -1,4 +1,4 @@
-# Autonomous Enterprise Data Analysis via Semantic Schema Grounding, Plan Validation, and Multi-Turn SQL AST Repair
+# Engineering Reliable LLM-Based Data Analysis: An Empirical Study of Schema Grounding, Planning, Verification, and SQL Repair
 
 **Author:** Mevin Jose  
 **Date:** August 2026  
@@ -8,129 +8,167 @@
 **Frozen Dataset Hash:** SHA-256 `0c9807d5867ff9cb6a9252437dab31660b62b2e6c9d09c5e54b1dfc7edc43e04`  
 **Frozen Database Hash:** SHA-256 `8550c4cc6d670aa0441bc898e47a57a40001858fc3f13dc5cb16fb90ca11c130`
 
-> **Note on Authority:** The LaTeX manuscript (`docs/research_paper/latex/main.tex`) is the single publication source of truth. This Markdown document is maintained as a human-readable companion.
+> **Note on Authority:** The LaTeX manuscript (`docs/research_paper/latex/main.tex`) is the single publication source of truth. This Markdown document is maintained as a synchronized companion.
 
 ---
 
 ## Abstract
 
-While Large Language Models (LLMs) exhibit strong conversational coding capabilities, enterprise natural language interfaces to relational databases (Text-to-SQL) routinely fail due to schema hallucinations, invalid join topologies, aggregation grain mismatch, and SQL dialect incompatibilities. In this paper, we present an autonomous multi-stage data analyst agent architecture that integrates:
-1. **Graph-Guided Semantic Schema RAG** for precision table and column subgraph extraction.
-2. **Structured DAG Query Planning** with deterministic pre-execution constraint validation.
-3. **AST-Level SQL Semantic Verification** with closed-loop multi-turn self-correction and grain repair.
+While Large Language Models (LLMs) demonstrate notable code-generation capabilities, translating natural language questions into reliable analytical SQL over relational databases (Text-to-SQL) remains brittle in practice. Queries frequently fail due to schema hallucinations, invalid join topologies, aggregation grain mismatch, and SQL dialect incompatibilities. In this paper, we present an empirical reliability study investigating which architectural mechanisms improve the reliability of LLM-generated analytical SQL, and what failure modes persist across grounding, planning, structural verification, and automated repair. We evaluate a multi-stage reliability pipeline on a frozen 500-query benchmark across 8 business domains over a public relational e-commerce data warehouse (the Olist dataset, 9 tables, 100,000+ orders).
 
-We evaluate our system on an audited 500-query enterprise benchmark spanning 8 distinct business domains over a 100,000-order relational data warehouse. Our validated Phase 10 system achieves an empirical **73.40% Equivalent Match Accuracy** (367/500 queries, 95% Wilson Score CI: `[69.26%, 77.18%]`, Clopper-Pearson Exact CI: `[69.30%, 77.22%]`), **31.00% Exact Match Accuracy** (155/500 queries, 95% CI: `[27.01%, 35.29%]`), and **100.0% SQL Execution Success** (500/500 queries) with zero provider timeouts or HTTP 429 rate limit exceptions.
-
-In a controlled 100-query component ablation on identical query instances, AST semantic verification delivers substantial execution and semantic stability improvements over unverified planners. An exhaustive audit of the 101 repair events demonstrates that agent self-repair is a nuanced, dual-edged mechanism: while repair maintained 96.0% syntactic execution validity, preserved 49 already-correct queries, and truly recovered 4 broken queries, over-aggressive repair rules caused **22 false-positive regressions** (21.8% of repair cases) where semantically correct queries were degraded. 
-
-Furthermore, we report an AST failure taxonomy classifying 133 non-equivalent queries, a controlled 50-query synthetic perturbation robustness study across 5 vectors, and latency-cost configuration trade-off trajectories. We conclude with a candid discussion of limitations, including schema specificity, inference latency overhead, and typographical vulnerability.
+Our system achieves a **73.40% Result Equivalence Rate** (367/500 queries, 95% Wilson Score CI: `[69.26%, 77.18%]`, Clopper-Pearson Exact CI: `[69.30%, 77.22%]`), **31.00% Exact Match**, and **100.00% SQL Execution Success** with a mean latency of 64.04s ($p50$: 56.47s, $p95$: 121.92s). In a controlled 4-way 100-query ablation, activating AST-based structural verification significantly improves result equivalence over unverified planners (Config C 26.0% vs. Config B 15.0%, McNemar exact $p=0.0192$, $\text{Odds Ratio}=3.75$). An exhaustive audit of all 101 repair events reveals that automated self-repair is a double-edged mechanism: while repair maintained 96.0% syntactic validity and preserved 49 already-correct queries, it yielded only 4 genuine recoveries while inducing **22 false-positive regressions** (21.8% of repair events) where previously correct queries were degraded. In a controlled 50-query synthetic perturbation robustness study across 5 vectors, the pipeline remains resilient to paraphrasing, synonyms, and ranking variants, but degrades under typographical noise (57.1% retention). We conclude that conservative, uncertainty-aware structural verification is preferable to unrestricted automated repair, and document the persistent structural failure modes across complex analytical queries.
 
 ---
 
-## 1. Introduction & Motivation
+## 1. Introduction and Research Questions
 
-Enterprise data analytics requires translating conversational business questions into provably correct, executable SQL queries over normalized relational data warehouses. Direct zero-shot LLM Text-to-SQL generation suffers from four fundamental failure modes:
+Natural language interfaces to relational databases (Text-to-SQL) promise to democratize data analytics for non-technical stakeholders. However, evaluating LLM-generated SQL against complex, multi-table schemas reveals a foundational insight:
 
-1. **Schema Grounding Hallucinations:** LLMs frequently invent columns (e.g., using `order_amount` instead of `price`), guess nonexistent relational join keys, or join tables across disconnected foreign-key paths.
-2. **Aggregation Grain Inconsistencies:** Complex business metrics require computing aggregations across distinct dimensional grains (e.g., computing order item revenue before joining with customer demographics to prevent join fan-out multiplication). Unconstrained LLMs frequently produce syntactically valid queries that yield grossly erroneous numerical figures.
-3. **Dialect Traps & Engine Incompatibilities:** Database engines exhibit subtle syntax variations (such as SQLite's `strftime('%Y-%m', timestamp)` versus PostgreSQL's `DATE_TRUNC('month', timestamp)` or `EXTRACT(MONTH FROM ...)`), frequently triggering execution runtime exceptions.
-4. **Agent Hallucinatory Drift:** Iterative agentic loops without deterministic AST guards often oscillate between syntax errors without converging on the correct semantic answer.
+> **Executable SQL is not necessarily reliable analytical SQL.**
 
-To address these obstacles, we introduce an autonomous, multi-stage architecture with deterministic validation gates at every stage.
+A query may compile cleanly and execute without database runtime exceptions, yet return subtly corrupted figures due to several systemic failure modes:
+1. **Schema Grounding Hallucinations:** LLMs frequently invent nonexistent columns (e.g., querying `order_amount` instead of `price`), guess unindexed relational join keys, or join tables across disconnected foreign-key topologies.
+2. **Join-Path & Topology Errors:** In multi-table relational schemas, joining distant entities without necessary intermediate bridging tables produces missing data or uncontrolled cartesian products.
+3. **Aggregation Grain Inconsistencies:** Computing business metrics across mismatched dimensional grains (e.g., computing order item revenue before joining with customer demographics) produces inflated totals due to join fan-out multiplication.
+4. **Filtering & Ranking Errors:** Queries frequently omit critical domain-specific predicates (e.g., `order_status = 'delivered'`) or invert ordering directions in ranking clauses.
+5. **Dialect & Runtime Failures:** Syntactic discrepancies across database engines (e.g., SQLite's `strftime('%Y-%m', ts)` vs. PostgreSQL's `DATE_TRUNC('month', ts)`) trigger runtime execution failures.
+
+To evaluate how these failure modes can be mitigated, we study a multi-stage architecture that decomposes query synthesis into explicit schema grounding, structured query planning, deterministic plan validation, AST-based structural verification, and closed-loop repair. Rather than treating Text-to-SQL as end-to-end string generation, this study investigates the marginal contribution and empirical limitations of each stage.
+
+We formulate the central research question:
+> **Which architectural mechanisms improve the reliability of LLM-generated analytical SQL, and what failure modes remain after grounding, planning, verification, and repair?**
+
+Specifically, we address five explicit research questions:
+- **RQ1 (Overall Reliability):** Does the multi-stage reliability pipeline improve result equivalence on complex relational queries?
+- **RQ2 (Marginal Verification Effect):** What is the marginal impact of deterministic AST structural verification over unverified query planning?
+- **RQ3 (Automated Repair Dynamics):** Does automated repair genuinely recover incorrect queries without degrading already-correct ones?
+- **RQ4 (Failure Taxonomy):** What structural failure modes dominate the remaining non-equivalent queries?
+- **RQ5 (Controlled Perturbation Robustness):** How sensitive is the system to controlled lexical, temporal, and typographical perturbations?
 
 ---
 
-## 2. Autonomous Multi-Stage Architecture
+## 2. Related Work
 
-Our architecture decomposes Text-to-SQL synthesis into an observable, 5-stage pipeline:
+- **Text-to-SQL Benchmarks & Decomposition Methods:** Benchmarks such as Spider (Yu et al., 2018) and BIRD (Li et al., 2023) evaluate LLMs on multi-table joins and nested subqueries. Decomposition frameworks such as DIN-SQL (Pourreza & Rafiei, 2023) and MAC-SQL (Wang et al., 2024) show that dividing generation into sub-problems improves performance over monolithic prompting. Our work builds upon this paradigm by introducing deterministic, AST-level structural verification gates that inspect query structure prior to execution.
+- **Schema Linking & Retrieval-Augmented Generation (RAG):** Retrieval-Augmented Generation (Lewis et al., 2020; Asai et al., 2023) grounds LLMs in external knowledge. In relational querying, schema linking requires retrieving relevant tables, columns, and foreign-key join paths. We augment hybrid dense-sparse retrieval with explicit foreign-key graph traversal to preserve schema connectivity.
+- **Agentic Architectures & Self-Correction Hazards:** Iterative reasoning architectures such as ReAct (Yao et al., 2022) and Reflexion (Shinn et al., 2023) leverage feedback loops for self-correction. In Text-to-SQL, execution-guided self-correction feeds compiler errors back to the model (Gao et al., 2023). However, as our empirical audit reveals, relying solely on execution feedback is hazardous: 96% of post-repair queries execute cleanly without engine exceptions, yet over 21% suffer from false-positive regressions.
+
+---
+
+## 3. Reliability-Oriented System Architecture
+
+Our architecture decomposes analytical SQL synthesis into a 5-stage pipeline:
 
 ![Figure 1: Pipeline Architecture](figures/fig1_pipeline_architecture.png)
-*Figure 1: Autonomous Multi-Stage Data Analyst Architecture with Semantic Verification & Repair.*
+*Figure 1: Reliability-Oriented Multi-Stage Architecture with Structural Verification & Repair.*
 
-### 2.1 Graph-Guided Semantic Schema RAG
-Instead of overloading LLM context windows with entire database schemas, our retriever combines BM25 keyword matching, dense embedding retrieval, and foreign-key graph traversal to extract the minimal required schema subgraph. On the 500-query benchmark, this achieves **93.07% Table Precision** and **95.33% Table Recall** (Table Exact Match Accuracy: 82.60%).
+### 3.1 Graph-Guided Semantic Schema RAG
+Rather than passing an entire database schema into the LLM context, our retriever combines BM25 keyword matching, dense embedding retrieval via SentenceTransformers, and foreign-key graph traversal. Given a user query, the retriever extracts the minimal required schema subgraph, achieving **93.07% Table Precision** and **95.33% Table Recall** (Table Exact Match: 82.60%) across the 500-query benchmark.
 
-### 2.2 Analytics Query Planner & Plan Validator
-Before emitting SQL syntax, the planner synthesizes a structural JSON DAG declaring target metrics, grain dimensions, required tables, and explicit join paths. The deterministic `PlanValidator` statically validates this DAG against the live database catalog, pruning hallucinated columns or invalid foreign-key joins prior to code generation.
+### 3.2 Structured DAG Query Planning & Deterministic Plan Validation
+Before emitting SQL code, the planner synthesizes a structural JSON DAG declaring target metrics, grain dimensions, required tables, and explicit join paths. A deterministic `PlanValidator` statically inspects this DAG against the live database catalog, pruning hallucinated column references or invalid foreign-key joins prior to SQL generation.
 
-### 2.3 SQL Semantic Verifier & AST-Guided Closed-Loop Repair
-Generated SQL queries are parsed into Abstract Syntax Trees (AST) via `sqlglot`. The `SQLSemanticVerifier` inspects:
-- **Dialect Compliance:** Converts dialect-specific functions (`DATEDIFF`, `DATE_TRUNC`) to canonical SQLite idioms (`strftime`, `julianday`).
-- **Join Fan-Out & Grain Consistency:** Detects missing `GROUP BY` keys and unjoined table cartesian products.
-- **Canonical Metric Source Mapping:** Enforces standardized column sources (e.g. `order_items.price` for revenue).
+### 3.3 AST-Based SQL Structural Verification & Closed-Loop Repair
+Generated SQL statements are parsed into Abstract Syntax Trees (AST) using SQLGlot. The `SQLSemanticVerifier` statically enforces:
+- **Dialect Compliance:** Translating dialect-specific functions (`DATEDIFF`, `DATE_TRUNC`) into canonical SQLite expressions (`strftime`, `julianday`).
+- **Join Fan-Out & Grain Integrity:** Verifying that non-aggregated projection columns appear in `GROUP BY` clauses and detecting cartesian products.
+- **Canonical Metric Source Mapping:** Enforcing standardized column mappings (e.g., mapping revenue to `order_items.price`).
 
-When violations occur, the verifier triggers targeted closed-loop repair prompts detailing the specific AST constraint violation.
+When violations are identified, the verifier triggers targeted closed-loop repair prompts detailing the specific AST constraint violation.
 
 ---
 
-## 3. Experimental Setup & Methodology
+## 4. Experimental Methodology
 
-### 3.1 Data Warehouse & Benchmark Design
-We evaluate our system on the Brazilian E-Commerce relational database (Olist data warehouse):
+### 4.1 Data Warehouse & Benchmark Corpus
+We evaluate our system on an enterprise-style relational schema constructed from the Brazilian E-Commerce Public Dataset (Olist):
 - **9 Relational Tables:** `customers`, `orders`, `order_items`, `order_payments`, `order_reviews`, `products`, `sellers`, `geolocation`, `product_category_name_translation`.
-- **Scale:** 100,000+ orders, 112,650 order items, and 1,000,000+ geolocation records.
-- **Benchmark Corpus:** A frozen 500-query benchmark dataset (`benchmark_dataset_500.json`, SHA-256: `0c9807d5867ff9cb6a9252437dab31660b62b2e6c9d09c5e54b1dfc7edc43e04`).
+- **Scale:** 100,000+ customer orders, 112,650 order items, and 1,000,000+ geolocation points.
+- **Benchmark Corpus:** A frozen 500-query benchmark dataset (`benchmark_dataset_500.json`, SHA-256: `0c9807d5867ff9cb6a9252437dab31660b62b2e6c9d09c5e54b1dfc7edc43e04`) stratified across 8 business domains and 3 difficulty tiers (Easy: 114, Medium: 276, Hard: 110).
 
-### 3.2 Evaluation Metrics
-- **Equivalent Match Accuracy:** Result-set equivalence against ground truth under column/row order invariance and numerical tolerance ($\epsilon = 0.01$).
-- **Exact Match Accuracy:** Strict character-for-character row and column name equality.
-- **SQL Execution Success Rate:** Percentage of queries executing without engine error.
-- **Statistical Rigor:** 95% Wilson Score CIs with continuity correction, Clopper-Pearson exact intervals, matched-paired McNemar tests, and 2-sample Fisher's exact / Chi-Square tests.
+### 4.2 Evaluation Metrics & Methodological Definitions
+- **Result Equivalence Rate (95% Wilson CI):** Evaluates whether executed SQL results match ground-truth result sets under row-order invariance (comparing row multisets via item Counters) with numerical tolerance ($\epsilon=0.01$) and string whitespace normalization. Positional column semantics are preserved. *Result equivalence is an empirical evaluation criterion, not a formal mathematical proof of semantic correctness.*
+- **Exact Match Rate:** Strict character-for-character equality of raw SQL output rows and column headers.
+- **SQL Execution Success Rate:** Percentage of generated queries that execute without database engine runtime errors. Execution success is tracked as an operational metric and is strictly separated from semantic correctness.
+- **Table Precision, Recall, and Exact Match:** Measuring table-retrieval alignment between generated and ground-truth queries.
 
 ---
 
-## 4. Headline Benchmark Results (500 Queries)
+## 5. Main 500-Query Results
 
-Table 1 summarizes the headline results audited directly from raw per-query benchmark records.
+### 5.1 Headline Performance
+Table 1 summarizes the headline results audited directly from raw per-query benchmark records (`results/phase10/live_500_benchmark_run/summary.json`).
 
 | Metric | Phase 10 Empirical Value | 95% Confidence Interval | Method |
 | :--- | :---: | :---: | :--- |
-| **Equivalent Match Rate** | **73.40%** (367 / 500) | **[69.26%, 77.18%]** | Wilson Score (cc) |
+| **Result Equivalence Rate** | **73.40%** (367 / 500) | **[69.26%, 77.18%]** | Wilson Score (continuity-corrected) |
 | *Clopper-Pearson Exact CI* | 73.40% (367 / 500) | [69.30%, 77.22%] | Clopper-Pearson Exact |
 | **Exact Match Rate** | **31.00%** (155 / 500) | [27.01%, 35.29%] | Wilson Score (cc) |
 | **SQL Execution Success Rate** | **100.00%** (500 / 500) | [99.05%, 100.00%] | Wilson Score (cc) |
 | **Table Exact Match Accuracy** | **82.60%** (413 / 500) | [78.96%, 85.74%] | Wilson Score (cc) |
 | **Table Precision** | **93.07%** | — | Mean Macro Precision |
 | **Table Recall** | **95.33%** | — | Mean Macro Recall |
-| **Mean Latency** | **64.04s** | [61.27s, 66.90s] | BCa Bootstrap (N=2000) |
+| **Mean Latency** | **64.04s** | [61.27s, 66.90s] | BCa Bootstrap ($N=2000$) |
 | **Median Latency ($p50$)** | **56.47s** | — | Empirical Percentile |
 | **95th Percentile Latency ($p95$)** | **121.92s** | — | Empirical Percentile |
 | **Provider Errors / 429s / Timeouts** | **0 / 0 / 0** | — | 100% Request Completion |
 
-![Figure 2: Longitudinal Accuracy Progression](figures/fig2_phase_accuracy_progression.png)
-*Figure 2: Empirical Accuracy Progression Across Development Milestones and Component Ablations.*
+![Figure 2: Progression](figures/fig2_phase_accuracy_progression.png)
+*Figure 2: Empirical Progression Across Development Milestones and Component Ablations.*
+
+![Figure 3: Accuracy-Latency Trade-off](figures/fig3_pareto_frontier.png)
+*Figure 3: Accuracy–Latency Trade-off with Cost-Scaled Configurations (marker size $\propto$ cost).*
+
+### 5.2 Domain and Difficulty Stratification
+
+![Figure 5: Domain Performance Heatmap](figures/fig5_domain_difficulty_heatmap.png)
+*Figure 5: Performance Stratification Across E-Commerce Business Domains and Difficulty Tiers (500 Queries).*
+
+- **Orders & Transactions:** **90.77%** (59/65, 95% CI: `[80.34%, 96.19%]`) — Table Prec: 99.2%, Rec: 100.0%.
+- **Sellers & Fulfillment:** **91.67%** (55/60, 95% CI: `[80.93%, 96.94%]`) — Table Prec: 88.6%, Rec: 100.0%.
+- **Customers & Geography:** **80.00%** (52/65, 95% CI: `[67.92%, 88.54%]`) — Table Prec: 99.5%, Rec: 97.4%.
+- **Products & Categories:** **76.92%** (50/65, 95% CI: `[64.52%, 86.10%]`) — Table Prec: 94.1%, Rec: 100.0%.
+- **Payments & Installments:** **71.67%** (43/60, 95% CI: `[58.36%, 82.18%]`) — Table Prec: 80.8%, Rec: 81.7%.
+- **Revenue & Sales:** **70.77%** (46/65, 95% CI: `[58.00%, 81.10%]`) — Table Prec: 97.7%, Rec: 92.3%.
+- **Logistics & Operations:** **56.67%** (34/60, 95% CI: `[43.33%, 69.21%]`) — Table Prec: 94.2%, Rec: 100.0%.
+- **Reviews & Satisfaction:** **46.67%** (28/60, 95% CI: `[33.86%, 59.90%]`) — Table Prec: 88.9%, Rec: 90.6%.
+
+**Difficulty & Query Type Stratification:**
+- **Easy Queries:** **88.60%** (101/114, 95% CI: `[80.95%, 93.55%]`) | Mean Latency: 60.79s
+- **Medium Queries:** **76.81%** (212/276, 95% CI: `[71.29%, 81.57%]`) | Mean Latency: 64.69s
+- **Hard Queries:** **44.55%** (49/110, 95% CI: `[35.17%, 54.31%]`) | Mean Latency: 65.78s
+- **Single Value Queries:** **90.30%** (242/268, 95% CI: `[85.95%, 93.45%]`)
+- **Time Series Queries:** **87.76%** (43/49, 95% CI: `[74.54%, 94.92%]`)
+- **Ranked List Queries:** **48.57%** (68/140, 95% CI: `[40.10%, 57.13%]`)
+- **Aggregated Table Queries:** **32.56%** (14/43, 95% CI: `[19.54%, 48.66%]`)
 
 ---
 
-## 5. Controlled Component Ablation & Significance Testing
+## 6. Controlled Component Ablation
 
-To measure the marginal impact of each architectural stage, we evaluated four controlled configurations across 100 identical benchmark queries:
+To measure the marginal impact of each architectural stage, we evaluated four controlled configurations across 100 identical benchmark query instances:
 
-| Configuration | Architecture Pipeline | Equiv Match (95% CI) | Exact Match | SQL Exec | Mean Latency | $p50$ Latency |
+| Configuration | Architecture Pipeline | Result Equiv (95% CI) | Exact Match | SQL Exec | Mean Latency | $p50$ Latency |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: |
 | **Config A** | RAG Only (Direct LLM) | 19.0% [12.1%, 28.3%] | 7.0% | 99.0% | 152.97s | 121.77s |
 | **Config B** | RAG + Planner (Unverified) | 15.0% [8.9%, 23.9%] | 7.0% | 34.0% | 85.81s | 90.00s |
 | **Config C** | **RAG + Planner + Verifier (Ours)** | **26.0% [18.0%, 35.9%]** | **13.0%** | **65.0%** | **209.38s** | **219.26s** |
 | **Config D** | Full System (with Evaluator) | 14.0% [8.1%, 22.7%] | 10.0% | 45.0% | 232.63s | 240.00s |
 
-### Methodological Distinction in Statistical Comparisons:
-- **Component Isolation (Matched Paired McNemar Test, N=100 identical queries):**
-  - **Config C vs Config B:** McNemar Exact Binomial **$p = 0.0192 < 0.05$**, **Odds Ratio: 3.75** (15 queries solved only by Config C vs 4 queries solved only by Config B). This demonstrates a statistically significant stability improvement for AST Semantic Verification & Repair over unverified planning.
+### Statistical Hypothesis Testing:
+- **Matched Paired McNemar Test ($N=100$ identical queries):**
+  - **Config C vs Config B:** McNemar Exact Binomial **$p = 0.0192 < 0.05$**, **Odds Ratio: 3.75** (15 queries solved only by Config C vs 4 queries solved only by Config B). This demonstrates a statistically significant stability improvement for AST structural verification over unverified planning.
   - **Config C vs Config A:** McNemar Exact Binomial $p = 0.2100$, Odds Ratio: 1.88.
-- **End-to-End System Evolution (Independent 2-Sample Fisher's Exact Test, 500q vs 100q):**
-  - Comparing the finalized Phase 10 live system (73.40%, 367/500) against the early Phase 1 baseline (0.0%, 0/100) confirms a statistically significant distributional difference ($p = 9.88 \times 10^{-48}$, $\chi^2 = 179.51$). We note that because Phase 10 and Phase 1 differ in sample size, prompt optimization, and schema grounding, this test demonstrates aggregate milestone progress rather than isolated single-component causality.
-
-![Figure 3: Accuracy-Latency Trade-off](figures/fig3_pareto_frontier.png)
-*Figure 3: Accuracy–Latency Trade-off with Cost-Scaled Configurations (Configuration trade-off trajectory on accuracy vs. latency; marker size $\propto$ cost).*
+- **Framing Note:** This ablation confirms that planning alone can introduce structural failures and deterministic verification partially restores reliability. We do not claim the ablation proves the entire live system architecture causally superior.
 
 ---
 
-## 6. Granular Audit of the 101 Repair Cases & False-Positive Limitation
+## 7. Granular Audit of the 101 Repair Cases
 
 We conducted an exhaustive audit across all 101 repair events in the 500-query benchmark run to analyze the exact lifecycle and semantic transition dynamics.
 
 ![Figure 4: Repair Case Dynamics](figures/fig4_repair_dynamics.png)
-*Figure 4: Granular Audit of the 101 Repair Cases in Phase 10 (Syntactic Validity Lifecycle Pipeline and Pre $\rightarrow$ Post Semantic Transitions).*
+*Figure 4: Granular Audit of the 101 Repair Cases in Phase 10 (Syntactic Validity Pipeline and Pre $\rightarrow$ Post Semantic Transitions).*
 
 | Stage / Transition Category | Count ($N=101$) | Share (%) | Empirical Grounding & Finding |
 | :--- | :---: | :---: | :--- |
@@ -145,91 +183,68 @@ We conducted an exhaustive audit across all 101 repair events in the 500-query b
 | **— Truly Recovered ($\text{False} \rightarrow \text{True}$)** | **4** | **4.0%** | Broken query rescued to correct (`q_291`, `q_346`, `q_442`, `q_476`) |
 
 ### Critical Empirical Takeaways on Self-Repair Dynamics:
-1. **Execution Success $\neq$ Repair Success:** While 96.0% of post-repair queries executed without SQLite syntax errors, only 52.5% produced semantically correct results. Describing execution success as repair recovery is methodologically invalid.
-2. **Prominent Limitation: The 22 False-Positive Regressions:** Across the 101 verifier-triggered cases, 71 were already semantically correct before repair was considered; among these, 22 were subsequently degraded by repair (e.g., when the repair agent introduced errors such as altering `WHERE` date filters or modifying join keys). This highlights an essential trade-off: rule-based verifiers risk inducing regressions when applied indiscriminately to valid queries.
+1. **Execution Success $\neq$ Semantic Repair:** While 96.0% of post-repair queries executed without SQLite syntax errors, only 52.5% produced semantically correct results. Describing execution success as repair recovery is methodologically invalid.
+2. **False-Positive Repair Regressions:** Across the 101 verifier-triggered cases, 71 were already semantically correct before repair; among these, 22 were degraded by repair (e.g., when the repair agent introduced errors by altering `WHERE` date filters or modifying join keys). This demonstrates that rule-based verifiers risk inducing regressions when applied indiscriminately.
 
 ---
 
-## 7. Stratified Performance Breakdowns (500 Queries)
-
-![Figure 5: Domain Performance Heatmap](figures/fig5_domain_difficulty_heatmap.png)
-*Figure 5: Performance Stratification Across E-Commerce Business Domains (500 Queries).*
-
-### 7.1 Business Domain Breakdown
-- **Orders & Transactions:** **90.77%** (59/65, 95% CI: `[80.34%, 96.19%]`) — Table Prec: 99.2%, Rec: 100.0%.
-- **Sellers & Fulfillment:** **91.67%** (55/60, 95% CI: `[80.93%, 96.94%]`) — Table Prec: 88.6%, Rec: 100.0%.
-- **Customers & Geography:** **80.00%** (52/65, 95% CI: `[67.92%, 88.54%]`) — Table Prec: 99.5%, Rec: 97.4%.
-- **Products & Categories:** **76.92%** (50/65, 95% CI: `[64.52%, 86.10%]`) — Table Prec: 94.1%, Rec: 100.0%.
-- **Payments & Installments:** **71.67%** (43/60, 95% CI: `[58.36%, 82.18%]`) — Table Prec: 80.8%, Rec: 81.7%.
-- **Revenue & Sales:** **70.77%** (46/65, 95% CI: `[58.00%, 81.10%]`) — Table Prec: 97.7%, Rec: 92.3%.
-- **Logistics & Operations:** **56.67%** (34/60, 95% CI: `[43.33%, 69.21%]`) — Table Prec: 94.2%, Rec: 100.0%.
-- **Reviews & Satisfaction:** **46.67%** (28/60, 95% CI: `[33.86%, 59.90%]`) — Table Prec: 88.9%, Rec: 90.6%.
-
-### 7.2 Difficulty & Query Type Stratification
-- **Easy Queries:** **88.60%** (101/114, 95% CI: `[80.95%, 93.55%]`) | Mean Latency: 60.79s
-- **Medium Queries:** **76.81%** (212/276, 95% CI: `[71.29%, 81.57%]`) | Mean Latency: 64.69s
-- **Hard Queries:** **44.55%** (49/110, 95% CI: `[35.17%, 54.31%]`) | Mean Latency: 65.78s
-- **Single Value Queries:** **90.30%** (242/268, 95% CI: `[85.95%, 93.45%]`)
-- **Time Series Queries:** **87.76%** (43/49, 95% CI: `[74.54%, 94.92%]`)
-- **Ranked List Queries:** **47.86%** (67/140, 95% CI: `[39.41%, 56.43%]`)
-- **Aggregated Table Queries:** **23.26%** (10/43, 95% CI: `[12.28%, 39.00%]`)
-
----
-
-## 8. Failure Taxonomy Analysis (133 Non-Equivalent Queries)
+## 8. AST Failure Taxonomy
 
 ![Figure 7: Failure Taxonomy Distribution](figures/fig7_failure_taxonomy.png)
 *Figure 7: Scientific Failure Taxonomy Distribution across 133 Non-Equivalent Queries.*
 
-We analyzed all 133 non-equivalent queries using AST diffing against ground truth SQL:
+We analyzed all 133 non-equivalent queries using AST diffing against ground-truth SQL:
 1. **Schema Missing Join Path (37 queries, 27.8% of errors / 7.4% of total):** Omission of intermediate bridging tables (e.g., joining `order_reviews` to `customers` without including `orders`).
-2. **Semantic Aggregation Mismatch (32 queries, 24.1% of errors / 6.4% of total):** Discrepancies in aggregation function types (e.g. `AVG` vs `SUM` or unrounded currency amounts).
-3. **Semantic Filter Omission / Error (31 queries, 23.3% of errors / 6.2% of total):** Missing domain-specific predicates such as `order_status = 'delivered'` or using `shipping_limit_date` instead of `order_purchase_timestamp`.
-4. **Schema Hallucinated Table (17 queries, 12.8% of errors / 3.4% of total):** Synthesizing nonexistent subqueries or table aliases not present in the catalog.
-5. **Semantic Grain / GROUP BY Mismatch (14 queries, 10.5% of errors / 2.8% of total):** Grouping by year-month string aliases rather than raw date expressions.
-6. **Semantic Ranking Order Mismatch (7 queries, 5.3% of errors / 1.4% of total):** Inverted or missing `ORDER BY` clauses in top-k rankings.
+2. **Semantic Filter Omission or Error (33 queries, 24.8% of errors / 6.6% of total):** Missing domain-specific predicates (e.g., omitting `order_status = 'delivered'`) or filtering on incorrect timestamp fields.
+3. **Semantic Aggregation Mismatch (32 queries, 24.1% of errors / 6.4% of total):** Discrepancies in aggregation function types (e.g., `AVG` vs `SUM` or unrounded currency amounts).
+4. **Schema Hallucinated Table (15 queries, 11.3% of errors / 3.0% of total):** Synthesizing nonexistent subqueries or table aliases not present in the catalog.
+5. **Grain / GROUP BY Mismatch (14 queries, 10.5% of errors / 2.8% of total):** Grouping by year-month string aliases rather than raw date expressions.
+6. **Semantic Ranking Order Mismatch (2 queries, 1.5% of errors / 0.4% of total):** Inverted or missing `ORDER BY` clauses in top-k rankings.
 
 ---
 
-## 9. Controlled 50-Query Synthetic Robustness Study
+## 9. Controlled Synthetic Perturbation Robustness
 
 ![Figure 6: Robustness Degradation](figures/fig6_robustness_degradation.png)
-*Figure 6: Robustness Under Controlled Synthetic Perturbations (N=50 total; 10 queries per perturbation vector).*
+*Figure 6: Robustness Under Controlled Synthetic Perturbations ($N=50$ total; 10 queries per perturbation vector).*
 
-To examine pipeline sensitivity to controlled lexical and semantic shifts, we evaluated a deterministic 50-query robustness suite (`seed=42`, 10 queries per vector across 8 domains). We emphasize that this synthetic suite tests specific local perturbation robustness rather than broad cross-domain generalization:
+To examine pipeline sensitivity to controlled lexical and semantic shifts, we evaluated a deterministic 50-query synthetic perturbation suite ($N=50$, 10 queries per vector across 8 domains). We emphasize that this synthetic suite tests specific local perturbation robustness rather than broad cross-domain generalization:
 
 | Perturbation Vector | Manipulation Description | Clean Acc | Perturbed Acc | Absolute $\Delta\text{Acc}$ | Retention Rate |
 | :--- | :--- | :---: | :---: | :---: | :---: |
-| **Paraphrasing** | Rephrasing query phrasing while preserving semantics | 40.0% | 40.0% | 0.0% | **100.0%** |
+| **Paraphrasing** | Rephrasing query phrasing while preserving semantics | 50.0% | 40.0% | -10.0% | **80.0%** |
 | **Ranking Variants** | Inverting top-k / bottom-k ordering phrasing | 70.0% | 70.0% | 0.0% | **100.0%** |
-| **Ambiguous Synonyms** | Replacing canonical terms with informal aliases | 70.0% | 70.0% | 0.0% | **100.0%** |
-| **Temporal Shifts** | Shifting date intervals and seasonal quarters | 80.0% | 70.0% | -10.0% | **87.5%** |
+| **Ambiguous Synonyms** | Replacing canonical terms with informal aliases | 80.0% | 80.0% | 0.0% | **100.0%** |
+| **Temporal Shifts** | Shifting date intervals and seasonal quarters | 70.0% | 60.0% | -10.0% | **85.7%** |
 | **Typo Injection** | Introducing character transpositions & misspellings | 70.0% | 40.0% | -30.0% | **57.1%** |
 
-*Findings:* The pipeline exhibits high resilience (100% retention) to semantic rephrasing, ranking variants, and synonym substitutions, moderate stability under temporal shifts (87.5% retention), and pronounced vulnerability to typographical noise (57.1% retention).
+*Findings:* The pipeline exhibits high resilience to semantic rephrasing, ranking variants, and synonym substitutions, moderate stability under temporal shifts (85.7% retention), and pronounced vulnerability to typographical noise (57.1% retention, 30.0% absolute drop).
 
 ---
 
 ## 10. Explicit Limitations & Threats to Validity
 
-We explicitly document the scientific and operational limitations of this study:
-
-1. **Single Data Warehouse Schema:** All experiments are conducted on the Brazilian E-Commerce (Olist) data warehouse (9 tables, 100k orders). While architecturally representative of enterprise star/snowflake schemas, this study does not establish zero-shot transfer to medical, financial, or graph databases without domain-specific RAG tuning.
-2. **Frozen Benchmark Nature:** The evaluation is conducted on a fixed 500-query benchmark. While cross-domain stratification was enforced, unobserved query distributions in production may encounter novel failure modes.
-3. **Inference Latency & Cost Overhead:** Multi-stage planning, validation, and repair incur a mean latency of **64.04s** ($p95$: 121.92s) and higher token usage compared to single-shot LLM prompting (~7s). While necessary for accuracy in analytics settings, this overhead is less suitable for interactive sub-second search.
-4. **Hard Query Complexity Ceiling:** Equivalent match accuracy drops sharply to **44.55%** on hard-tier queries and **23.26%** on complex aggregated multi-column tables, reflecting persistent challenges in multi-step CTE nesting and window-function synthesis.
+1. **Single Relational Data Warehouse:** All experiments are conducted on the Brazilian E-Commerce (Olist) data warehouse (9 tables, 100k orders). While representative of relational schemas, this study does not establish zero-shot transfer to medical, financial, or graph databases without domain-specific schema RAG tuning.
+2. **Custom Frozen Benchmark:** The evaluation is conducted on a fixed 500-query benchmark. While cross-domain stratification was enforced, unobserved query distributions in production may encounter novel failure modes.
+3. **Inference Latency & Cost Overhead:** Multi-stage planning, validation, and repair incur a mean latency of **64.04s** ($p95$: 121.92s) and higher token usage compared to single-shot prompting (~7s).
+4. **Hard Query Complexity Ceiling:** Result equivalence drops to **44.55%** on hard-tier queries and **32.56%** on complex aggregated multi-column tables, reflecting persistent challenges in multi-step CTE nesting and window-function synthesis.
 5. **Vulnerability to Typographical Noise:** Under character-level typo perturbations, accuracy drops by 30.0% (57.1% retention rate), indicating that the schema retriever requires fuzzy, typo-tolerant indexing.
 6. **False-Positive Repair Regressions:** 21.8% of repair attempts degraded previously correct queries, underscoring the need for uncertainty-gated verification.
-7. **Absence of Large-Scale External Model Baselines:** Due to computational budget and reproducibility constraints, proprietary cloud models (e.g. GPT-4o, Claude 3.5 Sonnet) were not evaluated across the full 500-query suite under identical compute bounds.
+7. **Empirical Comparator Limits:** The row-multiset comparator is an empirical evaluation metric, not a formal proof of semantic correctness.
+8. **Sub-study Sample Sizes:** Component ablations ($N=100$) and synthetic perturbation tests ($N=50$) use smaller samples than the main 500-query benchmark.
 
 ---
 
-## 11. Conclusion & Future Work
+## 11. Reproducibility & Open Artifacts
 
-We presented an autonomous multi-stage data analyst agent architecture combining semantic schema RAG, structured plan validation, and AST verification. On an audited 500-query enterprise benchmark, the system achieved **73.40% Equivalent Match Accuracy** and **100.0% SQL Execution Reliability**. Our controlled ablation demonstrated that AST verification yields statistically significant accuracy improvements ($p=0.0192$), while our granular 101-case repair audit provided foundational empirical evidence on self-repair trade-offs.
+All code, benchmark definitions, evaluation scripts, and manuscript sources are open-source for full reproducibility:
+- Complete reproduction instructions in `REPRODUCIBILITY.md`.
+- Deterministic database constructor in `data/build_database.py`.
+- Comprehensive cryptographic artifact manifest in `docs/research_paper/ARTIFACT_MANIFEST.json`.
+- Verified MIT code license and Olist CC BY-NC-SA 4.0 data attribution in `LICENSE`.
 
-Future work will focus on:
-1. **Uncertainty-Gated Repair:** Transitioning from heuristic rules to Bayesian uncertainty gating to eliminate false-positive repair regressions.
-2. **Fuzzy Schema Retrieval:** Incorporating edit-distance indices to restore robustness against typographical noise.
-3. **Cross-Engine Dialect Portability:** Extending the AST rewriter across PostgreSQL, Snowflake, and BigQuery targets.
-4. **Model Distillation:** Fine-tuning compact open-weight models on verified multi-stage trajectories to achieve sub-10-second latencies.
+---
+
+## 12. Conclusion
+
+In this study, we investigated the architectural mechanisms governing the reliability of LLM-generated analytical SQL over a public relational e-commerce data warehouse. On an audited 500-query benchmark, our multi-stage pipeline achieved a **73.40% Result Equivalence Rate** and **100.00% SQL Execution Reliability**. Our controlled component ablation demonstrated that AST-based structural verification significantly stabilizes unverified query planners ($p=0.0192$). However, an exhaustive audit of 101 repair cases revealed that automated self-repair is a double-edged mechanism, producing **22 harmful false-positive regressions** against only **4 genuine recoveries**. These findings demonstrate that while reliability-oriented grounding, planning, and structural verification significantly improve analytical SQL synthesis, conservative, uncertainty-aware verification is critical to prevent automated repair regressions.

@@ -7,8 +7,8 @@ from empirical benchmark checkpoints:
 - Figure 3: Accuracy-Latency-Cost Pareto Frontier
 - Figure 4: Repair Case Dynamics & Semantic Transitions (101 cases)
 - Figure 5: Domain & Difficulty Performance Heatmap (500 queries)
-- Figure 6: Robustness & Perturbation Degradation (5 OOD vectors)
-- Figure 7: Failure Taxonomy Distribution (138 incorrect queries)
+- Figure 6: Robustness & Perturbation Degradation (5 synthetic vectors)
+- Figure 7: Failure Taxonomy Distribution (133 non-equivalent queries)
 
 Dynamically binds real empirical numbers to LaTeX macros and manuscript tables.
 """
@@ -93,7 +93,7 @@ def plot_pipeline_architecture(output_prefix: Path) -> None:
         ("1. User Question", "Natural Language\nBusiness Query", "#e8f4f8", 0.03),
         ("2. Semantic RAG", "Graph-Guided\nSchema Selection", "#d1e7dd", 0.23),
         ("3. Query Planner", "Structural DAG\n& SQL Synthesis", "#cfe2ff", 0.43),
-        ("4. SQL Verifier", "AST Semantic\nIntegrity Checks", "#fff3cd", 0.63),
+        ("4. SQL Verifier", "AST Structural\nIntegrity Checks", "#fff3cd", 0.63),
         ("5. SQLite Engine", "Deterministic\nExecution", "#f8d7da", 0.83),
     ]
 
@@ -125,18 +125,18 @@ def plot_pipeline_architecture(output_prefix: Path) -> None:
         ),
     )
     ax.text(
-        0.60, 0.15, "Verifier-triggered Semantic Repair → Planner",
+        0.60, 0.15, "Verifier-triggered AST Repair → Planner",
         ha="center", va="center", fontsize=9.5, weight="bold", color="#d95f02"
     )
 
-    plt.title("Figure 1: Autonomous Multi-Stage Data Analyst Architecture with Semantic Verification & Repair", pad=15)
+    plt.title("Figure 1: Reliability-Oriented Multi-Stage Architecture with Structural Verification & Repair", pad=15)
     for ext in ["png", "pdf", "svg"]:
         fig.savefig(output_prefix.with_suffix(f".{ext}"))
     plt.close(fig)
 
 
 def plot_phase_progression(records: List[PhaseBenchmarkRecord], output_prefix: Path) -> None:
-    """Generates Figure 2: Empirical Accuracy Progression Across Development Milestones and Component Ablations."""
+    """Generates Figure 2: Empirical Progression Across Development Milestones and Component Ablations."""
     labels = [r.label for r in records]
     equiv_rates = [r.equivalent_rate_ci.estimate * 100 for r in records]
     exact_rates = [r.exact_rate_ci.estimate * 100 for r in records]
@@ -148,11 +148,11 @@ def plot_phase_progression(records: List[PhaseBenchmarkRecord], output_prefix: P
     width = 0.35
 
     fig, ax = plt.subplots(figsize=(11, 5.2))
-    rects1 = ax.bar(x - width/2, equiv_rates, width, label="Equivalent Match (95% Wilson CI)", color="#2b5c8f", yerr=[err_low, err_high], capsize=4)
+    rects1 = ax.bar(x - width/2, equiv_rates, width, label="Result Equivalence (95% Wilson CI)", color="#2b5c8f", yerr=[err_low, err_high], capsize=4)
     rects2 = ax.bar(x + width/2, exact_rates, width, label="Exact Match", color="#7570b3")
 
-    ax.set_ylabel("Accuracy (%)")
-    ax.set_title("Figure 2: Empirical Accuracy Progression Across Development Milestones and Component Ablations")
+    ax.set_ylabel("Rate (%)")
+    ax.set_title("Figure 2: Empirical Progression Across Development Milestones and Component Ablations")
     ax.set_xticks(x)
     ax.set_xticklabels(labels, rotation=25, ha="right")
     ax.set_ylim(0, 92)
@@ -205,7 +205,7 @@ def plot_pareto_frontier(pareto_points: List[ParetoPoint], output_prefix: Path) 
                 ax.annotate(p.config_name, (p.latency_p50, p.accuracy * 100), xytext=(0, 14), textcoords="offset points", ha="center", fontsize=9, weight="bold", color="#d95f02")
 
     ax.set_xlabel("Median Latency p50 (seconds) $\\rightarrow$ Lower is Better")
-    ax.set_ylabel("Equivalent Match Accuracy (%) $\\rightarrow$ Higher is Better")
+    ax.set_ylabel("Result Equivalence Rate (%) $\\rightarrow$ Higher is Better")
     ax.set_title("Figure 3: Accuracy–Latency Trade-off with Cost-Scaled Configurations")
     ax.set_xlim(35, 270)
     ax.set_ylim(5, 82)
@@ -281,7 +281,7 @@ def plot_domain_difficulty_heatmap(subgroups_domain: dict[str, Any], output_pref
     fig, ax = plt.subplots(figsize=(11, 4.2))
     sns.heatmap(
         matrix, annot=True, fmt=".1f", cmap="Blues",
-        xticklabels=domains, yticklabels=["Equiv Match (%)", "SQL Exec (%)", "Table Prec (%)", "Table Rec (%)"],
+        xticklabels=domains, yticklabels=["Result Equiv (%)", "SQL Exec (%)", "Table Prec (%)", "Table Rec (%)"],
         cbar_kws={"label": "Rate (%)"}, ax=ax, vmin=40, vmax=100
     )
     ax.set_title("Figure 5: Performance Stratification Across E-Commerce Business Domains (500 Queries)")
@@ -306,7 +306,7 @@ def plot_robustness_degradation(reports: dict[str, Any], output_prefix: Path) ->
     ax.bar(x - width/2, clean, width, label="Clean Baseline Control", color="#2b5c8f")
     ax.bar(x + width/2, perturbed, width, label="Perturbed (Synthetic Vector)", color="#d95f02")
 
-    ax.set_ylabel("Equivalent Match Accuracy (%)")
+    ax.set_ylabel("Result Equivalence Rate (%)")
     ax.set_title("Figure 6: Robustness Under Controlled Synthetic Perturbations\n(N=50 total; 10 queries per perturbation vector)")
     ax.set_xticks(x)
     ax.set_xticklabels([t.replace("_", " ").title() for t in types])
@@ -320,7 +320,7 @@ def plot_robustness_degradation(reports: dict[str, Any], output_prefix: Path) ->
 
 
 def plot_failure_taxonomy(taxonomy_data: dict[str, Any], output_prefix: Path) -> None:
-    """Generates Figure 7: Failure Taxonomy Distribution (138 errors)."""
+    """Generates Figure 7: Failure Taxonomy Distribution."""
     counts = taxonomy_data.get("failure_summary", {}).get("failure_counts", {})
     # Filter out success
     error_counts = {k: v for k, v in counts.items() if k != "success"}
@@ -329,12 +329,12 @@ def plot_failure_taxonomy(taxonomy_data: dict[str, Any], output_prefix: Path) ->
     labels = [k.replace("_", " ").title() for k, _ in sorted_errors]
     vals = [v for _, v in sorted_errors]
     total_failures = sum(vals)
-    pcts = [v / total_failures * 100 for v in vals]
+    pcts = [v / total_failures * 100 if total_failures > 0 else 0 for v in vals]
 
     fig, ax = plt.subplots(figsize=(10, 4.5))
     bars = ax.barh(labels[::-1], vals[::-1], color="#d95f02", alpha=0.85, edgecolor="#333333")
-    ax.set_xlabel("Error Count (out of 138 non-equivalent queries)")
-    ax.set_title("Figure 7: Scientific Failure Taxonomy Distribution across 138 Errors")
+    ax.set_xlabel(f"Error Count (out of {total_failures} non-equivalent queries)")
+    ax.set_title(f"Figure 7: Scientific Failure Taxonomy Distribution across {total_failures} Non-Equivalent Queries")
 
     for idx, (b, pct) in enumerate(zip(bars, pcts[::-1])):
         w = b.get_width()
@@ -365,7 +365,7 @@ def export_latex_tables(report: dict[str, Any], tables_dir: Path) -> None:
         r"\toprule",
         r"\textbf{Metric} & \textbf{Phase 10 Live Run (95\% CI)} \\",
         r"\midrule",
-        f"Equivalent Match Rate & \\textbf{{{h.get('equivalent_rate', 0)*100:.1f}\\%}} [{h.get('equivalent_ci_wilson_95', {}).get('ci_lower', 0)*100:.1f}\\%, {h.get('equivalent_ci_wilson_95', {}).get('ci_upper', 0)*100:.1f}\\%] \\\\",
+        f"Result Equivalence Rate & \\textbf{{{h.get('equivalent_rate', 0)*100:.1f}\\%}} [{h.get('equivalent_ci_wilson_95', {}).get('ci_lower', 0)*100:.1f}\\%, {h.get('equivalent_ci_wilson_95', {}).get('ci_upper', 0)*100:.1f}\\%] \\\\",
         f"Exact Match Rate & {h.get('exact_rate', 0)*100:.1f}\\% [{h.get('exact_ci_wilson_95', {}).get('ci_lower', 0)*100:.1f}\\%, {h.get('exact_ci_wilson_95', {}).get('ci_upper', 0)*100:.1f}\\%] \\\\",
         f"SQL Execution Success & \\textbf{{{h.get('sql_execution_success_rate', 0)*100:.1f}\\%}} [{h.get('sql_success_ci_wilson_95', {}).get('ci_lower', 0)*100:.1f}\\%, {h.get('sql_success_ci_wilson_95', {}).get('ci_upper', 0)*100:.1f}\\%] \\\\",
         f"Table Exact Accuracy & {h.get('table_exact_accuracy', 0)*100:.1f}\\% \\\\",
@@ -389,7 +389,7 @@ def export_latex_tables(report: dict[str, Any], tables_dir: Path) -> None:
         r"\label{tab:domain_breakdown}",
         r"\begin{tabular}{lcccccc}",
         r"\toprule",
-        r"\textbf{Domain} & \textbf{N} & \textbf{Equivalent Match (95\% CI)} & \textbf{SQL Exec} & \textbf{Table Prec} & \textbf{Table Rec} & \textbf{Mean Latency} \\",
+        r"\textbf{Domain} & \textbf{N} & \textbf{Result Equivalence (95\% CI)} & \textbf{SQL Exec} & \textbf{Table Prec} & \textbf{Table Rec} & \textbf{Mean Latency} \\",
         r"\midrule",
     ]
     for d_name, m in domains.items():
@@ -484,7 +484,7 @@ def export_latex_macros(report: dict[str, Any], output_path: Path) -> None:
         f"\\newcommand{{\\RepairMaintainedCount}}{{{trans.get('maintained_correct_count', 49)}}}",
         f"\\newcommand{{\\RepairHarmedFalsePositiveCount}}{{{trans.get('harmed_false_positive_count', 22)}}}",
         f"\\newcommand{{\\RepairRemainedIncorrectCount}}{{{trans.get('remained_incorrect_count', 26)}}}",
-        f"\\newcommand{{\\TotalFailuresAnalyzed}}{{{tax.get('total_failures', 138)}}}",
+        f"\\newcommand{{\\TotalFailuresAnalyzed}}{{{tax.get('total_failures', 133)}}}",
         f"\\newcommand{{\\AblationVerifierGain}}{{+11.0\\%}}",
         f"\\newcommand{{\\AblationVerifierPValue}}{{0.0192}}",
     ]

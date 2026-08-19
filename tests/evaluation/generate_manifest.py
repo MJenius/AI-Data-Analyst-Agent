@@ -132,6 +132,7 @@ def generate_manifest():
 
     manifest = {
         "title": "Frozen Publication Artifact Manifest",
+        "paper_title": "Engineering Reliable LLM-Based Data Analysis: An Empirical Study of Schema Grounding, Planning, Verification, and SQL Repair",
         "version": "1.0.0",
         "timestamp_utc": "2026-08-19T10:00:00Z",
         "status": "FROZEN_FOR_PUBLICATION",
@@ -139,7 +140,7 @@ def generate_manifest():
         "verified_metrics": {
             "total_queries": 500,
             "equivalent_matches": 367,
-            "equivalent_accuracy": "73.40%",
+            "result_equivalence_rate": "73.40%",
             "exact_matches": 155,
             "exact_accuracy": "31.00%",
             "sql_execution_success": "100.00%",

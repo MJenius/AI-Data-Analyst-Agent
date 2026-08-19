@@ -559,14 +559,14 @@ def run_ood_robustness_evaluation(
 
 
 # ============================================================================
-# 5. Failure Taxonomy for 138 Non-Equivalent Queries
+# 5. Failure Taxonomy for Non-Equivalent Queries
 # ============================================================================
 
 def run_failure_taxonomy_audit(
     raw_results: List[dict[str, Any]],
     dataset_path: Path,
 ) -> dict[str, Any]:
-    """Performs AST-level diffing and failure classification for all 138 incorrect queries."""
+    """Performs AST-level diffing and failure classification for all non-equivalent queries."""
     logger.info("Analyzing failure taxonomy for non-equivalent queries...")
 
     with open(dataset_path, "r", encoding="utf-8") as f:
