@@ -152,7 +152,7 @@ If you build upon this work, please cite:
 ```bibtex
 @article{ai_data_analyst_2026,
   title={Autonomous Enterprise Data Analysis via Semantic Schema Grounding, Plan Validation, and Multi-Turn SQL AST Repair},
-  author={{Research \& Engineering Team, Agent Platform Division}},
+  author={Mevin Jose},
   year={2026},
   url={https://github.com/MJenius/AI-Data-Analyst-Agent}
 }
