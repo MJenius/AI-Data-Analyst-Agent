@@ -1,0 +1,21 @@
+\begin{table}[t]
+\centering
+\small
+\caption{Granular Lifecycle & Semantic Transition Audit of 101 Repair Cases}
+\label{tab:repair_audit}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Repair Stage / Transition} & \textbf{Count} & \textbf{Share (\%)} \\
+\midrule
+Repair Triggered by Verifier & 101 & 100.0\% \\
+Repair Applied & 88 & 87.1\% \\
+Post-Repair Syntactically Valid & 97 & 96.0\% \\
+\midrule
+\multicolumn{3}{l}{\textbf{Semantic Transitions (Pre $\rightarrow$ Post Repair)}} \\
+Maintained Correct (True $\rightarrow$ True) & 49 & 48.5\% \\
+Remained Incorrect (False $\rightarrow$ False) & 26 & 25.7\% \\
+Harmed / False Positive (True $\rightarrow$ False) & 22 & 21.8\% \\
+Truly Recovered (False $\rightarrow$ True) & \textbf{4} & \textbf{4.0\%} \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -7,13 +7,13 @@
 \toprule
 \textbf{Phase / System Variant} & \textbf{N} & \textbf{Equivalent Match (95\% CI)} & \textbf{Exact Match} & \textbf{SQL Exec} & \textbf{Table Rec} & \textbf{Latency (s)} \\
 \midrule
-Phase 1: Baseline & 0 & 0.0\% [0.0, 0.0] & 0.0\% & 0.0\% & 0.0\% & 0.0 (p95: 0.0) \\
+Phase 1: Baseline & 100 & 0.0\% [0.0, 4.6] & 0.0\% & 0.0\% & 0.0\% & 7.1 (p95: 12.3) \\
 Phase 7: Plan Grounding & 100 & 0.0\% [0.0, 4.6] & 0.0\% & 100.0\% & 95.0\% & 71.2 (p95: 121.6) \\
 Phase 8: Semantic Alignment & 100 & 0.0\% [0.0, 4.6] & 0.0\% & 100.0\% & 92.5\% & 89.7 (p95: 162.1) \\
-Phase 9: Concurrency v2 & 100 & 0.0\% [0.0, 4.6] & 0.0\% & 100.0\% & 95.8\% & 0.0 (p95: 0.0) \\
-Ablation: RAG Only & 100 & 19.0\% [12.1, 28.3] & 7.0\% & 99.0\% & 0.0\% & 153.0 (p95: 309.1) \\
-Ablation: RAG+Planner & 100 & 15.0\% [8.9, 23.9] & 7.0\% & 34.0\% & 0.0\% & 85.8 (p95: 93.1) \\
-Ablation: RAG+Plan+Verify & 100 & 26.0\% [18.0, 35.9] & 13.0\% & 65.0\% & 0.0\% & 209.4 (p95: 240.0) \\
+Ablation A: RAG Only & 100 & 19.0\% [12.1, 28.3] & 7.0\% & 99.0\% & 0.0\% & 153.0 (p95: 309.1) \\
+Ablation B: RAG+Planner & 100 & 15.0\% [8.9, 23.9] & 7.0\% & 34.0\% & 0.0\% & 85.8 (p95: 93.1) \\
+Ablation C: RAG+Plan+Verify & 100 & 26.0\% [18.0, 35.9] & 13.0\% & 65.0\% & 0.0\% & 209.4 (p95: 240.0) \\
+Ablation D: Full System & 100 & 14.0\% [8.1, 22.7] & 10.0\% & 45.0\% & 0.0\% & 232.6 (p95: 271.3) \\
 Phase 10: 500-Query Live & 500 & 72.4\% [68.2, 76.2] & 31.0\% & 100.0\% & 95.3\% & 64.0 (p95: 121.9) \\
 \bottomrule
 \end{tabular}

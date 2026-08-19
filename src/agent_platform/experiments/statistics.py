@@ -355,6 +355,67 @@ def wilcoxon_signed_rank_test(
     )
 
 
+def independent_two_sample_proportion_test(
+    successes_a: int,
+    total_a: int,
+    successes_b: int,
+    total_b: int,
+    alpha: float = 0.05,
+) -> SignificanceTestResult:
+    """Performs independent 2-sample proportion test using Fisher's Exact Test and Chi-Square with Yates' correction."""
+    if total_a <= 0 or total_b <= 0:
+        return SignificanceTestResult(
+            test_name="Independent 2-Sample Test",
+            statistic=0.0,
+            p_value=1.0,
+            is_significant=False,
+            alpha=alpha,
+            interpretation="Insufficient data.",
+            details={"total_a": total_a, "total_b": total_b}
+        )
+
+    table = [
+        [successes_a, total_a - successes_a],
+        [successes_b, total_b - successes_b]
+    ]
+
+    # Fisher exact test
+    res_fisher = stats.fisher_exact(table, alternative="two-sided")
+    odds_ratio = float(res_fisher.statistic)
+    p_fisher = float(res_fisher.pvalue)
+
+    # Chi-square with Yates' correction
+    chi2_stat, p_chi2, dof, _ = stats.chi2_contingency(table, correction=True)
+
+    # Rate difference
+    p_a = successes_a / total_a
+    p_b = successes_b / total_b
+    diff = p_a - p_b
+
+    is_sig = bool(p_fisher < alpha)
+    interp = f"{'Statistically significant' if is_sig else 'Not statistically significant'} difference in proportions (Group A: {p_a*100:.1f}%, Group B: {p_b*100:.1f}%, Fisher p={p_fisher:.4g}, OR={odds_ratio:.2f})."
+
+    return SignificanceTestResult(
+        test_name="Fisher's Exact Test / Chi-Square (Independent)",
+        statistic=float(chi2_stat),
+        p_value=p_fisher,
+        is_significant=is_sig,
+        alpha=alpha,
+        effect_size=odds_ratio,
+        interpretation=interp,
+        details={
+            "group_a": {"successes": successes_a, "total": total_a, "rate": p_a},
+            "group_b": {"successes": successes_b, "total": total_b, "rate": p_b},
+            "rate_difference": diff,
+            "odds_ratio": odds_ratio,
+            "fisher_p_value": p_fisher,
+            "chi2_statistic": float(chi2_stat),
+            "chi2_p_value": float(p_chi2)
+        }
+    )
+
+
+
 # ============================================================================
 # Stratified / Subgroup Analysis
 # ============================================================================
@@ -579,6 +640,23 @@ class BenchmarkStatisticalAnalyzer:
         res.details["phase_a"] = record_a.phase_id
         res.details["phase_b"] = record_b.phase_id
         return res
+
+    def compare_independent_runs(
+        self,
+        record_a: PhaseBenchmarkRecord,
+        record_b: PhaseBenchmarkRecord,
+        metric_key: str = "equivalent_match",
+    ) -> SignificanceTestResult:
+        """Compares two independent benchmark records using Fisher's exact test and Chi-Square."""
+        k_a = sum(1 for e in record_a.raw_entries if bool(e.get(metric_key, False)))
+        n_a = record_a.total_queries
+        k_b = sum(1 for e in record_b.raw_entries if bool(e.get(metric_key, False)))
+        n_b = record_b.total_queries
+        res = independent_two_sample_proportion_test(k_a, n_a, k_b, n_b, alpha=1.0 - self.confidence)
+        res.details["phase_a"] = record_a.phase_id
+        res.details["phase_b"] = record_b.phase_id
+        return res
+
 
 
 # ============================================================================

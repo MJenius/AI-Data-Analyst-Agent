@@ -128,3 +128,18 @@ def test_benchmark_statistical_analyzer():
     latex = format_latex_phase_table([rec])
     assert r"\begin{table*}" in latex
     assert "Test Phase" in latex
+
+
+def test_independent_two_sample_proportion_test():
+    from agent_platform.experiments.statistics import independent_two_sample_proportion_test
+    # 362 / 500 (72.4%) vs 26 / 100 (26.0%)
+    res = independent_two_sample_proportion_test(362, 500, 26, 100)
+    assert res.is_significant
+    assert res.p_value < 1e-10
+    assert res.effect_size > 1.0
+
+    # Equal rates: 50/100 vs 50/100
+    res_equal = independent_two_sample_proportion_test(50, 100, 50, 100)
+    assert not res_equal.is_significant
+    assert res_equal.p_value == 1.0
+

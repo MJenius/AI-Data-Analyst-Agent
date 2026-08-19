@@ -74,14 +74,14 @@ Table~\ref{tab:phase_progression} presents the empirical progression of our syst
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.48\textwidth]{figures/fig2_phase_accuracy_progression.pdf}
-\caption{Longitudinal accuracy progression across development phases with 95\% Wilson score error bars.}
+\caption{Empirical accuracy progression across development milestones and component ablations with 95\% Wilson score error bars.}
 \label{fig:progression}
 \end{figure}
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.48\textwidth]{figures/fig3_pareto_frontier.pdf}
-\caption{Accuracy–Latency–Cost Pareto frontier showing trade-offs across architectural configurations.}
+\caption{Accuracy–Latency Trade-off with Cost-Scaled Configurations (Configuration trade-off trajectory on accuracy vs. latency; marker size $\propto$ cost).}
 \label{fig:pareto}
 \end{figure}
 
@@ -93,14 +93,14 @@ Our 4-way ablation reveals critical architectural insights:
     \item \textbf{RAG + Planner + Verifier (Config C):} Activating the SQL Semantic Verifier rescues planner queries, achieving our peak equivalent accuracy of \textbf{26.0\%} (+11.0\% over Config B) and 65.0\% SQL execution success.
 \end{itemize}
 
-\section{Out-of-Distribution Robustness}
+\section{Controlled Synthetic Perturbation Robustness}
 We stress-test our system against 5 synthetic perturbation vectors: syntactic paraphrasing, keyboard typo injection, ambiguous domain synonyms, ranking permutations, and temporal shifts.
-Figure~\ref{fig:robustness} illustrates the retention rates under distribution shift.
+Figure~\ref{fig:robustness} illustrates the retention rates under controlled perturbations.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.48\textwidth]{figures/fig6_robustness_degradation.pdf}
-\caption{Accuracy under clean vs. out-of-distribution perturbed queries.}
+\caption{Robustness under controlled synthetic perturbations ($N=50$ total; 10 queries per perturbation vector).}
 \label{fig:robustness}
 \end{figure}
 
