@@ -158,9 +158,12 @@ Table 1 summarizes the headline results audited directly from raw per-query benc
 *Figure 2: Empirical Progression Across Development Milestones and Component Ablations.*
 
 ![Figure 3: Accuracy-Latency Trade-off](figures/fig3_pareto_frontier.png)
-*Figure 3: Accuracy–Latency Trade-off with Cost-Scaled Configurations (marker size $\\propto$ cost).*
+*Figure 3: Accuracy–Latency Trade-off with Cost-Scaled Configurations (marker size $\\propto$ c### 5.2 Domain and Difficulty Stratification
 
-### 5.2 Domain and Difficulty Stratification
+Performance varies across business domains and difficulty tiers:
+- **Domain Differences:** *Orders & Transactions* (90.8%) and *Sellers & Fulfillment* (91.7%) achieve high result equivalence due to direct primary-foreign key links. Conversely, *Reviews & Satisfaction* (46.7%) and *Logistics & Operations* (56.7%) present lower equivalence due to multi-table bridge joins and complex date arithmetic.
+- **Difficulty Tiers:** Easy queries achieve 88.60% equivalence (101/114), Medium queries achieve 76.81% (212/276), and Hard queries drop to 44.55% (49/110).
+- **Query Type Breakdown:** Single-value queries achieve 90.30% (242/268), time-series queries achieve 87.76% (43/49), ranked-list queries achieve 48.57% (68/140), and aggregated tables achieve 23.26% (10/43).
 
 ![Figure 5: Domain Performance Heatmap](figures/fig5_domain_difficulty_heatmap.png)
 *Figure 5: Performance Stratification Across E-Commerce Business Domains and Difficulty Tiers (500 Queries).*
@@ -174,25 +177,27 @@ Table 1 summarizes the headline results audited directly from raw per-query benc
 | **Config C** | RAG + Planner + AST Structural Verifier & Repair | 65.0% | 26.0% | 60.8% | 209.4s |
 | **Config D** | Full Pipeline with Post-Execution Evaluator Agent | 45.0% | 14.0% | 42.3% | 232.6s |
 
-*Statistical Findings:* In a matched paired McNemar test on 100 identical benchmark queries, Config C demonstrates a statistically significant improvement over Config B for result equivalence (exact binomial $p=0.0192 < 0.05$, $\\text{Odds Ratio}=3.75$, with 15 queries solved only by Config C vs. 4 solved only by Config B), establishing that adding the AST-based verification and repair stage significantly improves result equivalence over unverified planning. While the AST verifier serves as the deterministic filtering and triggering mechanism, this empirical gain reflects the combined effect of verification and verifier-guided repair rather than isolated verification alone. Activating a post-execution evaluator agent (Config D) degrades execution success to 45.0% and result equivalence to 14.0% with mean latency increasing to 232.6s due to LLM hallucinations during post-execution iterative rewriting. Consequently, the evaluator agent was disabled, and Config C's verified architecture was adopted as the production pipeline for the primary 500-query benchmark (73.4% result equivalence, 100.0% execution success, 64.04s mean latency).
+*Statistical Findings:* In a matched paired McNemar test on 100 identical benchmark queries, Config C demonstrates a statistically significant improvement over Config B for result equivalence (exact binomial $p=0.0192 < 0.05$, $\text{Odds Ratio}=3.75$, with 15 queries solved only by Config C vs. 4 solved only by Config B), establishing that adding the AST-based verification and repair stage significantly improves result equivalence over unverified planning. While the AST verifier serves as the deterministic filtering and triggering mechanism, this empirical gain reflects the combined effect of verification and verifier-guided repair rather than isolated verification alone. Activating a post-execution evaluator agent (Config D) degrades execution success to 45.0% and result equivalence to 14.0% with mean latency increasing to 232.6s due to LLM hallucinations during post-execution iterative rewriting. Consequently, the evaluator agent was disabled, and Config C's verified architecture was adopted as the production pipeline for the primary 500-query benchmark (73.4% result equivalence, 100.0% execution success, 64.04s mean latency).
 
 ---
 
 ## 6. Empirical Audit of Automated SQL Repair
 
+To evaluate the true dynamics of automated self-repair, we conducted an exhaustive audit of all 101 repair-triggered query cases during the 500-query benchmark run (Table III and Fig. 4). These 101 cases contained multiple verifier trigger instances; transition statistics are computed at the query-case level.
+
 ![Figure 4: Repair Case Dynamics](figures/fig4_repair_dynamics.png)
-*Figure 4: Granular Audit of the 101 Repair Cases (Panel A: Syntactic validity; Panel B: 4-Way Semantic Transitions).*
+*Figure 4: Granular Audit of the 101 Repair-Triggered Query Cases (Panel A: Syntactic validity; Panel B: 4-Way Semantic Transitions).*
 
 | Metric / Transition Category | Count | Percentage |
 | :--- | :---: | :---: |
-| **Total Repair Events Triggered** | 101 | 100.0% |
+| **Total Repair-Triggered Query Cases** | 101 | 100.0% |
 | **Repairs Successfully Applied** | 88 | 87.1% |
 | **Post-Repair Syntax / Execution Valid** | 97 | 96.0% |
 | **Post-Repair Semantically Equivalent** | 53 | 52.5% |
 | **Maintained Correct (Valid Before & After)** | 49 | 48.5% |
 | **Remained Incorrect (Failed Before & After)** | 26 | 25.7% |
 | **Harmed / False-Positive Regressions** | **22** | **21.8%** |
-| **Truly Recovered (Failed $\\rightarrow$ Correct)** | **4** | **4.0%** |
+| **Truly Recovered (Failed $\rightarrow$ Correct)** | **4** | **4.0%** |
 
 *Core Finding:* **Execution Success Is Not Semantic Recovery.** While 96.0% of post-repair queries execute cleanly, repair degraded 22 previously correct queries into incorrect ones while genuinely rescuing only 4.
 
@@ -220,7 +225,7 @@ We analyzed all 133 non-equivalent queries using AST diffing against ground-trut
 ![Figure 6: Robustness Degradation](figures/fig6_robustness_degradation.png)
 *Figure 6: Robustness Under Controlled Synthetic Perturbations ($N=50$ total; 10 queries per perturbation vector).*
 
-| Perturbation Vector | Manipulation Description | Clean Acc | Perturbed Acc | Absolute $\\Delta\\text{Acc}$ | Retention Rate |
+| Perturbation Vector | Manipulation Description | Clean Acc | Perturbed Acc | Absolute $\Delta\text{Acc}$ | Retention Rate |
 | :--- | :--- | :---: | :---: | :---: | :---: |
 | **Paraphrasing** | Rephrasing query phrasing while preserving semantics | 50.0% | 40.0% | -10.0% | **80.0%** |
 | **Ranking Variants** | Inverting top-k / bottom-k ordering phrasing | 70.0% | 70.0% | 0.0% | **100.0%** |
@@ -246,11 +251,11 @@ We analyzed all 133 non-equivalent queries using AST diffing against ground-trut
 
 ## 9. Discussion and Limitations
 
-1. **Single Primary Relational Data Warehouse:** The primary 500-query benchmark is conducted on a multi-table relational e-commerce schema (Olist dataset, 9 tables, 100,000+ orders) with SQLite execution. Schema grounding assumptions tuned for this warehouse schema do not automatically translate to arbitrary domains.
+1. **Single Primary Relational Data Warehouse:** The primary 500-query benchmark is conducted on a multi-table relational e-commerce schema (Olist dataset, 9 tables, approximately 100,000 orders) with SQLite execution. Schema grounding assumptions tuned for this warehouse schema do not automatically translate to arbitrary domains.
 2. **Cross-Schema Transfer Gap (18.0% Spider Result):** On the 20-database, 50-query Spider transfer probe, result equivalence dropped to 18.0%, demonstrating a pronounced semantic-generalization gap on heterogeneous external schemas.
 3. **Sample Size of Transfer Probe:** The Spider transfer evaluation is a targeted 50-query stratified probe across 20 databases, not a full benchmark run.
 4. **Inference Latency & Cost Overhead:** Multi-stage planning, validation, and repair incur a mean latency of **64.04s** ($p95$: 121.92s) and higher token usage compared to single-shot prompting (~7s).
-5. **Hard Query Complexity Ceiling:** Result equivalence drops to **44.55%** on hard-tier queries and **32.56%** on complex aggregated multi-column tables, reflecting persistent challenges in multi-step CTE nesting and window-function synthesis.
+5. **Hard Query Complexity Ceiling:** Result equivalence drops to **44.55%** on hard-tier queries and **23.26%** on complex aggregated multi-column tables, reflecting persistent challenges in multi-step CTE nesting and window-function synthesis.
 6. **Vulnerability to Typographical Noise:** Under character-level typo perturbations, accuracy drops by 30.0% (57.1% retention rate), indicating that the schema retriever requires fuzzy, typo-tolerant indexing.
 7. **False-Positive Repair Regressions:** 21.8% of repair attempts degraded previously correct queries in this setting, confirming that syntactic repair success is not equivalent to semantic recovery.
 8. **Empirical Comparator Limits:** The row-multiset comparator is an empirical evaluation metric under the study comparator, not a formal proof of semantic correctness.
@@ -270,15 +275,10 @@ All code, benchmark definitions, evaluation scripts, and manuscript sources are 
 
 ## 11. Conclusion
 
-In this study, we investigated the architectural mechanisms governing the reliability of LLM-generated analytical SQL over a public relational e-commerce data warehouse. On an audited 500-query benchmark, our multi-stage pipeline achieved a **73.40% Result Equivalence Rate under the study comparator** and **100.00% SQL Execution Success**. Our controlled component ablation demonstrated that adding the AST-based verification and repair stage provides a statistically significant improvement over unverified planning (Config C 26.0% vs. Config B 15.0%, exact $p=0.0192$, $\\text{OR}=3.75$). However, an exhaustive audit of 101 repair cases revealed that automated self-repair is a double-edged mechanism, producing **22 harmful false-positive regressions** against only **4 genuine recoveries**. Furthermore, the Spider transfer probe shows that these reliability gains are not automatically preserved under unseen schemas, with result equivalence falling to 18.0% despite maintaining 100.0% execution success. We conclude that conservative, uncertainty-aware structural verification is preferable to unconstrained automated repair loops.
+In this study, we investigated the architectural mechanisms governing the reliability of LLM-generated analytical SQL over a public relational e-commerce data warehouse. On a frozen 500-query benchmark, our multi-stage pipeline achieved a **73.40% Result Equivalence Rate under the study comparator** and **100.00% SQL Execution Success**. Our controlled component ablation demonstrated that adding the AST-based verification and repair stage provides a statistically significant improvement over unverified planning (Config C 26.0% vs. Config B 15.0%, exact $p=0.0192$, $\text{OR}=3.75$). However, an exhaustive audit of 101 repair-triggered query cases revealed that automated self-repair is a double-edged mechanism, producing **22 harmful false-positive regressions** against only **4 genuine recoveries**. Furthermore, the Spider transfer probe shows that these reliability gains are not automatically preserved under unseen schemas, with result equivalence falling to 18.0% despite maintaining 100.0% execution success. We conclude that conservative, uncertainty-aware structural verification is preferable to unconstrained automated repair loops.
 """
 
 
-def build_conference_pdf(doc_path: Path) -> Path:
-    """Build a professional, compact two-column conference research paper PDF."""
-    md_file = doc_path / "PAPER_DRAFT.md"
-    pdf_file = doc_path / "paper.pdf"
-    
 def build_conference_pdf(md_text: str, output_pdf: Path) -> Path:
     """Compile paper markdown into an official IEEEtran conference-style two-column PDF."""
     from reportlab.lib.pagesizes import letter
@@ -561,9 +561,9 @@ def build_conference_pdf(md_text: str, output_pdf: Path) -> Path:
         "<b>31.00% Exact Result Match</b>, and <b>100.00% SQL Execution Success</b> with a mean latency of 64.04s (<i>p</i><sub>50</sub>: 56.47s, <i>p</i><sub>95</sub>: 121.92s). "
         "In a controlled 4-way 100-query ablation, adding the AST-based verification and repair stage significantly "
         "improves result equivalence over unverified planning (Config C 26.0% vs. Config B 15.0%, McNemar exact <i>p</i> = 0.0192, Odds Ratio = 3.75). "
-        "However, an exhaustive audit of all 101 repair events reveals that automated self-repair is a double-edged mechanism: while 97 of 101 "
+        "However, an exhaustive audit of all 101 repair-triggered query cases reveals that automated self-repair is a double-edged mechanism: while 97 of 101 "
         "post-repair queries (96.0%) were syntactically valid and preserved 49 already-correct queries, repair yielded only 4 genuine recoveries "
-        "while inducing <b>22 harmful false-positive regressions</b> (21.8% of repair events) where previously correct queries were degraded. "
+        "while inducing <b>22 harmful false-positive regressions</b> (21.8% of repair-triggered query cases) where previously correct queries were degraded. "
         "Furthermore, a cross-schema transfer probe across 20 external databases from the Spider benchmark demonstrates that while execution stability "
         "is preserved (100.0%), result equivalence drops to <b>18.0%</b> (9/50), highlighting the gap between in-domain grounding and zero-shot schema transfer. "
         "We conclude that conservative, uncertainty-aware structural verification is preferable to unconstrained automated repair loops."
@@ -628,14 +628,14 @@ def build_conference_pdf(md_text: str, output_pdf: Path) -> Path:
                         ("LINEBELOW", (0,-1), (-1,-1), 1.0, colors.HexColor("#000000")),
                         ("VALIGN", (0,0), (-1,-1), "MIDDLE"),
                         ("ROWBACKGROUNDS", (0,1), (-1,-1), [colors.HexColor("#ffffff"), colors.HexColor("#f8fafc")]),
-                        ("TOPPADDING", (0,0), (-1,-1), 1.2),
-                        ("BOTTOMPADDING", (0,0), (-1,-1), 1.2),
+                        ("TOPPADDING", (0,0), (-1,-1), 1.0),
+                        ("BOTTOMPADDING", (0,0), (-1,-1), 1.0),
                         ("LEFTPADDING", (0,0), (-1,-1), 2.0),
                         ("RIGHTPADDING", (0,0), (-1,-1), 2.0),
                     ]))
                     story.append(Spacer(1, 1))
                     story.append(t)
-                    story.append(Spacer(1, 2.5))
+                    story.append(Spacer(1, 2.0))
                 table_rows = []
 
         if not s:
@@ -647,7 +647,7 @@ def build_conference_pdf(md_text: str, output_pdf: Path) -> Path:
             break
         
         if s.startswith("## "):
-            story.append(Spacer(1, 4))
+            story.append(Spacer(1, 3.5))
             heading_p = Paragraph(inline_fmt(s[3:].upper()), h1_style)
             story.append(KeepTogether([heading_p]))
             idx += 1
@@ -678,11 +678,11 @@ def build_conference_pdf(md_text: str, output_pdf: Path) -> Path:
             
             if img_p.exists():
                 # Single-column figure width: 250 pt, proportional height
-                img_flowable = Image(str(img_p), width=COL_W, height=108)
+                img_flowable = Image(str(img_p), width=COL_W, height=100)
                 if caption_p:
-                    story.append(KeepTogether([Spacer(1, 1.5), img_flowable, caption_p, Spacer(1, 2)]))
+                    story.append(KeepTogether([Spacer(1, 1.0), img_flowable, caption_p, Spacer(1, 1.5)]))
                 else:
-                    story.append(KeepTogether([Spacer(1, 1.5), img_flowable, Spacer(1, 2)]))
+                    story.append(KeepTogether([Spacer(1, 1.0), img_flowable, Spacer(1, 1.5)]))
             idx += 1
         elif (s.startswith("*Fig.") or s.startswith("*Figure")) and s.endswith("*"):
             story.append(Paragraph(inline_fmt(s[1:-1]), caption_style))

@@ -7,7 +7,7 @@
 ---
 
 ### Abstract
-While Large Language Models (LLMs) demonstrate notable code-generation capabilities, translating natural language questions into reliable analytical SQL over relational databases (Text-to-SQL) remains brittle in practice. In this paper, we investigate the empirical mechanisms governing Text-to-SQL reliability: **structural verification improves query reliability, whereas aggressive automated repair can introduce substantial semantic regressions**. We evaluate a multi-stage reliability pipeline on a frozen 500-query benchmark across 8 business domains over a public relational e-commerce data warehouse (the Olist dataset, 9 tables, approximately 100,000 orders). Our system achieves a **73.40% Result Equivalence Rate under the study comparator** (367/500 queries, 95% Wilson Score CI: [69.26%, 77.18%], Clopper-Pearson Exact CI: [69.30%, 77.22%]), **31.00% Exact Result Match**, and **100.00% SQL Execution Success** with a mean latency of 64.04s ($p_{50}$: 56.47s, $p_{95}$: 121.92s). In a controlled 4-way 100-query ablation, adding the AST-based verification and repair stage significantly improves result equivalence over unverified planning (Config C 26.0% vs. Config B 15.0%, McNemar exact $p = 0.0192$, Odds Ratio = 3.75). However, an exhaustive audit of all 101 repair events reveals that automated self-repair is a double-edged mechanism: while 97 of 101 post-repair queries (96.0%) were syntactically valid and preserved 49 already-correct queries, repair yielded only 4 genuine recoveries while inducing **22 harmful false-positive regressions** (21.8% of repair events) where previously correct queries were degraded. Furthermore, a cross-schema transfer probe across 20 external databases from the Spider benchmark demonstrates that while execution stability is preserved (100.0%), result equivalence drops to **18.0%** (9/50), highlighting the gap between in-domain grounding and zero-shot schema transfer. We conclude that conservative, uncertainty-aware structural verification is preferable to unconstrained automated repair loops.
+While Large Language Models (LLMs) demonstrate notable code-generation capabilities, translating natural language questions into reliable analytical SQL over relational databases (Text-to-SQL) remains brittle in practice. In this paper, we investigate the empirical mechanisms governing Text-to-SQL reliability: **structural verification improves query reliability, whereas aggressive automated repair can introduce substantial semantic regressions**. We evaluate a multi-stage reliability pipeline on a frozen 500-query benchmark across 8 business domains over a public relational e-commerce data warehouse (the Olist dataset, 9 tables, approximately 100,000 orders). Our system achieves a **73.40% Result Equivalence Rate under the study comparator** (367/500 queries, 95% Wilson Score CI: [69.26%, 77.18%], Clopper-Pearson Exact CI: [69.30%, 77.22%]), **31.00% Exact Result Match**, and **100.00% SQL Execution Success** with a mean latency of 64.04s ($p_{50}$: 56.47s, $p_{95}$: 121.92s). In a controlled 4-way 100-query ablation, adding the AST-based verification and repair stage significantly improves result equivalence over unverified planning (Config C 26.0% vs. Config B 15.0%, McNemar exact $p = 0.0192$, Odds Ratio = 3.75). However, an exhaustive audit of all 101 repair-triggered query cases reveals that automated self-repair is a double-edged mechanism: while 97 of 101 post-repair queries (96.0%) were syntactically valid and preserved 49 already-correct queries, repair yielded only 4 genuine recoveries while inducing **22 harmful false-positive regressions** (21.8% of repair-triggered query cases) where previously correct queries were degraded. Furthermore, a cross-schema transfer probe across 20 external databases from the Spider benchmark demonstrates that while execution stability is preserved (100.0%), result equivalence drops to **18.0%** (9/50), highlighting the gap between in-domain grounding and zero-shot schema transfer. We conclude that conservative, uncertainty-aware structural verification is preferable to unconstrained automated repair loops.
 
 **Index Terms** — *Text-to-SQL, LLM Reliability, Structural Verification, Automated Query Repair, Abstract Syntax Trees, Empirical Software Engineering.*
 
@@ -30,7 +30,7 @@ To rigorously examine this thesis, we address five key research questions:
 
 Through these questions, this paper makes five concrete empirical contributions:
 - **Controlled Component Decomposition:** We evaluate the marginal effect of adding the AST-based verification and repair stage over unverified planning on 100 matched queries, establishing a statistically significant reliability gain ($p = 0.0192$, $\text{OR} = 3.75$).
-- **Repair-Risk Characterization:** We present an exhaustive 4-way semantic audit of 101 repair events, showing that execution-valid repair induces substantial false-positive regressions (21.8% regression rate).
+- **Repair-Risk Characterization:** We present an exhaustive 4-way semantic audit of 101 repair-triggered query cases, showing that execution-valid repair induces substantial false-positive regressions (21.8% regression rate).
 - **Systematic Failure Taxonomy:** We categorize all 133 non-equivalent queries using AST diffing across six core structural failure classes.
 - **Cross-Schema Transfer Probe:** We evaluate zero-shot transfer across 20 unseen SQLite databases from the Spider benchmark, demonstrating execution stability (100.0%) alongside a marked semantic generalization gap (18.0% equivalence).
 - **Audited Open Science Package:** We release all source code, frozen benchmark definitions, evaluation scripts, and a cryptographic artifact manifest.
@@ -123,7 +123,7 @@ Table I reports headline results across all 500 benchmark queries. The system ac
 Performance varies across business domains and difficulty tiers (Fig. 4):
 - **Domain Differences:** *Orders & Transactions* (90.8%) and *Sellers & Fulfillment* (91.7%) achieve high result equivalence due to direct primary-foreign key links. Conversely, *Reviews & Satisfaction* (46.7%) and *Logistics & Operations* (56.7%) present lower equivalence due to multi-table bridge joins and complex date arithmetic.
 - **Difficulty Tiers:** Easy queries achieve 88.60% equivalence (101/114), Medium queries achieve 76.81% (212/276), and Hard queries drop to 44.55% (49/110).
-- **Query Type Breakdown:** Single-value queries achieve 90.30% (242/268), time-series queries achieve 87.76% (43/49), ranked-list queries achieve 48.57% (68/140), and aggregated tables achieve 32.56% (14/43).
+- **Query Type Breakdown:** Single-value queries achieve 90.30% (242/268), time-series queries achieve 87.76% (43/49), ranked-list queries achieve 48.57% (68/140), and aggregated tables achieve 23.26% (10/43).
 
 ![Figure 5: Domain Difficulty Heatmap](figures/fig5_domain_difficulty_heatmap.png)
 *Fig. 4. Performance Stratification Across E-Commerce Business Domains and Difficulty Tiers (500 Queries).*
@@ -156,17 +156,17 @@ Activating a post-execution evaluator agent (Config D) degrades execution succes
 ## VI. Repair Audit and Failure Analysis
 
 ### A. Empirical Audit of Automated SQL Repair
-To evaluate the true dynamics of automated self-repair, we conducted an exhaustive audit of all 101 repair events triggered during the 500-query benchmark run (Table III and Fig. 5).
+To evaluate the true dynamics of automated self-repair, we conducted an exhaustive audit of all 101 repair-triggered query cases during the 500-query benchmark run (Table III and Fig. 5). These 101 cases contained multiple verifier trigger instances; transition statistics are computed at the query-case level.
 
 ![Figure 4: Granular Repair Audit](figures/fig4_repair_dynamics.png)
-*Fig. 5. Granular Audit of 101 Repair Cases: Syntactic Validity Pipeline (Panel A) and Pre $\rightarrow$ Post Semantic Transitions (Panel B: 49 maintained, 26 remained incorrect, 22 harmed false positives, 4 truly recovered).*
+*Fig. 5. Granular Audit of 101 Repair-Triggered Query Cases: Syntactic Validity Pipeline (Panel A) and Pre $\rightarrow$ Post Semantic Transitions (Panel B: 49 maintained, 26 remained incorrect, 22 harmed false positives, 4 truly recovered).*
 
 **TABLE III**  
-*4-WAY SEMANTIC TRANSITION AUDIT OF 101 REPAIR EVENTS*
+*4-WAY SEMANTIC TRANSITION AUDIT OF 101 REPAIR-TRIGGERED QUERY CASES*
 
 | Metric / Transition Category | Count | Percentage |
 | :--- | :--- | :--- |
-| **Total Repair Events Triggered** | 101 | 100.0% |
+| **Total Repair-Triggered Query Cases** | 101 | 100.0% |
 | **Repairs Successfully Applied** | 88 | 87.1% |
 | **Post-Repair Syntax / Execution Valid** | 97 | 96.0% |
 | **Post-Repair Semantically Equivalent** | 53 | 52.5% |
@@ -177,7 +177,7 @@ To evaluate the true dynamics of automated self-repair, we conducted an exhausti
 
 Key empirical findings include:
 1. **Execution Success Is Not Semantic Recovery:** While 97 of 101 post-repair queries (96.0\%) executed cleanly on SQLite, only 52.5% (53/101) produced correct result sets. Describing compiler execution validity as repair recovery is methodologically invalid.
-2. **The False-Positive Regression Hazard:** Out of 101 triggered repair events, 71 queries were already semantically correct before repair was invoked. For 22 of these queries (21.8% of all repair events), the automated repair agent degraded a correct query into an incorrect one (e.g., by injecting erroneous date filters or altering valid join aliases).
+2. **The False-Positive Regression Hazard:** Out of 101 repair-triggered query cases, 71 queries were already semantically correct before repair was invoked. For 22 of these queries (21.8% of repair-triggered query cases), the automated repair agent degraded a correct query into an incorrect one (e.g., by injecting erroneous date filters or altering valid join aliases).
 3. **Genuine Recovery Rate:** Automated repair genuinely rescued only 4 previously broken queries (`q_291`, `q_346`, `q_442`, `q_476`), while preserving 49 already-correct queries and failing to resolve 26 incorrect queries.
 
 ### B. AST-Level Failure Taxonomy
@@ -237,7 +237,7 @@ Under zero-shot transfer, the system preserved execution reliability (100.0% SQL
 2. **Cross-Schema Transfer Gap (18.0% Spider Result):** On the 20-database, 50-query Spider transfer probe, result equivalence dropped to 18.0%, demonstrating a pronounced semantic-generalization gap on heterogeneous external schemas.
 3. **Sample Size of Transfer Probe:** The Spider transfer evaluation is a targeted 50-query stratified probe across 20 databases, not a full benchmark run.
 4. **Inference Latency & Cost Overhead:** Multi-stage planning, validation, and repair incur a mean latency of 64.04s ($p_{95}$: 121.92s) and higher token usage compared to single-shot prompting (~7s).
-5. **Hard Query Complexity Ceiling:** Result equivalence drops to 44.55% on hard-tier queries and 32.56% on complex aggregated multi-column tables, reflecting persistent challenges in multi-step CTE nesting and window-function synthesis.
+5. **Hard Query Complexity Ceiling:** Result equivalence drops to 44.55% on hard-tier queries and 23.26% on complex aggregated multi-column tables, reflecting persistent challenges in multi-step CTE nesting and window-function synthesis.
 6. **Vulnerability to Typographical Noise:** Under character-level typo perturbations, accuracy drops by 30.0% (57.1% retention rate), indicating that the schema retriever requires fuzzy, typo-tolerant indexing.
 7. **False-Positive Repair Regressions:** 21.8% of repair attempts degraded previously correct queries in this setting, confirming that syntactic repair success is not equivalent to semantic recovery.
 8. **Empirical Comparator Limits:** The row-multiset comparator is an empirical evaluation metric under the study comparator with two-decimal rounding and string normalization, not a formal proof of semantic correctness.
@@ -257,7 +257,8 @@ All code, benchmark definitions, evaluation scripts, and manuscript sources are 
 
 ## X. Conclusion
 
-In this study, we investigated the architectural mechanisms governing the reliability of LLM-generated analytical SQL over a public relational e-commerce data warehouse. On a frozen 500-query benchmark, our multi-stage pipeline achieved a **73.40% Result Equivalence Rate under the study comparator** and **100.00% SQL Execution Success**. Our controlled component ablation demonstrated that adding the AST-based verification and repair stage provides a statistically significant improvement over unverified planning (Config C 26.0% vs. Config B 15.0%, exact $p = 0.0192$, $\text{OR}=3.75$). However, an exhaustive audit of 101 repair cases revealed that automated self-repair is a double-edged mechanism, producing **22 harmful false-positive regressions** against only **4 genuine recoveries**. Furthermore, the Spider transfer probe shows that these reliability gains are not automatically preserved under unseen schemas, with result equivalence falling to 18.0% despite maintaining 100.0% execution success. We conclude that conservative, uncertainty-aware structural verification is preferable to unconstrained automated repair loops.
+In this study, we investigated the architectural mechanisms governing the reliability of LLM-generated analytical SQL over a public relational e-commerce data warehouse. On a frozen 500-query benchmark, our multi-stage pipeline achieved a **73.40% Result Equivalence Rate under the study comparator** and **100.00% SQL Execution Success**. Our controlled component ablation demonstrated that adding the AST-based verification and repair stage provides a statistically significant improvement over unverified planning (Config C 26.0% vs. Config B 15.0%, exact $p = 0.0192$, $\text{OR}=3.75$). However, an exhaustive audit of 101 repair-triggered query cases revealed that automated self-repair is a double-edged mechanism, producing **22 harmful false-positive regressions** against only **4 genuine recoveries**. Furthermore, the Spider transfer probe shows that these reliability gains are not automatically preserved under unseen schemas, with result equivalence falling to 18.0% despite maintaining 100.0% execution success. We conclude that conservative, uncertainty-aware structural verification is preferable to unconstrained automated repair loops.
+
 
 ---
 
