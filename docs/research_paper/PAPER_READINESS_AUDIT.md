@@ -30,20 +30,21 @@ Every empirical claim in the research manuscript has been verified directly agai
 | **C12** | Repair Cases: Syntactic Validity | 101 | **97 / 101** Executable | **96.0%** Post-Repair Syntax Rate | SQLite live re-execution |
 | **C13** | Repair Cases: True Semantic Recovery | 101 | **4** Queries Recovered | 4.0% True Recovery Rate (`q_291`, `q_346`, `q_442`, `q_476`) | Ground-truth row comparison |
 | **C14** | Repair Cases: Correct Preserved | 101 | **49** Queries Maintained | 48.5% Maintained Correct Rate | Ground-truth row comparison |
-| **C15** | Repair Cases: False-Positive Regression | 101 | **22** Queries Harmed | 21.8% Regression Rate (True $\rightarrow$ False) | Ground-truth row comparison |
-| **C16** | Controlled Paraphrase/Synonym Invariance | 50 | **100.0%** Retention (Synonym/Ranking) | $\Delta\text{Acc} = 0.0\%$ | Robustness suite evaluation (`seed=42`) |
+| **C15** | Repair Cases: False-Positive Regression | 101 | **22** Queries Harmed | 21.8% Regression Rate (True $\rightarrow$ False) in repair-triggered query cases | Ground-truth row comparison |
+| **C16** | Controlled Paraphrase/Synonym Invariance | 50 | **100.0%** Retention (Synonym/Ranking) | $\Delta\text{Acc} = 0.0\%$ | Simulated synthetic perturbation probe (`seed=42`) |
 | **C17** | Dominant Failure Mode: Join Path Omission | 133 | **37 / 133** (27.8% of errors) | 7.4% of all 500 queries | AST diagnostic classifier |
+| **C18** | Spider Cross-Schema Transfer Probe | 50 | **18.0%** Equiv (9/50), **100.0%** Exec | 20 Databases | Raw eval: `results/spider/checkpoint.json` |
 
 ---
 
-## 2. Unsupported / Corrected Claims & Methodological Fixes
+## 2. Supported / Corrected Claims & Methodological Fixes
 
 The following claims from earlier drafts were identified as methodologically invalid, ambiguous, or unsupported, and have been corrected:
 
 ### ❌ Correction 1: Equating "Execution Success" with "Repair Success"
 - **Previous Overclaim:** *"The repair loop succeeded on 96% of triggered cases."*
-- **Empirical Grounding:** In reality, while 97 of the 101 repair cases (96.0%) executed without SQLite syntax errors, only 53 of them (52.5%) produced semantically equivalent result rows. Crucially, across the 101 verifier-triggered cases, 71 were already semantically correct before repair was considered; among these, 22 were subsequently degraded by repair (the repair loop truly recovered **4 queries** from broken to correct, but degraded **22 queries** from correct to incorrect due to aggressive aliasing and grain transformations).
-- **Fix in Manuscript:** Section 7 / 8 explicitly reports the 4-way semantic transition breakdown (+4 truly recovered, 49 maintained, 22 harmed/false positive, 26 unrecovered) as the primary scientific repair metric, explicitly warning that execution success must never be conflated with semantic repair.
+- **Empirical Grounding:** In reality, while 97 of the 101 repair-triggered query cases (96.0%) executed without SQLite syntax errors, only 53 of them (52.5%) produced semantically equivalent result rows. Crucially, across the 101 verifier-triggered query cases, 71 were already semantically correct before repair was considered; among these, 22 were subsequently degraded by repair (the repair loop truly recovered **4 queries** from broken to correct, but degraded **22 queries** from correct to incorrect due to aggressive aliasing and grain transformations).
+- **Fix in Manuscript:** Section 6 explicitly reports the 4-way semantic transition breakdown (+4 truly recovered, 49 maintained, 22 harmed/false positive, 26 unrecovered) as the primary scientific repair metric across 101 repair-triggered query cases, explicitly warning that execution success must never be conflated with semantic repair.
 
 ### ❌ Correction 2: Running Paired McNemar Tests Across Unmatched Query Sets
 - **Previous Flaw:** Running McNemar's test directly between the 500-query Phase 10 run and 100-query ablation runs.
@@ -51,7 +52,7 @@ The following claims from earlier drafts were identified as methodologically inv
 
 ### ❌ Correction 3: Ambiguity Between Exact Match and Semantic Equivalence
 - **Previous Ambiguity:** Using the term "accuracy" interchangeably for strict string match and numerical equivalence.
-- **Fix in Manuscript:** The manuscript maintains a strict distinction between **Result Equivalence Rate (73.40%)** (row-order invariant, float-tolerant result set matching) and **Exact Match Rate (31.00%)** (character-level SQL result match).
+- **Fix in Manuscript:** The manuscript maintains a strict distinction between **Result Equivalence Rate (73.40%)** (row-order invariant, float-tolerant result set matching under the study comparator) and **Exact Match Rate (31.00%)** (character-level SQL result match).
 
 ---
 
@@ -78,10 +79,10 @@ The following claims from earlier drafts were identified as methodologically inv
 ## 4. Remaining Weaknesses & Threats to Validity
 
 1. **Hard Query Complexity Ceiling:** Accuracy on "Hard" difficulty queries drops to **44.55%** (49/110) due to complex multi-step CTEs, window functions, and nested ratio calculations.
-2. **Aggregated Table Formulation:** Queries requesting wide multi-column aggregated breakdowns achieve **32.56%** (14/43) accuracy, primarily due to column naming mismatches and pivot representations.
-3. **Over-Aggressive Repair Regressions:** 22 out of 101 repair events degraded queries that were already producing correct results before repair, demonstrating that static verifier rules occasionally trigger on harmless syntax patterns.
-4. **Vulnerability to Typographical Noise:** Under heavy typographical noise (typo injection), accuracy drops by 30.0% (57.1% retention rate), indicating that the schema retriever requires fuzzy-matching capabilities.
-5. **Single-Database Evaluation:** The benchmark evaluates a single complex enterprise schema (Olist e-commerce warehouse). Cross-schema generalizability across medical or financial domains remains to be demonstrated.
+2. **Aggregated Table Formulation:** Queries requesting wide multi-column aggregated breakdowns achieve **23.26%** (10/43) accuracy, primarily due to column naming mismatches and pivot representations.
+3. **Over-Aggressive Repair Regressions:** 22 out of 101 repair-triggered query cases degraded queries that were already producing correct results before repair, demonstrating that static verifier rules occasionally trigger on harmless syntax patterns.
+4. **Simulated Robustness Probe:** The perturbation analysis is a deterministic simulation probe showing 57.1% retention under typo disruptions; live multi-turn end-to-end perturbed evaluation remains for future benchmark extensions.
+5. **Single-Database Primary Evaluation:** The primary benchmark evaluates a single complex enterprise schema (Olist e-commerce warehouse). The zero-shot Spider transfer probe highlights a generalizability gap (18.0% equivalence across 20 databases).
 
 ---
 
@@ -92,6 +93,8 @@ The following claims from earlier drafts were identified as methodologically inv
 | **Benchmark Dataset (500q)** | Verified Bitwise | SHA-256: `0c9807d5867ff9cb6a9252437dab31660b62b2e6c9d09c5e54b1dfc7edc43e04` |
 | **Relational Database (`analytics.db`)** | Verified Bitwise | SHA-256: `8550c4cc6d670aa0441bc898e47a57a40001858fc3f13dc5cb16fb90ca11c130` |
 | **Raw Per-Query Records** | Frozen & Read-Only | `results/phase10/live_500_benchmark_run/summary.json` (500 items) |
+| **Spider Raw Records** | Frozen & Read-Only | `results/spider/checkpoint.json` (50 records across 20 DBs) |
+| **Spider Evaluation Harness** | Verified Deterministic | `tests/evaluation/run_spider_eval.py` |
 | **Validation Report** | Auto-Generated | `results/phase10/final_research_validation_report.json` |
 | **Publication Figures (1–7)** | Vector & 300 DPI | `docs/research_paper/figures/` (`.pdf`, `.png`, `.svg`) |
 | **LaTeX Tables & Macros** | Auto-Generated | `docs/research_paper/tables/`, `docs/research_paper/macros.tex` |

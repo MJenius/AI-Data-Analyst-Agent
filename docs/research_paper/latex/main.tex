@@ -267,18 +267,18 @@ We analyzed all \TotalFailuresAnalyzed{} non-equivalent queries from the 500-que
 
 \section{Robustness and Cross-Schema Transfer}
 
-\subsection{Controlled Synthetic Perturbation Robustness}
-To examine sensitivity to controlled lexical and semantic shifts, we evaluated a deterministic 50-query synthetic perturbation suite ($N=50$, 10 queries per vector across 8 domains; Table~\ref{tab:robustness} and Fig.~\ref{fig:robustness}).
+\subsection{Controlled Synthetic Perturbation Simulation Probe}
+To examine theoretical resilience to controlled lexical and semantic shifts, we evaluated a deterministic synthetic perturbation simulation suite ($N=50$, 10 queries per vector across 8 domains; Table~\ref{tab:robustness} and Fig.~\ref{fig:robustness}). Perturbed outcomes were modeled via deterministic degradation simulation on a 50-query clean control sample rather than fresh end-to-end LLM inference, serving as an offline sensitivity baseline across five perturbation classes: syntactic paraphrasing, ranking phrasing variants, domain synonyms, temporal boundary shifts, and typographical noise.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{fig6_robustness_degradation.pdf}
-\caption{Robustness under controlled synthetic perturbations ($N=50$ total; 10 queries per perturbation vector).}
+\caption{Simulated robustness degradation under controlled synthetic perturbation probe ($N=50$ total; 10 queries per perturbation vector).}
 \label{fig:robustness}
 \end{figure}
 
 \begin{table}[t]
-\caption{Robustness Under 5 Controlled Perturbation Vectors ($N=50$)}
+\caption{Simulated Robustness Under 5 Controlled Perturbation Vectors ($N=50$)}
 \label{tab:robustness}
 \centering
 \begin{tabular}{lcccc}
@@ -294,10 +294,10 @@ To examine sensitivity to controlled lexical and semantic shifts, we evaluated a
 \end{tabular}
 \end{table}
 
-The pipeline demonstrates high retention under query paraphrasing (80.0\% retention), ranking phrasing variants (100.0\% retention), and synonym substitution (100.0\% retention). Temporal boundary shifts exhibit moderate degradation (85.7\% retention). However, character-level typographical noise causes severe degradation (57.1\% retention, 30.0\% absolute drop), exposing the vulnerability of exact token-matching in the schema retriever.
+The simulation indicates high retention under simulated paraphrasing (80.0\% retention), ranking phrasing variants (100.0\% retention), and synonym substitution (100.0\% retention), moderate degradation under temporal boundary shifts (85.7\% retention), and pronounced sensitivity to typographical noise (57.1\% retention, 30.0\% absolute drop), highlighting the vulnerability of exact token-matching in schema retrieval. Live end-to-end LLM re-evaluation of perturbed queries remains a subject for future multi-turn benchmark experiments.
 
 \subsection{Cross-Schema Transfer Evaluation (Spider Probe)}
-To examine whether performance in a controlled, explicitly modeled relational warehouse transfers to heterogeneous unseen schemas, we evaluated the identical multi-stage pipeline on a stratified transfer probe of \SpiderSampleQueries{} queries across \SpiderUniqueDatabases{} distinct SQLite databases from the public Spider benchmark \cite{yu2018spider} (Table~\ref{tab:spider_evaluation}).
+To examine whether performance in a controlled, explicitly modeled relational warehouse transfers to heterogeneous unseen schemas, we evaluated the identical multi-stage pipeline on a stratified transfer probe of \SpiderSampleQueries{} queries across \SpiderUniqueDatabases{} distinct SQLite databases from the public Spider benchmark \cite{yu2018spider} (Table~\ref{tab:spider_evaluation}). Complete raw per-query evaluation records (including generated SQL, execution status, and equivalence judgments) are released in the accompanying artifact package (\texttt{results/spider/checkpoint.json}).
 
 \begin{table}[t]
 \caption{In-Domain vs.\ Zero-Shot Cross-Schema Transfer (Spider)}
@@ -323,10 +323,10 @@ We explicitly document the scientific and operational limitations of this study:
     \item \textbf{Sample Size of Transfer Probe:} The Spider transfer evaluation is a targeted 50-query stratified probe across 20 databases, not a full benchmark run.
     \item \textbf{Inference Latency Overhead:} Multi-stage retrieval, planning, validation, and verification incur a mean latency of \HeadlineMeanLatency{} ($p95$: \HeadlinePNinetyFiveLatency{}), making this architecture suited for asynchronous business intelligence rather than sub-second interactive querying.
     \item \textbf{Hard Query Complexity Ceiling:} Result equivalence drops to 44.55\% on hard queries and 23.26\% on complex aggregated tables, reflecting persistent challenges in multi-step CTE nesting and window functions.
-    \item \textbf{Typographical Vulnerability:} The schema retriever degrades significantly under typographical perturbations (57.1\% retention), indicating the necessity of fuzzy edit-distance indexing.
-    \item \textbf{False-Positive Repair Regressions:} Heuristic repair rules induced regressions in 22 out of 101 repair-triggered query cases in this evaluation setting, confirming that syntactic repair success is not equivalent to semantic recovery.
+    \item \textbf{Simulated Robustness Probe \& Typographical Sensitivity:} The $N=50$ perturbation analysis is a deterministic simulation probe demonstrating theoretical sensitivity to token disruptions (57.1\% retention) rather than fresh live LLM inference; live multi-turn typographical benchmarking remains a dedicated future study.
+    \item \textbf{False-Positive Repair Regressions:} Heuristic repair rules induced regressions in 22 out of 101 repair-triggered query cases (21.8\% of repair-triggered query cases) in this evaluation setting, confirming that syntactic repair success is not equivalent to semantic recovery.
     \item \textbf{Empirical Comparator Scope:} The row-multiset comparator is an empirical evaluation criterion with two-decimal numeric rounding and string whitespace normalization under the defined comparator, not a formal mathematical proof of semantic correctness.
-    \item \textbf{Ablation Sample Sizes:} Component ablations ($N=100$) and synthetic perturbation tests ($N=50$) use smaller sample sizes than the main 500-query benchmark.
+    \item \textbf{Sub-study Sample Sizes \& Simulation Scope:} Component ablations ($N=100$) and synthetic perturbation simulations ($N=50$) use smaller samples and simulated models than the primary 500-query benchmark.
 \end{enumerate}
 
 \section{Reproducibility}

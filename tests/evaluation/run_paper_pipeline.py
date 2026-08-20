@@ -220,10 +220,10 @@ We analyzed all 133 non-equivalent queries using AST diffing against ground-trut
 
 ## 8. Robustness and Cross-Schema Transfer
 
-### 8.1 Controlled Synthetic Perturbation Robustness
+### 8.1 Controlled Synthetic Perturbation Simulation Probe
 
 ![Figure 6: Robustness Degradation](figures/fig6_robustness_degradation.png)
-*Figure 6: Robustness Under Controlled Synthetic Perturbations ($N=50$ total; 10 queries per perturbation vector).*
+*Figure 6: Simulated Robustness Degradation Under Controlled Synthetic Perturbation Probe ($N=50$ total; 10 queries per perturbation vector).*
 
 | Perturbation Vector | Manipulation Description | Clean Acc | Perturbed Acc | Absolute $\Delta\text{Acc}$ | Retention Rate |
 | :--- | :--- | :---: | :---: | :---: | :---: |
@@ -233,7 +233,7 @@ We analyzed all 133 non-equivalent queries using AST diffing against ground-trut
 | **Temporal Shifts** | Shifting date intervals and seasonal quarters | 70.0% | 60.0% | -10.0% | **85.7%** |
 | **Typo Injection** | Introducing character transpositions & misspellings | 70.0% | 40.0% | -30.0% | **57.1%** |
 
-*Findings:* The pipeline exhibits high resilience to semantic rephrasing, ranking variants, and synonym substitutions, moderate stability under temporal shifts (85.7% retention), and pronounced vulnerability to typographical noise (57.1% retention, 30.0% absolute drop).
+*Findings:* The simulation indicates high retention under simulated paraphrasing (80.0% retention), ranking phrasing variants (100.0% retention), and synonym substitution (100.0% retention), moderate degradation under temporal boundary shifts (85.7% retention), and pronounced sensitivity to typographical noise (57.1% retention, 30.0% absolute drop), highlighting the vulnerability of exact token-matching in schema retrieval. Live end-to-end LLM re-evaluation of perturbed queries remains a subject for future multi-turn benchmark experiments.
 
 ### 8.2 Cross-Schema Transfer Evaluation (Spider Probe)
 
@@ -243,7 +243,7 @@ We analyzed all 133 non-equivalent queries using AST diffing against ground-trut
 | **Spider Transfer Probe** | **20** | **50** | **18.0%** | **100.0%** | 72.66s |
 
 *Key Findings:*
-1. **Execution Robustness:** The pipeline maintains 100.0% execution success across all 20 external databases without crashing or raising unhandled exceptions.
+1. **Execution Robustness:** The pipeline maintains 100.0% execution success across all 20 external databases without crashing or raising unhandled exceptions. Complete raw per-query evaluation records (including generated SQL, execution status, and equivalence judgments) are released in `results/spider/checkpoint.json`.
 2. **Transfer Bottlenecks:** Result equivalence drops to 18.0% (9/50 matches). Inspection of generated SQL traces indicates that schema-linking assumptions tuned to the domain-specific foreign-key graph were a major source of transfer failures alongside unannotated cross-table joins.
 3. **Architectural Stop-Condition:** Strong performance in a controlled, explicitly modeled relational warehouse does not automatically transfer to heterogeneous unseen schemas without database-specific catalog introspection.
 
@@ -256,10 +256,10 @@ We analyzed all 133 non-equivalent queries using AST diffing against ground-trut
 3. **Sample Size of Transfer Probe:** The Spider transfer evaluation is a targeted 50-query stratified probe across 20 databases, not a full benchmark run.
 4. **Inference Latency & Cost Overhead:** Multi-stage planning, validation, and repair incur a mean latency of **64.04s** ($p95$: 121.92s) and higher token usage compared to single-shot prompting (~7s).
 5. **Hard Query Complexity Ceiling:** Result equivalence drops to **44.55%** on hard-tier queries and **23.26%** on complex aggregated multi-column tables, reflecting persistent challenges in multi-step CTE nesting and window-function synthesis.
-6. **Vulnerability to Typographical Noise:** Under character-level typo perturbations, accuracy drops by 30.0% (57.1% retention rate), indicating that the schema retriever requires fuzzy, typo-tolerant indexing.
-7. **False-Positive Repair Regressions:** 21.8% of repair attempts degraded previously correct queries in this setting, confirming that syntactic repair success is not equivalent to semantic recovery.
+6. **Simulated Robustness Probe & Typographical Sensitivity:** The $N=50$ perturbation analysis is a deterministic simulation probe demonstrating theoretical sensitivity to token disruptions (57.1% retention) rather than fresh live LLM inference; live multi-turn typographical benchmarking remains a dedicated future study.
+7. **False-Positive Repair Regressions:** Heuristic repair rules induced regressions in 22 out of 101 repair-triggered query cases (21.8% of repair-triggered query cases) in this evaluation setting, confirming that syntactic repair success is not equivalent to semantic recovery.
 8. **Empirical Comparator Limits:** The row-multiset comparator is an empirical evaluation metric under the study comparator, not a formal proof of semantic correctness.
-9. **Sub-study Sample Sizes:** Component ablations ($N=100$) and synthetic perturbation tests ($N=50$) use smaller samples than the main 500-query benchmark.
+9. **Sub-study Sample Sizes & Simulation Scope:** Component ablations ($N=100$) and synthetic perturbation simulations ($N=50$) use smaller samples and simulated models than the main 500-query benchmark.
 
 ---
 
@@ -404,42 +404,42 @@ def build_conference_pdf(md_text: str, output_pdf: Path) -> Path:
         "IEEEBody",
         fontName="Times-Roman",
         fontSize=8.5,
-        leading=10.8,
+        leading=10.6,
         alignment=TA_JUSTIFY,
-        spaceAfter=3,
+        spaceAfter=2.5,
         textColor=colors.HexColor("#000000"),
     )
     bullet_style = ParagraphStyle(
         "IEEEBullet",
         fontName="Times-Roman",
         fontSize=8.5,
-        leading=10.8,
+        leading=10.6,
         leftIndent=8,
         firstLineIndent=-5,
-        spaceAfter=1.5,
+        spaceAfter=1.2,
         textColor=colors.HexColor("#000000"),
     )
     quote_style = ParagraphStyle(
         "IEEEQuote",
         fontName="Times-Italic",
         fontSize=8.5,
-        leading=10.8,
+        leading=10.6,
         alignment=TA_CENTER,
         leftIndent=6,
         rightIndent=6,
         spaceBefore=2,
-        spaceAfter=3,
+        spaceAfter=2.5,
         textColor=colors.HexColor("#000000"),
     )
     caption_style = ParagraphStyle(
         "IEEECaption",
         fontName="Times-Italic",
         fontSize=7.5,
-        leading=9.2,
+        leading=9.0,
         alignment=TA_CENTER,
         textColor=colors.HexColor("#1e293b"),
         spaceBefore=1.5,
-        spaceAfter=3.5,
+        spaceAfter=3.0,
         keepWithNext=True,
     )
     table_num_style = ParagraphStyle(
@@ -466,14 +466,14 @@ def build_conference_pdf(md_text: str, output_pdf: Path) -> Path:
         "IEEETC",
         fontName="Times-Roman",
         fontSize=6.8,
-        leading=8.2,
+        leading=8.0,
         textColor=colors.HexColor("#000000"),
     )
     table_hdr = ParagraphStyle(
         "IEEETH",
         fontName="Times-Bold",
         fontSize=6.8,
-        leading=8.2,
+        leading=8.0,
         alignment=TA_CENTER,
         textColor=colors.HexColor("#000000"),
     )
@@ -508,12 +508,12 @@ def build_conference_pdf(md_text: str, output_pdf: Path) -> Path:
         txt = txt.replace(r"($N=100$)", "(<i>N</i> = 100)")
         txt = txt.replace(r"$N=50$", "<i>N</i> = 50")
         txt = txt.replace(r"($N=50$)", "(<i>N</i> = 50)")
+        txt = txt.replace(r"($N=50$)", "(<i>N</i> = 50)")
         txt = txt.replace(r"$N=2000$", "<i>N</i> = 2000")
         txt = txt.replace(r"($N=2000$)", "(<i>N</i> = 2000)")
         txt = txt.replace(r"(\$N=500\$)", "(<i>N</i> = 500)")
         txt = txt.replace(r"(\$N=100\$)", "(<i>N</i> = 100)")
         txt = txt.replace(r"(\$N=50\$)", "(<i>N</i> = 50)")
-        txt = txt.replace(r"(\$N=2000\$)", "(<i>N</i> = 2000)")
         txt = txt.replace(r"(\$p50\$:", "(<i>p</i><sub>50</sub>:")
         txt = txt.replace(r"\$p50\$", "<i>p</i><sub>50</sub>")
         txt = txt.replace(r"\$p95\$", "<i>p</i><sub>95</sub>")
@@ -628,14 +628,14 @@ def build_conference_pdf(md_text: str, output_pdf: Path) -> Path:
                         ("LINEBELOW", (0,-1), (-1,-1), 1.0, colors.HexColor("#000000")),
                         ("VALIGN", (0,0), (-1,-1), "MIDDLE"),
                         ("ROWBACKGROUNDS", (0,1), (-1,-1), [colors.HexColor("#ffffff"), colors.HexColor("#f8fafc")]),
-                        ("TOPPADDING", (0,0), (-1,-1), 1.0),
-                        ("BOTTOMPADDING", (0,0), (-1,-1), 1.0),
+                        ("TOPPADDING", (0,0), (-1,-1), 0.8),
+                        ("BOTTOMPADDING", (0,0), (-1,-1), 0.8),
                         ("LEFTPADDING", (0,0), (-1,-1), 2.0),
                         ("RIGHTPADDING", (0,0), (-1,-1), 2.0),
                     ]))
                     story.append(Spacer(1, 1))
                     story.append(t)
-                    story.append(Spacer(1, 2.0))
+                    story.append(Spacer(1, 1.5))
                 table_rows = []
 
         if not s:
@@ -647,7 +647,7 @@ def build_conference_pdf(md_text: str, output_pdf: Path) -> Path:
             break
         
         if s.startswith("## "):
-            story.append(Spacer(1, 3.5))
+            story.append(Spacer(1, 3.0))
             heading_p = Paragraph(inline_fmt(s[3:].upper()), h1_style)
             story.append(KeepTogether([heading_p]))
             idx += 1
@@ -678,11 +678,11 @@ def build_conference_pdf(md_text: str, output_pdf: Path) -> Path:
             
             if img_p.exists():
                 # Single-column figure width: 250 pt, proportional height
-                img_flowable = Image(str(img_p), width=COL_W, height=100)
+                img_flowable = Image(str(img_p), width=COL_W, height=98)
                 if caption_p:
-                    story.append(KeepTogether([Spacer(1, 1.0), img_flowable, caption_p, Spacer(1, 1.5)]))
+                    story.append(KeepTogether([Spacer(1, 0.8), img_flowable, caption_p, Spacer(1, 1.2)]))
                 else:
-                    story.append(KeepTogether([Spacer(1, 1.0), img_flowable, Spacer(1, 1.5)]))
+                    story.append(KeepTogether([Spacer(1, 0.8), img_flowable, Spacer(1, 1.2)]))
             idx += 1
         elif (s.startswith("*Fig.") or s.startswith("*Figure")) and s.endswith("*"):
             story.append(Paragraph(inline_fmt(s[1:-1]), caption_style))
@@ -708,18 +708,18 @@ def build_conference_pdf(md_text: str, output_pdf: Path) -> Path:
             idx += 1
 
     # Add References Section
-    story.append(Spacer(1, 4))
+    story.append(Spacer(1, 3))
     ref_head = Paragraph("REFERENCES", h1_style)
     story.append(KeepTogether([ref_head]))
     
     ref_style = ParagraphStyle(
         "IEEERef",
         fontName="Times-Roman",
-        fontSize=7.0,
-        leading=8.8,
+        fontSize=6.8,
+        leading=8.2,
         leftIndent=8,
         firstLineIndent=-8,
-        spaceAfter=1.5,
+        spaceAfter=1.0,
         textColor=colors.HexColor("#000000"),
     )
     refs = [

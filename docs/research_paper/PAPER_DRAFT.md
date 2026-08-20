@@ -197,14 +197,14 @@ We analyzed all 133 non-equivalent queries from the 500-query evaluation using A
 
 ## VII. Robustness and Cross-Schema Transfer
 
-### A. Controlled Synthetic Perturbation Robustness
-To examine sensitivity to controlled lexical and semantic shifts, we evaluated a deterministic 50-query synthetic perturbation suite ($N=50$, 10 queries per vector across 8 domains; Table IV and Fig. 7).
+### A. Controlled Synthetic Perturbation Simulation Probe
+To examine theoretical resilience to controlled lexical and semantic shifts, we evaluated a deterministic synthetic perturbation simulation suite ($N=50$, 10 queries per vector across 8 domains; Table IV and Fig. 7). Perturbed outcomes were modeled via deterministic degradation simulation on a 50-query clean control sample rather than fresh end-to-end LLM inference, serving as an offline sensitivity baseline across five perturbation classes: syntactic paraphrasing, ranking phrasing variants, domain synonyms, temporal boundary shifts, and typographical noise.
 
 ![Figure 6: Robustness Degradation](figures/fig6_robustness_degradation.png)
-*Fig. 7. Robustness Under Controlled Synthetic Perturbations ($N=50$ total; 10 queries per perturbation vector).*
+*Fig. 7. Simulated Robustness Degradation Under Controlled Synthetic Perturbation Probe ($N=50$ total; 10 queries per perturbation vector).*
 
 **TABLE IV**  
-*ROBUSTNESS UNDER 5 CONTROLLED PERTURBATION VECTORS ($N=50$)*
+*SIMULATED ROBUSTNESS UNDER 5 CONTROLLED PERTURBATION VECTORS ($N=50$)*
 
 | Perturbation Vector | Manipulation Description | Clean Acc | Perturbed Acc | Absolute $\Delta\text{Acc}$ | Retention Rate |
 | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -214,10 +214,10 @@ To examine sensitivity to controlled lexical and semantic shifts, we evaluated a
 | **Temporal Shifts** | Shifting date intervals and seasonal quarters | 70.0% | 60.0% | -10.0% | **85.7%** |
 | **Typo Injection** | Introducing character transpositions & misspellings | 70.0% | 40.0% | -30.0% | **57.1%** |
 
-The pipeline demonstrates high retention under query paraphrasing (80.0% retention), ranking phrasing variants (100.0% retention), and synonym substitution (100.0% retention). Temporal boundary shifts exhibit moderate degradation (85.7% retention). However, character-level typographical noise causes severe degradation (57.1% retention, 30.0% absolute drop), exposing the vulnerability of exact token-matching in the schema retriever.
+The simulation indicates high retention under simulated paraphrasing (80.0% retention), ranking phrasing variants (100.0% retention), and synonym substitution (100.0% retention), moderate degradation under temporal boundary shifts (85.7% retention), and pronounced sensitivity to typographical noise (57.1% retention, 30.0% absolute drop), highlighting the vulnerability of exact token-matching in schema retrieval. Live end-to-end LLM re-evaluation of perturbed queries remains a subject for future multi-turn benchmark experiments.
 
 ### B. Cross-Schema Transfer Evaluation (Spider Probe)
-To examine whether performance in a controlled, explicitly modeled relational warehouse transfers to heterogeneous unseen schemas, we evaluated the identical multi-stage pipeline on a stratified transfer probe of 50 queries across 20 distinct SQLite databases from the public Spider benchmark (Table V).
+To examine whether performance in a controlled, explicitly modeled relational warehouse transfers to heterogeneous unseen schemas, we evaluated the identical multi-stage pipeline on a stratified transfer probe of 50 queries across 20 distinct SQLite databases from the public Spider benchmark (Table V). Complete raw per-query evaluation records (including generated SQL, execution status, and equivalence judgments) are released in the accompanying artifact package (`results/spider/checkpoint.json`).
 
 **TABLE V**  
 *IN-DOMAIN VS. ZERO-SHOT CROSS-SCHEMA TRANSFER (SPIDER)*
@@ -238,10 +238,10 @@ Under zero-shot transfer, the system preserved execution reliability (100.0% SQL
 3. **Sample Size of Transfer Probe:** The Spider transfer evaluation is a targeted 50-query stratified probe across 20 databases, not a full benchmark run.
 4. **Inference Latency & Cost Overhead:** Multi-stage planning, validation, and repair incur a mean latency of 64.04s ($p_{95}$: 121.92s) and higher token usage compared to single-shot prompting (~7s).
 5. **Hard Query Complexity Ceiling:** Result equivalence drops to 44.55% on hard-tier queries and 23.26% on complex aggregated multi-column tables, reflecting persistent challenges in multi-step CTE nesting and window-function synthesis.
-6. **Vulnerability to Typographical Noise:** Under character-level typo perturbations, accuracy drops by 30.0% (57.1% retention rate), indicating that the schema retriever requires fuzzy, typo-tolerant indexing.
-7. **False-Positive Repair Regressions:** 21.8% of repair attempts degraded previously correct queries in this setting, confirming that syntactic repair success is not equivalent to semantic recovery.
+6. **Simulated Robustness Probe & Typographical Sensitivity:** The $N=50$ perturbation analysis is a deterministic simulation probe demonstrating theoretical sensitivity to token disruptions (57.1% retention) rather than fresh live LLM inference; live multi-turn typographical benchmarking remains a dedicated future study.
+7. **False-Positive Repair Regressions:** Heuristic repair rules induced regressions in 22 out of 101 repair-triggered query cases (21.8% of repair-triggered query cases) in this evaluation setting, confirming that syntactic repair success is not equivalent to semantic recovery.
 8. **Empirical Comparator Limits:** The row-multiset comparator is an empirical evaluation metric under the study comparator with two-decimal rounding and string normalization, not a formal proof of semantic correctness.
-9. **Sub-study Sample Sizes:** Component ablations ($N = 100$) and synthetic perturbation tests ($N = 50$) use smaller samples than the main 500-query benchmark.
+9. **Sub-study Sample Sizes & Simulation Scope:** Component ablations ($N = 100$) and synthetic perturbation simulations ($N = 50$) use smaller samples and simulated models than the main 500-query benchmark.
 
 ---
 
