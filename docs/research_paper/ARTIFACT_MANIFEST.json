@@ -309,6 +309,16 @@
       "size_bytes": 644,
       "is_external": false
     },
+    "docs/research_paper/paper.pdf": {
+      "sha256": "679e2170e0ec83abaa4083920a0f6a0825eec7c7015c588062600fb9f2377916",
+      "size_bytes": 1643744,
+      "is_external": false
+    },
+    "results/phase10/live_500_benchmark_run/benchmark_report.md": {
+      "sha256": "e6c1b4a5c5cab087ee94f4b23e124790004e125e5fa8ea0ff25c51708a368359",
+      "size_bytes": 942,
+      "is_external": false
+    },
     "REPRODUCIBILITY.md": {
       "sha256": "dc77584eacfedd781c91acf6024b2ea506a43cf74444559a93d6687c449d32a5",
       "size_bytes": 3603,

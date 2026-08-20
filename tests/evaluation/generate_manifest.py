@@ -85,6 +85,8 @@ def generate_manifest():
         "docs/research_paper/tables/tab_phase_progression.tex",
         "docs/research_paper/tables/tab_repair_audit.tex",
         "docs/research_paper/tables/tab_robustness.tex",
+        "docs/research_paper/paper.pdf",
+        "results/phase10/live_500_benchmark_run/benchmark_report.md",
         "REPRODUCIBILITY.md",
         "LICENSE",
         "CITATION.cff",
