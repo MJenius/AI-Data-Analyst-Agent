@@ -23,8 +23,8 @@ Every empirical claim in the research manuscript has been verified directly agai
 | **C5** | Table Retrieval Precision & Recall | 500 | **93.07%** / **95.33%** | Macro Precision / Recall | `summary.json` |
 | **C6** | Latency Profile ($p50$, $p90$, $p95$, Mean) | 500 | Mean: **64.04s**, $p50$: **56.47s**,<br>$p90$: **105.77s**, $p95$: **121.92s** | Mean BCa Bootstrap 95% CI:<br>**[61.27s, 66.90s]** | `summary.json` |
 | **C7** | Zero Provider Failure Guarantee | 500 | **0** Timeouts, **0** 429s, **0** Errors | Complete Request Convergence | `summary.json` |
-| **C8** | Ablation: Verifier Accuracy Gain | 100 | **+11.0%** (15.0% $\rightarrow$ 26.0%) | **$p = 0.0192 < 0.05$**, Odds Ratio = 3.75 | Matched Paired McNemar Test (Config C vs Config B) |
-| **C9** | Ablation: Verifier Execution Gain | 100 | **+31.0%** (34.0% $\rightarrow$ 65.0%) | **$p = 0.0001 < 0.001$**, Odds Ratio = 8.75 | Matched Paired McNemar Test (Config C vs Config B) |
+| **C8** | Ablation: Verifier & Repair Accuracy Gain | 100 | **+11.0%** (15.0% $\rightarrow$ 26.0%) | **$p = 0.0192 < 0.05$**, Odds Ratio = 3.75 | Matched Paired McNemar Test (Config C vs Config B) |
+| **C9** | Ablation: Verifier & Repair Execution Gain | 100 | **+31.0%** (34.0% $\rightarrow$ 65.0%) | **$p = 0.0001 < 0.001$**, Odds Ratio = 8.75 | Matched Paired McNemar Test (Config C vs Config B) |
 | **C10** | Phase 10 vs Baseline Superiority | 500 vs 100 | **+73.4%** (0.0% $\rightarrow$ 73.40%) | **$p = 9.88 \times 10^{-48} < 0.001$**, $\chi^2 = 179.51$ | Independent 2-Sample Fisher's Exact Test |
 | **C11** | Repair Cases: Triggered vs Applied | 101 | **101** Triggered, **88** Applied | 87.1% Application Rate | `repair_audit_cache.json` |
 | **C12** | Repair Cases: Syntactic Validity | 101 | **97 / 101** Executable | **96.0%** Post-Repair Syntax Rate | SQLite live re-execution |
@@ -64,7 +64,7 @@ The following claims from earlier drafts were identified as methodologically inv
 - **Phase 10 Mean Latency (N=500):** $64.04\text{s}$ $\rightarrow$ BCa Bootstrap: `[61.27s, 66.90s]`.
 
 ### 3.2 Hypothesis Testing Summary
-- **Hypothesis 1 (AST Verifier Benefit):** Config C (RAG+Planner+Verifier) vs Config B (RAG+Planner).
+- **Hypothesis 1 (AST Verification & Repair Benefit):** Config C (RAG+Planner+Verifier+Repair) vs Config B (RAG+Planner).
   - *Design:* Matched paired McNemar test on $N=100$ identical queries.
   - *Discordant Counts:* $b = 15$ (solved only by C), $c = 4$ (solved only by B).
   - *Result:* Exact Binomial $p = 0.0192 < 0.05$, Odds Ratio = 3.75. **Statistically Significant.**
