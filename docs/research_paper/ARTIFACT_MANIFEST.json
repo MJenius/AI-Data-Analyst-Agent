@@ -145,8 +145,8 @@
       "is_external": false
     },
     "docs/research_paper/latex/main.tex": {
-      "sha256": "10f6ab8d73b7c9b3b5db3a9e2ebd8055f430d1660aa78fc5829aab3856f3d001",
-      "size_bytes": 30716,
+      "sha256": "817a53c29bdb9fa1530c8a691f6b4f4afb19a09e6817474a52b78eff7c806277",
+      "size_bytes": 30318,
       "is_external": false
     },
     "docs/research_paper/latex/references.bib": {
@@ -155,18 +155,18 @@
       "is_external": false
     },
     "docs/research_paper/latex/macros.tex": {
-      "sha256": "8b3496855ba86b174f614231090221a7506fdba4feea261494eca473dc690e14",
-      "size_bytes": 1356,
+      "sha256": "0d6c64a965f2b04e8c923c96ee8a3a45f0072d94ad6b895db4701138ab9992bc",
+      "size_bytes": 1091,
       "is_external": false
     },
     "docs/research_paper/macros.tex": {
-      "sha256": "8b3496855ba86b174f614231090221a7506fdba4feea261494eca473dc690e14",
-      "size_bytes": 1356,
+      "sha256": "0d6c64a965f2b04e8c923c96ee8a3a45f0072d94ad6b895db4701138ab9992bc",
+      "size_bytes": 1091,
       "is_external": false
     },
     "docs/research_paper/PAPER_DRAFT.md": {
-      "sha256": "0de95465a51947aa5c6f3f8059d57965e6b6cae15bb1e30c37270fd1f390c847",
-      "size_bytes": 24879,
+      "sha256": "c6132c0d726670f5c0ed5c8b268cb47115c90bd722e35c5b25d60cec0f1d8002",
+      "size_bytes": 27804,
       "is_external": false
     },
     "docs/research_paper/PAPER_READINESS_AUDIT.md": {
@@ -180,7 +180,7 @@
       "is_external": false
     },
     "docs/research_paper/figures/fig1_pipeline_architecture.pdf": {
-      "sha256": "1d7a4f854f03cba74d3e0d2f312add58f8fb3b90b0069a2a2e1583b80e84a8d8",
+      "sha256": "a46cc63c0270273a024684b3f3f0b5315d08c401fbe9dce5032d8cbc7b6068a4",
       "size_bytes": 32472,
       "is_external": false
     },
@@ -190,12 +190,12 @@
       "is_external": false
     },
     "docs/research_paper/figures/fig1_pipeline_architecture.svg": {
-      "sha256": "91788f0fef95ea3530c750367fd6fae29fb2ca0107927375153664114aba910a",
+      "sha256": "dfc75483b6719b4eecafeeb28ee416dae405411a85961558aadf13853e04f275",
       "size_bytes": 71822,
       "is_external": false
     },
     "docs/research_paper/figures/fig2_phase_accuracy_progression.pdf": {
-      "sha256": "51faae0560a741a25f3b7347796243f38298a007071cf328696a9d27c3e3ea35",
+      "sha256": "be28b8e5b59a2ba0aaac520d47dfe34bf3b35fbf4e73892317d47e9648a8247a",
       "size_bytes": 26666,
       "is_external": false
     },
@@ -205,12 +205,12 @@
       "is_external": false
     },
     "docs/research_paper/figures/fig2_phase_accuracy_progression.svg": {
-      "sha256": "9296801eceb1420833bd53193363ecc05f21c545fbbc6e299729dfcaccd4b96b",
+      "sha256": "4c782a2d671e94b9ec7d5d51f6aff89fcc2319e4f33adb9a9bc257f95f3be70c",
       "size_bytes": 66514,
       "is_external": false
     },
     "docs/research_paper/figures/fig3_pareto_frontier.pdf": {
-      "sha256": "9f2cf655e2aab7ec613f924cfa61bb4f87c80fe20231e0221403d9968cf64900",
+      "sha256": "7e867ee7ec08b5ad296e77cea42affc08f27097103b6381ed66a5b2906a34dd4",
       "size_bytes": 39620,
       "is_external": false
     },
@@ -220,12 +220,12 @@
       "is_external": false
     },
     "docs/research_paper/figures/fig3_pareto_frontier.svg": {
-      "sha256": "675c88bd1e75be5c571b32464f6b09f003ecb8bb779db78a3a611dbae3f9b473",
+      "sha256": "f9274955f185ac31c2b01b137349eeb803d1e2e1a57d9848a034d290ce0223bc",
       "size_bytes": 95809,
       "is_external": false
     },
     "docs/research_paper/figures/fig4_repair_dynamics.pdf": {
-      "sha256": "785c39a824f02a0dce5479b5c450e855de01c326a632ea8db6a48afad8b6a8d4",
+      "sha256": "424f9404fbb5d2b608641c07df58d31bd0bdc067d20b4e32ee79c113deaf4cfb",
       "size_bytes": 26510,
       "is_external": false
     },
@@ -235,12 +235,12 @@
       "is_external": false
     },
     "docs/research_paper/figures/fig4_repair_dynamics.svg": {
-      "sha256": "b7c0bf66868b52bc95e0aece04905f11daa37f89c4597b19a8c01c69615b97bd",
+      "sha256": "ace91904e7418d1fe3ae07c9ac13c74cf3bb6f7c5ba8296134c66f8ce58e96c6",
       "size_bytes": 80067,
       "is_external": false
     },
     "docs/research_paper/figures/fig5_domain_difficulty_heatmap.pdf": {
-      "sha256": "4235466d32a427af0c7a238a02d04f9bc920f5a25c4060c980199f99f60757bb",
+      "sha256": "9771859e643dac33bfdf95028e2c1393a0449d2be42901d52d7eba8cfc9dde09",
       "size_bytes": 26931,
       "is_external": false
     },
@@ -250,12 +250,12 @@
       "is_external": false
     },
     "docs/research_paper/figures/fig5_domain_difficulty_heatmap.svg": {
-      "sha256": "742e61924e11ca9b6d7299daa8aaaf0899bc5029d06dd0e2478250f7b1a29bf9",
+      "sha256": "db02c800e86ae783132ee3098a88430953ed3e6701fff2afd1ca26d618c5bf89",
       "size_bytes": 84956,
       "is_external": false
     },
     "docs/research_paper/figures/fig6_robustness_degradation.pdf": {
-      "sha256": "6c1f7caa2cbc322bd6de87f0edd3a1d95cc7824fe490df9054525e5afa56c93e",
+      "sha256": "72e5847917b63d82e41a3b30845aa4e6449ed13acc0b09beb74be3d93875475a",
       "size_bytes": 18426,
       "is_external": false
     },
@@ -265,12 +265,12 @@
       "is_external": false
     },
     "docs/research_paper/figures/fig6_robustness_degradation.svg": {
-      "sha256": "caad964f71dc018481dddabdc59e251c57bba318dcc62354c47b53a35b216f78",
+      "sha256": "e8d2c3bff20fdd3f37e19a29d783e18fd349caf4e717c7cc906dcdaa5d12432d",
       "size_bytes": 50697,
       "is_external": false
     },
     "docs/research_paper/figures/fig7_failure_taxonomy.pdf": {
-      "sha256": "bdfd48bc6c1b05f6fd1eb6c6714d8ad4e4c0cb9a4494b7d49f5b767dd76d8e0f",
+      "sha256": "a83ee6cd87b4f04232d1cadfce21cd2aaa6e61075fd57d6bc6193f7a23f06566",
       "size_bytes": 26245,
       "is_external": false
     },
@@ -280,7 +280,7 @@
       "is_external": false
     },
     "docs/research_paper/figures/fig7_failure_taxonomy.svg": {
-      "sha256": "3e030e2d97d9c318a95a4dad1aa44841b80b45f9c8dacecb3a821ea9f87aabf4",
+      "sha256": "ac2ca1594e404d4295e9706a7cfe71623ef577b43093b5834a1599ee9da95cba",
       "size_bytes": 69959,
       "is_external": false
     },
@@ -337,16 +337,6 @@
     "pyproject.toml": {
       "sha256": "89109a21c31652d0a62796a56fb4ad174ee5363445d4a6b61dcf382e639acb42",
       "size_bytes": 903,
-      "is_external": false
-    },
-    "results/spider/summary.json": {
-      "sha256": "698db227266ff0d288cf3905b38a2e60eccb14194e95d41ce903019dd3a4e358",
-      "size_bytes": 2148,
-      "is_external": false
-    },
-    "docs/research_paper/paper.pdf": {
-      "sha256": "3794d3d854873b1186c8093ab280426e2d8867a623bbffba1acdc5566f8d573a",
-      "size_bytes": 1641355,
       "is_external": false
     }
   },
