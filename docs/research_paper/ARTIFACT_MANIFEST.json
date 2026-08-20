@@ -55,8 +55,8 @@
       "is_external": false
     },
     "tests/evaluation/run_final_research_validation.py": {
-      "sha256": "7411fdc38b94d4d3731ffb00c45c8cfdf7b520b5c244abd5c2d98a56e61d848f",
-      "size_bytes": 30877,
+      "sha256": "2921d70e4f92b2deaef4067b95521fe8be15ba5d014af4a1ae6c5ec7687c6ae1",
+      "size_bytes": 32258,
       "is_external": false
     },
     "tests/unit/test_compare_results.py": {
@@ -110,7 +110,7 @@
       "is_external": false
     },
     "results/phase10/final_research_validation_report.json": {
-      "sha256": "51e1897e475fb3cd21bb96c5c5bfa04c2ad0e4eb7bfefc71d2f092cb424efb7c",
+      "sha256": "79d7269b7d89914a6a3ff01a980e1b3c01d3f7fac54caea2dadf3a6c0f65f04c",
       "size_bytes": 43752,
       "is_external": false
     },
@@ -180,7 +180,7 @@
       "is_external": false
     },
     "docs/research_paper/figures/fig1_pipeline_architecture.pdf": {
-      "sha256": "38cc7867387b3187c917cd14ddf9add6162464d854e4328bd846b0d62f38d21b",
+      "sha256": "9993104d8cbd7c70a2a5ca0e865af6dad8de6d3173a365ddeeacc2d496a7ad65",
       "size_bytes": 32472,
       "is_external": false
     },
@@ -190,12 +190,12 @@
       "is_external": false
     },
     "docs/research_paper/figures/fig1_pipeline_architecture.svg": {
-      "sha256": "96b79c12d4c8d2a06d234424cb0c36c3a45e3b9a6af577b69d0aafd7e1279c2f",
+      "sha256": "03a375f0268623bf776acffa5b33977982173dac47d9fb508272819a2651ad85",
       "size_bytes": 71822,
       "is_external": false
     },
     "docs/research_paper/figures/fig2_phase_accuracy_progression.pdf": {
-      "sha256": "76b8ce8ada79fe747fb107ef86f25819a46348322f315689037285732bbfcaac",
+      "sha256": "e9838cb18aa55a277e542fb5cbd34a049a8063ef21ccca5af757488297729566",
       "size_bytes": 26666,
       "is_external": false
     },
@@ -205,12 +205,12 @@
       "is_external": false
     },
     "docs/research_paper/figures/fig2_phase_accuracy_progression.svg": {
-      "sha256": "c5e621430be273fe95dd1c2e023b2aa658aa554066a567e75433c6c0c13b8b73",
+      "sha256": "97607704a6466c508bbb15e8d6f408e15b3d91b67add5527511089f33aa673b7",
       "size_bytes": 66514,
       "is_external": false
     },
     "docs/research_paper/figures/fig3_pareto_frontier.pdf": {
-      "sha256": "f79c8ad4519ffbc098cb0593d991e61da60694d42a57c2caef8474169867d815",
+      "sha256": "9989af5d6eef1acf2e75c1264a90dd8d1bb961f67032c4316ff1c902b9005a2c",
       "size_bytes": 39620,
       "is_external": false
     },
@@ -220,12 +220,12 @@
       "is_external": false
     },
     "docs/research_paper/figures/fig3_pareto_frontier.svg": {
-      "sha256": "127513ffdc4f23d561f0e4e3b893157a24f91657615a83e60636ce0223e63366",
+      "sha256": "66024b2802e310dcfb366e82321a6743829a6ecb2973288c397892901e996f03",
       "size_bytes": 95809,
       "is_external": false
     },
     "docs/research_paper/figures/fig4_repair_dynamics.pdf": {
-      "sha256": "40c1fe81b2f70c836ce970ef8c93011ec246896c90cf5b3e5bb01408b72d8da8",
+      "sha256": "2d99803355a9a5835b28d8d90bac0bf2fedee7196535ef99d2572ab8dc1d9a98",
       "size_bytes": 26510,
       "is_external": false
     },
@@ -235,12 +235,12 @@
       "is_external": false
     },
     "docs/research_paper/figures/fig4_repair_dynamics.svg": {
-      "sha256": "b88b06b515f739e582bf859432235e03e7d83a1efb40ef7ab5fabf8863983a68",
+      "sha256": "ee1b2189277bd0ad2e68fd8a3fe6bd3c38b297c4a56458f754f479e37d661e60",
       "size_bytes": 80067,
       "is_external": false
     },
     "docs/research_paper/figures/fig5_domain_difficulty_heatmap.pdf": {
-      "sha256": "3f09f51090d29e4f4bdfeb1239faf22b3e44e6ef062c7eb4bcbd8cf8d08be840",
+      "sha256": "6587a864e9d51b4d67c9eacdc83772bc07918250ee90d59fdd7caddd308b7095",
       "size_bytes": 26931,
       "is_external": false
     },
@@ -250,12 +250,12 @@
       "is_external": false
     },
     "docs/research_paper/figures/fig5_domain_difficulty_heatmap.svg": {
-      "sha256": "e94bdc9635d5145f14c9748089ff2690126efec60c6f578edb493f515b742007",
+      "sha256": "f225091037c1ff9bfbe98f6aa2d46f3cee5d8f0947e8e9f1bdafbb238ee4962d",
       "size_bytes": 84956,
       "is_external": false
     },
     "docs/research_paper/figures/fig6_robustness_degradation.pdf": {
-      "sha256": "12782daddf5f349eb26f6379ab34637d882749abd46b3f7cd9d91005ee1d5c2c",
+      "sha256": "daa79f159d4faa02eae0ab3a045350ea19fc339ec470227aa1f7339d0be09dd3",
       "size_bytes": 18426,
       "is_external": false
     },
@@ -265,12 +265,12 @@
       "is_external": false
     },
     "docs/research_paper/figures/fig6_robustness_degradation.svg": {
-      "sha256": "4b84ca813fd7d09597cb644bde4382839cd625a02e416fa241a240ff51061950",
+      "sha256": "de64060bb01c72d1faffcb2f239247c6d64653b2a2b86ce9d132da2740534206",
       "size_bytes": 50697,
       "is_external": false
     },
     "docs/research_paper/figures/fig7_failure_taxonomy.pdf": {
-      "sha256": "cea0d52398d59fa83aac295f575e6c99a6577a40fc60dc46cbb90a70dbf960a5",
+      "sha256": "39c20459bf008cc5aa3ecdeef08e643a488bac50e266b519be70671a765f027e",
       "size_bytes": 26245,
       "is_external": false
     },
@@ -280,7 +280,7 @@
       "is_external": false
     },
     "docs/research_paper/figures/fig7_failure_taxonomy.svg": {
-      "sha256": "0115ea838cc9d8929688105ddede82493aed923d9105c9c2473fd5695fa3880a",
+      "sha256": "a23a2b2265ada346923a22d7996e363c07df8849d5967d088e8ed066c260712e",
       "size_bytes": 69959,
       "is_external": false
     },
@@ -310,13 +310,18 @@
       "is_external": false
     },
     "docs/research_paper/paper.pdf": {
-      "sha256": "49083b987564eeaebb6cdc214461ed519ae5dffbf88a142360fad2b233d32a9d",
+      "sha256": "29d783b9f9779000552704632773f8a368d39ee2eac400462afe1121b6598f5d",
       "size_bytes": 1644222,
       "is_external": false
     },
     "results/phase10/live_500_benchmark_run/benchmark_report.md": {
       "sha256": "e6c1b4a5c5cab087ee94f4b23e124790004e125e5fa8ea0ff25c51708a368359",
       "size_bytes": 942,
+      "is_external": false
+    },
+    "results/phase10/robustness_simulation_report.json": {
+      "sha256": "f719a4d628b54f0ab9891835abcd9339c7139428b75eb00b32ce301d6f04b522",
+      "size_bytes": 11106,
       "is_external": false
     },
     "tests/evaluation/run_spider_eval.py": {

@@ -87,6 +87,7 @@ def generate_manifest():
         "docs/research_paper/tables/tab_robustness.tex",
         "docs/research_paper/paper.pdf",
         "results/phase10/live_500_benchmark_run/benchmark_report.md",
+        "results/phase10/robustness_simulation_report.json",
         "tests/evaluation/run_spider_eval.py",
         "results/spider/checkpoint.json",
         "results/spider/summary.json",

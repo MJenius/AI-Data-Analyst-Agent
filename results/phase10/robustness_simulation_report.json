@@ -1,0 +1,364 @@
+{
+  "title": "Deterministic Synthetic Perturbation Robustness Simulation Probe",
+  "simulation_type": "deterministic_synthetic_perturbation_simulation_probe",
+  "methodology_note": "Perturbed outcomes are modeled via deterministic rule-based degradation simulation on a 50-query clean control sample rather than fresh end-to-end LLM inference.",
+  "seed": 42,
+  "control_sample_size": 50,
+  "perturbed_sample_size": 50,
+  "degradation_factors": {
+    "paraphrase": 0.05,
+    "synonym": 0.12,
+    "ranking": 0.18,
+    "temporal": 0.22,
+    "typo": 0.32
+  },
+  "degradation_metrics": {
+    "paraphrase": {
+      "perturbation_type": "paraphrase",
+      "sample_size": 10,
+      "clean_accuracy": 0.5,
+      "perturbed_accuracy": 0.4,
+      "absolute_drop": 0.1,
+      "retention_rate": 0.8,
+      "degradation_percent": "20.0%"
+    },
+    "ranking_variant": {
+      "perturbation_type": "ranking_variant",
+      "sample_size": 10,
+      "clean_accuracy": 0.7,
+      "perturbed_accuracy": 0.7,
+      "absolute_drop": 0.0,
+      "retention_rate": 1.0,
+      "degradation_percent": "0.0%"
+    },
+    "synonym": {
+      "perturbation_type": "synonym",
+      "sample_size": 10,
+      "clean_accuracy": 0.8,
+      "perturbed_accuracy": 0.8,
+      "absolute_drop": 0.0,
+      "retention_rate": 1.0,
+      "degradation_percent": "0.0%"
+    },
+    "temporal_variant": {
+      "perturbation_type": "temporal_variant",
+      "sample_size": 10,
+      "clean_accuracy": 0.7,
+      "perturbed_accuracy": 0.6,
+      "absolute_drop": 0.1,
+      "retention_rate": 0.8571,
+      "degradation_percent": "14.3%"
+    },
+    "typo": {
+      "perturbation_type": "typo",
+      "sample_size": 10,
+      "clean_accuracy": 0.7,
+      "perturbed_accuracy": 0.4,
+      "absolute_drop": 0.3,
+      "retention_rate": 0.5714,
+      "degradation_percent": "42.9%"
+    }
+  },
+  "simulated_query_records": [
+    {
+      "id": "q_001_ood_paraphrase",
+      "perturbation_type": "paraphrase",
+      "clean_equivalent_match": false,
+      "simulated_perturbed_equivalent_match": false
+    },
+    {
+      "id": "q_002_ood_typo",
+      "perturbation_type": "typo",
+      "clean_equivalent_match": true,
+      "simulated_perturbed_equivalent_match": true
+    },
+    {
+      "id": "q_003_ood_synonym",
+      "perturbation_type": "synonym",
+      "clean_equivalent_match": true,
+      "simulated_perturbed_equivalent_match": true
+    },
+    {
+      "id": "q_004_ood_ranking",
+      "perturbation_type": "ranking_variant",
+      "clean_equivalent_match": true,
+      "simulated_perturbed_equivalent_match": true
+    },
+    {
+      "id": "q_005_ood_temporal",
+      "perturbation_type": "temporal_variant",
+      "clean_equivalent_match": true,
+      "simulated_perturbed_equivalent_match": true
+    },
+    {
+      "id": "q_006_ood_paraphrase",
+      "perturbation_type": "paraphrase",
+      "clean_equivalent_match": false,
+      "simulated_perturbed_equivalent_match": false
+    },
+    {
+      "id": "q_007_ood_typo",
+      "perturbation_type": "typo",
+      "clean_equivalent_match": true,
+      "simulated_perturbed_equivalent_match": false
+    },
+    {
+      "id": "q_008_ood_synonym",
+      "perturbation_type": "synonym",
+      "clean_equivalent_match": true,
+      "simulated_perturbed_equivalent_match": true
+    },
+    {
+      "id": "q_009_ood_ranking",
+      "perturbation_type": "ranking_variant",
+      "clean_equivalent_match": true,
+      "simulated_perturbed_equivalent_match": true
+    },
+    {
+      "id": "q_010_ood_temporal",
+      "perturbation_type": "temporal_variant",
+      "clean_equivalent_match": true,
+      "simulated_perturbed_equivalent_match": true
+    },
+    {
+      "id": "q_011_ood_paraphrase",
+      "perturbation_type": "paraphrase",
+      "clean_equivalent_match": true,
+      "simulated_perturbed_equivalent_match": true
+    },
+    {
+      "id": "q_012_ood_typo",
+      "perturbation_type": "typo",
+      "clean_equivalent_match": true,
+      "simulated_perturbed_equivalent_match": true
+    },
+    {
+      "id": "q_013_ood_synonym",
+      "perturbation_type": "synonym",
+      "clean_equivalent_match": true,
+      "simulated_perturbed_equivalent_match": true
+    },
+    {
+      "id": "q_014_ood_ranking",
+      "perturbation_type": "ranking_variant",
+      "clean_equivalent_match": true,
+      "simulated_perturbed_equivalent_match": true
+    },
+    {
+      "id": "q_015_ood_temporal",
+      "perturbation_type": "temporal_variant",
+      "clean_equivalent_match": true,
+      "simulated_perturbed_equivalent_match": true
+    },
+    {
+      "id": "q_016_ood_paraphrase",
+      "perturbation_type": "paraphrase",
+      "clean_equivalent_match": true,
+      "simulated_perturbed_equivalent_match": true
+    },
+    {
+      "id": "q_017_ood_typo",
+      "perturbation_type": "typo",
+      "clean_equivalent_match": true,
+      "simulated_perturbed_equivalent_match": true
+    },
+    {
+      "id": "q_018_ood_synonym",
+      "perturbation_type": "synonym",
+      "clean_equivalent_match": true,
+      "simulated_perturbed_equivalent_match": true
+    },
+    {
+      "id": "q_019_ood_ranking",
+      "perturbation_type": "ranking_variant",
+      "clean_equivalent_match": true,
+      "simulated_perturbed_equivalent_match": true
+    },
+    {
+      "id": "q_020_ood_temporal",
+      "perturbation_type": "temporal_variant",
+      "clean_equivalent_match": true,
+      "simulated_perturbed_equivalent_match": false
+    },
+    {
+      "id": "q_021_ood_paraphrase",
+      "perturbation_type": "paraphrase",
+      "clean_equivalent_match": false,
+      "simulated_perturbed_equivalent_match": false
+    },
+    {
+      "id": "q_022_ood_typo",
+      "perturbation_type": "typo",
+      "clean_equivalent_match": false,
+      "simulated_perturbed_equivalent_match": false
+    },
+    {
+      "id": "q_023_ood_synonym",
+      "perturbation_type": "synonym",
+      "clean_equivalent_match": true,
+      "simulated_perturbed_equivalent_match": true
+    },
+    {
+      "id": "q_024_ood_ranking",
+      "perturbation_type": "ranking_variant",
+      "clean_equivalent_match": true,
+      "simulated_perturbed_equivalent_match": true
+    },
+    {
+      "id": "q_025_ood_temporal",
+      "perturbation_type": "temporal_variant",
+      "clean_equivalent_match": false,
+      "simulated_perturbed_equivalent_match": false
+    },
+    {
+      "id": "q_026_ood_paraphrase",
+      "perturbation_type": "paraphrase",
+      "clean_equivalent_match": true,
+      "simulated_perturbed_equivalent_match": true
+    },
+    {
+      "id": "q_027_ood_typo",
+      "perturbation_type": "typo",
+      "clean_equivalent_match": false,
+      "simulated_perturbed_equivalent_match": false
+    },
+    {
+      "id": "q_028_ood_synonym",
+      "perturbation_type": "synonym",
+      "clean_equivalent_match": false,
+      "simulated_perturbed_equivalent_match": false
+    },
+    {
+      "id": "q_029_ood_ranking",
+      "perturbation_type": "ranking_variant",
+      "clean_equivalent_match": true,
+      "simulated_perturbed_equivalent_match": true
+    },
+    {
+      "id": "q_030_ood_temporal",
+      "perturbation_type": "temporal_variant",
+      "clean_equivalent_match": true,
+      "simulated_perturbed_equivalent_match": true
+    },
+    {
+      "id": "q_031_ood_paraphrase",
+      "perturbation_type": "paraphrase",
+      "clean_equivalent_match": false,
+      "simulated_perturbed_equivalent_match": false
+    },
+    {
+      "id": "q_032_ood_typo",
+      "perturbation_type": "typo",
+      "clean_equivalent_match": false,
+      "simulated_perturbed_equivalent_match": false
+    },
+    {
+      "id": "q_033_ood_synonym",
+      "perturbation_type": "synonym",
+      "clean_equivalent_match": true,
+      "simulated_perturbed_equivalent_match": true
+    },
+    {
+      "id": "q_034_ood_ranking",
+      "perturbation_type": "ranking_variant",
+      "clean_equivalent_match": true,
+      "simulated_perturbed_equivalent_match": true
+    },
+    {
+      "id": "q_035_ood_temporal",
+      "perturbation_type": "temporal_variant",
+      "clean_equivalent_match": false,
+      "simulated_perturbed_equivalent_match": false
+    },
+    {
+      "id": "q_036_ood_paraphrase",
+      "perturbation_type": "paraphrase",
+      "clean_equivalent_match": false,
+      "simulated_perturbed_equivalent_match": false
+    },
+    {
+      "id": "q_037_ood_typo",
+      "perturbation_type": "typo",
+      "clean_equivalent_match": true,
+      "simulated_perturbed_equivalent_match": false
+    },
+    {
+      "id": "q_038_ood_synonym",
+      "perturbation_type": "synonym",
+      "clean_equivalent_match": true,
+      "simulated_perturbed_equivalent_match": true
+    },
+    {
+      "id": "q_039_ood_ranking",
+      "perturbation_type": "ranking_variant",
+      "clean_equivalent_match": false,
+      "simulated_perturbed_equivalent_match": false
+    },
+    {
+      "id": "q_040_ood_temporal",
+      "perturbation_type": "temporal_variant",
+      "clean_equivalent_match": false,
+      "simulated_perturbed_equivalent_match": false
+    },
+    {
+      "id": "q_041_ood_paraphrase",
+      "perturbation_type": "paraphrase",
+      "clean_equivalent_match": true,
+      "simulated_perturbed_equivalent_match": false
+    },
+    {
+      "id": "q_042_ood_typo",
+      "perturbation_type": "typo",
+      "clean_equivalent_match": true,
+      "simulated_perturbed_equivalent_match": false
+    },
+    {
+      "id": "q_043_ood_synonym",
+      "perturbation_type": "synonym",
+      "clean_equivalent_match": false,
+      "simulated_perturbed_equivalent_match": false
+    },
+    {
+      "id": "q_044_ood_ranking",
+      "perturbation_type": "ranking_variant",
+      "clean_equivalent_match": false,
+      "simulated_perturbed_equivalent_match": false
+    },
+    {
+      "id": "q_045_ood_temporal",
+      "perturbation_type": "temporal_variant",
+      "clean_equivalent_match": true,
+      "simulated_perturbed_equivalent_match": true
+    },
+    {
+      "id": "q_046_ood_paraphrase",
+      "perturbation_type": "paraphrase",
+      "clean_equivalent_match": true,
+      "simulated_perturbed_equivalent_match": true
+    },
+    {
+      "id": "q_047_ood_typo",
+      "perturbation_type": "typo",
+      "clean_equivalent_match": true,
+      "simulated_perturbed_equivalent_match": true
+    },
+    {
+      "id": "q_048_ood_synonym",
+      "perturbation_type": "synonym",
+      "clean_equivalent_match": true,
+      "simulated_perturbed_equivalent_match": true
+    },
+    {
+      "id": "q_049_ood_ranking",
+      "perturbation_type": "ranking_variant",
+      "clean_equivalent_match": false,
+      "simulated_perturbed_equivalent_match": false
+    },
+    {
+      "id": "q_050_ood_temporal",
+      "perturbation_type": "temporal_variant",
+      "clean_equivalent_match": true,
+      "simulated_perturbed_equivalent_match": true
+    }
+  ]
+}

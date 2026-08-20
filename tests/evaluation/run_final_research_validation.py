@@ -548,8 +548,31 @@ def run_ood_robustness_evaluation(
 
     degradation_metrics = evaluate_robustness_drop(clean_formatted, perturbed_results)
 
+    sim_report = {
+        "title": "Deterministic Synthetic Perturbation Robustness Simulation Probe",
+        "simulation_type": "deterministic_synthetic_perturbation_simulation_probe",
+        "methodology_note": "Perturbed outcomes are modeled via deterministic rule-based degradation simulation on a 50-query clean control sample rather than fresh end-to-end LLM inference.",
+        "seed": seed,
+        "control_sample_size": len(clean_sample),
+        "perturbed_sample_size": len(perturbed_results),
+        "degradation_factors": deg_factors,
+        "degradation_metrics": {k: v.to_dict() for k, v in degradation_metrics.items()},
+        "simulated_query_records": [
+            {
+                "id": p["id"],
+                "perturbation_type": p["perturbation_type"],
+                "clean_equivalent_match": next((bool(r.get("equivalent_match", False)) for r in clean_formatted if (r.get("query_id") or r.get("id")) == re.sub(r"_ood_.*$", "", str(p["id"]))), True),
+                "simulated_perturbed_equivalent_match": p["equivalent_match"],
+            }
+            for p in perturbed_results
+        ]
+    }
+    
+    sim_out_path = ROOT / "results" / "phase10" / "robustness_simulation_report.json"
+    with open(sim_out_path, "w", encoding="utf-8") as f:
+        json.dump(sim_report, f, indent=2)
 
-    logger.info("OOD Evaluation Complete across %d categories.", len(degradation_metrics))
+    logger.info("OOD Evaluation Complete across %d categories. Saved report to %s", len(degradation_metrics), sim_out_path)
     return {
         "seed": seed,
         "control_sample_size": len(clean_sample),
