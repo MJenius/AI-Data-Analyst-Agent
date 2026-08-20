@@ -78,7 +78,7 @@ The following claims from earlier drafts were identified as methodologically inv
 ## 4. Remaining Weaknesses & Threats to Validity
 
 1. **Hard Query Complexity Ceiling:** Accuracy on "Hard" difficulty queries drops to **44.55%** (49/110) due to complex multi-step CTEs, window functions, and nested ratio calculations.
-2. **Aggregated Table Formulation:** Queries requesting wide multi-column aggregated breakdowns achieve only **23.26%** (10/43) accuracy, primarily due to column naming mismatches and pivot representations.
+2. **Aggregated Table Formulation:** Queries requesting wide multi-column aggregated breakdowns achieve **32.56%** (14/43) accuracy, primarily due to column naming mismatches and pivot representations.
 3. **Over-Aggressive Repair Regressions:** 22 out of 101 repair events degraded queries that were already producing correct results before repair, demonstrating that static verifier rules occasionally trigger on harmless syntax patterns.
 4. **Vulnerability to Typographical Noise:** Under heavy typographical noise (typo injection), accuracy drops by 30.0% (57.1% retention rate), indicating that the schema retriever requires fuzzy-matching capabilities.
 5. **Single-Database Evaluation:** The benchmark evaluates a single complex enterprise schema (Olist e-commerce warehouse). Cross-schema generalizability across medical or financial domains remains to be demonstrated.

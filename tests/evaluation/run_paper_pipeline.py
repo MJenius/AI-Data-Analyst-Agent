@@ -47,7 +47,7 @@ PAPER_DRAFT_TEXT = """# Engineering Reliable LLM-Based Data Analysis: An Empiric
 
 ## Abstract
 
-While Large Language Models (LLMs) demonstrate notable code-generation capabilities, translating natural language questions into reliable analytical SQL over relational databases (Text-to-SQL) remains brittle in practice. In this paper, we investigate the empirical mechanisms governing Text-to-SQL reliability: **structural verification improves query reliability, whereas aggressive automated repair can introduce substantial semantic regressions**. We evaluate a multi-stage reliability pipeline on a frozen 500-query benchmark across 8 business domains over a public relational e-commerce data warehouse (the Olist dataset, 9 tables, 100,000+ orders). Our system achieves a **73.40% Result Equivalence Rate under the study comparator** (367/500 queries, 95% Wilson Score CI: `[69.26%, 77.18%]`, Clopper-Pearson Exact CI: `[69.30%, 77.22%]`), **31.00% Exact Result Match**, and **100.00% SQL Execution Success** with a mean latency of 64.04s ($p50$: 56.47s, $p95$: 121.92s). In a controlled 4-way 100-query ablation, adding the AST-based verification and repair stage significantly improves result equivalence over unverified planning (Config C 26.0% vs. Config B 15.0%, McNemar exact $p=0.0192$, $\\text{Odds Ratio}=3.75$). However, an exhaustive audit of all 101 repair events reveals that automated self-repair is a double-edged mechanism: while 97 of 101 post-repair queries (96.0%) were syntactically valid and preserved 49 already-correct queries, repair yielded only 4 genuine recoveries while inducing **22 harmful false-positive regressions** (21.8% of repair events) where previously correct queries were degraded. Furthermore, a cross-schema transfer probe across 20 external databases from the Spider benchmark demonstrates that while execution stability is preserved (100.0%), result equivalence drops to **18.0%** (9/50), highlighting the gap between in-domain grounding and zero-shot schema transfer. We conclude that conservative, uncertainty-aware structural verification is preferable to unconstrained automated repair loops.
+While Large Language Models (LLMs) demonstrate notable code-generation capabilities, translating natural language questions into reliable analytical SQL over relational databases (Text-to-SQL) remains brittle in practice. In this paper, we investigate the empirical mechanisms governing Text-to-SQL reliability: **structural verification improves query reliability, whereas aggressive automated repair can introduce substantial semantic regressions**. We evaluate a multi-stage reliability pipeline on a frozen 500-query benchmark across 8 business domains over a public relational e-commerce data warehouse (the Olist dataset, 9 tables, approximately 100,000 orders). Our system achieves a **73.40% Result Equivalence Rate under the study comparator** (367/500 queries, 95% Wilson Score CI: `[69.26%, 77.18%]`, Clopper-Pearson Exact CI: `[69.30%, 77.22%]`), **31.00% Exact Result Match**, and **100.00% SQL Execution Success** with a mean latency of 64.04s ($p50$: 56.47s, $p95$: 121.92s). In a controlled 4-way 100-query ablation, adding the AST-based verification and repair stage significantly improves result equivalence over unverified planning (Config C 26.0% vs. Config B 15.0%, McNemar exact $p=0.0192$, $\\text{Odds Ratio}=3.75$). However, an exhaustive audit of all 101 repair events reveals that automated self-repair is a double-edged mechanism: while 97 of 101 post-repair queries (96.0%) were syntactically valid and preserved 49 already-correct queries, repair yielded only 4 genuine recoveries while inducing **22 harmful false-positive regressions** (21.8% of repair events) where previously correct queries were degraded. Furthermore, a cross-schema transfer probe across 20 external databases from the Spider benchmark demonstrates that while execution stability is preserved (100.0%), result equivalence drops to **18.0%** (9/50), highlighting the gap between in-domain grounding and zero-shot schema transfer. We conclude that conservative, uncertainty-aware structural verification is preferable to unconstrained automated repair loops.
 
 **Keywords:** Text-to-SQL, LLM Reliability, Structural Verification, Automated Query Repair, Abstract Syntax Trees, Empirical Software Engineering.
 
@@ -73,7 +73,7 @@ Our evidence directly supports this thesis:
 ### Research Questions
 - **RQ1 (Overall Reliability):** Does the multi-stage pipeline achieve high result equivalence on a complex relational warehouse? ($\\rightarrow$ **73.40% Result Equivalence**, **100.00% Execution Success**).
 - **RQ2 (Verification and Repair Impact):** What is the marginal effect of adding the AST-based verification and repair stage over unverified planning? ($\\rightarrow$ Execution rises from 34.0% to 65.0%, result equivalence rises from 15.0% to 26.0%; paired McNemar exact $p=0.0192$, $\\text{OR}=3.75$).
-- **RQ3 (Repair Dynamics):** Does automated self-repair reliably fix broken queries without harming valid ones? ($\\rightarrow$ No; **4 genuine recoveries** vs. **22 false-positive regressions**).
+- **RQ3 (Repair Dynamics):** Does verifier-triggered automated repair resolve structurally flagged queries without degrading already-correct queries? ($\\rightarrow$ No; **4 genuine recoveries** vs. **22 false-positive regressions**).
 - **RQ4 (Failure Taxonomy):** What structural failure modes dominate remaining non-equivalent queries? ($\\rightarrow$ Missing join paths [27.8%], filter omissions [24.8%], and aggregation mismatches [24.1%]).
 - **RQ5 (Cross-Schema Transfer):** Does warehouse-grounded reliability transfer to unseen external schemas? ($\\rightarrow$ **100.0% execution success**, but **18.0% result equivalence** on 20 unseen databases).
 
@@ -89,20 +89,20 @@ Our evidence directly supports this thesis:
 ## 2. Related Work and Positioning
 
 - **Text-to-SQL Decomposition & Benchmarks:** Benchmarks such as Spider (Yu et al., 2018) and BIRD (Li et al., 2023) evaluate LLMs on multi-table joins and nested subqueries. Decomposition frameworks such as DIN-SQL (Pourreza & Rafiei, 2023), MAC-SQL (Wang et al., 2024), and CHESS (Talaei et al., 2024) show that dividing SQL generation into sub-problems improves performance over monolithic prompting. Our work builds upon this modular paradigm by introducing deterministic, AST-level structural verification gates that inspect query structure prior to execution.
-- **Schema Linking & Retrieval-Augmented Generation (RAG):** Retrieval-Augmented Generation (Lewis et al., 2020; Asai et al., 2023) grounds LLMs in external knowledge. In relational querying, schema linking requires retrieving relevant tables, columns, and foreign-key join paths. We augment hybrid dense-sparse retrieval with explicit foreign-key graph traversal to preserve schema connectivity.
-- **Structural Verification vs. Execution-Guided Self-Repair:** Iterative reasoning architectures such as ReAct (Yao et al., 2022) and Reflexion (Shinn et al., 2023) leverage feedback loops for self-correction. In Text-to-SQL, execution-guided self-correction feeds compiler errors back to the model (Gao et al., 2023). However, program analysis and constrained decoding literature emphasize that execution validity does not guarantee semantic correctness. Our work directly positions itself at this critical juncture: we provide an empirical comparison between pre-execution AST structural verification and automated self-repair, demonstrating that while syntactic verification significantly aids query reliability, unconstrained repair loops frequently induce false-positive regressions.
+- **Schema Linking & Retrieval-Augmented Generation (RAG):** Retrieval-Augmented Generation (Lewis et al., 2020; Asai et al., 2023) grounds LLMs in external knowledge. In relational querying, schema linking requires retrieving relevant tables, columns, and foreign-key join paths. We combine dense embeddings with lexical token overlap and explicit foreign-key graph traversal to preserve schema connectivity.
+- **Structural Verification vs. Execution-Guided Self-Repair:** Iterative reasoning architectures such as ReAct (Yao et al., 2022) and Reflexion (Shinn et al., 2023) leverage feedback loops for self-correction. In Text-to-SQL, execution-guided self-correction feeds compiler errors back to the model (Gao et al., 2024). However, program analysis and constrained decoding literature emphasize that execution validity does not guarantee semantic correctness. Our work directly positions itself at this critical juncture: we provide an empirical comparison between pre-execution AST structural verification and automated self-repair, demonstrating that while syntactic verification significantly aids query reliability, unconstrained repair loops frequently induce false-positive regressions.
 
 ---
 
 ## 3. Reliability-Oriented System Architecture
 
-Our architecture decomposes analytical SQL synthesis into a 5-stage pipeline:
+Our architecture decomposes analytical SQL synthesis into a multi-stage pipeline:
 
 ![Figure 1: Pipeline Architecture](figures/fig1_pipeline_architecture.png)
 *Figure 1: Reliability-Oriented Multi-Stage Architecture with Structural Verification & Repair.*
 
 ### 3.1 Graph-Guided Semantic Schema RAG
-Rather than passing an entire database schema into the LLM context, our retriever combines BM25 keyword matching, dense embedding retrieval via SentenceTransformers, and foreign-key graph traversal. Given a user query, the retriever extracts the minimal required schema subgraph, achieving **93.07% Table Precision** and **95.33% Table Recall** (Table Exact Match: 82.60%) across the 500-query benchmark.
+Rather than passing an entire database schema into the LLM context, our retriever combines dense embedding retrieval via SentenceTransformers with lexical token-overlap scoring and foreign-key graph traversal. Given a user query, the retriever extracts the minimal required schema subgraph; generated SQL achieved **93.07% Table Precision** and **95.33% Table Recall** (Table Exact Match: 82.60%) against the benchmark's expected table sets across the 500-query benchmark.
 
 ### 3.2 Structured DAG Query Planning & Deterministic Plan Validation
 Before emitting SQL code, the planner synthesizes a structural JSON DAG declaring target metrics, grain dimensions, required tables, and explicit join paths. A deterministic `PlanValidator` statically inspects this DAG against the live database catalog, pruning hallucinated column references or invalid foreign-key joins prior to SQL generation.
@@ -122,14 +122,17 @@ When violations are identified, the verifier triggers targeted closed-loop repai
 ### 4.1 Data Warehouse & Benchmark Corpus
 We evaluate our system on a multi-table relational e-commerce schema constructed from the Brazilian E-Commerce Public Dataset (Olist):
 - **9 Relational Tables:** `customers`, `orders`, `order_items`, `order_payments`, `order_reviews`, `products`, `sellers`, `geolocation`, `product_category_name_translation`.
-- **Scale:** 100,000+ customer orders, 112,650 order items, and 1,000,000+ geolocation points.
+- **Scale:** Approximately 100,000 customer orders (99,441 orders), 112,650 order items, and 1,000,163 geolocation records.
 - **Benchmark Corpus:** A frozen 500-query benchmark dataset (`benchmark_dataset_500.json`) stratified across 8 business domains and 3 difficulty tiers (Easy: 114, Medium: 276, Hard: 110).
 
-### 4.2 Evaluation Metrics & Methodological Definitions
-- **Result Equivalence Rate under the Study Comparator (95% Wilson CI):** Evaluates whether executed SQL results match ground-truth result sets under row-order invariance (comparing row multisets via item Counters) with numerical tolerance ($\\epsilon=0.01$) and string whitespace normalization. Positional column semantics are preserved. *Result equivalence is an empirical evaluation criterion under the study comparator, not a formal mathematical proof of semantic correctness.*
+### 4.2 LLM Inference & Execution Configuration
+All benchmark evaluations utilize NVIDIA Nemotron-3 Super 120B-A12B (`nvidia/nemotron-3-super-120b-a12b`) via the NVIDIA NIM API with deterministic decoding ($T=0.0$, seed=42, concurrency=1; benchmark date: August 19, 2026). The primary 500-query benchmark deploys the 4-stage verified pipeline (Schema RAG, Plan Validation, SQL Synthesis, AST Verification & Repair); the post-execution evaluator agent was bypassed during the 500-query production benchmark due to latency overhead and iterative rewrite degradation.
+
+### 4.3 Evaluation Metrics & Methodological Definitions
+- **Result Equivalence Rate under the Study Comparator (95% Wilson CI):** Evaluates whether executed SQL results match ground-truth result sets under row-order invariance. Numeric values are rounded to two decimal places; strings are stripped and lowercased; rows are compared as multisets (using item Counters) while preserving positional column semantics.
 - **Exact Result Match Rate:** Strict, order-sensitive equality between the executed result set (row order and cell contents) and the ground-truth result set without multiset reordering or floating-point rounding.
 - **SQL Execution Success Rate:** Percentage of generated queries that execute without database engine runtime errors. Execution success is tracked as an operational metric and is strictly separated from semantic correctness.
-- **Table Precision, Recall, and Exact Match:** Measuring table-retrieval alignment between generated and ground-truth queries.
+- **Table Precision, Recall, and Exact Match:** Measuring table-set alignment between tables referenced in generated SQL and ground-truth expected table sets.
 
 ---
 
@@ -166,12 +169,12 @@ Table 1 summarizes the headline results audited directly from raw per-query benc
 
 | Configuration | Description | Execution Success | Result Equivalence | Table Exact Match | Mean Latency |
 | :--- | :--- | :---: | :---: | :---: | :---: |
-| **Config A** | Baseline Schema RAG (No DAG Planner, No Verifier) | 99.0% | 19.0% | 76.0% | 14.2s |
-| **Config B** | RAG + Structured DAG Planner (Verifier Disabled) | 34.0% | 15.0% | 81.0% | 38.6s |
-| **Config C** | RAG + Planner + AST Structural Verifier & Repair | 65.0% | 26.0% | 83.0% | 61.2s |
-| **Config D** | Full Pipeline (Planner + Verifier + Evaluator Agent) | **100.0%** | **73.4%** | **82.6%** | 64.0s |
+| **Config A** | Baseline Schema RAG (No DAG Planner, No Verifier) | 99.0% | 19.0% | 93.0% | 153.0s |
+| **Config B** | RAG + Structured DAG Planner (Verifier Disabled) | 34.0% | 15.0% | 32.3% | 85.8s |
+| **Config C** | RAG + Planner + AST Structural Verifier & Repair | 65.0% | 26.0% | 60.8% | 209.4s |
+| **Config D** | Full Pipeline with Post-Execution Evaluator Agent | 45.0% | 14.0% | 42.3% | 232.6s |
 
-*Statistical Findings:* In a matched paired McNemar test on 100 identical benchmark queries, Config C demonstrates a statistically significant improvement over Config B for result equivalence (exact binomial $p=0.0192 < 0.05$, $\\text{Odds Ratio}=3.75$, with 15 queries solved only by Config C vs. 4 solved only by Config B), establishing that adding the AST-based verification and repair stage significantly improves result equivalence over unverified planning. While the AST verifier serves as the deterministic filtering and triggering mechanism, this empirical gain reflects the combined effect of verification and verifier-guided repair rather than isolated verification alone.
+*Statistical Findings:* In a matched paired McNemar test on 100 identical benchmark queries, Config C demonstrates a statistically significant improvement over Config B for result equivalence (exact binomial $p=0.0192 < 0.05$, $\\text{Odds Ratio}=3.75$, with 15 queries solved only by Config C vs. 4 solved only by Config B), establishing that adding the AST-based verification and repair stage significantly improves result equivalence over unverified planning. While the AST verifier serves as the deterministic filtering and triggering mechanism, this empirical gain reflects the combined effect of verification and verifier-guided repair rather than isolated verification alone. Activating a post-execution evaluator agent (Config D) degrades execution success to 45.0% and result equivalence to 14.0% with mean latency increasing to 232.6s due to LLM hallucinations during post-execution iterative rewriting. Consequently, the evaluator agent was disabled, and Config C's verified architecture was adopted as the production pipeline for the primary 500-query benchmark (73.4% result equivalence, 100.0% execution success, 64.04s mean latency).
 
 ---
 
@@ -553,7 +556,7 @@ def build_conference_pdf(md_text: str, output_pdf: Path) -> Path:
         "remains brittle in practice. In this paper, we investigate the empirical mechanisms governing Text-to-SQL reliability: "
         "<b>structural verification improves query reliability, whereas aggressive automated repair can introduce substantial semantic regressions</b>. "
         "We evaluate a multi-stage reliability pipeline on a frozen 500-query benchmark across 8 business domains over a public relational "
-        "e-commerce data warehouse (the Olist dataset, 9 tables, 100,000+ orders). Our system achieves a <b>73.40% Result Equivalence Rate "
+        "e-commerce data warehouse (the Olist dataset, 9 tables, approximately 100,000 orders). Our system achieves a <b>73.40% Result Equivalence Rate "
         "under the study comparator</b> (367/500 queries, 95% Wilson Score CI: [69.26%, 77.18%], Clopper-Pearson Exact CI: [69.30%, 77.22%]), "
         "<b>31.00% Exact Result Match</b>, and <b>100.00% SQL Execution Success</b> with a mean latency of 64.04s (<i>p</i><sub>50</sub>: 56.47s, <i>p</i><sub>95</sub>: 121.92s). "
         "In a controlled 4-way 100-query ablation, adding the AST-based verification and repair stage significantly "
@@ -723,11 +726,11 @@ def build_conference_pdf(md_text: str, output_pdf: Path) -> Path:
         "[1] T. Yu, R. Zhang, K. Yang, M. Yasunaga, D. Wang, Z. Li, et al., \"Spider: A large-scale human-labeled dataset for complex and cross-domain semantic parsing and text-to-sql,\" in <i>Proc. EMNLP</i>, 2018.",
         "[2] J. Li, B. Hui, G. Qu, J. Yang, B. Li, B. Wang, et al., \"Can llm already serve as a database interface? a bird's eye view of text-to-sql benchmarks,\" in <i>Proc. NeurIPS</i>, 2023.",
         "[3] M. Pourreza and D. Rafiei, \"DIN-SQL: Decomposed in-context learning of text-to-sql with self-correction,\" in <i>Proc. NeurIPS</i>, 2023.",
-        "[4] B. Wang, C. Zhang, Z. Yang, M. Zhang, B. Qin, and T. Liu, \"MAC-SQL: A multi-agent collaborative framework for text-to-sql,\" <i>arXiv preprint arXiv:2403.11181</i>, 2024.",
-        "[5] S. Talaei, M. Pourreza, Y. Chang, A. Mirhoseini, and D. Rafiei, \"CHESS: Contextual harnessing for efficient sql synthesis,\" <i>arXiv preprint arXiv:2405.16755</i>, 2024.",
-        "[6] D. Gao, H. Wang, Y. Li, X. Xi, Y. Chen, H. Shen, et al., \"Text-to-sql empowered by large language models: A benchmark evaluation,\" <i>PVLDB</i>, vol. 17, no. 5, pp. 1132-1145, 2023.",
+        "[4] B. Wang, C. Ren, J. Yang, X. Liang, J. Bai, L. Chai, Z. Yan, Q.-W. Zhang, D. Yin, X. Sun, and Z. Li, \"MAC-SQL: A multi-agent collaborative framework for text-to-sql,\" <i>arXiv preprint arXiv:2312.11242</i>, 2024.",
+        "[5] S. Talaei, M. Pourreza, Y. Chang, A. Mirhoseini, and A. Saberi, \"CHESS: Contextual harnessing for efficient sql synthesis,\" <i>arXiv preprint arXiv:2405.16755</i>, 2024.",
+        "[6] D. Gao, H. Wang, Y. Li, X. Sun, Y. Qian, B. Ding, and J. Zhou, \"Text-to-sql empowered by large language models: A benchmark evaluation,\" <i>PVLDB</i>, vol. 17, no. 5, pp. 1132-1145, 2024.",
         "[7] P. Lewis, E. Perez, A. Piktus, F. Petroni, V. Karpukhin, N. Goyal, et al., \"Retrieval-augmented generation for knowledge-intensive nlp tasks,\" in <i>Proc. NeurIPS</i>, 2020.",
-        "[8] A. Asai, S. Min, Z. Zhong, and D. Chen, \"Self-RAG: Learning to retrieve, generate, and critique through self-reflection,\" <i>arXiv preprint arXiv:2310.11511</i>, 2023.",
+        "[8] A. Asai, Z. Wu, Y. Wang, A. Sil, and H. Hajishirzi, \"Self-RAG: Learning to retrieve, generate, and critique through self-reflection,\" <i>arXiv preprint arXiv:2310.11511</i>, 2023.",
         "[9] S. Yao, J. Zhao, D. Yu, N. Du, I. Shafran, K. Narasimhan, and Y. Cao, \"ReAct: Synergizing reasoning and acting in language models,\" in <i>Proc. ICLR</i>, 2023.",
         "[10] N. Shinn, F. Cassano, E. Berman, A. Gopinath, K. Narasimhan, and S. Yao, \"Reflexion: Language agents with verbal reinforcement learning,\" in <i>Proc. NeurIPS</i>, 2023.",
         "[11] Olist and Kaggle, \"Brazilian E-Commerce Public Dataset by Olist,\" <i>Kaggle Datasets</i>, 2018. [Online]. Available: https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce.",
@@ -736,6 +739,7 @@ def build_conference_pdf(md_text: str, output_pdf: Path) -> Path:
         "[14] Q. McNemar, \"Note on the sampling error of the difference between correlated proportions or percentages,\" <i>Psychometrika</i>, vol. 12, no. 2, pp. 153-157, 1947.",
         "[15] R. G. Newcombe, \"Two-sided confidence intervals for the single proportion: comparison of seven methods,\" <i>Statistics in Medicine</i>, vol. 17, no. 8, pp. 857-872, 1998.",
     ]
+
     for r in refs:
         story.append(Paragraph(r, ref_style))
 
