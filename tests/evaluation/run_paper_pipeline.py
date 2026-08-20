@@ -556,7 +556,7 @@ def build_conference_pdf(md_text: str, output_pdf: Path) -> Path:
         "e-commerce data warehouse (the Olist dataset, 9 tables, 100,000+ orders). Our system achieves a <b>73.40% Result Equivalence Rate "
         "under the study comparator</b> (367/500 queries, 95% Wilson Score CI: [69.26%, 77.18%], Clopper-Pearson Exact CI: [69.30%, 77.22%]), "
         "<b>31.00% Exact Result Match</b>, and <b>100.00% SQL Execution Success</b> with a mean latency of 64.04s (<i>p</i><sub>50</sub>: 56.47s, <i>p</i><sub>95</sub>: 121.92s). "
-        "In a controlled 4-way 100-query ablation, activating deterministic Abstract Syntax Tree (AST) structural verification significantly "
+        "In a controlled 4-way 100-query ablation, adding the AST-based verification and repair stage significantly "
         "improves result equivalence over unverified planning (Config C 26.0% vs. Config B 15.0%, McNemar exact <i>p</i> = 0.0192, Odds Ratio = 3.75). "
         "However, an exhaustive audit of all 101 repair events reveals that automated self-repair is a double-edged mechanism: while 97 of 101 "
         "post-repair queries (96.0%) were syntactically valid and preserved 49 already-correct queries, repair yielded only 4 genuine recoveries "
@@ -712,11 +712,11 @@ def build_conference_pdf(md_text: str, output_pdf: Path) -> Path:
     ref_style = ParagraphStyle(
         "IEEERef",
         fontName="Times-Roman",
-        fontSize=7.5,
-        leading=9.5,
+        fontSize=7.0,
+        leading=8.8,
         leftIndent=8,
         firstLineIndent=-8,
-        spaceAfter=2,
+        spaceAfter=1.5,
         textColor=colors.HexColor("#000000"),
     )
     refs = [
@@ -727,9 +727,14 @@ def build_conference_pdf(md_text: str, output_pdf: Path) -> Path:
         "[5] S. Talaei, M. Pourreza, Y. Chang, A. Mirhoseini, and D. Rafiei, \"CHESS: Contextual harnessing for efficient sql synthesis,\" <i>arXiv preprint arXiv:2405.16755</i>, 2024.",
         "[6] D. Gao, H. Wang, Y. Li, X. Xi, Y. Chen, H. Shen, et al., \"Text-to-sql empowered by large language models: A benchmark evaluation,\" <i>PVLDB</i>, vol. 17, no. 5, pp. 1132-1145, 2023.",
         "[7] P. Lewis, E. Perez, A. Piktus, F. Petroni, V. Karpukhin, N. Goyal, et al., \"Retrieval-augmented generation for knowledge-intensive nlp tasks,\" in <i>Proc. NeurIPS</i>, 2020.",
-        "[8] S. Yao, J. Zhao, D. Yu, N. Du, I. Shafran, K. Narasimhan, and Y. Cao, \"ReAct: Synergizing reasoning and acting in language models,\" in <i>Proc. ICLR</i>, 2023.",
-        "[9] N. Shinn, F. Cassano, E. Berman, A. Gopinath, K. Narasimhan, and S. Yao, \"Reflexion: Language agents with verbal reinforcement learning,\" in <i>Proc. NeurIPS</i>, 2023.",
-        "[10] Q. McNemar, \"Note on the sampling error of the difference between correlated proportions or percentages,\" <i>Psychometrika</i>, vol. 12, no. 2, pp. 153-157, 1947.",
+        "[8] A. Asai, S. Min, Z. Zhong, and D. Chen, \"Self-RAG: Learning to retrieve, generate, and critique through self-reflection,\" <i>arXiv preprint arXiv:2310.11511</i>, 2023.",
+        "[9] S. Yao, J. Zhao, D. Yu, N. Du, I. Shafran, K. Narasimhan, and Y. Cao, \"ReAct: Synergizing reasoning and acting in language models,\" in <i>Proc. ICLR</i>, 2023.",
+        "[10] N. Shinn, F. Cassano, E. Berman, A. Gopinath, K. Narasimhan, and S. Yao, \"Reflexion: Language agents with verbal reinforcement learning,\" in <i>Proc. NeurIPS</i>, 2023.",
+        "[11] Olist and Kaggle, \"Brazilian E-Commerce Public Dataset by Olist,\" <i>Kaggle Datasets</i>, 2018. [Online]. Available: https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce.",
+        "[12] T. Mao and Contributors, \"SQLGlot: An Uncompromising SQL Parser and Transpiler,\" 2023. [Online]. Available: https://github.com/tobymao/sqlglot.",
+        "[13] N. Reimers and I. Gurevych, \"Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks,\" in <i>Proc. EMNLP-IJCNLP</i>, pp. 3982-3992, 2019.",
+        "[14] Q. McNemar, \"Note on the sampling error of the difference between correlated proportions or percentages,\" <i>Psychometrika</i>, vol. 12, no. 2, pp. 153-157, 1947.",
+        "[15] R. G. Newcombe, \"Two-sided confidence intervals for the single proportion: comparison of seven methods,\" <i>Statistics in Medicine</i>, vol. 17, no. 8, pp. 857-872, 1998.",
     ]
     for r in refs:
         story.append(Paragraph(r, ref_style))

@@ -180,7 +180,7 @@
       "is_external": false
     },
     "docs/research_paper/figures/fig1_pipeline_architecture.pdf": {
-      "sha256": "0102c9767c2f8bb4dd0c749df50c8ccb8bb4e0ebe1920acf87171426cbb7df1b",
+      "sha256": "9540e3e8988d772bcf4d82b8f8e8b08def46ba233db0dda27652dc239516d29d",
       "size_bytes": 32472,
       "is_external": false
     },
@@ -190,12 +190,12 @@
       "is_external": false
     },
     "docs/research_paper/figures/fig1_pipeline_architecture.svg": {
-      "sha256": "d1dc9467b82cfd4e746e6339fb4e0e441ff312f3748b89554bbc7c864581cee4",
+      "sha256": "c20b86f173a0172597caedb348a45bbf4cf01cba4f8e0b96f80f25fc48fad755",
       "size_bytes": 71822,
       "is_external": false
     },
     "docs/research_paper/figures/fig2_phase_accuracy_progression.pdf": {
-      "sha256": "efb3a78d055c80c953c12a0140b73c66fdb193968434b6efe340f181ad67a346",
+      "sha256": "762921ea79fe40c8ab85230964e8a57079c81c08df660f443fa25359acfd5ec7",
       "size_bytes": 26666,
       "is_external": false
     },
@@ -205,12 +205,12 @@
       "is_external": false
     },
     "docs/research_paper/figures/fig2_phase_accuracy_progression.svg": {
-      "sha256": "068e108d0873f2ada374cfe9c8b7329232f20b6c976becb1b54d0de65d77a2ac",
+      "sha256": "aa08f84ffd3c0b89075c0b1c0159d75efe360d0e8782cdde3fb16fcf382adada",
       "size_bytes": 66514,
       "is_external": false
     },
     "docs/research_paper/figures/fig3_pareto_frontier.pdf": {
-      "sha256": "be507a66eb8567ed46b0f25a41e78de890ee3ec40cf8a296dd25ddac4ebcfc95",
+      "sha256": "42563e3b7bf806c014684cdd08390f423696e1e5eaf13a1827e67607aea0d5ce",
       "size_bytes": 39620,
       "is_external": false
     },
@@ -220,12 +220,12 @@
       "is_external": false
     },
     "docs/research_paper/figures/fig3_pareto_frontier.svg": {
-      "sha256": "1502a9ba195f69668ad961d85380e7fba018604ed44a64ebe6f72853a819997b",
+      "sha256": "47de2fed02fa38de08ce29341277ef8983762e1db9ffe0a7f1a4e0291c3286a1",
       "size_bytes": 95809,
       "is_external": false
     },
     "docs/research_paper/figures/fig4_repair_dynamics.pdf": {
-      "sha256": "a387428be1aa08fd27491a95a7c41a29a63761a9bea458b35eed76b606f3447a",
+      "sha256": "38f9c164c4ab2bfc71cd20a030f50c50ba41c590b3f5f10e9464b407155b10e2",
       "size_bytes": 26510,
       "is_external": false
     },
@@ -235,12 +235,12 @@
       "is_external": false
     },
     "docs/research_paper/figures/fig4_repair_dynamics.svg": {
-      "sha256": "4703aed1bbb65fdbafe2cfea0c0c3ebc8583242fca2b47548167dbda26d90e13",
+      "sha256": "e1c715abe5e5dd124198609f1063655040f36be75194082e3fe1f7bebcac5ae6",
       "size_bytes": 80067,
       "is_external": false
     },
     "docs/research_paper/figures/fig5_domain_difficulty_heatmap.pdf": {
-      "sha256": "88898d78a94899f578393de2deeba5f1061a3d87e7babd5e93ae612ab7697556",
+      "sha256": "da91fbc3ff436d5e19070903c573c2df352f8d13c90456cfc451bfe6f23a73b5",
       "size_bytes": 26931,
       "is_external": false
     },
@@ -250,12 +250,12 @@
       "is_external": false
     },
     "docs/research_paper/figures/fig5_domain_difficulty_heatmap.svg": {
-      "sha256": "d859eb9bc268daec87c4cf27130c7983bf5c66463accf8b92d632041139a818c",
+      "sha256": "c8e5c5ffe1dbafcb21494c8ba33bc4c7a4f22dae159ec0d6760a288f87254fb4",
       "size_bytes": 84956,
       "is_external": false
     },
     "docs/research_paper/figures/fig6_robustness_degradation.pdf": {
-      "sha256": "0f312208efd8aadc8923569925fdac12af7b4075758184da2a2174edfb195dbd",
+      "sha256": "c1b744f3ce47f320531ed4dda07d3aa88b1d02320ec8066142b8deb5430c11de",
       "size_bytes": 18426,
       "is_external": false
     },
@@ -265,12 +265,12 @@
       "is_external": false
     },
     "docs/research_paper/figures/fig6_robustness_degradation.svg": {
-      "sha256": "bf31aaa93d2bf523d17ef8e6912f40988d812ef095c1ba4957f48bdc3593c901",
+      "sha256": "e40a3cf016f7f7841a1439eeeb837c5791fa8b54568d391f154a5b45995fafbb",
       "size_bytes": 50697,
       "is_external": false
     },
     "docs/research_paper/figures/fig7_failure_taxonomy.pdf": {
-      "sha256": "f1878dea2e83d07d692a301397d9a2dc99f03ea12f0822f1aaf39c0f17e4905a",
+      "sha256": "48ed0993df119aac31f003098b7e147566df787840ef5047d078b4ca3944b593",
       "size_bytes": 26245,
       "is_external": false
     },
@@ -280,7 +280,7 @@
       "is_external": false
     },
     "docs/research_paper/figures/fig7_failure_taxonomy.svg": {
-      "sha256": "3a232fdb9d49a5c459e42800dad9ba58f5f20203bf0105ef6732d35ccf2d784a",
+      "sha256": "3a557db24f02ceb04516ed2ac00f32fa328e82ee9be9bd53b6dc75b02d85c474",
       "size_bytes": 69959,
       "is_external": false
     },
